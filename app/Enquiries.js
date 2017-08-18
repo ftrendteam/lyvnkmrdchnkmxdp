@@ -21,7 +21,8 @@ export default class Enquiries extends Component {
   constructor(props){
           super(props);
           this.state={
-              date:new Date()
+              startDate:new Date(),
+              endDate:new Date()
           }
       }
     pressPop(){
@@ -40,9 +41,9 @@ export default class Enquiries extends Component {
             });
         }
         showDateTimePicker() {
-            var date = new Date();
-            this.picker.showDateTimePicker(date, (d)=>{
-                this.setState({date:d});
+            var startDate = new Date();
+            this.picker.showDateTimePicker(startDate, (d)=>{
+                this.setState({startDate:d});
             });
         }
   render() {
@@ -58,12 +59,12 @@ export default class Enquiries extends Component {
             <View style={styles.Content}>
                 <View style={styles.ContList}>
                     <Text style={styles.ContLeft}>开始日期：</Text>
-                    <Text style={styles.ContLeft} onPress={this.showDateTimePicker.bind(this)}>{this.state.date.toString()}</Text>
+                    <Text style={styles.ContLeft} onPress={this.showDateTimePicker.bind(this)}>{this.state.startDate.toString()}</Text>
                     <DateTimePicker ref={(picker)=>{this.picker=picker}}/>
                 </View>
                 <View style={styles.ContList}>
                     <Text style={styles.ContLeft}>结束日期：</Text>
-                    <Text style={styles.ContLeft} onPress={this.showDateTimePicker.bind(this)}>{this.state.date.toString()}</Text>
+                    <Text style={styles.ContLeft} onPress={this.showDateTimePicker.bind(this)}>{this.state.endDate.toString()}</Text>
                     <DateTimePicker ref={(picker)=>{this.picker=picker}}/>
                 </View>
                 <View style={styles.ContList}>

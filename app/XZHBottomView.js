@@ -47,7 +47,6 @@ class XZHBottomView extends Component{
             show:!isShow,
           });
       }
-    
     render(){
         return(
             <View style={styles.viewStyle}>
@@ -72,11 +71,6 @@ class XZHBottomView extends Component{
                     <TouchableOpacity style={styles.Submit} onPress={()=>this._buy()}>
                         <Text style={{fontSize:16,color:"#ffffff",}}>提交</Text>
                     </TouchableOpacity>
-                </View>
-                <View style={styles.rightView}>
-                  <TouchableOpacity onPress={()=>this._clearGoods()}>
-                    <Text style={{fontSize:16, color:'red'}}>清空购物车</Text>
-                  </TouchableOpacity>
                 </View>
                 <Modal
                 transparent={true}
@@ -114,23 +108,6 @@ class XZHBottomView extends Component{
             buyString += '(' + (index+1) + ') 商品ID:' + value.id + ', 单价:' + value.money + ', 购买数量' + value.buyNum + '\n';
         });
         alert(buyString + '\n' + '总价:' + this.state.totalPrice + '元');
-    }
-    /**
-     * 清空购物车
-     * @private
-     */
-    _clearGoods() {
-        // 1. 删除购物车中所有商品
-        const buyWineArr = this.state.buyWineArr;
-        buyWineArr.splice(0, buyWineArr.length);
-
-        // 2. 更新状态,刷新UI
-        this.setState({
-            buyWineArr: buyWineArr,
-            totalPrice: 0
-        })
-        // 3. 通知界面刷新
-        DeviceEventEmitter.emit('refreshList', null);
     }
     componentDidMount() {
         this.notice = DeviceEventEmitter.addListener('changeTotalPrice', (wine)=>{
@@ -227,7 +204,8 @@ const styles = StyleSheet.create({
         },
         DocumentsNote:{
             fontSize:16,
-            color:"#f47882"
+            color:"#f47882",
+            marginTop:15,
         },
         Submit:{
 
@@ -275,6 +253,7 @@ const styles = StyleSheet.create({
         marginTop:15,
         borderWidth:1,
         borderColor:"#fbced2",
+        textAlignVertical: 'top'
        },
        ModalLeft:{
         position:"absolute",
