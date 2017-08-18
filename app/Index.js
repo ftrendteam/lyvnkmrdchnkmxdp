@@ -187,6 +187,36 @@ export default class Index extends Component {
                                                   </View>
                                               </TouchableHighlight>
                                            </View>
+                                           <View style={styles.RightCont1}>
+                                              <TouchableHighlight onPress={this.OrderDetails.bind(this)} style={{flex:3,}}>
+                                                  <View>
+                                                      <View style={styles.AddNumber}>
+                                                          <Text style={styles.Number}>2</Text>
+                                                          <Text style={styles.Reduction}>-</Text>
+                                                      </View>
+                                                      <View style={styles.Image}>
+                                                          <Image source={require("../images/image.png")}></Image>
+                                                       </View>
+                                                      <Text style={styles.Text}>哈密瓜</Text>
+                                                  </View>
+                                              </TouchableHighlight>
+                                              <TouchableHighlight onPress={this.OrderDetails.bind(this)} style={styles.Border}>
+                                                  <View>
+                                                      <View style={styles.Image}>
+                                                          <Image source={require("../images/image.png")}></Image>
+                                                       </View>
+                                                      <Text style={styles.Text}>哈密瓜</Text>
+                                                  </View>
+                                              </TouchableHighlight>
+                                              <TouchableHighlight onPress={this.OrderDetails.bind(this)} style={{flex:3,}}>
+                                                  <View>
+                                                      <View style={styles.Image}>
+                                                          <Image source={require("../images/image.png")}></Image>
+                                                       </View>
+                                                      <Text style={styles.Text}>哈密瓜</Text>
+                                                  </View>
+                                              </TouchableHighlight>
+                                           </View>
                                       </View>
                                   </ScrollView>
                               </View>
