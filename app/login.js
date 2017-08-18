@@ -22,6 +22,7 @@ class login extends Component{
         var nextRoute={
             name:"主页",
             component:admin
+            //测试
         };
         this.props.navigator.push(nextRoute)
     }
