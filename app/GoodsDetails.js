@@ -3,7 +3,6 @@
  * https://github.com/facebook/react-native
  * @flow
  */
-
 import React, { Component } from 'react';
 import {
   AppRegistry,
@@ -22,7 +21,7 @@ export default class GoodsDetails extends Component {
               rowHasChanged: (r1, r2) => r1 !== r2 //
           });
           this.state = {
-             dataSource: ds.cloneWithRows(['1', '2', '3', '4', '5', '6', '7', '8','9', '10', '11', '12', '13', '14', '15','16', '17', '18', '19', '20', '21', '22', ])
+             dataSource: ds.cloneWithRows(['1', '2', '3', '4', '5', '6', '7', '8','9', '10', '11', '12', '13', '14', '15','16','17','18', '19', '20', '21','22','23', ])
           };
       }
     GoodsDetails(){
@@ -88,7 +87,7 @@ export default class GoodsDetails extends Component {
                 <Text style={styles.ShopPrice}>金额</Text>
                 <Text style={styles.ShopNumber}>数量</Text>
             </View>
-            <ListView contentContainerStyle={styles.listViewStyle}
+            <ListView style={styles.listViewStyle}
             showsVerticalScrollIndicator={true}
             dataSource={this.state.dataSource}
             renderRow={(rowData, sectionID, rowID) => this.renderRow(rowData, sectionID, rowID)}
@@ -209,4 +208,7 @@ const styles = StyleSheet.create({
    ContList:{
    paddingBottom:50,
    },
+   listViewStyle:{
+    marginBottom:260,
+   }
 });
