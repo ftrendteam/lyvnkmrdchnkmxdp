@@ -19,9 +19,11 @@ import {
   Modal,
   Dimensions,
   TouchableHighlight,
+  ListView
 } from 'react-native';
+import admin from "./admin";
+import Home from "./Home";
 import Code from "./Code";
-import OrderDetails from "./OrderDetails";
 import Search from "./Search";
 import list from "./HomeLeftList";
 import XZHBottomView from './XZHBottomView';
@@ -32,8 +34,14 @@ var data = require('./../LocalData/data.json');
 export default class Index extends Component {
     constructor(props){
         super(props);
+         // 创建数据源
+        var ds = new ListView.DataSource({
+                    rowHasChanged: (r1, r2) => r1 !== r2
+                });
         this.state = {
             show:false,
+            dataArr: data,
+            dataSource: ds
         };
     }
     pressPush(){
@@ -43,19 +51,35 @@ export default class Index extends Component {
           };
           this.props.navigator.push(nextRoute)
     }
-    OrderDetails(){
+    pullOut(){
+        this._setModalVisible()
+        var nextRoute={
+            name:"主页",
+            component:admin
+        };
+        this.props.navigator.push(nextRoute)
+    }
+    Code(){
+         var nextRoute={
+            name:"主页",
+            component:Code
+         };
+         this.props.navigator.push(nextRoute)
+    }
+    Home(){
+          this._setModalVisible()
           var nextRoute={
               name:"主页",
-              component:OrderDetails
+              component:Home
           };
           this.props.navigator.push(nextRoute)
     }
-    Code(){
-              var nextRoute={
-                  name:"主页",
-                  component:Code
-              };
-              this.props.navigator.push(nextRoute)
+    List(){
+          var nextRoute={
+              name:"主页",
+              component:Home
+          };
+          this.props.navigator.push(nextRoute)
     }
     pressPop(){
           this._setModalVisible()
@@ -72,6 +96,7 @@ export default class Index extends Component {
           });
       }
     render() {
+    var wine = this.state.wine;
         return (
                   <View style={styles.container}>
                           <View style={styles.header}>
@@ -91,90 +116,65 @@ export default class Index extends Component {
                           <View style={styles.ContList}>
                               <ScrollView style={styles.scrollview}>
                                   <View>
-                                       <View style={styles.addnumber}>
+                                       <View style={styles.AddNumber}>
                                            <Text style={styles.Reduction1}>14</Text>
                                        </View>
-                                      <Text style={styles.Active}>苹果</Text>
+                                      <Text style={styles.Active} onPress={this.List.bind(this)}>苹果</Text>
                                   </View>
                                   <View>
-                                      <Text style={styles.scrollText}>橙子</Text>
+                                      <Text style={styles.scrollText} onPress={this.List.bind(this)}>橙子</Text>
                                   </View>
                                   <View>
-                                      <Text style={styles.scrollText}>哈密瓜</Text>
+                                      <Text style={styles.scrollText} onPress={this.List.bind(this)}>哈密瓜</Text>
                                   </View>
                                   <View>
-                                      <Text style={styles.scrollText}>桃类</Text>
+                                      <Text style={styles.scrollText} onPress={this.List.bind(this)}>桃类</Text>
                                   </View>
                                   <View>
-                                      <Text style={styles.scrollText}>提子</Text>
+                                      <Text style={styles.scrollText} onPress={this.List.bind(this)}>提子</Text>
                                   </View>
                                   <View>
-                                      <Text style={styles.scrollText}>芒果</Text>
+                                      <Text style={styles.scrollText} onPress={this.List.bind(this)}>芒果</Text>
                                   </View>
                                   <View>
-                                      <Text style={styles.scrollText}>榴莲</Text>
+                                      <Text style={styles.scrollText} onPress={this.List.bind(this)}>榴莲</Text>
                                   </View>
                                   <View>
-                                      <Text style={styles.scrollText}>布林</Text>
+                                      <Text style={styles.scrollText} onPress={this.List.bind(this)}>布林</Text>
                                   </View>
                                   <View>
-                                      <Text style={styles.scrollText}>莓类</Text>
+                                      <Text style={styles.scrollText} onPress={this.List.bind(this)}>莓类</Text>
                                   </View>
                                   <View>
-                                      <Text style={styles.scrollText}>猕猴桃</Text>
+                                      <Text style={styles.scrollText} onPress={this.List.bind(this)}>猕猴桃</Text>
                                   </View>
                                   <View>
-                                      <Text style={styles.scrollText}>香蕉</Text>
+                                      <Text style={styles.scrollText} onPress={this.List.bind(this)}>香蕉</Text>
                                   </View>
                                   <View>
-                                      <Text style={styles.scrollText}>草莓</Text>
+                                      <Text style={styles.scrollText} onPress={this.List.bind(this)}>草莓</Text>
                                   </View>
                                   <View>
-                                      <Text style={styles.scrollText}>橘子</Text>
+                                      <Text style={styles.scrollText} onPress={this.List.bind(this)}>橘子</Text>
                                   </View>
                                   <View>
-                                      <Text style={styles.scrollText}>火龙果</Text>
+                                      <Text style={styles.scrollText} onPress={this.List.bind(this)}>火龙果</Text>
                                   </View>
                               </ScrollView>
                               <View style={styles.RightList1}>
                                   <ScrollView style={styles.ScrollView1}>
-                                      <View style={styles.RightList}>
-                                           <View style={styles.RightCont1}>
-                                              <TouchableHighlight onPress={this.OrderDetails.bind(this)} style={{height:125,borderBottomWidth:1,borderBottomColor:"#e5e5e5",flex:3,}}>
-                                                  <View>
-                                                      <View style={styles.AddNumber}>
-                                                          <Text style={styles.Number}>2</Text>
-                                                          <Text style={styles.Reduction}>-</Text>
-                                                      </View>
-                                                      <View style={styles.Image}>
-                                                          <Image source={require("../images/image.png")}></Image>
-                                                       </View>
-                                                      <Text style={styles.Text}>哈密瓜</Text>
-                                                  </View>
-                                              </TouchableHighlight>
-                                              <TouchableHighlight onPress={this.OrderDetails.bind(this)} style={{height:125,borderBottomWidth:1,borderBottomColor:"#e5e5e5",flex:3,}}>
-                                                  <View style={styles.Border}>
-                                                      <View style={styles.Image}>
-                                                          <Image source={require("../images/image.png")}></Image>
-                                                       </View>
-                                                      <Text style={styles.Text}>哈密瓜</Text>
-                                                  </View>
-                                              </TouchableHighlight>
-                                              <TouchableHighlight onPress={this.OrderDetails.bind(this)} style={{height:125,borderBottomWidth:1,borderBottomColor:"#e5e5e5",flex:3,}}>
-                                                  <View>
-                                                      <View style={styles.Image}>
-                                                          <Image source={require("../images/image.png")}></Image>
-                                                       </View>
-                                                      <Text style={styles.Text}>哈密瓜</Text>
-                                                  </View>
-                                              </TouchableHighlight>
-                                           </View>
-                                      </View>
+                                        <View style={styles.view}>
+                                            <ListView
+                                                style={styles.ListView}
+                                                dataSource={this.state.dataSource}
+                                                renderRow={(rowData)=> this._renderRow(rowData)}
+                                                contentInset={{bottom: 44}}
+                                            />
+                                        </View>
                                   </ScrollView>
                               </View>
                            </View>
                     <Modal
-                        animationType='fade'
                         transparent={true}
                         visible={this.state.show}
                         onShow={() => {}}
@@ -182,31 +182,31 @@ export default class Index extends Component {
                         <View style={styles.modalStyle}>
                             <View style={styles.ModalView}>
                                 <View style={styles.ModalViewList}>
-                                    <View style={styles.subView}>
+                                    <TouchableOpacity style={styles.subView} onPress={this.Home.bind(this)}>
                                         <Text style={styles.titleText}>要货</Text>
-                                    </View>
-                                    <View style={styles.subView}>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity style={styles.subView} onPress={this.Home.bind(this)}>
                                         <Text style={styles.titleText}>损益</Text>
-                                    </View>
+                                    </TouchableOpacity>
                                 </View>
                                 <View style={styles.ModalViewList}>
-                                    <View style={styles.subView}>
+                                    <TouchableOpacity style={styles.subView} onPress={this.Home.bind(this)}>
                                         <Text style={styles.titleText}>实时盘点</Text>
-                                    </View>
-                                    <View style={styles.subView}>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity style={styles.subView} onPress={this.Home.bind(this)}>
                                         <Text style={styles.titleText}>商品盘点</Text>
-                                    </View>
+                                    </TouchableOpacity>
                                 </View>
                                 <View style={styles.ModalViewList}>
-                                    <View style={styles.subView}>
+                                    <TouchableOpacity style={styles.subView} onPress={this.Home.bind(this)}>
                                         <Text style={styles.titleText}>配送收货</Text>
-                                    </View>
-                                    <View style={styles.subView}>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity style={styles.subView} onPress={this.Home.bind(this)}>
                                         <Text style={styles.titleText}>数据更新</Text>
-                                    </View>
+                                    </TouchableOpacity>
                                 </View>
                                 <View style={styles.ModalViewList1}>
-                                    <TouchableOpacity  style={styles.subView1} onPress={this.pressPop.bind(this)}>
+                                    <TouchableOpacity  style={styles.subView1} onPress={this.pullOut.bind(this)}>
                                         <Text style={styles.titleText1}>退出账号</Text>
                                     </TouchableOpacity>
                                 </View>
@@ -221,6 +221,24 @@ export default class Index extends Component {
                   </View>
     );
   }
+
+        _renderRow(rowData){
+            return(
+                <XZHWineCell wine={rowData} navigator={this.props.navigator}/>
+            )
+        };
+        componentWillMount() {
+            for (var i = 0; i < data.length; i++) {
+                // 1. 取出单个对象
+                var item = data[i];
+                // 2. 定义购买数量 并 插入对象
+                item.buyNum = 0;
+            }
+
+            this.setState({
+                dataSource: this.state.dataSource.cloneWithRows(this.state.dataArr)
+            });
+        }
 }
 const styles = StyleSheet.create({
    container:{
@@ -302,6 +320,8 @@ const styles = StyleSheet.create({
         backgroundColor:"#ffffff",
         marginLeft:10,
         marginRight:10,
+        paddingLeft:10,
+        paddingRight:10,
       },
       ContList:{
         flexDirection:"row",
@@ -333,11 +353,6 @@ const styles = StyleSheet.create({
         height:20,
         position:'absolute',
         right:6,
-      },
-      addnumber:{
-        height:20,
-        position:'absolute',
-        right:10,
         top:6,
       },
       Reduction1:{
@@ -428,5 +443,8 @@ const styles = StyleSheet.create({
         color:"#ffffff",
         lineHeight:26,
         textAlign:"center"
-      }
+      },
+      buttonText1:{
+        opacity:0
+      },
 });
