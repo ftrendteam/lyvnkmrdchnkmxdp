@@ -17,7 +17,6 @@ import {
 import OrderDetails from "./OrderDetails";
 var Dimensions = require('Dimensions');
 var {width, height} = Dimensions.get('window');
-
 class XZHWineCell extends Component{
     // 构造
       constructor(props) {
@@ -35,25 +34,6 @@ class XZHWineCell extends Component{
          };
          this.props.navigator.push(nextRoute)
       }
-    componentWillUpdate(nextProps) {
-         // 接收通知
-         this.notice = DeviceEventEmitter.addListener('refreshList', ()=>{
-             // 1. 购买数量清零
-             const tempWine = this.state.wine;
-             tempWine.buyNum = 0;
-
-             this.setState({
-                 wine: tempWine
-             })
-         });
-    }
-    componentDidUnMount() {
-        // 移除通知
-        this.notice.remove();
-    }
-    /**
-     * 移除商品
-     */
     _removeWine(wine){
         // 1.判断
         if(wine.buyNum == 0){
@@ -92,20 +72,50 @@ class XZHWineCell extends Component{
         var wine = this.state.wine;
         return(
                     <View style={styles.viewStyle}>
-                          <TouchableHighlight onPress={this.OrderDetails.bind(this)} style={styles.Image}>
-                              <Image source={require("../images/image.png")}></Image>
-                          </TouchableHighlight>
-                          <TouchableOpacity style={styles.Name} onPress={()=>this._addWine(wine)}>
-                            <Text style={styles.Text}>{wine.name}</Text>
-                            <Text>¥{wine.money}</Text>
-                          </TouchableOpacity>
-                          <View style={styles.rightView}>
-                             <Text style={{fontSize:16, margin: 10}}>{wine.buyNum}</Text>
-                             <TouchableOpacity onPress={()=>this._removeWine(wine)}>
-                                  <Text style={[{fontSize:20}, styles.circleStyle]}>-</Text>
-                             </TouchableOpacity>
-                          </View>
+                        <View style={styles.ListMenu}>
+                              <TouchableHighlight onPress={this.OrderDetails.bind(this)} style={styles.Image}>
+                                  <Image source={require("../images/image.png")}></Image>
+                              </TouchableHighlight>
+                              <TouchableOpacity style={styles.Name} onPress={()=>this._addWine(wine)}>
+                                <Text style={styles.Text}>{wine.name}</Text>
+                              </TouchableOpacity>
+                              <View style={styles.rightView}>
+                                 <Text style={{fontSize:16, margin: 5}}>{wine.buyNum}</Text>
+                                 <TouchableOpacity onPress={()=>this._removeWine(wine)}>
+                                      <Text style={[{fontSize:20}, styles.circleStyle]}>-</Text>
+                                 </TouchableOpacity>
+                              </View>
+                        </View>
+                        <View style={styles.ListMenu1}>
+                              <TouchableHighlight onPress={this.OrderDetails.bind(this)} style={styles.Image}>
+                                  <Image source={require("../images/image.png")}></Image>
+                              </TouchableHighlight>
+                              <TouchableOpacity style={styles.Name} onPress={()=>this._addWine(wine)}>
+                                <Text style={styles.Text}>{wine.name}</Text>
+                              </TouchableOpacity>
+                              <View style={styles.rightView}>
+                                 <Text style={{fontSize:16, margin: 5}}>{wine.buyNum}</Text>
+                                 <TouchableOpacity onPress={()=>this._removeWine(wine)}>
+                                      <Text style={[{fontSize:20}, styles.circleStyle]}>-</Text>
+                                 </TouchableOpacity>
+                              </View>
+                         </View>
+                        <View style={styles.ListMenu}>
+                              <TouchableHighlight onPress={this.OrderDetails.bind(this)} style={styles.Image}>
+                                  <Image source={require("../images/image.png")}></Image>
+                              </TouchableHighlight>
+                              <TouchableOpacity style={styles.Name} onPress={()=>this._addWine(wine)}>
+                                <Text style={styles.Text}>{wine.name}</Text>
+                              </TouchableOpacity>
+                              <View style={styles.rightView}>
+                                 <Text style={{fontSize:16, margin: 5}}>{wine.buyNum}</Text>
+                                 <TouchableOpacity onPress={()=>this._removeWine(wine)}>
+                                      <Text style={[{fontSize:20}, styles.circleStyle]}>-</Text>
+                                 </TouchableOpacity>
+                              </View>
+                        </View>
                     </View>
+
         )
     }
 }
@@ -115,42 +125,56 @@ const styles = StyleSheet.create({
         backgroundColor:'#fff',
         borderBottomWidth:1,
         borderBottomColor: '#ccc',
+
+    },
+    ListMenu:{
+        flex:1,
+         paddingTop:10,
+         paddingBottom:10,
+         paddingLeft:5,
+    },
+    ListMenu1:{
+        flex:1,
+        borderLeftWidth:1,
+        borderLeftColor: '#ccc',
+        borderRightWidth:1,
+        borderRightColor: '#ccc',
         paddingTop:10,
         paddingBottom:10,
-    },
-    ListView:{
-        flexDirection:'row',
+        paddingLeft:5,
+        paddingRight:5,
     },
     Image:{
-        width:80,
-        height:80,
-        backgroundColor:"#cccc",
-        marginRight:10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom:8
     },
     Name:{
         flex:6,
     },
     Text:{
-
+    height:22,
+    textAlign:"center",
     },
     money:{
-
+    height:22,
     },
     rightView: {
         flexDirection: 'row',
         justifyContent:'center',
         alignItems:'center',
         position:"absolute",
-        bottom:5,
-        right:0,
+        top:2,
+        right:5,
+        position:"absolute"
     },
     circleStyle:{
-        width: 18,
-        height: 18,
+        width: 15,
+        height: 15,
         borderRadius: 15,
         backgroundColor:'red',
         textAlign:'center',
-        lineHeight:14,
+        lineHeight:13,
         color:'#ffffff',
         fontWeight:'900'
     }

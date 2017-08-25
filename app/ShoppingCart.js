@@ -22,6 +22,8 @@ import {
 import Code from "./Code";
 import Search from "./Search";
 import Succeed from "./Succeed";
+import OrderDetails from "./OrderDetails";
+import List from "./List";
 import XZHBottomView from './XZHBottomView';
 import XZHWineCell from  './XZHWineCell';
 import SideMenu from 'react-native-side-menu';
@@ -55,6 +57,20 @@ constructor(props){
           };
           this.props.navigator.push(nextRoute)
     }
+    List(){
+        var nextRoute={
+            name:"主页",
+            component:List
+        };
+        this.props.navigator.push(nextRoute)
+    }
+    OrderDetails(){
+        var nextRoute={
+            name:"主页",
+            component:OrderDetails
+        };
+        this.props.navigator.push(nextRoute)
+    }
     pressPop(){
           this._setModalVisible()
           this.props.navigator.pop();
@@ -71,6 +87,9 @@ constructor(props){
                 <TouchableOpacity onPress={this.pressPush.bind(this)}>
                     <Image source={require("../images/search.png")} style={styles.HeaderImage}></Image>
                 </TouchableOpacity>
+                  <TouchableOpacity onPress={this.List.bind(this)}>
+                    <Image source={require("../images/search.png")} style={styles.HeaderImage}></Image>
+                  </TouchableOpacity>
             </View>
         </View>
         <View style={styles.ContList1}>
@@ -84,7 +103,7 @@ constructor(props){
             <View style={styles.ContList}>
                 <ScrollView>
                     <View style={styles.ShopList}>
-                        <View style={styles.ShopContList}>
+                        <TouchableOpacity style={styles.ShopContList} onPress={this.OrderDetails.bind(this)}>
                             <View style={styles.ShopTop}>
                                 <Text style={styles.ShopLeft}>苹果</Text>
                                 <Text style={styles.ShopRight}>单位：件</Text>
@@ -95,7 +114,7 @@ constructor(props){
                                 <Text style={[styles.Price,styles.Name1]}>12.00</Text>
                                 <Text style={[styles.SmallScale,styles.Name2]}>144.00</Text>
                             </View>
-                        </View>
+                        </TouchableOpacity>
                     </View>
                 </ScrollView>
             </View>
