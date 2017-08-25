@@ -26,6 +26,7 @@ import admin from "./admin";
 import OrderDetails from "./OrderDetails";
 import Search from "./Search";
 import list from "./HomeLeftList";
+import Query from "./Query";
 import XZHBottomView from './XZHBottomView';
 import XZHWineCell from  './XZHWineCell';
 import SideMenu from 'react-native-side-menu';
@@ -72,6 +73,14 @@ export default class Index extends Component {
         var nextRoute={
             name:"主页",
             component:admin
+        };
+        this.props.navigator.push(nextRoute)
+    }
+    Query(){
+        this._setModalVisible()
+        var nextRoute={
+            name:"主页",
+            component:Query
         };
         this.props.navigator.push(nextRoute)
     }
@@ -238,10 +247,10 @@ export default class Index extends Component {
                                     </TouchableOpacity>
                                 </View>
                                 <View style={styles.ModalViewList}>
-                                    <TouchableOpacity style={styles.subView} onPress={this.Home.bind(this)}>
+                                    <TouchableOpacity style={styles.subView} onPress={this.Query.bind(this)}>
                                         <Text style={styles.titleText}>实时盘点</Text>
                                     </TouchableOpacity>
-                                    <TouchableOpacity style={styles.subView} onPress={this.Home.bind(this)}>
+                                    <TouchableOpacity style={styles.subView} onPress={this.Query.bind(this)}>
                                         <Text style={styles.titleText}>商品盘点</Text>
                                     </TouchableOpacity>
                                 </View>

@@ -79,7 +79,8 @@ export default class GoodsDetails extends Component {
             <View style={styles.List}>
                 <View style={styles.left2}>
                     <Text style={styles.price}>单价</Text>
-                    <Text style={styles.Price}>152800.00</Text>
+                    <TextInput style={styles.Number1} underlineColorAndroid='transparent' />
+
                 </View>
                 <View style={styles.right2}>
                     <Text style={styles.price}>元/件</Text>
@@ -220,6 +221,15 @@ const styles = StyleSheet.create({
     height:40,
     width:300,
   },
+    Number1:{
+        position:"absolute",
+        left:40,
+        fontSize:16,
+        color:"#666666",
+        top:0,
+        height:35,
+        width:300,
+    },
   NumberText:{
     position:"absolute",
     right:150,
