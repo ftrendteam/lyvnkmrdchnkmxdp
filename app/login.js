@@ -14,7 +14,7 @@ import admin from "./admin";
 import NetUtils from "../utils/NetUtils";
 import WebUtils from "../utils/WebUtils";
 import Navigator from "react-native-deprecated-custom-components";
-import Storage from '../utils/Storage';//
+//import Storage from '../utils/Storage';
 class login extends Component{
 //获取数据
     read(){
@@ -70,23 +70,22 @@ class login extends Component{
                 var  DetailInfo = JSON.stringify(data.DetailInfo);
                 //alert(JSON.stringify(data))
                 for(var value of data.DetailInfo){
-                   //     console.log(value)
-                   //     alert(JSON.stringify(value))
+                   //alert(JSON.stringify(value))
                    LinkUrl = value.LinkUrl;
                    //alert(LinkUrl);获取url地址
                 }
                 //标记位  登录成功保存记录，已经登录
-                Storage.save({
-                    key: 'isInit',  // 注意:请不要在key中使用_下划线符号!
-                    id: '100',   // 注意:请不要在id中使用_下划线符号!
-                });
+                //Storage.save({
+                    //key: 'isInit',  // 注意:请不要在key中使用_下划线符号!
+                    //id: '100',   // 注意:请不要在id中使用_下划线符号!
+                //});
                 var nextRoute={
                     name:"主页",
                     component:admin,
                 };
                 this.props.navigator.push(nextRoute)
             }else{
-                ToastAndroid.show('用户名或密码错误', ToastAndroid.SHORT)
+                ToastAndroid.show('商户名或密码错误', ToastAndroid.SHORT)
             }
         })
     }

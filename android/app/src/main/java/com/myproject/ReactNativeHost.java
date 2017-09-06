@@ -10,7 +10,7 @@ import com.lwansbrough.RCTCamera.RCTCameraPackage;
 
 import java.util.Arrays;
 import java.util.List;
-import org.pgsqlite.SQLitePluginPackage;
+//import org.pgsqlite.SQLitePluginPackage;
 public class ReactNativeHost extends com.facebook.react.ReactNativeHost {
     protected ReactNativeHost(Application application) {
         super(application);
@@ -25,7 +25,7 @@ public class ReactNativeHost extends com.facebook.react.ReactNativeHost {
         return Arrays.<ReactPackage>asList(
                 new RCTDateTimePickerPackage(),
                 new RCTCameraPackage(),
-                new SQLitePluginPackage(),
+//                new SQLitePluginPackage(),
                 new MainReactPackage(),
                 new PickerViewPackage()
         );

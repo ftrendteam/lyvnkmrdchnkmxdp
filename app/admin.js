@@ -23,17 +23,13 @@ import {
 import home from "./Home";
 import NetUtils from "../utils/NetUtils";
 import WebUtils from "../utils/WebUtils";
-import DBAdapter from "../adapter/DBAdapter";
+//import DBAdapter from "../adapter/DBAdapter";
 import Storage from 'react-native-storage';
 import Picker from 'react-native-picker';
 //第二页面
-let dbAdapter=new DBAdapter();
-let db;
 export default class admin extends Component {
-
     constructor(props){
         super(props);
-
         this.state = {
             language:null,
             show:false,
@@ -47,12 +43,6 @@ export default class admin extends Component {
             UserPwd:"",
         };
         this.pickerData=[]
-    }
-    componentWillMount(){
-        if(!db){
-            db=dbAdapter.open();
-        }
-        dbAdapter.createTable();
     }
 
  //第一次跑数据 componentDidMount
@@ -82,7 +72,7 @@ export default class admin extends Component {
                    // alert("成功")
                    //alert(JSON.stringify(data.DetailInfo1))
             }else{
-                alert("数据保存失败")
+                ToastAndroid.show('数据保存失败', ToastAndroid.SHORT)
             }
          })
     }
@@ -110,7 +100,7 @@ export default class admin extends Component {
                 };
                 this.props.navigator.push(nextRoute)
             }else{
-                  ToastAndroid.show('用户名或密码错误', ToastAndroid.SHORT)
+                  ToastAndroid.show('用户编码或用户密码错误', ToastAndroid.SHORT)
             }
          })
     }
