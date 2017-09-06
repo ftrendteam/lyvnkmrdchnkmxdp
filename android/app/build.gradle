@@ -94,7 +94,7 @@ android {
     buildToolsVersion "23.0.1"
 
     defaultConfig {
-        applicationId "com.untitled"
+        applicationId "com.myproject"
         minSdkVersion 16
         targetSdkVersion 22
         versionCode 1
@@ -139,6 +139,7 @@ dependencies {
     compile project(':react-native-datetime')
     compile project(':react-native-camera')
     compile project(':react-native-picker')
+    compile project(':react-native-sqlite-storage')
 }
 
 // Run this once to be able to run the application with BUCK

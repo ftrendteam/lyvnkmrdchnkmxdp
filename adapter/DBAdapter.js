@@ -14,7 +14,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
   }
   
   open() {
-    db = this.open();
+    db = sqLiteOpenHelper.open();
     return db;
   }
   

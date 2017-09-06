@@ -27,10 +27,17 @@ import DBAdapter from "../adapter/DBAdapter";
 import Storage from 'react-native-storage';
 import Picker from 'react-native-picker';
 //第二页面
-let dbAdapter=new DBAdapter();
+let dbAdapter = new DBAdapter();
 let db;
 export default class admin extends Component {
-
+  componentWillMount() {
+    //开启数据库
+    if (!db) {
+      db = dbAdapter.open();
+    }
+    //建表
+    dbAdapter.createTable();
+  }
     constructor(props){
         super(props);
 
@@ -48,13 +55,6 @@ export default class admin extends Component {
         };
         this.pickerData=[]
     }
-    componentWillMount(){
-        if(!db){
-            db=dbAdapter.open();
-        }
-        dbAdapter.createTable();
-    }
-
  //第一次跑数据 componentDidMount
  //失去焦点时 跑数据、存储、获取数据
     autoFocuss(){
