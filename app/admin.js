@@ -17,38 +17,23 @@ import {
   ModalDropdown,
   Modal,
   TouchableHighlight,
-  AsyncStorages
+  AsyncStorages,
+  ToastAndroid
 } from 'react-native';
 import home from "./Home";
-import NetUtils from "../utils/NetUtils.js";
+import NetUtils from "../utils/NetUtils";
 import WebUtils from "../utils/WebUtils";
+import DBAdapter from "../adapter/DBAdapter";
 import Storage from 'react-native-storage';
 import Picker from 'react-native-picker';
 //第二页面
+let dbAdapter=new DBAdapter();
+let db;
 export default class admin extends Component {
-//获取数据
-    read(){
-        AsyncStorage.getItem('object',(error,result)=>{
-            if (!error) {
-                console.log(result);
-                alert(result);
-            }
-        })
-    }
-//存储数据
-    save(){
-        var object = {};
-        // JSON.stringify(object): JSON对象转换为字符串 用来存储
-        AsyncStorage.setItem('object',JSON.stringify(object),(error)=>{
-            if (error) {
-                alert('存储失败');
-            } else  {
-                alert('存储成功');
-            }
-        });
-    }
+
     constructor(props){
         super(props);
+
         this.state = {
             language:null,
             show:false,
@@ -63,6 +48,13 @@ export default class admin extends Component {
         };
         this.pickerData=[]
     }
+    componentWillMount(){
+        if(!db){
+            db=dbAdapter.open();
+        }
+        dbAdapter.createTable();
+    }
+
  //第一次跑数据 componentDidMount
  //失去焦点时 跑数据、存储、获取数据
     autoFocuss(){
@@ -86,6 +78,7 @@ export default class admin extends Component {
                         this.pickerData .push(shopname+"_"+shopcode);
                         // alert(shopname+"_"+shopcode);
                    }
+
                    // alert("成功")
                    //alert(JSON.stringify(data.DetailInfo1))
             }else{
@@ -101,26 +94,23 @@ export default class admin extends Component {
     pressPush(){
         let params = {
             reqCode:"App_PosReq",
-            reqDetailCode:"App_Client_Qry",
+            reqDetailCode:"App_Client_UseQry",
             Usercode:this.state.super,
             sDateTime:"2017-08-09 12:12:12",//获取当前时间转换成时间戳
             UserPwd:NetUtils.MD5(this.state.UserPwd)+'',//获取到密码之后md5加密
-            Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_Qry" + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
+            Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_UseQry" + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
         };
          WebUtils.Post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',params, (data)=>{
-            if(data.retcode == 1){
+          alert(JSON.stringify(data))
+            if(data.isEnter == 1){
+
                 var nextRoute={
                     name:"主页",
                      component:home,
                 };
                 this.props.navigator.push(nextRoute)
             }else{
-                //  alert("用户名或密码不正确")
-                var nextRoute={
-                    name:"主页",
-                    component:home,
-                };
-                this.props.navigator.push(nextRoute)
+                  ToastAndroid.show('用户名或密码错误', ToastAndroid.SHORT)
             }
          })
     }

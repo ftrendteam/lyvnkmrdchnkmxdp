@@ -10,12 +10,12 @@ let database_size = -1;//-1应该是表示无限制
 let db;
 export default class SQLiteOpenHelper {
   constructor() {
-    //if (db) {
-    //  this._successCB('close');
-    //  db.close();
-    //} else {
-    //  console.log("SQLiteStorage not open");
-    //}
+//    if (db) {
+//      this._successCB('close');
+//      db.close();
+//    } else {
+//      console.log("SQLiteStorage not open");
+//    }
     this.createTable();
   }
   
