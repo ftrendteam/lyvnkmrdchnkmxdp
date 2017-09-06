@@ -10,6 +10,7 @@ import java.util.List;
 
 import com.keyee.datetime.*;
 import com.lwansbrough.RCTCamera.RCTCameraPackage;
+import com.beefe.picker.PickerViewPackage;
 public class ReactNativeHost extends com.facebook.react.ReactNativeHost {
     protected ReactNativeHost(Application application) {
         super(application);
@@ -24,7 +25,8 @@ public class ReactNativeHost extends com.facebook.react.ReactNativeHost {
         return Arrays.<ReactPackage>asList(
                 new RCTDateTimePickerPackage(),
                 new RCTCameraPackage(),
-                new MainReactPackage()
+                new MainReactPackage(),
+                new PickerViewPackage()
         );
     }
 }

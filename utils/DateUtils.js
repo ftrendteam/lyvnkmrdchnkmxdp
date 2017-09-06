@@ -1,5 +1,5 @@
 /**
- * Created by admin on 2017/8/25.
+ * Created by admin on 2017/8/25.  2017-1-1 12:00:00
  */
 
 export default class DateUtils {

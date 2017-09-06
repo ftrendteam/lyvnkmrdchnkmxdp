@@ -37,12 +37,12 @@ export  default class RequestBodyUtils {
     return JSON.stringify({
       'reqCode': 'App_PosReq',
       'reqDetailCode': 'App_Client_UseQry',
-      'ClientCode': clientCode,
+      'ClientCode': '810001',
       'sDateTime': date,
-      'Sign': sign + '',
+      'Sign': sign
     });
   }
-  
+
   static createYH = (reqDetailCode, clientCode) => {
     let date = DateUtils.getCurrentDate(new Date());
     let sign = MD5Utils.encryptMD5('App_PosReq' + "##" + reqDetailCode + "##" + date + "##" + 'PosControlCs');
@@ -60,7 +60,7 @@ export  default class RequestBodyUtils {
     //let DetailInfo2 = {'prodcode': '0101', 'countm': 10, 'ProPrice': 12, 'promemo': '', 'kccount': '10'};
     return DetailInfo1;
   }
-  
+
   /***
    * 品级请求体
    */
@@ -77,7 +77,7 @@ export  default class RequestBodyUtils {
       'LastYWDate': '2016-06-04'
     });
   }
-  
+
   /**
    * 商品请求体
    */
@@ -134,5 +134,5 @@ export  default class RequestBodyUtils {
     //} while (RequestBodyUtils.currPage != 1)
     //
   //}
-  
+
 }

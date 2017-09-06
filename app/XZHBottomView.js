@@ -208,7 +208,6 @@ const styles = StyleSheet.create({
             marginTop:15,
         },
         Submit:{
-
             backgroundColor:"#f47882",
             paddingTop:15,
             paddingBottom:15,
@@ -227,12 +226,11 @@ const styles = StyleSheet.create({
        },
        ModalView:{
             position:"absolute",
-            width:400,
             height:260,
             backgroundColor:"#ffffff",
             borderRadius:5,
-            top:250,
             marginLeft:100,
+            top:200,
        },
        DanJu:{
         height:45,
