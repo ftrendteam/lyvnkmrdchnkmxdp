@@ -85,7 +85,7 @@ class login extends Component{
                 };
                 this.props.navigator.push(nextRoute)
             }else{
-                ToastAndroid.show('商户名或密码错误', ToastAndroid.SHORT)
+                ToastAndroid.show('商户号或密码错误', ToastAndroid.SHORT)
             }
         })
     }

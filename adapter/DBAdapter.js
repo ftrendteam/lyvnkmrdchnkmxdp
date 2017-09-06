@@ -337,7 +337,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
   }
   
   /***
-   *
+   * 根据登录界面的用户编码，返回机构列表
    * @param  当前shopcode下管理的机构信息
    * @return 返回管理的机构信息
    */
@@ -352,17 +352,25 @@ export default class DBAdapter extends SQLiteOpenHelper {
         });
       });
   }
-  
+
   /***
-   *  获取密码
+  *取目前登录的机构
+  */
+
+  /***
+   *  根据用户编码，密码，校验是否正确，正确的话，保存当前登录的机构信息
+   保存机构信息的时候，查询一下有没有机构信息，若是没有机构信息（下载基础信息），保存完机构信息
    * @param Usercode 改用户编码
    * @return md5加密的密码
+
    */
-  selectTUserSetData(Usercode) {
+  selectTUserSetData(Usercode,userpwd,shopcode) {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
         tx.executeSql("select * from tuserset where Usercode = '" + Usercode + "'", [], (tx, results) => {
           resolve(results.rows);
+          //验证用户是否成，若是成功，取 tcurrSysopt (optname,optvalue)  optshopcode,shopcode\
+          //若是这个表中没有记录，下载基础信息，根据当前的 shopcode
         });
       }, (error) => {
         this._errorCB('transaction', error);
@@ -372,9 +380,9 @@ export default class DBAdapter extends SQLiteOpenHelper {
   
   
   /***
-   * 查询某级品类名称
+   * 登录后，商品属性页面口 查询某级品类名称
    * @param DepLevel 当前阶段穿默认值 1
-   *
+   * DepLevel 默认取1
    *
    */
   selectTDepSet(DepLevel) {

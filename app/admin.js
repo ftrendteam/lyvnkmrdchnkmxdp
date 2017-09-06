@@ -56,16 +56,25 @@ export default class admin extends Component {
         this.pickerData=[]
     }
  //第一次跑数据 componentDidMount
+    componentDidMount(){
+        let params = {
+             reqCode:"App_PosReq",
+             reqDetailCode:"App_Client_UseQry",
+             ClientCode:"800000001",
+             sDateTime:"2017-08-09 12:12:12",//获取当前时间转换成时间戳
+             Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_UseQry" + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
+        };
+         //console.log(loginParams);
+         WebUtils.Post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',params, (data)=>{
+             if(data.retcode == 1){
+//                 alert(JSON.stringify(data))
+             }else{
+                 alert("数据保存失败")
+             }
+         })
+    }
  //失去焦点时 跑数据、存储、获取数据
     autoFocuss(){
-        let params = {
-            reqCode:"App_PosReq",
-            reqDetailCode:"App_Client_UseQry",
-            ClientCode:"800000001",
-            sDateTime:"2017-08-09 12:12:12",//获取当前时间转换成时间戳
-            Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_UseQry" + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
-        };
-        //console.log(loginParams);
          WebUtils.Post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',params, (data)=>{
             if(data.retcode == 1){
                 DetailInfo1 = JSON.stringify(data.DetailInfo1);// 在这里从接口取出要保存的数据，然后执行save方法
@@ -76,7 +85,7 @@ export default class admin extends Component {
                         var shopcode = value.shopcode;
                         var shopname = value.shopname;
                         this.pickerData .push(shopname+"_"+shopcode);
-                        // alert(shopname+"_"+shopcode);
+                         alert(shopname+"_"+shopcode);
                    }
 
                    // alert("成功")
