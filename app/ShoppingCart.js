@@ -23,17 +23,22 @@ import Code from "./Code";
 import Search from "./Search";
 import Succeed from "./Succeed";
 import OrderDetails from "./OrderDetails";
-import List from "./List";
 import XZHBottomView from './XZHBottomView';
 import XZHWineCell from  './XZHWineCell';
+import WebUtils from "../utils/WebUtils";
 import SideMenu from 'react-native-side-menu';
-var data = require('./../LocalData/data.json');
 //第二页面
 export default class ShoppingCart extends Component {
 constructor(props){
         super(props);
         this.state = {
             show:false,
+            Text1:59875888,
+            Text2:254,
+            totalPrice:"",
+            goods:"",
+            Number1:25564654988,
+            Number2:22,
         };
     }
     pressPush(){
@@ -50,20 +55,6 @@ constructor(props){
           };
           this.props.navigator.push(nextRoute)
     }
-    Succeed(){
-          var nextRoute={
-              name:"主页",
-              component:Succeed
-          };
-          this.props.navigator.push(nextRoute)
-    }
-    List(){
-        var nextRoute={
-            name:"主页",
-            component:List
-        };
-        this.props.navigator.push(nextRoute)
-    }
     OrderDetails(){
         var nextRoute={
             name:"主页",
@@ -71,9 +62,98 @@ constructor(props){
         };
         this.props.navigator.push(nextRoute)
     }
+//自动跑接口
+    componentDidMount(){
+       var Text1=this.state.Text1;
+       this.state.totalPrice =Text1+Text1+Text1+Text1+Text1+Text1;
+       this.setState({
+           totalPrice: this.state.totalPrice
+       });
+
+       var Number1=this.state.Number1;
+       this.state.goods =Number1+Number1+Number1+Number1+Number1+Number1;
+       this.setState({
+          goods: this.state.goods
+       })
+    }
     pressPop(){
           this._setModalVisible()
           this.props.navigator.pop();
+    }
+//提交
+    submit(){
+        let Params= {
+            "reqCode":"App_PosReq",
+            "reqDetailCode":"App_Client_ProYH",
+            "ClientCode":"810001",
+            "sDateTime":"2017-08-09 12:12:12",
+            "Sign":"C4CB5D0FB1C34B6D18086937E077D00C",
+            "username":"收银员1",
+            "usercode":"001",
+             "DetailInfo1":{"ShopCode":"0001","OrgFormno":"","ProMemo":"表单备注"},
+             "DetailInfo2":[
+                               {
+                                   "prodcode":"10000001",
+                                   "countm":10,
+                                   "ProPrice":12,
+                                   "promemo":"",
+                                   "kccount":10
+                               },
+                               {
+                                    "prodcode":"10000002",
+                                    "countm":10,
+                                    "ProPrice":12,
+                                    "promemo":"",
+                                    "kccount":10
+                                },
+                                {
+                                   "prodcode":"10000003",
+                                   "countm":10,
+                                   "ProPrice":12,
+                                   "promemo":"",
+                                   "kccount":10
+                               },
+                               {
+                                    "prodcode":"10000005",
+                                    "countm":10,
+                                    "ProPrice":12,
+                                    "promemo":"",
+                                    "kccount":10
+                                },
+                               {
+                                     "prodcode":"10000006",
+                                     "countm":10,
+                                     "ProPrice":12,
+                                     "promemo":"",
+                                     "kccount":10
+                               },
+                               {
+                                      "prodcode":"10000007",
+                                      "countm":10,
+                                      "ProPrice":12,
+                                      "promemo":"",
+                                      "kccount":10
+                               }
+                           ]
+        };
+        WebUtils.Post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',params, (data)=>{
+            if(data.retcode == 1){
+    //          alert(JSON.stringify(data))
+                 alert("提交成功")
+              }else{
+                   alert("提交失败")
+              }
+        })
+    }
+    _rightButtonClick() {
+          console.log('右侧按钮点击了');
+          this._setModalVisible();
+      }
+      _setModalVisible() {
+          let isShow = this.state.show;
+          this.setState({
+            show:!isShow,
+          });
       }
   render() {
     return (
@@ -87,9 +167,6 @@ constructor(props){
                 <TouchableOpacity onPress={this.pressPush.bind(this)}>
                     <Image source={require("../images/search.png")} style={styles.HeaderImage}></Image>
                 </TouchableOpacity>
-                  <TouchableOpacity onPress={this.List.bind(this)}>
-                    <Image source={require("../images/search.png")} style={styles.HeaderImage}></Image>
-                  </TouchableOpacity>
             </View>
         </View>
         <View style={styles.ContList1}>
@@ -105,21 +182,150 @@ constructor(props){
                     <View style={styles.ShopList}>
                         <TouchableOpacity style={styles.ShopContList} onPress={this.OrderDetails.bind(this)}>
                             <View style={styles.ShopTop}>
-                                <Text style={styles.ShopLeft}>苹果</Text>
+                                <Text style={styles.ShopLeft}>10000001</Text>
                                 <Text style={styles.ShopRight}>单位：件</Text>
                             </View>
                             <View style={styles.ShopTop}>
                                 <Text style={[styles.Name,styles.Name1]}></Text>
-                                <Text style={[styles.Number,styles.Name1]}>12.00</Text>
-                                <Text style={[styles.Price,styles.Name1]}>12.00</Text>
-                                <Text style={[styles.SmallScale,styles.Name2]}>144.00</Text>
+                                <Text style={[styles.Number,styles.Name1]}>{this.state.Number1}</Text>
+                                <Text style={[styles.Price,styles.Name1]}>25.00</Text>
+                                <Text style={[styles.SmallScale,styles.Name2]}>{this.state.Text1}</Text>
+                            </View>
+                        </TouchableOpacity>
+                    </View>
+                    <View style={styles.ShopList}>
+                        <TouchableOpacity style={styles.ShopContList} onPress={this.OrderDetails.bind(this)}>
+                            <View style={styles.ShopTop}>
+                                <Text style={styles.ShopLeft}>10000002</Text>
+                                <Text style={styles.ShopRight}>单位：件</Text>
+                            </View>
+                            <View style={styles.ShopTop}>
+                                <Text style={[styles.Name,styles.Name1]}></Text>
+                                <Text style={[styles.Number,styles.Name1]} numberOfLines={1}>{this.state.Number1}</Text>
+                                <Text style={[styles.Price,styles.Name1]}>25.00</Text>
+                                <Text style={[styles.SmallScale,styles.Name2]}>{this.state.Text1}</Text>
+                            </View>
+                        </TouchableOpacity>
+                    </View>
+                    <View style={styles.ShopList}>
+                        <TouchableOpacity style={styles.ShopContList} onPress={this.OrderDetails.bind(this)}>
+                            <View style={styles.ShopTop}>
+                                <Text style={styles.ShopLeft}>10000003</Text>
+                                <Text style={styles.ShopRight}>单位：件</Text>
+                            </View>
+                            <View style={styles.ShopTop}>
+                                <Text style={[styles.Name,styles.Name1]}></Text>
+                                <Text style={[styles.Number,styles.Name1]}>{this.state.Number1}</Text>
+                                <Text style={[styles.Price,styles.Name1]}>25.00</Text>
+                                <Text style={[styles.SmallScale,styles.Name2]}>{this.state.Text1}</Text>
+                            </View>
+                        </TouchableOpacity>
+                    </View>
+                    <View style={styles.ShopList}>
+                        <TouchableOpacity style={styles.ShopContList} onPress={this.OrderDetails.bind(this)}>
+                            <View style={styles.ShopTop}>
+                                <Text style={styles.ShopLeft}>10000005</Text>
+                                <Text style={styles.ShopRight}>单位：件</Text>
+                            </View>
+                            <View style={styles.ShopTop}>
+                                <Text style={[styles.Name,styles.Name1]}></Text>
+                                <Text style={[styles.Number,styles.Name1]}>{this.state.Number1}</Text>
+                                <Text style={[styles.Price,styles.Name1]}>25.00</Text>
+                                <Text style={[styles.SmallScale,styles.Name2]}>{this.state.Text1}</Text>
+                            </View>
+                        </TouchableOpacity>
+                    </View>
+                    <View style={styles.ShopList}>
+                        <TouchableOpacity style={styles.ShopContList} onPress={this.OrderDetails.bind(this)}>
+                            <View style={styles.ShopTop}>
+                                <Text style={styles.ShopLeft}>10000006</Text>
+                                <Text style={styles.ShopRight}>单位：件</Text>
+                            </View>
+                            <View style={styles.ShopTop}>
+                                <Text style={[styles.Name,styles.Name1]}></Text>
+                                <Text style={[styles.Number,styles.Name1]}>{this.state.Number1}</Text>
+                                <Text style={[styles.Price,styles.Name1]}>25.00</Text>
+                                <Text style={[styles.SmallScale,styles.Name2]}>{this.state.Text1}</Text>
+                            </View>
+                        </TouchableOpacity>
+                    </View>
+                    <View style={styles.ShopList}>
+                        <TouchableOpacity style={styles.ShopContList} onPress={this.OrderDetails.bind(this)}>
+                            <View style={styles.ShopTop}>
+                                <Text style={styles.ShopLeft}>10000007</Text>
+                                <Text style={styles.ShopRight}>单位：件</Text>
+                            </View>
+                            <View style={styles.ShopTop}>
+                                <Text style={[styles.Name,styles.Name1]}></Text>
+                                <Text style={[styles.Number,styles.Name1]}>{this.state.Number1}</Text>
+                                <Text style={[styles.Price,styles.Name1]}>25.00</Text>
+                                <Text style={[styles.SmallScale,styles.Name2]}>{this.state.Text1}</Text>
                             </View>
                         </TouchableOpacity>
                     </View>
                 </ScrollView>
             </View>
         </View>
-           <XZHBottomView style={styles.bottomViewStyle}/>
+            <View style={styles.viewStyle}>
+                <View style={styles.Combined}>
+                    <Text style={styles.CombinedText}>合计：</Text>
+                </View>
+                <View style={styles.Client}>
+                    <Text style={styles.ClientText}>
+                        <Text style={styles.client}>客户：</Text>
+                        <Text style={styles.ClientType}>散户</Text>
+                    </Text>
+                    <Text style={styles.goodSNumber}>
+                        <Text style={styles.goods}>货品：</Text>
+                        <Text style={styles.GoodsNumber}
+                            onPress={()=>{
+                               this.setState({goods:this.state.goods});
+                            }}
+                            numberOfLines={1}
+                        >
+                        {this.state.goods}
+                        </Text>
+                     </Text>
+                        <Text style={styles.Price1}
+                            onPress={() => {
+                                this.setState({totalPrice:this.state.totalPrice});
+                            }}
+                            numberOfLines={1}
+                        >
+                        ￥{this.state.totalPrice}
+                        </Text>
+
+                </View>
+                <View style={styles.Note}>
+                    <TouchableOpacity onPress={this._rightButtonClick.bind(this)}>
+                        <Text style={styles.DocumentsNote}>单据备注</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.Submit} onPress={this.submit.bind(this)}>
+                        <Text style={{fontSize:16,color:"#ffffff",}}>提交</Text>
+                    </TouchableOpacity>
+                </View>
+                <Modal
+                transparent={true}
+                visible={this.state.show}
+                onShow={() => {}}
+                onRequestClose={() => {}} >
+                     <View style={styles.modalStyle}>
+                          <View style={styles.LayerThickness}></View>
+                               <View style={styles.ModalView}>
+                                    <View style={styles.DanJu}><Text style={styles.DanText}>单据备注</Text></View>
+                                          <TextInput
+                                          multiline={true}
+                                          placeholder="请填写单据备注信息"
+                                          underlineColorAndroid='transparent'
+                                          placeholderTextColor="#bcbdc1"
+                                          style={styles.TextInput} />
+                                          <View style={styles.ModalLeft} >
+                                               <Text style={styles.buttonText1} onPress={this._setModalVisible.bind(this)}>×</Text>
+                                    </View>
+                               </View>
+                          </View>
+                </Modal>
+            </View>
       </View>
     );
   }
@@ -225,7 +431,7 @@ const styles = StyleSheet.create({
             color:"#f63e4d"
         },
         ContList1:{
-            marginBottom:10,
+            marginBottom:60,
             flex:1,
         },
         CommoditySettlement:{
@@ -262,17 +468,19 @@ const styles = StyleSheet.create({
         },
         goods:{
             fontSize:16,
-            color:"#555555"
+            color:"#555555",
+            marginRight:3,
+            width:45,
         },
         GoodsNumber:{
             fontSize:16,
-            color:"#555555"
+            color:"#555555",
+            flex:2
         },
         Price1:{
             fontSize:16,
             color:"#f47882",
-            position:"absolute",
-            right:0,
+            flex:2,
         },
         DocumentsNote:{
             fontSize:16,
@@ -338,8 +546,123 @@ const styles = StyleSheet.create({
        buttonText1:{
         color:"#f47882",
         fontSize:24,
-       }
+       },
+    viewStyle:{
+            backgroundColor:"#ffffff",
+            borderTopWidth:1,
+            borderTopColor:"#f5f5f5",
+            paddingLeft:25,
+            paddingRight:25,
+            paddingTop:15,
+            height:150,
+        },
 
+        leftView:{
+            flexDirection:'row',
+            marginLeft: 8
+        },
+
+        rightView:{
+            flexDirection:'row',
+            marginRight: 8
+        },
+            CombinedText:{
+                fontSize:16,
+                color:"#555555",
+            },
+            Client:{
+                marginTop:10,
+                marginBottom:10,
+                flexDirection:'row',
+            },
+            client:{
+                fontSize:16,
+                color:"#555555",
+            },
+            ClientType:{
+                fontSize:16,
+                color:"#555555",
+            },
+            goods:{
+                fontSize:16,
+                color:"#555555"
+            },
+            ClientText:{
+                flex:2
+            },
+            goodSNumber:{
+                flex:2
+            },
+            GoodsNumber:{
+                fontSize:16,
+                color:"#555555"
+            },
+            Price1:{
+                fontSize:16,
+                color:"#f47882",
+                flex:2,
+                textAlign:"right"
+            },
+            DocumentsNote:{
+                fontSize:16,
+                color:"#f47882",
+                marginTop:15,
+            },
+            Submit:{
+                backgroundColor:"#f47882",
+                paddingTop:15,
+                paddingBottom:15,
+                paddingLeft:50,
+                paddingRight:50,
+                position:"absolute",
+                right:0,
+            },
+           modalStyle: {
+             flex:1,
+           },
+           LayerThickness:{
+                backgroundColor:"#000000",
+                opacity:0.5,
+                flex:1,
+           },
+           ModalView:{
+                position:"absolute",
+                height:260,
+                backgroundColor:"#ffffff",
+                borderRadius:5,
+                marginLeft:100,
+                top:200,
+           },
+           DanJu:{
+            height:45,
+            backgroundColor:"#fbced2",
+            borderRadius:5,
+           },
+           DanText:{
+            color:"#f47882",
+            lineHeight:30,
+            textAlign:"center",
+            fontSize:16,
+           },
+           TextInput:{
+            width:350,
+            marginLeft:25,
+            marginRight:25,
+            height:180,
+            marginTop:15,
+            borderWidth:1,
+            borderColor:"#fbced2",
+            textAlignVertical: 'top'
+           },
+           ModalLeft:{
+            position:"absolute",
+            right:15,
+            top:3,
+           },
+           buttonText1:{
+            color:"#f47882",
+            fontSize:24,
+           }
 
 
 

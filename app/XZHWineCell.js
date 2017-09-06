@@ -71,50 +71,20 @@ class XZHWineCell extends Component{
     render(){
         var wine = this.state.wine;
         return(
-                    <View style={styles.viewStyle}>
-                        <View style={styles.ListMenu}>
-                              <TouchableHighlight onPress={this.OrderDetails.bind(this)} style={styles.Image}>
-                                  <Image source={require("../images/image.png")}></Image>
-                              </TouchableHighlight>
-                              <TouchableOpacity style={styles.Name} onPress={()=>this._addWine(wine)}>
-                                <Text style={styles.Text}>{wine.name}</Text>
-                              </TouchableOpacity>
-                              <View style={styles.rightView}>
-                                 <Text style={{fontSize:16, margin: 5}}>{wine.buyNum}</Text>
-                                 <TouchableOpacity onPress={()=>this._removeWine(wine)}>
-                                      <Text style={[{fontSize:20}, styles.circleStyle]}>-</Text>
-                                 </TouchableOpacity>
-                              </View>
+                <View style={styles.viewStyle}>
+                    <TouchableOpacity style={styles.ShopContList} onPress={()=>this._addWine(wine)}>
+                        <View style={styles.ShopTop}>
+                            <Text style={styles.ShopLeft}>10000001</Text>
+                            <Text style={styles.ShopRight}>单位：件</Text>
                         </View>
-                        <View style={styles.ListMenu1}>
-                              <TouchableHighlight onPress={this.OrderDetails.bind(this)} style={styles.Image}>
-                                  <Image source={require("../images/image.png")}></Image>
-                              </TouchableHighlight>
-                              <TouchableOpacity style={styles.Name} onPress={()=>this._addWine(wine)}>
-                                <Text style={styles.Text}>{wine.name}</Text>
-                              </TouchableOpacity>
-                              <View style={styles.rightView}>
-                                 <Text style={{fontSize:16, margin: 5}}>{wine.buyNum}</Text>
-                                 <TouchableOpacity onPress={()=>this._removeWine(wine)}>
-                                      <Text style={[{fontSize:20}, styles.circleStyle]}>-</Text>
-                                 </TouchableOpacity>
-                              </View>
-                         </View>
-                        <View style={styles.ListMenu}>
-                              <TouchableHighlight onPress={this.OrderDetails.bind(this)} style={styles.Image}>
-                                  <Image source={require("../images/image.png")}></Image>
-                              </TouchableHighlight>
-                              <TouchableOpacity style={styles.Name} onPress={()=>this._addWine(wine)}>
-                                <Text style={styles.Text}>{wine.name}</Text>
-                              </TouchableOpacity>
-                              <View style={styles.rightView}>
-                                 <Text style={{fontSize:16, margin: 5}}>{wine.buyNum}</Text>
-                                 <TouchableOpacity onPress={()=>this._removeWine(wine)}>
-                                      <Text style={[{fontSize:20}, styles.circleStyle]}>-</Text>
-                                 </TouchableOpacity>
-                              </View>
+                        <View style={styles.ShopTop}>
+                            <Text style={[styles.Name,styles.Name1]}></Text>
+                            <Text style={[styles.Number,styles.Name1]}>{wine.buyNum}</Text>
+                            <Text style={[styles.Price,styles.Name1]}>¥{wine.money}</Text>
+                            <Text style={[styles.SmallScale,styles.Name2]}>{this.state.totalPrice}</Text>
                         </View>
-                    </View>
+                    </TouchableOpacity>
+                </View>
 
         )
     }
@@ -177,6 +147,64 @@ const styles = StyleSheet.create({
         lineHeight:13,
         color:'#ffffff',
         fontWeight:'900'
-    }
+    },
+    viewStyle:{
+        backgroundColor:"#ffffff",
+        borderTopWidth:1,
+        borderTopColor:"#f5f5f5",
+
+        paddingTop:15,
+        height:150,
+    },
+    ShopContList:{
+       paddingLeft:25,
+       paddingRight:25,
+       paddingTop:20,
+    },
+    ShopTop:{
+        marginBottom:20,
+        flexDirection:"row",
+    },
+    ShopLeft:{
+        flex:6,
+        color:"#666666",
+        fontSize:16,
+    },
+    ShopRight:{
+        flex:2,
+        textAlign:"right",
+        color:"#666666",
+        fontSize:16,
+    },
+    Name1:{
+        color:"#333333",
+        fontSize:16,
+    },
+    Name2:{
+        color:"#f63e4d"
+    },
+    Name:{
+        flex:2,
+        fontSize:16,
+        color:"#333333",
+    },
+    Number:{
+        flex:1,
+        textAlign:"right",
+        fontSize:16,
+        color:"#333333",
+    },
+    Price:{
+        flex:1,
+        textAlign:"right",
+        fontSize:16,
+        color:"#333333",
+    },
+    SmallScale:{
+        flex:1,
+        textAlign:"right",
+        fontSize:16,
+        color:"#333333",
+    },
 });
 module.exports = XZHWineCell;

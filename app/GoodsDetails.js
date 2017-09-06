@@ -28,17 +28,17 @@ export default class GoodsDetails extends Component {
           this.props.navigator.pop();
     }
         renderRow(rowData, sectionID, rowID) {
-        console.log(rowData, sectionID, rowID)
-                return (
-                    <TouchableOpacity >
-                        <View style={styles.ShopList1}>
-                            <Text style={styles.Name1}>青柠</Text>
-                            <Text style={styles.ShopPrice1}>200.00</Text>
-                            <Text style={styles.ShopNumber1}>5.0件</Text>
-                        </View>
-                    </TouchableOpacity>
-                );
-            }
+            console.log(rowData, sectionID, rowID)
+            return (
+                <TouchableOpacity >
+                    <View style={styles.ShopList1}>
+                        <Text style={styles.Name1}>青柠</Text>
+                        <Text style={styles.ShopPrice1}>200.00</Text>
+                        <Text style={styles.ShopNumber1}>5.0件</Text>
+                    </View>
+                </TouchableOpacity>
+            );
+        }
   render() {
     return (
       <View style={styles.container}>

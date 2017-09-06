@@ -28,24 +28,19 @@ export default class home extends Component {
      	selectedTab:'home'
      };
    }
-  pressPush(){
-    var nextRoute={
-        name:"主页",
-        component:admin
-    };
-    this.props.navigator.push(nextRoute)
-  }
   render() {
     return (
       <View style={styles.container}>
-                  <TabNavigator>
+                  <TabNavigator
+      tabBarStyle={{height:60,}}
+      >
                      <TabNavigator.Item
                      			  	title="历史单据"
                      			    selected={this.state.selectedTab === 'history'}
                      			    selectedTitleStyle={styles.selectedTextStyle}
                      			    titleStyle={styles.textStyle}
-                                    renderIcon={() => <Image source={require("../images/documents.png")} style={styles.iconStyle}/>}
-                     			    renderSelectedIcon={() => <Image source={require("../images/documents1.png")} style={styles.iconStyle}/>}
+                                    renderIcon={() => <Image source={require("../images/documents.png")} resizeMode={"contain"} style={styles.iconStyle}/>}
+                     			    renderSelectedIcon={() => <Image source={require("../images/documents1.png")} resizeMode={"contain"} style={styles.iconStyle}/>}
                      			    onPress={() => this.setState({ selectedTab: 'history' })}>
                      			    <HistoricalDocument {...this.props}/>
                      </TabNavigator.Item>
@@ -54,8 +49,8 @@ export default class home extends Component {
                       			    selected={this.state.selectedTab === 'home'}
                       			    selectedTitleStyle={styles.selectedTextStyle}
                       			    titleStyle={styles.textStyle}
-                      			    renderIcon={() => <Image source={require("../images/home.png")} style={styles.iconStyle}/>}
-                                    renderSelectedIcon={() => <Image source={require("../images/home1.png")} style={styles.iconStyle}/>}
+                      			    renderIcon={() => <Image source={require("../images/home.png")} resizeMode={"contain"} style={styles.iconStyle}/>}
+                                    renderSelectedIcon={() => <Image source={require("../images/home1.png")} resizeMode={"contain"} style={styles.iconStyle}/>}
                       			    onPress={() => this.setState({ selectedTab: 'home' })}>
                       			    <Index {...this.props}/>
                      </TabNavigator.Item>
@@ -64,8 +59,8 @@ export default class home extends Component {
                       			    selected={this.state.selectedTab === 'shoppingCart'}
                       			    selectedTitleStyle={styles.selectedTextStyle}
                       			    titleStyle={styles.textStyle}
-                      			    renderIcon={() => <Image source={require("../images/shop.png")} style={styles.iconStyle}/>}
-                                    renderSelectedIcon={() => <Image source={require("../images/shop1.png")} style={styles.iconStyle}/>}
+                      			    renderIcon={() => <Image source={require("../images/shop.png")} resizeMode={"contain"} style={styles.iconStyle1}/>}
+                                    renderSelectedIcon={() => <Image source={require("../images/shop1.png")} resizeMode={"contain"} style={styles.iconStyle1}/>}
                       			    onPress={() => this.setState({ selectedTab: 'shoppingCart' })}>
                       			    <ShoppingCart {...this.props}/>
                      </TabNavigator.Item>
@@ -80,9 +75,13 @@ const styles = StyleSheet.create({
           backgroundColor:"#f1f5f6",
       },
       iconStyle:{
-             width:26,
-             height:26,
+             width:22,
+             height:22,
          },
+    iconStyle:{
+        width:23,
+        height:23,
+    },
          textStyle:{
              color:'black',
              fontSize:16,

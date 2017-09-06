@@ -8,9 +8,9 @@ import {
   AppRegistry,
   StyleSheet,
   Text,
-  View
+  View,
+  AsyncStorage
 } from 'react-native';
 /*引入*/
 import MainView from "./app/login";
-
 AppRegistry.registerComponent('myproject', () => MainView);

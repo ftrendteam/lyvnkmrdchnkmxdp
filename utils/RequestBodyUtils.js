@@ -37,3 +37,18 @@ export default class RequestBodyUtils {
     });
   }
 }
+/**
+   * 数据下发
+   * @param clientCode 商户号
+   */
+  static createDownload = (clientCode) => {
+    let date = DateUtils.getCurrentDate(new Date());
+    let sign = MD5Utils.encryptMD5('App_PosReq' + "##" + 'App_Client_UseQry' + "##" + date + "##" + "PosControlCs");
+    return JSON.stringify({
+      'reqCode': 'App_PosReq',
+      'reqDetailCode': 'App_Client_UseQry',
+      'ClientCode': clientCode,
+      'sDateTime': date,
+      'Sign': sign + '',
+    });
+  }
