@@ -1,16 +1,16 @@
 package com.myproject;
 
 import android.app.Application;
-import com.facebook.react.ReactApplication;
+
+import com.beefe.picker.PickerViewPackage;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
-import com.facebook.soloader.SoLoader;
-import java.util.Arrays;
-import java.util.List;
-
 import com.keyee.datetime.*;
 import com.lwansbrough.RCTCamera.RCTCameraPackage;
-import com.beefe.picker.PickerViewPackage;
+
+import java.util.Arrays;
+import java.util.List;
+import org.pgsqlite.SQLitePluginPackage;
 public class ReactNativeHost extends com.facebook.react.ReactNativeHost {
     protected ReactNativeHost(Application application) {
         super(application);
@@ -25,6 +25,7 @@ public class ReactNativeHost extends com.facebook.react.ReactNativeHost {
         return Arrays.<ReactPackage>asList(
                 new RCTDateTimePickerPackage(),
                 new RCTCameraPackage(),
+                new SQLitePluginPackage(),
                 new MainReactPackage(),
                 new PickerViewPackage()
         );
