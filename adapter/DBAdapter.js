@@ -2,7 +2,10 @@
  * Created by admin on 2017/9/1.
  */
 import SQLiteOpenHelper from '../sqLiteOpenHelper/SQLiteOpenHelper';
-
+import MD5Utils from '../MD5Utils';
+import DataUtils from '../utils/DataUtils';
+import WebUtils from '../utils/WebUtils';
+import RequestBodyUtils from '../utils/RequestBodyUtils';
 let db;
 let sqLiteOpenHelper
 export default class DBAdapter extends SQLiteOpenHelper {
@@ -116,8 +119,8 @@ export default class DBAdapter extends SQLiteOpenHelper {
       this._successCB('transaction insert data');
     });
   }
-
-
+  
+  
   /***
    * 插入数据 tuserright 权限表
    * @param tuserright 插入数据的数组
@@ -342,29 +345,29 @@ export default class DBAdapter extends SQLiteOpenHelper {
    * @return 返回管理的机构信息
    */
   selectTUserShopData(Usercode) {
-      return new Promise((resolve, reject) => {
-        db.transaction((tx) => {
-          tx.executeSql("select b.ShopCode,b.ShopName from tUserShop a inner join tshopitem b on b.SubCode+rtrim(b.shopcode)+';' like '%;'+rtrim(a.shopcode)+';%' or a.shopcode='0' where a.UserCode='" + Usercode + "'" + Usercode + "'", [], (tx, results) => {
-            resolve(results.rows);
-          });
-        }, (error) => {
-          this._errorCB('transaction', error);
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        tx.executeSql("select b.ShopCode,b.ShopName from tUserShop a inner join tshopitem b on b.SubCode+rtrim(b.shopcode)+';' like '%;'+rtrim(a.shopcode)+';%' or a.shopcode='0' where a.UserCode='" + Usercode + "'" + Usercode + "'", [], (tx, results) => {
+          resolve(results.rows);
         });
+      }, (error) => {
+        this._errorCB('transaction', error);
       });
+    });
   }
-
+  
   /***
-  *取目前登录的机构
-  */
-
+   *取目前登录的机构
+   */
+  
   /***
    *  根据用户编码，密码，校验是否正确，正确的话，保存当前登录的机构信息
-   保存机构信息的时候，查询一下有没有机构信息，若是没有机构信息（下载基础信息），保存完机构信息
+   *  保存机构信息的时候，查询一下有没有机构信息，若是没有机构信息（下载基础信息），保存完机构信息
    * @param Usercode 改用户编码
    * @return md5加密的密码
-
+   *
    */
-  selectTUserSetData(Usercode,userpwd,shopcode) {
+  selectTUserSetData(Usercode, userpwd, shopcode) {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
         tx.executeSql("select * from tuserset where Usercode = '" + Usercode + "'", [], (tx, results) => {
@@ -377,8 +380,71 @@ export default class DBAdapter extends SQLiteOpenHelper {
       });
     });
   }
-
-
+  
+  isLogin(Usercode, userpwd, currShopCode) {
+    let md5Pwd = MD5Utils.encryptMD5(userpwd);
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        tx.executeSql("select * from tuserset where Usercode = '" + Usercode + "'", [], (tx, results) => {
+          let length = results.rows.length;//没有特殊情况 长度为1
+          //for (let i = 0; i < length; i++) {
+          if (length === 1) {
+            let item = results.rows.item(0);
+            if (md5Pwd == item.UserPwd) {//密码正确
+              let shopCode = DataUtils.get('shopCode');
+              if (shopCode == currShopCode) {//当前登录的机构号 和本地保存的相同
+                resolve(true);
+              } else if (shopCode == '') {//本地没有保存机构号,根据当前的机构号下载商品和品类
+                let productBody = RequestBodyUtils.createProduct(currShopCode, '');
+                let categoryBody = RequestBodyUtils.createCategory(currShopCode);
+                this.downProductAndCategory(productBody, categoryBody);
+              } else {//当前登录的机构号和本地保存的机构号不同.重新保存并下载新的品类和商品信息
+                DataUtils.save('shopCode', currShopCode);
+                /***
+                 * prductBody 商品信息下载请求体
+                 * categoryBody 品类信息下载请求体
+                 */
+                let productBody = RequestBodyUtils.createProduct(currShopCode, '');
+                let categoryBody = RequestBodyUtils.createCategory(currShopCode);
+                this.downProductAndCategory(productBody, categoryBody);
+              }
+              resolve(true);
+            } else {
+              resolve(false);
+            }
+          } else {
+            //resolve(false);
+          }
+          
+          //}
+          //验证用户是否成，若是成功，取 tcurrSysopt (optname,optvalue)  optshopcode,shopcode\
+          //若是这个表中没有记录，下载基础信息，根据当前的 shopcode
+        });
+      }, (error) => {
+        this._errorCB('transaction', error);
+      });
+    });
+  }
+  
+  /**
+   * url地址如何保存的如何去出来.
+   * @param productBody
+   * @param categoryBody
+   */
+  downProductAndCategory(productBody, categoryBody) {
+    WebUtils.Post('url', productBody, (data) => {//下载商品信息并保存
+      if (data.retcode == 1) {
+        this.deleteData('product');
+        this.insertProductData(data.TblRow);
+      }
+    });
+    WebUtils.Post('url', categoryBody, (data) => {//下载品类信息并保存
+      if (data.retcode == 1) {
+        this.insertTDepSetData(data.TblRow);
+      }
+    });
+  }
+  
   /***
    * 登录后，商品属性页面口 查询某级品类名称
    * @param DepLevel 当前阶段穿默认值 1

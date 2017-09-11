@@ -117,7 +117,7 @@ export default class admin extends Component {
     inputOnBlur(){
         this.autoFocuss();
     }
-//登录
+  //登录
     pressPush(){
         var Usercode=this.state.Usercode;
         var UserPwd=NetUtils.MD5(this.state.UserPwd)+'';//获取到密码之后md5加密
