@@ -116,8 +116,8 @@ export default class DBAdapter extends SQLiteOpenHelper {
       this._successCB('transaction insert data');
     });
   }
-  
-  
+
+
   /***
    * 插入数据 tuserright 权限表
    * @param tuserright 插入数据的数组
@@ -377,8 +377,8 @@ export default class DBAdapter extends SQLiteOpenHelper {
       });
     });
   }
-  
-  
+
+
   /***
    * 登录后，商品属性页面口 查询某级品类名称
    * @param DepLevel 当前阶段穿默认值 1
