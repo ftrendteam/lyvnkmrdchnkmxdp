@@ -99,7 +99,7 @@ export default class admin extends Component {
     inputOnBlur(){
         this.autoFocuss();
     }
-//登录
+  //登录
     pressPush(){
         let params = {
             reqCode:"App_PosReq",
