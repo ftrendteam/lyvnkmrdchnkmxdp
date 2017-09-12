@@ -112,10 +112,11 @@ export default class Index extends Component {
     //左侧品级
     componentDidMount(){
         dbAdapter.selectTDepSet('1').then((rows)=>{
+          //alert(JSON.stringify(rows.length));
             for(let i =0;i<rows.length;i++){
                 var row = rows.item(i);
                 this.dataRows.push(row);
-//                alert(JSON.stringify(row))
+                
             }
             this.setState({
                 dataSource:this.state.dataSource.cloneWithRows(this.dataRows)

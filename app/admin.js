@@ -35,9 +35,11 @@ export default class admin extends Component {
     //开启数据库
     if (!db) {
       db = dbAdapter.open();
+      
     }
     //建表
     dbAdapter.createTable();
+    
   }
   read(){
           AsyncStorage.getItem('object',(error,result)=>{
@@ -131,8 +133,8 @@ export default class admin extends Component {
                         var str=shopname+"_"+shopcode;
                         str1 = str.split('_');
                         str2 = str1[1];
-                        alert(str2);
-//                         alert(shopname+"_"+shopcode);
+                        //alert(str2);
+                        // alert(shopname+"_"+shopcode);
                    }
 //                   alert(JSON.stringify(data.DetailInfo1))
             }else{
@@ -152,20 +154,27 @@ export default class admin extends Component {
         var Usercode=this.state.Usercode;
         var UserPwd=NetUtils.MD5(this.state.UserPwd)+'';//获取到密码之后md5加密
         var UserPwd=NetUtils.MD5(this.state.UserPwd)+'';
-        dbAdapter.selectTUserSetData(Usercode,'','').then((results)=>{//取数据
-            var str = results.item(0).UserPwd;
-            if(str = UserPwd){
-                var nextRoute={
-                    name:"主页",
-                    component:home,
-                };
-                this.props.navigator.push(nextRoute);
-                //获取到当前的组织机构信息   isLogin(Usercode, userpwd, currShopCode)
-
-            }else{
-                ToastAndroid.show('用户编码或密码错误', ToastAndroid.SHORT)
-            }
-        });
+        let result = dbAdapter.isLogin(Usercode, this.state.UserPwd, "0");
+        //alert(result+"===");
+        console.log(result)
+      if (result) {
+        var nextRoute={
+          name:"主页",
+          component:home,
+        };
+        this.props.navigator.push(nextRoute);
+        //获取到当前的组织机构信息
+      }
+        //dbAdapter.selectTUserSetData(Usercode,'','').then((results)=>{//取数据
+        //    var str = results.item(0).UserPwd;
+        //    if(str = UserPwd){
+        //
+        //
+        //
+        //    }else{
+        //        ToastAndroid.show('用户编码或密码错误', ToastAndroid.SHORT)
+        //    }
+        //});
     }
     pressPop(){
         this.props.navigator.pop();

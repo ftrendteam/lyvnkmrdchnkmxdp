@@ -56,7 +56,6 @@ export default class FetchUtils {
         },
         body: 'jsonStr=' + requstBody,
       }).then((response) => response.text()).then((responseText) => {
-        console.log('c=' + responseText);
         let jsonResult = JSON.parse(responseText);
         resolve(jsonResult);
       }).catch((err) => {

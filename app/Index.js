@@ -113,6 +113,7 @@ export default class Index extends Component {
     //左侧品级
     componentDidMount(){
         dbAdapter.selectTDepSet('1').then((rows)=>{
+          alert(rows.length);
             for(let i =0;i<rows.length;i++){
                 var row = rows.item(i);
                 this.dataRows.push(row);
@@ -135,7 +136,7 @@ export default class Index extends Component {
         dbAdapter.selectProduct('9').then((rows)=>{
             for(let i =0;i<rows.length;i++){
                 var row = rows.item(i);
-               alert(JSON.stringify(row));
+               //alert(JSON.stringify(row));
             }
 //            alert(JSON.stringify(row));
             // this.setState({
