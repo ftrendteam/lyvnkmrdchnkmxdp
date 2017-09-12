@@ -1,8 +1,7 @@
 /**
  * Created by admin on 2017/8/24.
  */
-
-export default class FetchUtil {
+export default class FetchUtils {
   /**
    * 基于 fetch 封装的 GET请求
    * @param url
@@ -10,7 +9,7 @@ export default class FetchUtil {
    * @param headers
    * @returns {Promise}
    */
-  FetchUtil.get = function (common_url, params, headers) {
+  static get = (common_url, params, headers) => {
     if (params) {
       let paramsArray = [];
       //encodeURIComponent
@@ -46,7 +45,7 @@ export default class FetchUtil {
    * @param requstBody
    * @returns {Promise}
    */
-  FetchUtil.post = function (common_url, requstBody) {
+  static post = (common_url, requstBody) => {
     console.log(common_url);
     return new Promise(function (resolve, reject) {
       fetch(common_url, {
@@ -64,6 +63,5 @@ export default class FetchUtil {
         console.log(err);
       })
     })
-  }
-  
-};
+  };
+}

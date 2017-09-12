@@ -4,7 +4,7 @@
 import SQLiteOpenHelper from '../sqLiteOpenHelper/SQLiteOpenHelper';
 import MD5Utils from '../MD5Utils';
 import DataUtils from '../utils/DataUtils';
-import WebUtils from '../utils/WebUtils';
+import FetchUtils from '../utils/FetchUtils';
 import RequestBodyUtils from '../utils/RequestBodyUtils';
 let db;
 let sqLiteOpenHelper
@@ -432,13 +432,13 @@ export default class DBAdapter extends SQLiteOpenHelper {
    * @param categoryBody
    */
   downProductAndCategory(productBody, categoryBody) {
-    WebUtils.Post('url', productBody, (data) => {//下载商品信息并保存
+    FetchUtils.post('url', productBody, (data) => {//下载商品信息并保存
       if (data.retcode == 1) {
         this.deleteData('product');
         this.insertProductData(data.TblRow);
       }
     });
-    WebUtils.Post('url', categoryBody, (data) => {//下载品类信息并保存
+    FetchUtils.post('url', categoryBody, (data) => {//下载品类信息并保存
       if (data.retcode == 1) {
         this.insertTDepSetData(data.TblRow);
       }
