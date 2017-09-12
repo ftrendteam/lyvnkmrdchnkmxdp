@@ -69,7 +69,7 @@ class login extends Component{
             if(data.retcode == 1){
                 DetailInfo = JSON.stringify(data.DetailInfo);// 在这里从接口取出要保存的数据，然后执行save方法
                 var  DetailInfo = JSON.stringify(data.DetailInfo);
-                alert(JSON.stringify(data))
+//                alert(JSON.stringify(data))
                 for(var value of data.DetailInfo){
                    //alert(JSON.stringify(value))
                    LinkUrl = value.LinkUrl;
@@ -83,11 +83,6 @@ class login extends Component{
                 this.props.navigator.push(nextRoute)
             }else{
                 ToastAndroid.show('商户号或密码错误', ToastAndroid.SHORT)
-//                var nextRoute={
-//                    name:"主页",
-//                    component:admin,
-//                };
-//                this.props.navigator.push(nextRoute)
             }
         })
     }

@@ -169,42 +169,47 @@ export default class DBAdapter extends SQLiteOpenHelper {
    * @param tdepset 插入数据的数组
    */
   insertTDepSetData(tdepSetData) {
-    let len = tdepSetData.length;
-    if (!db) {
-      this.open();
-    }
-    //this.createTable();
-    this.deleteData('tdepset');
-    db.transaction((tx) => {
-      for (let i = 0; i < len; i++) {
-        let tdepSet = tdepSetData[i];
-        let pid = tdepSet.Pid;
-        let DepCode = tdepSet.DepCode;
-        let DepName = tdepSet.DepName;
-        let AidCode = tdepSet.AidCode;
-        let SubCode = tdepSet.SubCode;
-        let DepMemo = tdepSet.DepMemo;
-        let SpecTag = tdepSet.SpecTag;
-        let IsLeaf = tdepSet.IsLeaf;
-        let ProfitRate = tdepSet.ProfitRate;
-        let GatherRate = tdepSet.GatherRate;
-        let DepLevel = tdepSet.DepLevel;
-        let IsDel = tdepSet.IsDel;
-        
-        let sql = "INSERT INTO tdepset(pid,DepCode,DepName,AidCode,SubCode,DepMemo,SpecTag,IsLeaf,ProfitRate,GatherRate,DepLevel,IsDel)" +
-          "values(?,?,?,?,?,?,?,?,?,?,?,?)";
-        tx.executeSql(sql, [pid, DepCode, DepName, AidCode, SubCode, DepMemo, SpecTag, IsLeaf, ProfitRate, GatherRate, DepLevel, IsDel], () => {
-          
-          }, (err) => {
-            console.log(err);
-          }
-        );
+    return new Promise((resolve, reject) => {
+      let len = tdepSetData.length;
+      if (!db) {
+        this.open();
       }
-    }, (error) => {
-      this._errorCB('transaction', error);
-    }, () => {
-      this._successCB('transaction insert data');
+      //this.createTable();
+      this.deleteData('tdepset');
+      db.transaction((tx) => {
+        for (let i = 0; i < len; i++) {
+          let tdepSet = tdepSetData[i];
+          let pid = tdepSet.Pid;
+          let DepCode = tdepSet.DepCode;
+          let DepName = tdepSet.DepName;
+          let AidCode = tdepSet.AidCode;
+          let SubCode = tdepSet.SubCode;
+          let DepMemo = tdepSet.DepMemo;
+          let SpecTag = tdepSet.SpecTag;
+          let IsLeaf = tdepSet.IsLeaf;
+          let ProfitRate = tdepSet.ProfitRate;
+          let GatherRate = tdepSet.GatherRate;
+          let DepLevel = tdepSet.DepLevel;
+          let IsDel = tdepSet.IsDel;
+          
+          let sql = "INSERT INTO tdepset(pid,DepCode,DepName,AidCode,SubCode,DepMemo,SpecTag,IsLeaf,ProfitRate,GatherRate,DepLevel,IsDel)" +
+            "values(?,?,?,?,?,?,?,?,?,?,?,?)";
+          tx.executeSql(sql, [pid, DepCode, DepName, AidCode, SubCode, DepMemo, SpecTag, IsLeaf, ProfitRate, GatherRate, DepLevel, IsDel], () => {
+            
+            }, (err) => {
+              console.log(err);
+            }
+          );
+        }
+      }, (error) => {
+        reject(false);
+        //this._errorCB('transaction', error);
+      }, () => {
+        //this._successCB('transaction insert data');
+        resolve(true);
+      });
     });
+    
   }
   
   
@@ -254,89 +259,98 @@ export default class DBAdapter extends SQLiteOpenHelper {
    * @param product 插入数据的数组
    */
   insertProductData(productData) {
-    let len = productData.length;
-    if (!db) {
-      this.open();
-    }
-    //this.createTable();
-    this.deleteData("product");
-    db.transaction((tx) => {
-      for (let i = 0; i < len; i++) {
-        let product = productData[i];
-        let Pid = product.Pid;
-        let ProdCode = product.ProdCode;
-        let BarCode = product.BarCode;
-        let ProdName = product.ProdName;
-        let ShortName = product.ShortName;
-        let AidCode = product.AidCode;
-        let OtherCode = product.OtherCode;
-        let DepCode = product.DepCode;
-        let SuppCode = product.SuppCode;
-        let BrandCode = product.BrandCode;
-        let Spec = product.Spec;
-        let ProdAdr = product.ProdAdr;
-        let Unit = product.Unit;
-        let PUnitAmt = product.PUnitAmt;
-        let PicInfo = product.PicInfo;
-        let ProdMemo = product.ProdMemo;
-        let StdOPrice = product.StdOPrice;
-        let StdOutOPrice = product.StdOutOPrice;
-        let StdPrice = product.StdPrice;
-        let WPrice = product.WPrice;
-        let LowPrice = product.LowPrice;
-        let HighPrice = product.HighPrice;
-        let OTax = product.OTax;
-        let STax = product.STax;
-        let VipPrice1 = product.VipPrice1;
-        let VipPrice2 = product.VipPrice2;
-        let VipPrice3 = product.VipPrice3;
-        let BoxCode = product.BoxCode;
-        let IsIntCount = product.IsIntCount;
-        let SaleType = product.SaleType;
-        let GatherType = product.GatherType;
-        let GatherRate = product.GatherRate;
-        let ProdType = product.ProdType;
-        //let EditDate = product.EditDate;
-        let SeasonCode = product.SeasonCode;
-        let ProdMemo1 = product.ProdMemo1;
-        let ProdMemo2 = product.ProdMemo2;
-        let ProdMemo3 = product.ProdMemo3;
-        let FNoCD = product.FNoCD;
-        let IsDel = product.IsDel;
-        let FNoSale = product.FNoSale;
-        let FNoTH = product.FNoTH;
-        let FNoPromotion = product.FNoPromotion;
-        let FUseSalePrice = product.FUseSalePrice;
-        let FNoYH = product.FNoYH;
-        let hlimit = product.HLimit;
-        let llimit = product.LLimit;
-        let bestkc = product.BestKC;
-        let FNoCG = product.FNoCG;
-        
-        let TakeType = product.TakeType;
-        let TakeRate = product.TakeRate;
-        let PriceFlag = product.PriceFlag;
-        let OperRange = product.OperRange;
-        
-        let sql = 'INSERT INTO product(Pid,ProdCode,BarCode,ProdName,ShortName,AidCode,OtherCode,DepCode,SuppCode,BrandCode,' +
-          'Spec,ProdAdr,Unit,PUnitAmt,PicInfo,ProdMemo,StdOPrice,StdOutOPrice,StdPrice,WPrice,LowPrice,HighPrice,OTax,' +
-          'STax,VipPrice1,VipPrice2,VipPrice3,BoxCode,IsIntCount,SaleType,GatherType,GatherRate,ProdType,SeasonCode,' +
-          'ProdMemo1,ProdMemo2,ProdMemo3,FNoCD,IsDel,FNoSale,FNoTH,FNoPromotion,FUseSalePrice,FNoYH,Hlimit,Llimit,Bestkc,FNoCG,TakeType,TakeRate,OperRange,PriceFlag)' +
-          "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-        tx.executeSql(sql, [Pid, ProdCode, BarCode, ProdName, ShortName, AidCode, OtherCode, DepCode, SuppCode, BrandCode,
-            Spec, ProdAdr, Unit, PUnitAmt, PicInfo, ProdMemo, StdOPrice, StdOutOPrice, StdPrice, WPrice, LowPrice, HighPrice, OTax,
-            STax, VipPrice1, VipPrice2, VipPrice3, BoxCode, IsIntCount, SaleType, GatherType, GatherRate, ProdType, SeasonCode,
-            ProdMemo1, ProdMemo2, ProdMemo3, FNoCD, IsDel, FNoSale, FNoTH, FNoPromotion, FUseSalePrice, FNoYH, hlimit, llimit, bestkc, FNoCG, TakeType, TakeRate, PriceFlag, OperRange], () => {
-          }, (err) => {
-            console.log(err);
-          }
-        );
+    return new Promise((resolve, reject) => {
+      let len = productData.length;
+      if (!db) {
+        this.open();
       }
-    }, (error) => {
-      this._errorCB('transaction', error);
-    }, () => {
-      this._successCB('transaction insert data');
+      //this.createTable();
+      console.log("product-start");
+      this.deleteData("product");
+      db.transaction((tx) => {
+        console.log("product-2");
+        for (let i = 0; i < len; i++) {
+          let product = productData[i];
+          let Pid = product.Pid;
+          let ProdCode = product.ProdCode;
+          let BarCode = product.BarCode;
+          let ProdName = product.ProdName;
+          let ShortName = product.ShortName;
+          let AidCode = product.AidCode;
+          let OtherCode = product.OtherCode;
+          let DepCode = product.DepCode;
+          let SuppCode = product.SuppCode;
+          let BrandCode = product.BrandCode;
+          let Spec = product.Spec;
+          let ProdAdr = product.ProdAdr;
+          let Unit = product.Unit;
+          let PUnitAmt = product.PUnitAmt;
+          let PicInfo = product.PicInfo;
+          let ProdMemo = product.ProdMemo;
+          let StdOPrice = product.StdOPrice;
+          let StdOutOPrice = product.StdOutOPrice;
+          let StdPrice = product.StdPrice;
+          let WPrice = product.WPrice;
+          let LowPrice = product.LowPrice;
+          let HighPrice = product.HighPrice;
+          let OTax = product.OTax;
+          let STax = product.STax;
+          let VipPrice1 = product.VipPrice1;
+          let VipPrice2 = product.VipPrice2;
+          let VipPrice3 = product.VipPrice3;
+          let BoxCode = product.BoxCode;
+          let IsIntCount = product.IsIntCount;
+          let SaleType = product.SaleType;
+          let GatherType = product.GatherType;
+          let GatherRate = product.GatherRate;
+          let ProdType = product.ProdType;
+          //let EditDate = product.EditDate;
+          let SeasonCode = product.SeasonCode;
+          let ProdMemo1 = product.ProdMemo1;
+          let ProdMemo2 = product.ProdMemo2;
+          let ProdMemo3 = product.ProdMemo3;
+          let FNoCD = product.FNoCD;
+          let IsDel = product.IsDel;
+          let FNoSale = product.FNoSale;
+          let FNoTH = product.FNoTH;
+          let FNoPromotion = product.FNoPromotion;
+          let FUseSalePrice = product.FUseSalePrice;
+          let FNoYH = product.FNoYH;
+          let hlimit = product.HLimit;
+          let llimit = product.LLimit;
+          let bestkc = product.BestKC;
+          let FNoCG = product.FNoCG;
+          
+          let TakeType = product.TakeType;
+          let TakeRate = product.TakeRate;
+          let PriceFlag = product.PriceFlag;
+          let OperRange = product.OperRange;
+          
+          let sql = 'INSERT INTO product(Pid,ProdCode,BarCode,ProdName,ShortName,AidCode,OtherCode,DepCode,SuppCode,BrandCode,' +
+            'Spec,ProdAdr,Unit,PUnitAmt,PicInfo,ProdMemo,StdOPrice,StdOutOPrice,StdPrice,WPrice,LowPrice,HighPrice,OTax,' +
+            'STax,VipPrice1,VipPrice2,VipPrice3,BoxCode,IsIntCount,SaleType,GatherType,GatherRate,ProdType,SeasonCode,' +
+            'ProdMemo1,ProdMemo2,ProdMemo3,FNoCD,IsDel,FNoSale,FNoTH,FNoPromotion,FUseSalePrice,FNoYH,Hlimit,Llimit,Bestkc,FNoCG,TakeType,TakeRate,OperRange,PriceFlag)' +
+            "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+          tx.executeSql(sql, [Pid, ProdCode, BarCode, ProdName, ShortName, AidCode, OtherCode, DepCode, SuppCode, BrandCode,
+              Spec, ProdAdr, Unit, PUnitAmt, PicInfo, ProdMemo, StdOPrice, StdOutOPrice, StdPrice, WPrice, LowPrice, HighPrice, OTax,
+              STax, VipPrice1, VipPrice2, VipPrice3, BoxCode, IsIntCount, SaleType, GatherType, GatherRate, ProdType, SeasonCode,
+              ProdMemo1, ProdMemo2, ProdMemo3, FNoCD, IsDel, FNoSale, FNoTH, FNoPromotion, FUseSalePrice, FNoYH, hlimit, llimit, bestkc, FNoCG, TakeType, TakeRate, PriceFlag, OperRange], () => {
+            }, (err) => {
+              console.log(err);
+            }
+          );
+          
+        }
+        
+      }, (error) => {
+        reject(false);
+        //this._errorCB('transaction', error);
+      }, () => {
+        resolve(true);
+        //this._successCB('transaction insert data');
+      });
     });
+    
   }
   
   /***
@@ -387,35 +401,52 @@ export default class DBAdapter extends SQLiteOpenHelper {
       db.transaction((tx) => {
         tx.executeSql("select * from tuserset where Usercode = '" + Usercode + "'", [], (tx, results) => {
           let length = results.rows.length;//没有特殊情况 长度为1
+          console.log('length=', length);
           //for (let i = 0; i < length; i++) {
           if (length === 1) {
             let item = results.rows.item(0);
-            if (md5Pwd == item.UserPwd) {//密码正确
-              let shopCode = DataUtils.get('shopCode','');
-              if (shopCode == currShopCode) {//当前登录的机构号 和本地保存的相同
-                resolve(true);
-              } else if (shopCode == '') {//本地没有保存机构号,根据当前的机构号下载商品和品类
-                let productBody = RequestBodyUtils.createProduct(currShopCode, '');
-                let categoryBody = RequestBodyUtils.createCategory(currShopCode);
-                 this.downProductAndCategory(productBody, categoryBody);
+            console.log("pwd=", item.UserPwd)
+            console.log("md5Pwd=", md5Pwd + '')
+            console.log("pwd=", md5Pwd == item.UserPwd)
+            if ((md5Pwd + '') == item.UserPwd) {//密码正确
+              console.log("pwd ok");
+              let shopCode;
+              DataUtils.get('shopCode', '').then((data) => {
+                shopCode = data;
+                console.log("shopCode",shopCode);
+                if (shopCode == currShopCode) {//当前登录的机构号 和本地保存的相同
                   resolve(true);
-              } else {//当前登录的机构号和本地保存的机构号不同.重新保存并下载新的品类和商品信息
-                DataUtils.save('shopCode', currShopCode);
-                /***
-                 * prductBody 商品信息下载请求体
-                 * categoryBody 品类信息下载请求体
-                 */
-                let productBody = RequestBodyUtils.createProduct(currShopCode, '');
-                let categoryBody = RequestBodyUtils.createCategory(currShopCode);
-                 this.downProductAndCategory(productBody, categoryBody);
-                  resolve(true);
-              }
-//              resolve(true);
+                } else if (shopCode == '') {//本地没有保存机构号,根据当前的机构号下载商品和品类
+                  let productBody = RequestBodyUtils.createProduct(currShopCode, '');
+                  let categoryBody = RequestBodyUtils.createCategory(currShopCode);
+                  this.downProductAndCategory(productBody, categoryBody).then((result) => {
+                    if (result) {
+                      resolve(true);
+                    }
+                  });
+                  
+                } else {//当前登录的机构号和本地保存的机构号不同.重新保存并下载新的品类和商品信息
+                  DataUtils.save('shopCode', currShopCode);
+                  /***
+                   * prductBody 商品信息下载请求体
+                   * categoryBody 品类信息下载请求体
+                   */
+                  let productBody = RequestBodyUtils.createProduct(currShopCode, '');
+                  let categoryBody = RequestBodyUtils.createCategory(currShopCode);
+                  this.downProductAndCategory(productBody, categoryBody).then((result) => {
+                    if (result) {
+                      resolve(true);
+                    }
+                  });
+                  
+                }
+              });
+              
             } else {
               resolve(false);
             }
           } else {
-            //resolve(false);
+            resolve(false);
           }
           
           //}
@@ -423,7 +454,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
           //若是这个表中没有记录，下载基础信息，根据当前的 shopcode
         });
       }, (error) => {
-        this._errorCB('transaction', error);
+        this._errorCB('transactiondsaf', error);
       });
     });
   }
@@ -434,18 +465,26 @@ export default class DBAdapter extends SQLiteOpenHelper {
    * @param categoryBody
    */
   downProductAndCategory(productBody, categoryBody) {
-    FetchUtils.post('url', productBody, (data) => {//下载商品信息并保存
-      if (data.retcode == 1) {
-        this.deleteData('product');
-        this.insertProductData(data.TblRow);
+  return new Promise((resolve, reject)=>{
+  DataUtils.get("LinkUrl",LinkUrl).then((urlData)=>{
+   FetchUtils.post(urlData, productBody).then((data) => {
+          if (data.retcode == 1) {
+            this.insertProductData(data.TblRow).then((result) => {
+              FetchUtils.post(urlData, categoryBody).then((data) => {
+                if (data.retcode == 1) {
+                  this.insertTDepSetData(data.TblRow).then((result) => {
+                    console.log("end");
+                   resolve(true);
+                  });
+                }
+              });
+            });
+          }
+        });
+    });
+  }
+  });
 
-      }
-    });
-    FetchUtils.post('url', categoryBody, (data) => {//下载品类信息并保存
-      if (data.retcode == 1) {
-        this.insertTDepSetData(data.TblRow);
-      }
-    });
   }
   
   /***
@@ -458,10 +497,11 @@ export default class DBAdapter extends SQLiteOpenHelper {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
         tx.executeSql('select * from tdepset where IsDel=0 and DepLevel=' + DepLevel + '', [], (tx, results) => {
+          console.log("wtf2=", results.rows.length)
           resolve(results.rows);
         });
       }, (error) => {
-        this._errorCB('transaction', error);
+        this._errorCB('wtf', error);
       });
     })
   }

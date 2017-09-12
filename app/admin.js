@@ -23,7 +23,8 @@ import {
 import DataUtils from "../utils/DataUtils";
 import home from "./Home";
 import NetUtils from "../utils/NetUtils";
-import WebUtils from "../utils/WebUtils";
+//import WebUtils from "../utils/WebUtils";
+import FetchUtil from "../utils/FetchUtils";
 import DBAdapter from "../adapter/DBAdapter";
 import Storage from 'react-native-storage';
 import Picker from 'react-native-picker';
@@ -73,7 +74,7 @@ export default class admin extends Component {
             Sign:"",
             Usercode:"",
             UserPwd:"",
-
+            pickedDate:"",
         };
         this.pickerData=[]
     }
@@ -87,7 +88,7 @@ export default class admin extends Component {
              Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_UseQry" + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
         };
          //console.log(loginParams);
-         WebUtils.Post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',params, (data)=>{
+          FetchUtil.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
              if(data.retcode == 1){
                   //用户信息
                   var detailInfo1 = data.DetailInfo1;
@@ -103,7 +104,7 @@ export default class admin extends Component {
                   //用户管理机构表
                   var detailInfo4 = data.DetailInfo4;
                   dbAdapter.insertTUsershopData(detailInfo4);
-                  // DataUtils.save("LinkUrl",LinkUrl);
+//                  var acquiring = DataUtils.get("LinkUrl",LinkUrl);
              }else{
                  ToastAndroid.show('网络请求失败', ToastAndroid.SHORT);
              }
@@ -118,7 +119,7 @@ export default class admin extends Component {
                 sDateTime:"2017-08-09 12:12:12",//获取当前时间转换成时间戳
                 Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_UseQry" + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
          };
-         WebUtils.Post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',params, (data)=>{
+         FetchUtil.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
             if(data.retcode == 1){
                 DetailInfo1 = JSON.stringify(data.DetailInfo1);// 在这里从接口取出要保存的数据，然后执行save方法
                    var  DetailInfo1 = JSON.stringify(data.DetailInfo1);
@@ -128,11 +129,10 @@ export default class admin extends Component {
                         var shopcode = value.shopcode;
                         var shopname = value.shopname;
                         this.pickerData .push(shopname+"_"+shopcode);
-                        var str=shopname+"_"+shopcode;
-                        str1 = str.split('_');
-                        str2 = str1[1];
-                        alert(str2);
-//                         alert(shopname+"_"+shopcode);
+//                        var code = this.state.pickedDate;
+//                         str1 = code.split('_');
+//                         str2 = str1[1];
+//                         alert(str2);
                    }
 //                   alert(JSON.stringify(data.DetailInfo1))
             }else{
@@ -145,28 +145,41 @@ export default class admin extends Component {
         this.autoFocuss();
     }
   //登录
-    pressPush(){
-//    var str =pickedDate;
-//                            str = str.substr(0, str.indexOf('_'));
-//                            alert(str);
-        var Usercode=this.state.Usercode;
-        var UserPwd=NetUtils.MD5(this.state.UserPwd)+'';//获取到密码之后md5加密
-        var UserPwd=NetUtils.MD5(this.state.UserPwd)+'';
-        dbAdapter.selectTUserSetData(Usercode,'','').then((results)=>{//取数据
-            var str = results.item(0).UserPwd;
-            if(str = UserPwd){
-                var nextRoute={
-                    name:"主页",
-                    component:home,
-                };
-                this.props.navigator.push(nextRoute);
-                //获取到当前的组织机构信息   isLogin(Usercode, userpwd, currShopCode)
-
-            }else{
-                ToastAndroid.show('用户编码或密码错误', ToastAndroid.SHORT)
-            }
-        });
-    }
+   pressPush(){
+           var code = ""+this.state.pickedDate;//获取到之后前面加""+
+           var Usercode=this.state.Usercode;
+        // var UserPwd=NetUtils.MD5(this.state.UserPwd)+'';//获取到密码之后md5加密
+            str1 = code.split('_');
+           str2 = str1[1];
+//           alert(str2);
+            dbAdapter.isLogin(Usercode, this.state.UserPwd, str2).then((isLogin)=>{
+                if(isLogin){
+                     var nextRoute={
+                       name:"主页",
+                       component:home,
+                   };
+                   this.props.navigator.push(nextRoute);
+                }
+            });
+//           dbAdapter.selectTUserSetData(Usercode,'','').then((results)=>{//取数据
+//               var str = results.item(0).UserPwd;
+//               if(str = UserPwd){
+//   //                var nextRoute={
+//   //                    name:"主页",
+//   //                    component:home,
+//   //                };
+//   //                this.props.navigator.push(nextRoute);
+//                   //获取到当前的组织机构信息 isLogin(Usercode, userpwd, currShopCode)
+//                   str1 = code.split('_');
+//                   str2 = str1[1];
+//                   //alert(str2);
+//                   //将截取的字符串传入currShopCode并调用isLogin
+//
+//               }else{
+//                   ToastAndroid.show('用户编码或密码错误', ToastAndroid.SHORT)
+//               }
+//           });
+       }
     pressPop(){
         this.props.navigator.pop();
     }

@@ -45,9 +45,8 @@ export default class Index extends Component {
     constructor(props){
         super(props);
         this.state = {
-            show: false,
+            show:false,
             dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
-            data:[],
         };
         this.dataRows = [];
     }
@@ -125,44 +124,10 @@ export default class Index extends Component {
     }
     _renderRow(renderRow){
          return (
-            <TouchableOpacity style={styles.Active} onPress={this.grade.bind(this)}>
+            <TouchableOpacity style={styles.Active}>
                 <Text style={styles.Active1}>{renderRow.DepName}</Text>
             </TouchableOpacity>
          );
-    }
-    //右侧商品信息DepCode
-    componentDidMount(){
-        dbAdapter.selectProduct('9').then((rows)=>{
-            for(let i =0;i<rows.length;i++){
-                var row = rows.item(i);
-               alert(JSON.stringify(row));
-            }
-//            alert(JSON.stringify(row));
-            // this.setState({
-            //     data:row
-            // })
-        });
-    }
-    _renderItem(item,index){
-//      alert(renderItem)
-        return(
-            <View style={styles.Border}>
-                 <TouchableOpacity onPress={this.OrderDetails.bind(this)}>
-                     <View style={styles.Image}>
-                         <Image source={require("../images/image.png")}></Image>
-                      </View>
-                     <Text style={styles.Text}>{item.ProdName}</Text>
-                 </TouchableOpacity>
-            </View>
-        )
-    }
-    _separator = () => {
-        return <View style={{height:1,backgroundColor:'#f5f5f5'}}/>;
-    }
-    _createEmptyView() {
-        return (
-            <Text style={{fontSize: 16, alignSelf: 'center',marginTop:10}}>等待更新！</Text>
-        );
     }
     render() {
         return (
@@ -186,19 +151,39 @@ export default class Index extends Component {
                           <View style={styles.addnumber}>
                               <Text style={styles.Reduction1}>14</Text>
                           </View>
-                          <TouchableOpacity style={styles.Active}>
-                              <Text style={styles.Active1}>ytt</Text>
-                          </TouchableOpacity>
+                          <ListView
+                            style={styles.listViewStyle}
+                            dataSource={this.state.dataSource}
+                            showsVerticalScrollIndicator={true}
+                            renderRow={this._renderRow.bind(this)}
+                          />
                       </ScrollView>
                       <View style={styles.RightList1}>
                           <ScrollView style={styles.ScrollView1}>
-                              <FlatList
-                                  numColumns={3}
-                                  renderItem={this._renderItem.bind(this)}
-                                  ItemSeparatorComponent={this._separator.bind(this)}
-                                  ListEmptyComponent={this._createEmptyView()}
-                                  data={this.state.data}
-                              />
+                              <View style={styles.Border}>
+                                   <TouchableOpacity onPress={this.OrderDetails.bind(this)}>
+                                       <View style={styles.Image}>
+                                           <Image source={require("../images/image.png")}></Image>
+                                        </View>
+                                       <Text style={styles.Text}>哈密瓜</Text>
+                                   </TouchableOpacity>
+                               </View>
+                               <View style={styles.Border}>
+                                    <TouchableOpacity onPress={this.OrderDetails.bind(this)}>
+                                        <View style={styles.Image}>
+                                            <Image source={require("../images/image.png")}></Image>
+                                         </View>
+                                        <Text style={styles.Text}>哈密瓜</Text>
+                                    </TouchableOpacity>
+                                </View>
+                                <View style={styles.Border}>
+                                     <TouchableOpacity onPress={this.OrderDetails.bind(this)}>
+                                         <View style={styles.Image}>
+                                             <Image source={require("../images/image.png")}></Image>
+                                          </View>
+                                         <Text style={styles.Text}>哈密瓜</Text>
+                                     </TouchableOpacity>
+                                 </View>
                           </ScrollView>
                       </View>
                   </View>
@@ -296,7 +281,6 @@ const styles = StyleSheet.create({
       },
       scrollview:{
         width:130,
-        height:1000,
         backgroundColor:"#ffffff",
         flex:2,
       },
