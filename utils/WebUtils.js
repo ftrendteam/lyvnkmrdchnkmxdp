@@ -17,8 +17,7 @@ static Post(url,params,callback){
                 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
             },
             body:"jsonStr="+JSON.stringify(params)
-        })
-           .then((response)=>{
+        }).then((response)=>{
                response.json().then((data)=>{
                    callback(data);
                });

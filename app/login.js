@@ -10,11 +10,12 @@ import {
     Button,
     ToastAndroid
 } from 'react-native';
+import DataUtils from "../utils/DataUtils";
 import admin from "./admin";
 import NetUtils from "../utils/NetUtils";
-import WebUtils from "../utils/WebUtils";
+//import WebUtils from "../utils/WebUtils";
+import FetchUtil from "../utils/FetchUtils";
 import Navigator from "react-native-deprecated-custom-components";
-//import Storage from '../utils/Storage';
 class login extends Component{
 //获取数据
     read(){
@@ -64,21 +65,17 @@ class login extends Component{
             Pwd:NetUtils.MD5(this.state.Pwd)+'',//获取到密码之后md5加密
             Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_Qry" + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
         };
-        WebUtils.Post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',params, (data)=>{
+        FetchUtil.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
             if(data.retcode == 1){
                 DetailInfo = JSON.stringify(data.DetailInfo);// 在这里从接口取出要保存的数据，然后执行save方法
                 var  DetailInfo = JSON.stringify(data.DetailInfo);
-                //alert(JSON.stringify(data))
+                alert(JSON.stringify(data))
                 for(var value of data.DetailInfo){
                    //alert(JSON.stringify(value))
                    LinkUrl = value.LinkUrl;
-                   //alert(LinkUrl);获取url地址
+                   // alert(LinkUrl);//获取url地址
+                   DataUtils.save("LinkUrl",LinkUrl);
                 }
-                //标记位  登录成功保存记录，已经登录
-                //Storage.save({
-                    //key: 'isInit',  // 注意:请不要在key中使用_下划线符号!
-                    //id: '100',   // 注意:请不要在id中使用_下划线符号!
-                //});
                 var nextRoute={
                     name:"主页",
                     component:admin,
@@ -86,6 +83,11 @@ class login extends Component{
                 this.props.navigator.push(nextRoute)
             }else{
                 ToastAndroid.show('商户号或密码错误', ToastAndroid.SHORT)
+//                var nextRoute={
+//                    name:"主页",
+//                    component:admin,
+//                };
+//                this.props.navigator.push(nextRoute)
             }
         })
     }

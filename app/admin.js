@@ -20,6 +20,7 @@ import {
   AsyncStorages,
   ToastAndroid
 } from 'react-native';
+import DataUtils from "../utils/DataUtils";
 import home from "./Home";
 import NetUtils from "../utils/NetUtils";
 import WebUtils from "../utils/WebUtils";
@@ -38,6 +39,26 @@ export default class admin extends Component {
     //建表
     dbAdapter.createTable();
   }
+  read(){
+          AsyncStorage.getItem('object',(error,result)=>{
+              if (!error) {
+                  console.log(result);
+                  alert(result);
+              }
+          })
+      }
+  //存储数据
+  save(){
+      // JSON.stringify(object): JSON对象转换为字符串 用来存储
+      AsyncStorage.setItem('object',JSON.stringify(object),(error)=>{
+          if (error) {
+              alert('存储失败');
+          } else  {
+              alert('存储成功');
+              read();
+          }
+      });
+  }
     constructor(props){
         super(props);
 
@@ -52,10 +73,11 @@ export default class admin extends Component {
             Sign:"",
             Usercode:"",
             UserPwd:"",
+
         };
         this.pickerData=[]
     }
- //第一次跑数据 componentDidMount
+ //直接跑数据 componentDidMount
     componentDidMount(){
         let params = {
              reqCode:"App_PosReq",
@@ -67,14 +89,35 @@ export default class admin extends Component {
          //console.log(loginParams);
          WebUtils.Post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',params, (data)=>{
              if(data.retcode == 1){
-//                 alert(JSON.stringify(data))
+                  //用户信息
+                  var detailInfo1 = data.DetailInfo1;
+                  //console.log("detailInfo1=",detailInfo1);打印debug
+                  //alert(detailInfo1)
+                  dbAdapter.insertTShopItemData(detailInfo1);
+                  //机构信息
+                  var detailInfo2 = data.DetailInfo2;
+                  dbAdapter.insertTUserSetData(detailInfo2);
+                  //权限表
+                  var detailInfo3 = data.DetailInfo3;
+                  dbAdapter.insertTUserRrightData(detailInfo3);
+                  //用户管理机构表
+                  var detailInfo4 = data.DetailInfo4;
+                  dbAdapter.insertTUsershopData(detailInfo4);
+                  // DataUtils.save("LinkUrl",LinkUrl);
              }else{
-                 alert("数据保存失败")
+                 ToastAndroid.show('网络请求失败', ToastAndroid.SHORT);
              }
          })
     }
  //失去焦点时 跑数据、存储、获取数据
     autoFocuss(){
+         let params = {
+                reqCode:"App_PosReq",
+                reqDetailCode:"App_Client_UseQry",
+                ClientCode:"800000001",
+                sDateTime:"2017-08-09 12:12:12",//获取当前时间转换成时间戳
+                Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_UseQry" + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
+         };
          WebUtils.Post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',params, (data)=>{
             if(data.retcode == 1){
                 DetailInfo1 = JSON.stringify(data.DetailInfo1);// 在这里从接口取出要保存的数据，然后执行save方法
@@ -85,11 +128,13 @@ export default class admin extends Component {
                         var shopcode = value.shopcode;
                         var shopname = value.shopname;
                         this.pickerData .push(shopname+"_"+shopcode);
-                         alert(shopname+"_"+shopcode);
+                        var str=shopname+"_"+shopcode;
+                        str1 = str.split('_');
+                        str2 = str1[1];
+                        alert(str2);
+//                         alert(shopname+"_"+shopcode);
                    }
-
-                   // alert("成功")
-                   //alert(JSON.stringify(data.DetailInfo1))
+//                   alert(JSON.stringify(data.DetailInfo1))
             }else{
                 alert("数据保存失败")
             }
@@ -101,27 +146,26 @@ export default class admin extends Component {
     }
   //登录
     pressPush(){
-        let params = {
-            reqCode:"App_PosReq",
-            reqDetailCode:"App_Client_UseQry",
-            Usercode:this.state.super,
-            sDateTime:"2017-08-09 12:12:12",//获取当前时间转换成时间戳
-            UserPwd:NetUtils.MD5(this.state.UserPwd)+'',//获取到密码之后md5加密
-            Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_UseQry" + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
-        };
-         WebUtils.Post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',params, (data)=>{
-          alert(JSON.stringify(data))
-            if(data.isEnter == 1){
-
+//    var str =pickedDate;
+//                            str = str.substr(0, str.indexOf('_'));
+//                            alert(str);
+        var Usercode=this.state.Usercode;
+        var UserPwd=NetUtils.MD5(this.state.UserPwd)+'';//获取到密码之后md5加密
+        var UserPwd=NetUtils.MD5(this.state.UserPwd)+'';
+        dbAdapter.selectTUserSetData(Usercode,'','').then((results)=>{//取数据
+            var str = results.item(0).UserPwd;
+            if(str = UserPwd){
                 var nextRoute={
                     name:"主页",
-                     component:home,
+                    component:home,
                 };
-                this.props.navigator.push(nextRoute)
+                this.props.navigator.push(nextRoute);
+                //获取到当前的组织机构信息   isLogin(Usercode, userpwd, currShopCode)
+
             }else{
-                  ToastAndroid.show('用户名或密码错误', ToastAndroid.SHORT)
+                ToastAndroid.show('用户编码或密码错误', ToastAndroid.SHORT)
             }
-         })
+        });
     }
     pressPop(){
         this.props.navigator.pop();
