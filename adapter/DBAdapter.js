@@ -419,7 +419,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
                 } else if (shopCode == '') {//本地没有保存机构号,根据当前的机构号下载商品和品类
                   let productBody = RequestBodyUtils.createProduct(currShopCode, '');
                   let categoryBody = RequestBodyUtils.createCategory(currShopCode);
-                  this.downProductAndCategory(productBody, categoryBody).then((result) = {
+                  this.downProductAndCategory(productBody, categoryBody).then((result) => {
                     if (result) {
                       resolve(true);
                     }
@@ -465,21 +465,26 @@ export default class DBAdapter extends SQLiteOpenHelper {
    * @param categoryBody
    */
   downProductAndCategory(productBody, categoryBody) {
-    FetchUtils.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos', productBody).then((data) => {
-      if (data.retcode == 1) {
-        this.insertProductData(data.TblRow).then((result) => {
-          FetchUtils.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos', categoryBody).then((data) => {
-            if (data.retcode == 1) {
-              this.insertTDepSetData(data.TblRow).then((result) => {
-                console.log("end");
-                return result;
+  return new Promise((resolve, reject)=>{
+  DataUtils.get("LinkUrl",LinkUrl).then((urlData)=>{
+   FetchUtils.post(urlData, productBody).then((data) => {
+          if (data.retcode == 1) {
+            this.insertProductData(data.TblRow).then((result) => {
+              FetchUtils.post(urlData, categoryBody).then((data) => {
+                if (data.retcode == 1) {
+                  this.insertTDepSetData(data.TblRow).then((result) => {
+                    console.log("end");
+                   resolve(true);
+                  });
+                }
               });
-            }
-          });
+            });
+          }
         });
-      }
     });
-    
+  }
+  });
+
   }
   
   /***
