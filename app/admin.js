@@ -128,10 +128,10 @@ export default class admin extends Component {
                         var shopcode = value.shopcode;
                         var shopname = value.shopname;
                         this.pickerData .push(shopname+"_"+shopcode);
-
-//                        str1 = str.split('_');
-////                        str2 = str[1];
-//                        alert(str1);
+                        var str=shopname+"_"+shopcode;
+                        str1 = str.split('_');
+                        str2 = str1[1];
+                        alert(str2);
 //                         alert(shopname+"_"+shopcode);
                    }
 //                   alert(JSON.stringify(data.DetailInfo1))
@@ -146,9 +146,9 @@ export default class admin extends Component {
     }
   //登录
     pressPush(){
-    var str =pickedDate;
-                            str = str.substr(0, str.indexOf('_'));
-                            alert(str);
+//    var str =pickedDate;
+//                            str = str.substr(0, str.indexOf('_'));
+//                            alert(str);
         var Usercode=this.state.Usercode;
         var UserPwd=NetUtils.MD5(this.state.UserPwd)+'';//获取到密码之后md5加密
         var UserPwd=NetUtils.MD5(this.state.UserPwd)+'';

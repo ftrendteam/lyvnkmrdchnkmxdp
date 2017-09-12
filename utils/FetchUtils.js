@@ -57,7 +57,8 @@ FetchUtil.post = function (common_url, requstBody) {
       },
       body: 'jsonStr=' + requstBody,
     }).then((response) => response.text()).then((responseText) => {
-      resolve(responseText);
+    let jsonResult = JSON.parse(responseText);
+      resolve(jsonResult);
     }).catch((err) => {
       console.log("aaaaaa==",err);
     })
