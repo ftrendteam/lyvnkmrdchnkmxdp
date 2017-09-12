@@ -20,6 +20,7 @@ import {
   AsyncStorages,
   ToastAndroid
 } from 'react-native';
+import DataUtils from "../utils/DataUtils";
 import home from "./Home";
 import NetUtils from "../utils/NetUtils";
 import WebUtils from "../utils/WebUtils";
@@ -38,6 +39,26 @@ export default class admin extends Component {
     //建表
     dbAdapter.createTable();
   }
+  read(){
+          AsyncStorage.getItem('object',(error,result)=>{
+              if (!error) {
+                  console.log(result);
+                  alert(result);
+              }
+          })
+      }
+  //存储数据
+  save(){
+      // JSON.stringify(object): JSON对象转换为字符串 用来存储
+      AsyncStorage.setItem('object',JSON.stringify(object),(error)=>{
+          if (error) {
+              alert('存储失败');
+          } else  {
+              alert('存储成功');
+              read();
+          }
+      });
+  }
     constructor(props){
         super(props);
 
@@ -52,6 +73,7 @@ export default class admin extends Component {
             Sign:"",
             Usercode:"",
             UserPwd:"",
+
         };
         this.pickerData=[]
     }
@@ -81,6 +103,7 @@ export default class admin extends Component {
                   //用户管理机构表
                   var detailInfo4 = data.DetailInfo4;
                   dbAdapter.insertTUsershopData(detailInfo4);
+                  // DataUtils.save("LinkUrl",LinkUrl);
              }else{
                  ToastAndroid.show('网络请求失败', ToastAndroid.SHORT);
              }
@@ -105,9 +128,13 @@ export default class admin extends Component {
                         var shopcode = value.shopcode;
                         var shopname = value.shopname;
                         this.pickerData .push(shopname+"_"+shopcode);
+
+//                        str1 = str.split('_');
+////                        str2 = str[1];
+//                        alert(str1);
 //                         alert(shopname+"_"+shopcode);
                    }
-                   alert(JSON.stringify(data.DetailInfo1))
+//                   alert(JSON.stringify(data.DetailInfo1))
             }else{
                 alert("数据保存失败")
             }
@@ -119,8 +146,12 @@ export default class admin extends Component {
     }
   //登录
     pressPush(){
+    var str =pickedDate;
+                            str = str.substr(0, str.indexOf('_'));
+                            alert(str);
         var Usercode=this.state.Usercode;
         var UserPwd=NetUtils.MD5(this.state.UserPwd)+'';//获取到密码之后md5加密
+        var UserPwd=NetUtils.MD5(this.state.UserPwd)+'';
         dbAdapter.selectTUserSetData(Usercode,'','').then((results)=>{//取数据
             var str = results.item(0).UserPwd;
             if(str = UserPwd){
@@ -128,7 +159,9 @@ export default class admin extends Component {
                     name:"主页",
                     component:home,
                 };
-                this.props.navigator.push(nextRoute)
+                this.props.navigator.push(nextRoute);
+                //获取到当前的组织机构信息   isLogin(Usercode, userpwd, currShopCode)
+
             }else{
                 ToastAndroid.show('用户编码或密码错误', ToastAndroid.SHORT)
             }

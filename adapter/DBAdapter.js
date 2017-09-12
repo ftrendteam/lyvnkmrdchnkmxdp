@@ -2,7 +2,7 @@
  * Created by admin on 2017/9/1.
  */
 import SQLiteOpenHelper from '../sqLiteOpenHelper/SQLiteOpenHelper';
-import MD5Utils from '../MD5Utils';
+import MD5Utils from '../utils/MD5Utils';
 import DataUtils from '../utils/DataUtils';
 import WebUtils from '../utils/WebUtils';
 import RequestBodyUtils from '../utils/RequestBodyUtils';
@@ -391,13 +391,14 @@ export default class DBAdapter extends SQLiteOpenHelper {
           if (length === 1) {
             let item = results.rows.item(0);
             if (md5Pwd == item.UserPwd) {//密码正确
-              let shopCode = DataUtils.get('shopCode');
+              let shopCode = DataUtils.get('shopCode','');
               if (shopCode == currShopCode) {//当前登录的机构号 和本地保存的相同
                 resolve(true);
               } else if (shopCode == '') {//本地没有保存机构号,根据当前的机构号下载商品和品类
                 let productBody = RequestBodyUtils.createProduct(currShopCode, '');
                 let categoryBody = RequestBodyUtils.createCategory(currShopCode);
-                this.downProductAndCategory(productBody, categoryBody);
+                 this.downProductAndCategory(productBody, categoryBody);
+                  resolve(true);
               } else {//当前登录的机构号和本地保存的机构号不同.重新保存并下载新的品类和商品信息
                 DataUtils.save('shopCode', currShopCode);
                 /***
@@ -406,9 +407,10 @@ export default class DBAdapter extends SQLiteOpenHelper {
                  */
                 let productBody = RequestBodyUtils.createProduct(currShopCode, '');
                 let categoryBody = RequestBodyUtils.createCategory(currShopCode);
-                this.downProductAndCategory(productBody, categoryBody);
+                 this.downProductAndCategory(productBody, categoryBody);
+                  resolve(true);
               }
-              resolve(true);
+//              resolve(true);
             } else {
               resolve(false);
             }
@@ -436,6 +438,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
       if (data.retcode == 1) {
         this.deleteData('product');
         this.insertProductData(data.TblRow);
+
       }
     });
     WebUtils.Post('url', categoryBody, (data) => {//下载品类信息并保存

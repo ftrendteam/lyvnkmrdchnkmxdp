@@ -135,12 +135,12 @@ export default class Index extends Component {
         dbAdapter.selectProduct('9').then((rows)=>{
             for(let i =0;i<rows.length;i++){
                 var row = rows.item(i);
-//                alert(JSON.stringify(row));
+               alert(JSON.stringify(row));
             }
 //            alert(JSON.stringify(row));
-            this.setState({
-                data:row
-            })
+            // this.setState({
+            //     data:row
+            // })
         });
     }
     _renderItem(item,index){

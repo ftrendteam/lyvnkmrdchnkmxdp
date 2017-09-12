@@ -3,7 +3,6 @@
  */
 import MD5Utils from './MD5Utils';
 import DateUtils from './DateUtils';
-import FetchUtils from './FetchUtils'
 import DataUtils from './DataUtils'
 export  default class RequestBodyUtils {
   static  currPage = 1;
