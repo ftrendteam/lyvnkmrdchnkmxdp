@@ -2,7 +2,7 @@
  * Created by admin on 2017/9/1.
  */
 import SQLiteOpenHelper from '../sqLiteOpenHelper/SQLiteOpenHelper';
-import MD5Utils from '../MD5Utils';
+import MD5Utils from '../utils/MD5Utils';
 import DataUtils from '../utils/DataUtils';
 import FetchUtils from '../utils/FetchUtils';
 import RequestBodyUtils from '../utils/RequestBodyUtils';
@@ -259,6 +259,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
       this.open();
     }
     //this.createTable();
+    console.log("product-start");
     this.deleteData("product");
     db.transaction((tx) => {
       for (let i = 0; i < len; i++) {
@@ -317,7 +318,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
         let TakeRate = product.TakeRate;
         let PriceFlag = product.PriceFlag;
         let OperRange = product.OperRange;
-        
+        console.log("product-start2");
         let sql = 'INSERT INTO product(Pid,ProdCode,BarCode,ProdName,ShortName,AidCode,OtherCode,DepCode,SuppCode,BrandCode,' +
           'Spec,ProdAdr,Unit,PUnitAmt,PicInfo,ProdMemo,StdOPrice,StdOutOPrice,StdPrice,WPrice,LowPrice,HighPrice,OTax,' +
           'STax,VipPrice1,VipPrice2,VipPrice3,BoxCode,IsIntCount,SaleType,GatherType,GatherRate,ProdType,SeasonCode,' +
@@ -331,6 +332,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
             console.log(err);
           }
         );
+        console.log("product-start2");
       }
     }, (error) => {
       this._errorCB('transaction', error);
@@ -432,13 +434,14 @@ export default class DBAdapter extends SQLiteOpenHelper {
    * @param categoryBody
    */
   downProductAndCategory(productBody, categoryBody) {
-    FetchUtils.post('url', productBody, (data) => {//下载商品信息并保存
+    FetchUtils.post('url', productBody).then((data)=>{
       if (data.retcode == 1) {
-        this.deleteData('product');
+        //this.deleteData('product');
         this.insertProductData(data.TblRow);
+        console.log("end");
       }
     });
-    FetchUtils.post('url', categoryBody, (data) => {//下载品类信息并保存
+    FetchUtils.post('url', categoryBody).then((data)=>{
       if (data.retcode == 1) {
         this.insertTDepSetData(data.TblRow);
       }

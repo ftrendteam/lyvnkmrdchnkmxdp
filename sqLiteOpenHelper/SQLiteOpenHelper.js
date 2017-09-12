@@ -27,8 +27,7 @@ export default class SQLiteOpenHelper {
       database_size,
       () => {
         this._successCB('open');
-      },
-      (err) => {
+      }, (err) => {
         this._errorCB('open', err);
       });
     return db;

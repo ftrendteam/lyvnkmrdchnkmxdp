@@ -56,9 +56,9 @@ export default class FetchUtils {
         },
         body: 'jsonStr=' + requstBody,
       }).then((response) => response.text()).then((responseText) => {
-        //alert('dddb=' + responseText);
         console.log('c=' + responseText);
-        resolve(responseText);
+        let jsonResult = JSON.parse(responseText);
+        resolve(jsonResult);
       }).catch((err) => {
         console.log(err);
       })
