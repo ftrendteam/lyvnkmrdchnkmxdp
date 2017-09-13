@@ -74,7 +74,11 @@ class login extends Component{
                    //alert(JSON.stringify(value))
                    LinkUrl = value.LinkUrl;
                    // alert(LinkUrl);//获取url地址
-                   DataUtils.save("LinkUrl",LinkUrl);
+                   var str=LinkUrl;
+                   var items=str.replace("?wsdl","")
+                   var data="/FMJsonInterfaceByDownToPos";
+                   var date=items+"/FMJsonInterfaceByDownToPos";
+                   DataUtils.save("LinkUrl",date);
                 }
                 var nextRoute={
                     name:"主页",
@@ -83,6 +87,11 @@ class login extends Component{
                 this.props.navigator.push(nextRoute)
             }else{
                 ToastAndroid.show('商户号或密码错误', ToastAndroid.SHORT)
+                var nextRoute={
+                    name:"主页",
+                    component:admin,
+                };
+                this.props.navigator.push(nextRoute)
             }
         })
     }

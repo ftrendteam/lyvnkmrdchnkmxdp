@@ -46,7 +46,7 @@ export default class FetchUtils {
    * @returns {Promise}
    */
   static post = (common_url, requstBody) => {
-    console.log(common_url);
+    console.log(requstBody);
     return new Promise(function (resolve, reject) {
       fetch(common_url, {
         method: 'POST',
@@ -56,6 +56,7 @@ export default class FetchUtils {
         },
         body: 'jsonStr=' + requstBody,
       }).then((response) => response.text()).then((responseText) => {
+      console.log("wtf==",responseText);
         let jsonResult = JSON.parse(responseText);
         resolve(jsonResult);
       }).catch((err) => {

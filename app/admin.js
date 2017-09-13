@@ -124,17 +124,12 @@ export default class admin extends Component {
                 DetailInfo1 = JSON.stringify(data.DetailInfo1);// 在这里从接口取出要保存的数据，然后执行save方法
                    var  DetailInfo1 = JSON.stringify(data.DetailInfo1);
                    for(var value of data.DetailInfo1){
-                        // console.log(value)
                         // alert(JSON.stringify(value))
                         var shopcode = value.shopcode;
                         var shopname = value.shopname;
                         this.pickerData .push(shopname+"_"+shopcode);
-//                        var code = this.state.pickedDate;
-//                         str1 = code.split('_');
-//                         str2 = str1[1];
-//                         alert(str2);
                    }
-//                   alert(JSON.stringify(data.DetailInfo1))
+                   //alert(JSON.stringify(data.DetailInfo1))
             }else{
                 alert("数据保存失败")
             }
@@ -144,42 +139,27 @@ export default class admin extends Component {
     inputOnBlur(){
         this.autoFocuss();
     }
-  //登录
-   pressPush(){
-           var code = ""+this.state.pickedDate;//获取到之后前面加""+
-           var Usercode=this.state.Usercode;
-        // var UserPwd=NetUtils.MD5(this.state.UserPwd)+'';//获取到密码之后md5加密
-            str1 = code.split('_');
-           str2 = str1[1];
-//           alert(str2);
-            dbAdapter.isLogin(Usercode, this.state.UserPwd, str2).then((isLogin)=>{
-                if(isLogin){
-                     var nextRoute={
-                       name:"主页",
-                       component:home,
-                   };
-                   this.props.navigator.push(nextRoute);
-                }
-            });
-//           dbAdapter.selectTUserSetData(Usercode,'','').then((results)=>{//取数据
-//               var str = results.item(0).UserPwd;
-//               if(str = UserPwd){
-//   //                var nextRoute={
-//   //                    name:"主页",
-//   //                    component:home,
-//   //                };
-//   //                this.props.navigator.push(nextRoute);
-//                   //获取到当前的组织机构信息 isLogin(Usercode, userpwd, currShopCode)
-//                   str1 = code.split('_');
-//                   str2 = str1[1];
-//                   //alert(str2);
-//                   //将截取的字符串传入currShopCode并调用isLogin
-//
-//               }else{
-//                   ToastAndroid.show('用户编码或密码错误', ToastAndroid.SHORT)
-//               }
-//           });
-       }
+//登录
+    pressPush(){
+        var code = ""+this.state.pickedDate;//获取到之后前面加""+
+        var Usercode=this.state.Usercode;
+        DataUtils.save("shopCode","0");
+        //var UserPwd=NetUtils.MD5(this.state.UserPwd)+'';//获取到密码之后md5加密
+        str1 = code.split('_');
+        str2 = str1[1];
+        //alert(str2);
+        dbAdapter.isLogin(Usercode, this.state.UserPwd, str2).then((isLogin)=>{
+            if(isLogin){
+               var nextRoute={
+                   name:"主页",
+                   component:home,
+               };
+               this.props.navigator.push(nextRoute);
+            }else{
+                ToastAndroid.show('用户编码或密码错误', ToastAndroid.SHORT)
+            }
+        });
+    }
     pressPop(){
         this.props.navigator.pop();
     }
