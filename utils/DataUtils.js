@@ -22,7 +22,6 @@ export default class DataUtils {
         if (result == null) {
           resolve(defaultValue);
         } else {
-          console.log("resule", result);
           resolve(result);
         }
       });
