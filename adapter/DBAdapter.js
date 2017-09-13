@@ -465,26 +465,24 @@ export default class DBAdapter extends SQLiteOpenHelper {
    * @param categoryBody
    */
   downProductAndCategory(productBody, categoryBody) {
-  return new Promise((resolve, reject)=>{
-  DataUtils.get("LinkUrl",LinkUrl).then((urlData)=>{
-   FetchUtils.post(urlData, productBody).then((data) => {
+    return new Promise((resolve, reject) => {
+      DataUtils.get("LinkUrl", "").then((urldata) => {
+        FetchUtils.post(urlData, productBody).then((data) => {
           if (data.retcode == 1) {
             this.insertProductData(data.TblRow).then((result) => {
               FetchUtils.post(urlData, categoryBody).then((data) => {
                 if (data.retcode == 1) {
                   this.insertTDepSetData(data.TblRow).then((result) => {
-                    console.log("end");
-                   resolve(true);
+                    resolve(true);
                   });
                 }
               });
             });
           }
         });
+      })
     });
-  }
-  });
-
+    
   }
   
   /***
@@ -497,7 +495,6 @@ export default class DBAdapter extends SQLiteOpenHelper {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
         tx.executeSql('select * from tdepset where IsDel=0 and DepLevel=' + DepLevel + '', [], (tx, results) => {
-          console.log("wtf2=", results.rows.length)
           resolve(results.rows);
         });
       }, (error) => {
