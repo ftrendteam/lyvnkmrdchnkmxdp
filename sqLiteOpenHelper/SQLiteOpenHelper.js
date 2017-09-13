@@ -99,6 +99,13 @@ export default class SQLiteOpenHelper {
         }, (err) => {
           this._errorCB('f', err);
         });
+      tx.executeSql("CREATE TABLE IF NOT EXISTS shopInfo(ShopName varchar(40) null,ShopNumber int(20) null,"+
+        +"ShopPrice float(8) null,ShopAmount float(8) null,ShopRemark varchar(1000))",[],
+        ()=>{
+        
+        }, (err)=>{
+        console.log(err);
+      });
     }, (err) => {
       this._errorCB('transaction', err);
     }, () => {

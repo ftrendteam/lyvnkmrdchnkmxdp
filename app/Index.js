@@ -147,14 +147,13 @@ export default class Index extends Component {
         });
     }
     _renderItem(item,index){
-      alert(item.ProdName)
         return(
             <View style={styles.Border}>
                  <TouchableOpacity onPress={this.OrderDetails.bind(this)}>
                      <View style={styles.Image}>
                          <Image source={require("../images/image.png")}></Image>
                      </View>
-                     <Text style={styles.Text}>{item.ProdName}</Text>
+                     <Text style={styles.Text}>{item.item.ProdName}</Text>
                  </TouchableOpacity>
             </View>
         )
@@ -203,6 +202,7 @@ export default class Index extends Component {
                                <FlatList
                                     numColumns={3}
                                     key={item => item.Pid}
+                                    keyExtractor={item => item.Pid}
                                     renderItem={this._renderItem.bind(this)}
 //                                    renderItem={({item}) => <Text>{item.ProdName}</Text>}
                                     ItemSeparatorComponent={this._separator.bind(this)}
