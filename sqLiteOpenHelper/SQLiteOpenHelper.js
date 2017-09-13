@@ -2,7 +2,7 @@
  * Created by admin on 2017/9/1.
  */
 import SQLiteStorage from 'react-native-sqlite-storage';
-SQLiteStorage.DEBUG(true);
+SQLiteStorage.DEBUG(false);
 let database_name = "PosBasicItem.db";//数据库文件
 let database_version = "1.0";//版本号
 let database_displayname = "MySQLite";

@@ -31,7 +31,8 @@ import Search from "./Search";
 import list from "./HomeLeftList";
 import Query from "./Query";
 import NetUtils from "../utils/NetUtils";
-import WebUtils from "../utils/WebUtils";
+//import WebUtils from "../utils/WebUtils";
+import FetchUtils from "../utils/FetchUtils";
 import DBAdapter from "../adapter/DBAdapter";
 import Storage from 'react-native-storage';
 import XZHBottomView from './XZHBottomView';
@@ -47,8 +48,10 @@ export default class Index extends Component {
         this.state = {
             show:false,
             dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
+            data:[],
         };
         this.dataRows = [];
+
     }
     pressPush(){
         var nextRoute={
@@ -122,14 +125,51 @@ export default class Index extends Component {
             })
         });
     }
-    _renderRow(renderRow){
+    _renderRow(rowData, sectionID, rowID){
          return (
-            <TouchableOpacity style={styles.Active}>
-                <Text style={styles.Active1}>{renderRow.DepName}</Text>
+            <TouchableOpacity style={styles.Active} onPress={()=>this._pressRow(rowData)}>
+                <Text style={styles.Active1}>{rowData.DepName}</Text>
             </TouchableOpacity>
          );
     }
+ //右侧商品信息
+    _pressRow(rowData){
+         let priductData=[];
+        dbAdapter.selectProduct(rowData.DepCode).then((rows)=>{
+            for(let i =0;i<rows.length;i++){
+                var row = rows.item(i);
+                priductData.push(row);
+            }
+
+             this.setState({
+                 data:priductData,
+             })
+        });
+    }
+    _renderItem(item,index){
+      alert(item.ProdName)
+        return(
+            <View style={styles.Border}>
+                 <TouchableOpacity onPress={this.OrderDetails.bind(this)}>
+                     <View style={styles.Image}>
+                         <Image source={require("../images/image.png")}></Image>
+                     </View>
+                     <Text style={styles.Text}>{item.ProdName}</Text>
+                 </TouchableOpacity>
+            </View>
+        )
+    }
+    _separator = () => {
+        return <View style={{height:1,backgroundColor:'#f5f5f5'}}/>;
+    }
+    //ListEmptyComponent={this._createEmptyView()}
+    _createEmptyView() {
+        return (
+            <Text style={{fontSize: 16, alignSelf: 'center',marginTop:10}}>等待更新！</Text>
+        );
+    }
     render() {
+     const {data} = this.state;
         return (
               <View style={styles.container}>
                   <View style={styles.header}>
@@ -160,30 +200,14 @@ export default class Index extends Component {
                       </ScrollView>
                       <View style={styles.RightList1}>
                           <ScrollView style={styles.ScrollView1}>
-                              <View style={styles.Border}>
-                                   <TouchableOpacity onPress={this.OrderDetails.bind(this)}>
-                                       <View style={styles.Image}>
-                                           <Image source={require("../images/image.png")}></Image>
-                                        </View>
-                                       <Text style={styles.Text}>哈密瓜</Text>
-                                   </TouchableOpacity>
-                               </View>
-                               <View style={styles.Border}>
-                                    <TouchableOpacity onPress={this.OrderDetails.bind(this)}>
-                                        <View style={styles.Image}>
-                                            <Image source={require("../images/image.png")}></Image>
-                                         </View>
-                                        <Text style={styles.Text}>哈密瓜</Text>
-                                    </TouchableOpacity>
-                                </View>
-                                <View style={styles.Border}>
-                                     <TouchableOpacity onPress={this.OrderDetails.bind(this)}>
-                                         <View style={styles.Image}>
-                                             <Image source={require("../images/image.png")}></Image>
-                                          </View>
-                                         <Text style={styles.Text}>哈密瓜</Text>
-                                     </TouchableOpacity>
-                                 </View>
+                               <FlatList
+                                    numColumns={3}
+                                    key={item => item.Pid}
+                                    renderItem={this._renderItem.bind(this)}
+//                                    renderItem={({item}) => <Text>{item.ProdName}</Text>}
+                                    ItemSeparatorComponent={this._separator.bind(this)}
+                                    data={data}
+                               />
                           </ScrollView>
                       </View>
                   </View>
