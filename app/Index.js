@@ -31,14 +31,10 @@ import Search from "./Search";
 import list from "./HomeLeftList";
 import Query from "./Query";
 import NetUtils from "../utils/NetUtils";
-//import WebUtils from "../utils/WebUtils";
 import FetchUtils from "../utils/FetchUtils";
 import DBAdapter from "../adapter/DBAdapter";
 import Storage from 'react-native-storage';
-import XZHBottomView from './XZHBottomView';
-import XZHWineCell from  './XZHWineCell';
 import SideMenu from 'react-native-side-menu';
-
 //第二页面
 let dbAdapter = new DBAdapter();
 let db;
@@ -74,14 +70,6 @@ export default class Index extends Component {
         };
         this.props.navigator.push(nextRoute)
     }
-    Home(){
-        this._setModalVisible()
-        var nextRoute={
-            name:"主页",
-            component:Home
-        };
-        this.props.navigator.push(nextRoute)
-    }
     pullOut(){
         this._setModalVisible()
         var nextRoute={
@@ -114,6 +102,7 @@ export default class Index extends Component {
     }
     //左侧品级
     componentDidMount(){
+
         dbAdapter.selectTDepSet('1').then((rows)=>{
             for(let i =0;i<rows.length;i++){
                 var row = rows.item(i);
@@ -134,27 +123,27 @@ export default class Index extends Component {
     }
  //右侧商品信息
     _pressRow(rowData){
-         let priductData=[];
+        let priductData=[];
         dbAdapter.selectProduct(rowData.DepCode).then((rows)=>{
             for(let i =0;i<rows.length;i++){
                 var row = rows.item(i);
+//                alert(JSON.stringify(row))
                 priductData.push(row);
             }
-
              this.setState({
                  data:priductData,
              })
         });
     }
-    _renderItem(item,index){
-      alert(item.ProdName)
+    _renderItem(data,index){
+//        alert(JSON.stringify(item))
         return(
             <View style={styles.Border}>
                  <TouchableOpacity onPress={this.OrderDetails.bind(this)}>
                      <View style={styles.Image}>
                          <Image source={require("../images/image.png")}></Image>
                      </View>
-                     <Text style={styles.Text}>{item.ProdName}</Text>
+                     <Text style={styles.Text}>{data.item.ProdName}</Text>
                  </TouchableOpacity>
             </View>
         )
@@ -167,6 +156,33 @@ export default class Index extends Component {
         return (
             <Text style={{fontSize: 16, alignSelf: 'center',marginTop:10}}>等待更新！</Text>
         );
+    }
+//    加入购物城
+    Home(){
+//        this._setModalVisible()
+//        var nextRoute={
+//            name:"主页",
+//            component:Home
+//        };
+//        this.props.navigator.push(nextRoute)
+        let params = {
+            reqCode: "App_PosReq",
+            reqDetailCode: "App_Client_ProYH",
+            ClientCode: "800000001",
+            sDateTime: "",
+            Sign: "",
+            username: "001",
+            usercode: "001",
+            DetailInfo1: {"ShopCode": "0", "OrgFormno": "", "ProMemo": "表单备注"},
+            DetailInfo2: [{"prodcode": "0101", "countm": 10, "ProPrice": 12, "promemo": "", "kccount": '10'}]
+        };
+        FetchUtil.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
+            if(data.retcode == 1){
+               alert("提交成功")
+            }else{
+               alert("提交失败")
+            }
+        })
     }
     render() {
      const {data} = this.state;
@@ -204,7 +220,6 @@ export default class Index extends Component {
                                     numColumns={3}
                                     key={item => item.Pid}
                                     renderItem={this._renderItem.bind(this)}
-//                                    renderItem={({item}) => <Text>{item.ProdName}</Text>}
                                     ItemSeparatorComponent={this._separator.bind(this)}
                                     data={data}
                                />
