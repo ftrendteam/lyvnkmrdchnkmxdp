@@ -266,15 +266,17 @@ export default class DBAdapter extends SQLiteOpenHelper {
       db.transaction((tx) => {
         for (let i = 0; i < lenght; i++) {
           let shopInfo = shopInfoData[i];
-          let shopName = shopInfo.ShopName;
-          let ShopNumber = shopInfo.ShopNumber;
+          let shopName = shopInfo.prodname;
+          let ShopNumber = shopInfo.countm;
           let ShopPrice = shopInfo.ShopPrice;
-          let ShopAmount = shopInfo.ShopAmount;
-          let ShopRemark = shopInfo.ShopRemark;
+          let ShopAmount = shopInfo.prototal;
+          let ShopRemark = shopInfo.promemo;
           let Pid=shopInfo.Pid;
-          let sql = "INSERT INTO shopInfo(Pid,ShopName,ShopNumber,ShopPrice,ShopAmount,ShopRemark)" +
-            "values(?,?,?,?,?,?)";
-          tx.executeSql(sql, [Pid,shopName, ShopNumber, ShopPrice, ShopAmount, ShopRemark], () => {
+          let ProdCode=shopInfo.ProdCode;
+       //   "prodname":"海鲜菇","countm":1.0000,"kccount":0.0,"prototal":1.0000,"unit":"kg  ","promemo":""
+          let sql = "INSERT INTO shopInfo(Pid,ProdCode,prodname,countm,ShopPrice,prototal,promemo)" +
+            "values(?,?,?,?,?,?,?)";
+          tx.executeSql(sql, [Pid,ProdCode,shopName, ShopNumber, ShopPrice, ShopAmount, ShopRemark], () => {
               resolve(true);
             }, (err) => {
               reject(false);
@@ -582,8 +584,8 @@ export default class DBAdapter extends SQLiteOpenHelper {
   selectProduct(DepCode) {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
-        tx.executeSql("select a.*,ifNull(b.ShopNumber,0) as ShopNumber,ifNull(b.ShopPrice,a.StdPrice) as ShopPrice ,ifNull(b.ShopAmount,0) as ShopAmount   "+
-        ",ifNull(b.ShopRemark,'') as ShopRemark "+
+        tx.executeSql("select a.*,ifNull(b.countm,0) as ShopNumber,ifNull(b.ShopPrice,a.StdPrice) as ShopPrice ,ifNull(b.prototal,0) as ShopAmount   "+
+        ",ifNull(b.promemo,'') as ShopRemark "+
         " from product a left join shopInfo b on a.Pid=b.Pid where IsDel='0' and prodtype<>'1' and DepCode in (select DepCode from tdepset where IsDel='0'" +
           "and (DepCode=" + DepCode + " or SubCode like '%;" + DepCode + ";%'))", [], (tx, results) => {
           resolve(results.rows);

@@ -122,37 +122,36 @@ export default class ShoppingCart extends Component {
             });
        });
        dbAdapter.selectShopInfo('1').then((rows)=>{
-       var shopnumber = 0;
-       var shopAmount = 0;
+           var shopnumber = 0;
+           var shopAmount = 0;
            for(let i =0;i<rows.length;i++){
                var row = rows.item(i);
-               shopAmount += parseInt(row.ShopAmount);
-               shopnumber += parseInt(row.ShopNumber);
+               var number = row.countm;
+               shopAmount += parseInt(row.prototal);
+               shopnumber += parseInt(row.countm);
                this.dataRows.push(row);
            }
-           var ShopNumber=this.state.ShopNumber;
-           var ShopAmount=this.state.ShopAmount;
            this.setState({
+               number1:number,
                ShopNumber:shopnumber,//数量
                ShopAmount:shopAmount,//总金额
                dataSource:this.state.dataSource.cloneWithRows(this.dataRows)
            })
        });
-
     }
      _renderRow(rowData, sectionID, rowID){
          return (
             <View style={styles.ShopList}>
                 <TouchableOpacity style={styles.ShopContList} onPress={this.OrderDetails.bind(this)}>
                     <View style={styles.ShopTop}>
-                        <Text style={styles.ShopLeft}>{rowData.ShopName}</Text>
+                        <Text style={styles.ShopLeft}>{rowData.prodname}</Text>
                         <Text style={styles.ShopRight}>单位：件</Text>
                     </View>
                     <View style={styles.ShopTop}>
                         <Text style={[styles.Name,styles.Name1]}></Text>
-                        <Text style={[styles.Number,styles.Name1]}>{rowData.ShopNumber}</Text>
+                        <Text style={[styles.Number,styles.Name1]}>{rowData.countm}</Text>
                         <Text style={[styles.Price,styles.Name1]}>{rowData.ShopPrice}</Text>
-                        <Text style={[styles.SmallScale,styles.Name2]}>{rowData.ShopAmount}</Text>
+                        <Text style={[styles.SmallScale,styles.Name2]}>{rowData.prototal}</Text>
                     </View>
                 </TouchableOpacity>
             </View>
@@ -171,6 +170,7 @@ export default class ShoppingCart extends Component {
                         ClientCode: this.state.ClientCode,
                         username: this.state.Username,
                         usercode: this.state.Userpwd,
+                        Remark: this.state.ShopRemark,
                     };
                 });
             });
@@ -183,12 +183,12 @@ export default class ShoppingCart extends Component {
                 username: this.state.Username,
                 usercode: this.state.Userpwd,
                 DetailInfo1: {"ShopCode": tags, "OrgFormno": this.state.orgFormno, "ProMemo": ""},
-                DetailInfo2: [{"prodcode": this.state.procode, "countm": 10, "ProPrice": 12, "promemo": "", "kccount": '10'}]
+                DetailInfo2: this.dataRows
             };
             FetchUtils.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
                 if(data.retcode == 1){
                    alert("提交成功")
-                }else{
+                    }else{
 //                   alert("提交失败");
                      alert(JSON.stringify(data))
                 }

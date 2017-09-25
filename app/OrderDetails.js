@@ -33,17 +33,19 @@ export default class GoodsDetails extends Component {
             ProdCode:this.props.ProdCode ? this.props.ProdCode : "",//接受传入的值
             ProdName:this.props.ProdName ? this.props.ProdName : "",//接受传入的值
             Pid:this.props.Pid ? this.props.Pid : "",
-            StdPrice:this.props.StdPrice ? this.props.StdPrice : "",
-            ShopNumber:this.props.ShopNumber ? this.props.ShopNumber : "1",
-            ShopRemark:this.props.ShopRemark ? this.props.ShopRemark : "",
-            ShopAmount:this.props.ShopAmount ? this.props.ShopAmount : "",
+            ShopPrice:this.props.ShopPrice ? this.props.ShopPrice : "",
+            Number:this.props.Number ? this.props.Number : "1",
+            Remark:this.props.Remark ? this.props.Remark : "",
+            prototal:this.props.prototal ? this.props.prototal : "",
             totalPrice:"",
             Number:this.props.ShopNumber ? this.props.ShopNumber : "",
             Price:"",
-            Remark:this.props.ShopRemark ? this.props.ShopRemark : "",
         }
     }
+    componentDidMount(){
 
+    alert(this.state.ProdName)
+    }
     GoodsDetails(){
         this.props.navigator.pop();
     }
@@ -61,17 +63,11 @@ export default class GoodsDetails extends Component {
        };
        this.props.navigator.push(nextRoute)
     }
-    componentDidMount(){
-        var procode = this.state.ProdCode;
-        alert(procode)
-        Storage.save('procode',procode);
-    }
-
 // 失焦时触发事件
     inputOnBlur(){
        var Number=this.state.Number;
-       var StdPrice=this.state.StdPrice;
-       this.state.totalPrice =Number*StdPrice;
+       var ShopPrice=this.state.ShopPrice;
+       this.state.totalPrice =Number*ShopPrice;
        this.setState({
            totalPrice: this.state.totalPrice
        });
@@ -106,11 +102,12 @@ export default class GoodsDetails extends Component {
         var shopInfoData = [];
         var shopInfo = {};
         shopInfo.Pid = this.state.Pid;
-        shopInfo.ShopName = this.state.ProdName;
-        shopInfo.ShopNumber = this.state.Number;
-        shopInfo.ShopPrice = this.state.StdPrice;
-        shopInfo.ShopAmount =(this.state.Number)*(this.state.StdPrice);
-        shopInfo.ShopRemark = this.state.Remark;
+        shopInfo.ProdCode=this.state.ProdCode;
+        shopInfo.prodname = this.state.ProdName;
+        shopInfo.countm = this.state.Number;
+        shopInfo.ShopPrice = this.state.ShopPrice;
+        shopInfo.prototal =(this.state.Number)*(this.state.ShopPrice);
+        shopInfo.promemo = this.state.Remark;
         shopInfoData.push(shopInfo);
         //然后调用方法
         dbAdapter.insertShopInfo(shopInfoData);
@@ -162,7 +159,7 @@ export default class GoodsDetails extends Component {
             <View style={styles.List}>
                 <View style={styles.left2}>
                     <Text style={styles.Price}>单价</Text>
-                    <Text style={styles.Price1}>{this.state.StdPrice}</Text>
+                    <Text style={styles.Price1}>{this.state.ShopPrice}</Text>
                 </View>
                 <View style={styles.right2}>
                     <Text style={styles.price}>元/件</Text>
@@ -172,7 +169,7 @@ export default class GoodsDetails extends Component {
                 <View style={styles.left2}>
                     <Text style={styles.Price}>金额</Text>
                     <Text style={styles.Price1}>
-                    {(this.state.Number)*(this.state.StdPrice)}
+                    {(this.state.Number)*(this.state.ShopPrice)}
                     </Text>
                 </View>
                 <View style={styles.right2}>

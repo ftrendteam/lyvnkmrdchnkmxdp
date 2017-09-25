@@ -84,6 +84,7 @@ export default class GoodsDetails extends Component {
                     this.setState({
                        dataSource:this.state.dataSource.cloneWithRows(this.dataRows)
                    })
+                   alert(JSON.stringify(data))
                  }else{
                    ToastAndroid.show('网络请求失败', ToastAndroid.SHORT);
                  }

@@ -143,12 +143,6 @@ export default class Index extends Component {
                 Number:value,
             })
         });
-//        var head=this.state.head;
-//        if(head == ""){
-//            alert(123)
-//            }else{
-//            this.OrderDetails();
-//         }
     }
     _renderRow(rowData, sectionID, rowID){
          return (
@@ -203,13 +197,13 @@ export default class Index extends Component {
         this.props.navigator.push({
             component:OrderDetails,
             params:{
-                ProdCode:item.item.ProdCode,
                 ProdName:item.item.ProdName,
-                StdPrice:item.item.StdPrice,
+                ShopPrice:item.item.ShopPrice,
                 Pid:item.item.Pid,
-                ShopNumber:item.item.ShopNumber,
-                ShopRemark:item.item.ShopRemark,
-                ShopAmount:item.item.ShopAmount
+                countm:item.item.countm,
+                promemo:item.item.promemo,
+                prototal:item.item.prototal,
+                ProdCode:item.item.ProdCode
             }
         })
 //        alert(JSON.stringify(item.item.ShopNumber))

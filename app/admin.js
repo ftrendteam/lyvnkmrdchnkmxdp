@@ -62,7 +62,6 @@ export default class admin extends Component {
   }
     constructor(props){
         super(props);
-
         this.state = {
             language:null,
             show:false,
@@ -82,7 +81,6 @@ export default class admin extends Component {
  //直接跑数据 componentDidMount
     componentDidMount(){
 //        Storage.get('ClientCode').then((tags) => {
-
         let params = {
              reqCode:"App_PosReq",
              reqDetailCode:"App_Client_UseQry",
