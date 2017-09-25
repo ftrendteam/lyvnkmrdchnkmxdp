@@ -271,9 +271,10 @@ export default class DBAdapter extends SQLiteOpenHelper {
           let ShopPrice = shopInfo.ShopPrice;
           let ShopAmount = shopInfo.ShopAmount;
           let ShopRemark = shopInfo.ShopRemark;
-          let sql = "INSERT INTO shopInfo(ShopName,ShopNumber,ShopPrice,ShopAmount,ShopRemark)" +
-            "values(?,?,?,?,?)";
-          tx.executeSql(sql, [shopName, ShopNumber, ShopPrice, ShopAmount, ShopRemark], () => {
+          let Pid=shopInfo.Pid;
+          let sql = "INSERT INTO shopInfo(Pid,ShopName,ShopNumber,ShopPrice,ShopAmount,ShopRemark)" +
+            "values(?,?,?,?,?,?)";
+          tx.executeSql(sql, [Pid,shopName, ShopNumber, ShopPrice, ShopAmount, ShopRemark], () => {
               resolve(true);
             }, (err) => {
               reject(false);
@@ -450,11 +451,11 @@ export default class DBAdapter extends SQLiteOpenHelper {
           //for (let i = 0; i < length; i++) {
           if (length === 1) {
             let item = results.rows.item(0);
-            console.log("pwd=", item.UserPwd)
-            console.log("md5Pwd=", md5Pwd + '')
-            console.log("pwd=", md5Pwd == item.UserPwd)
+
             if ((md5Pwd + '') == item.UserPwd) {//密码正确
-              console.log("pwd ok");
+              let userName = item.UserName;
+              DataUtils.save("userName",userName);
+              DataUtils.save("userCode",Usercode);
               let shopCode;
               DataUtils.get('shopCode', '').then((data) => {
                 shopCode = data;
@@ -509,9 +510,32 @@ export default class DBAdapter extends SQLiteOpenHelper {
    * @param productBody
    * @param categoryBody
    */
+//   downProductAndCategory(productBody, categoryBody) {
+//       return new Promise((resolve, reject) => {
+//   //      DataUtils.get("LinkUrl", LinkUrl).then((urlData) => {
+//         Storage.get('LinkUrl').then((tags) => {
+//           FetchUtils.post(tags, productBody).then((data) => {
+//             if (data.retcode == 1) {
+//               this.insertProductData(data.TblRow).then((result) => {
+//                 FetchUtils.post(tags, categoryBody).then((data) => {
+//                   console.log("data=", data);
+//                   if (data.retcode == 1) {
+//                     this.insertTDepSetData(data.TblRow).then((result) => {
+//                       console.log("end");
+//                       resolve(true);
+//                     });
+//                   }
+//                 });
+//               });
+//             }
+//           });
+//         });
+//       });
+//     }
   downProductAndCategory(productBody, categoryBody) {
     return new Promise((resolve, reject) => {
-      DataUtils.get("LinkUrl", LinkUrl).then((urlData) => {
+
+      DataUtils.get("LinkUrl", '').then((urlData) => {
         FetchUtils.post(urlData, productBody).then((data) => {
           if (data.retcode == 1) {
             this.insertProductData(data.TblRow).then((result) => {
@@ -558,7 +582,9 @@ export default class DBAdapter extends SQLiteOpenHelper {
   selectProduct(DepCode) {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
-        tx.executeSql("select * from product where IsDel='0' and DepCode in (select DepCode from tdepset where IsDel='0'" +
+        tx.executeSql("select a.*,ifNull(b.ShopNumber,0) as ShopNumber,ifNull(b.ShopPrice,a.StdPrice) as ShopPrice ,ifNull(b.ShopAmount,0) as ShopAmount   "+
+        ",ifNull(b.ShopRemark,'') as ShopRemark "+
+        " from product a left join shopInfo b on a.Pid=b.Pid where IsDel='0' and prodtype<>'1' and DepCode in (select DepCode from tdepset where IsDel='0'" +
           "and (DepCode=" + DepCode + " or SubCode like '%;" + DepCode + ";%'))", [], (tx, results) => {
           resolve(results.rows);
         });
@@ -567,7 +593,37 @@ export default class DBAdapter extends SQLiteOpenHelper {
       });
     })
   }
-  
+  /***
+     * 助记码查询商品
+     */
+    selectAidCode(aidCode) {
+      return new Promise((resolve, reject) => {
+        db.transaction((tx) => {
+          tx.executeSql("select * from product where isdel='0' and (prodname like '%"+aidCode+"%' or aidcode like '%"+aidCode+"%' or prodcode like '%"+aidCode+"%' or barcode like '%"+aidCode+"%')", [], (tx, results) => {
+//            alert(results.rows.length);
+            resolve(results.rows);
+          });
+        }, (error) => {
+          this._errorCB('transaction', error);
+        });
+      });
+    }
+    /***
+     * 扫描查询商品
+     */
+    scaningCode(scanCode){
+      return new Promise((resolve, reject) => {
+        db.transaction((tx) => {
+          tx.executeSql("select * from product where isdel='0' and (barcode='"+scanCode+"' or prodcode='"+scanCode+"')", [], (tx, results) => {
+            alert(results.rows.length);
+            resolve(results.rows);
+          });
+        }, (error) => {
+          this._errorCB('transaction', error);
+        });
+      });
+    }
+
   /***
    * 关闭表
    */

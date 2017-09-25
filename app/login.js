@@ -13,10 +13,21 @@ import {
 import DataUtils from "../utils/DataUtils";
 import admin from "./admin";
 import NetUtils from "../utils/NetUtils";
-//import WebUtils from "../utils/WebUtils";
 import FetchUtil from "../utils/FetchUtils";
-import Navigator from "react-native-deprecated-custom-components";
-class login extends Component{
+import Storage from "../utils/Storage";
+export default class  login extends Component{
+    constructor(props){
+        super(props);
+        this.state = {
+            reqCode:"",
+            reqDetailCode:"",
+            ClientCode:"",
+            sDateTime:"",
+            Pwd:"",
+            Sign:"",
+            LinkUrl:""
+        };
+    }
 //获取数据
     read(){
         AsyncStorage.getItem('object',(error,result)=>{
@@ -26,7 +37,7 @@ class login extends Component{
             }
         })
     }
-//存储数据
+//本地存储数据
     save(){
         var object = {
             ClientCode:this.state.ClientCode,
@@ -44,18 +55,6 @@ class login extends Component{
             }
         });
     }
-    constructor(props){
-        super(props);
-        this.state = {
-            reqCode:"",
-            reqDetailCode:"",
-            ClientCode:"",
-            sDateTime:"",
-            Pwd:"",
-            Sign:"",
-            LinkUrl:""
-        };
-    }
     pressPush(){
         let params = {
             reqCode:"App_PosReq",
@@ -69,29 +68,26 @@ class login extends Component{
             if(data.retcode == 1){
                 DetailInfo = JSON.stringify(data.DetailInfo);// 在这里从接口取出要保存的数据，然后执行save方法
                 var  DetailInfo = JSON.stringify(data.DetailInfo);
-//                alert(JSON.stringify(data))
-                for(var value of data.DetailInfo){
-                   //alert(JSON.stringify(value))
-                   LinkUrl = value.LinkUrl;
-                   // alert(LinkUrl);//获取url地址
+                //alert(JSON.stringify(data))
+                for(var value of data.DetailInfo){//获取DetailInfo数据
+                   LinkUrl = value.LinkUrl;//获取url地址
                    var str=LinkUrl;
-                   var items=str.replace("?wsdl","")
-                   var data="/FMJsonInterfaceByDownToPos";
-                   var date=items+"/FMJsonInterfaceByDownToPos";
-                   DataUtils.save("LinkUrl",date);
-                }
-                var nextRoute={
-                    name:"主页",
-                    component:admin,
+                   var items=str.replace('?wsdl',"")
+                   var data='/FMJsonInterfaceByDownToPos';
+                   var date=items+'/FMJsonInterfaceByDownToPos';
+                   //alert(date)
+                   DataUtils.save('LinkUrl',date);
                 };
-                this.props.navigator.push(nextRoute)
+                this.props.navigator.push({
+                    component:admin,
+                    params:{
+                        ClientCode:this.state.ClientCode,
+                    }
+                });
+                Storage.save('FirstTime','1');
+                Storage.save('ClientCode',this.state.ClientCode);
             }else{
                 ToastAndroid.show('商户号或密码错误', ToastAndroid.SHORT)
-                var nextRoute={
-                    name:"主页",
-                    component:admin,
-                };
-                this.props.navigator.push(nextRoute)
             }
         })
     }
@@ -118,54 +114,30 @@ class login extends Component{
                     <Image source={require("../images/admin.png")} style={styles.TextImage}></Image>
                 </View>
                 <View style={styles.TextInput}>
-                <TextInput
-                    autofocus="{true}"
-                    numberoflines="{1}"
-                    placeholder="密码"
-                    maxLength={6}
-                    textalign="center"
-                    underlineColorAndroid='transparent'
-                    placeholderTextColor="#bcbdc1"
-                    style={styles.pass}
-                    onChangeText={(value)=>{
-                        this.setState({
-                            Pwd:value
-                        })
-                    }}/>
-                <Image source={require("../images/look.png")} style={styles.TextImage1}></Image>
-                 </View>
+                    <TextInput
+                        autofocus="{true}"
+                        numberoflines="{1}"
+                        placeholder="密码"
+                        maxLength={6}
+                        textalign="center"
+                        underlineColorAndroid='transparent'
+                        placeholderTextColor="#bcbdc1"
+                        style={styles.pass}
+                        onChangeText={(value)=>{
+                            this.setState({
+                                Pwd:value
+                            })
+                        }}
+                    />
+                    <Image source={require("../images/look.png")} style={styles.TextImage1}></Image>
+                </View>
                 <TouchableOpacity onPress={this.pressPush.bind(this)}>
                     <Text style={styles.login}>确定</Text>
                 </TouchableOpacity>
             </View>
-    );
-    }
-}
-export default class MainView extends Component{
-    render() {
-        var rootRoute={
-            name:"测试",
-            component:login
-        };
-        return (
-            <Navigator.Navigator
-                initialRoute={rootRoute}
-                configureScene={(route)=>{
-                    return Navigator.Navigator.SceneConfigs.PushFromRight;
-                }}
-                renderScene={(route,navigator)=>{
-                    var Component=route.component;
-                    return(
-                        <Component
-                            navigator={navigator}
-                            route={route}/>
-                    );
-                }}
-            />
         );
     }
 }
-
 const styles = StyleSheet.create({
     container:{
         flex:1,

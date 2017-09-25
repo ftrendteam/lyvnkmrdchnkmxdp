@@ -76,7 +76,7 @@ export  default class RequestBodyUtils {
    *   string, usercode: string, DetailInfo1: {ShopCode: string, OrgFormno: string, ProMemo: string}, DetailInfo2:
    *   [*]}}
    */
-  static createPS = (clientCode) => {
+  static createPS = (clientCode,orgFormno) => {
     let date = DateUtils.getCurrentDate(new Date());
     let sign = MD5Utils.encryptMD5('App_PosReq' + "##" + "App_Client_ProPSSH" + "##" + date + "##" + 'PosControlCs');
     let DetailInfo1 = {
@@ -87,7 +87,7 @@ export  default class RequestBodyUtils {
       "Sign": "",
       "username": "001",
       "usercode": "001",
-      "DetailInfo1": {"ShopCode": "0", "OrgFormno": "", "ProMemo": "表单备注"},
+      "DetailInfo1": {"ShopCode": "0", "OrgFormno": ""+orgFormno+"", "ProMemo": "表单备注"},
       "DetailInfo2": [{"prodcode": "0101", "countm": 10, "ProPrice": 12, "promemo": "", "kccount": '10'}]
     };
     //let DetailInfo2 = {'prodcode': '0101', 'countm': 10, 'ProPrice': 12, 'promemo': '', 'kccount': '10'};
@@ -102,7 +102,7 @@ export  default class RequestBodyUtils {
    *   string, usercode: string, DetailInfo1: {ShopCode: string, OrgFormno: string, ProMemo: string}, DetailInfo2:
    *   [*]}}
    */
-  static createPD = (clientCode) => {
+  static createPD = (clientCode,orgFormno) => {
     let date = DateUtils.getCurrentDate(new Date());
     let sign = MD5Utils.encryptMD5('App_PosReq' + "##" + "App_Client_ProPC" + "##" + date + "##" + 'PosControlCs');
     let DetailInfo1 = {
@@ -113,7 +113,7 @@ export  default class RequestBodyUtils {
       "Sign": "",
       "username": "001",
       "usercode": "001",
-      "DetailInfo1": {"ShopCode": "0", "OrgFormno": "", "ProMemo": "表单备注"},
+      "DetailInfo1": {"ShopCode": "0", "OrgFormno": ""+orgFormno+"", "ProMemo": "表单备注"},
       "DetailInfo2": [{"prodcode": "0101", "countm": 10, "ProPrice": 12, "promemo": "", "kccount": '10'}]
     };
     //let DetailInfo2 = {'prodcode': '0101', 'countm': 10, 'ProPrice': 12, 'promemo': '', 'kccount': '10'};
@@ -161,8 +161,8 @@ export  default class RequestBodyUtils {
       "reqCode": "App_PosReq",
       "reqDetailCode": "App_Client_ProSY",
       "ClientCode": clientCode,
-      "sDateTime": "",
-      "Sign": "",
+      "sDateTime": date,
+      "Sign": sign+"",
       "username": userName,
       "usercode": userCode,
       "DetailInfo1": {"ShopCode": "0", "OrgFormno": "", "ProMemo": "表单备注"},

@@ -18,28 +18,56 @@ import {
   Modal,
   Dimensions,
   TouchableHighlight,
+  ListView
 } from 'react-native';
+import Index from "./Index";
+import HistoricalDocument from "./HistoricalDocument";
 import Code from "./Code";
 import Search from "./Search";
 import Succeed from "./Succeed";
 import OrderDetails from "./OrderDetails";
-import XZHBottomView from './XZHBottomView';
-import XZHWineCell from  './XZHWineCell';
-import WebUtils from "../utils/WebUtils";
+import NetUtils from "../utils/NetUtils";
+import FetchUtils from "../utils/FetchUtils";
+import DataUtils from '../utils/DataUtils';
+import DBAdapter from "../adapter/DBAdapter";
+import Storage from "../utils/Storage";
 import SideMenu from 'react-native-side-menu';
 //第二页面
+let dbAdapter = new DBAdapter();
+let db;
 export default class ShoppingCart extends Component {
-constructor(props){
+    constructor(props){
         super(props);
         this.state = {
             show:false,
-            Text1:59875888,
-            Text2:254,
-            totalPrice:"",
-            goods:"",
-            Number1:25564654988,
-            Number2:22,
+            ShopNumber:"",
+            ShopAmount:"",
+            reqDetailCode:"",
+            dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
         };
+        this.dataRows = [];
+    }
+    HISTORY(){
+        var nextRoute={
+            name:"主页",
+            component:HistoricalDocument
+        };
+        this.props.navigator.push(nextRoute)
+    }
+    HOME(){
+        var nextRoute={
+            name:"主页",
+            component:Index
+        };
+        this.props.navigator.push(nextRoute)
+    }
+    SHOP(){
+        var nextRoute={
+            name:"主页",
+
+            component:ShoppingCart
+        };
+        this.props.navigator.push(nextRoute)
     }
     pressPush(){
           var nextRoute={
@@ -64,86 +92,109 @@ constructor(props){
     }
 //自动跑接口
     componentDidMount(){
-       var Text1=this.state.Text1;
-       this.state.totalPrice =Text1+Text1+Text1+Text1+Text1+Text1;
-       this.setState({
-           totalPrice: this.state.totalPrice
+       //取出保存本地的数据  'valueOf'是保存的时候自己定义的参数   tags就是保存的那个值
+       //在一进来页面就取出来，就不会出现第一次点击为 空值
+       Storage.get('valueOf').then((tags) => {
+            this.setState({
+                reqDetailCode: tags
+            })
+        });
+       Storage.get('OrgFormno').then((tags) => {
+            this.setState({
+                orgFormno: tags
+            });
+       });
+       Storage.get('procode').then((tags) => {
+            this.setState({
+                procode: tags
+            });
+       });
+       //username获取
+       Storage.get('username').then((tags) => {
+            this.setState({
+                Username: tags
+            });
+       });
+       //usercode获取
+       Storage.get('userpwd').then((tags) => {
+            this.setState({
+                Userpwd: tags
+            });
+       });
+       dbAdapter.selectShopInfo('1').then((rows)=>{
+       var shopnumber = 0;
+       var shopAmount = 0;
+           for(let i =0;i<rows.length;i++){
+               var row = rows.item(i);
+               shopAmount += parseInt(row.ShopAmount);
+               shopnumber += parseInt(row.ShopNumber);
+               this.dataRows.push(row);
+           }
+           var ShopNumber=this.state.ShopNumber;
+           var ShopAmount=this.state.ShopAmount;
+           this.setState({
+               ShopNumber:shopnumber,//数量
+               ShopAmount:shopAmount,//总金额
+               dataSource:this.state.dataSource.cloneWithRows(this.dataRows)
+           })
        });
 
-       var Number1=this.state.Number1;
-       this.state.goods =Number1+Number1+Number1+Number1+Number1+Number1;
-       this.setState({
-          goods: this.state.goods
-       })
     }
+     _renderRow(rowData, sectionID, rowID){
+         return (
+            <View style={styles.ShopList}>
+                <TouchableOpacity style={styles.ShopContList} onPress={this.OrderDetails.bind(this)}>
+                    <View style={styles.ShopTop}>
+                        <Text style={styles.ShopLeft}>{rowData.ShopName}</Text>
+                        <Text style={styles.ShopRight}>单位：件</Text>
+                    </View>
+                    <View style={styles.ShopTop}>
+                        <Text style={[styles.Name,styles.Name1]}></Text>
+                        <Text style={[styles.Number,styles.Name1]}>{rowData.ShopNumber}</Text>
+                        <Text style={[styles.Price,styles.Name1]}>{rowData.ShopPrice}</Text>
+                        <Text style={[styles.SmallScale,styles.Name2]}>{rowData.ShopAmount}</Text>
+                    </View>
+                </TouchableOpacity>
+            </View>
+         );
+     }
     pressPop(){
           this._setModalVisible()
           this.props.navigator.pop();
     }
 //提交
     submit(){
-        let Params= {
-            "reqCode":"App_PosReq",
-            "reqDetailCode":"App_Client_ProYH",
-            "ClientCode":"810001",
-            "sDateTime":"2017-08-09 12:12:12",
-            "Sign":"C4CB5D0FB1C34B6D18086937E077D00C",
-            "username":"收银员1",
-            "usercode":"001",
-             "DetailInfo1":{"ShopCode":"0001","OrgFormno":"","ProMemo":"表单备注"},
-             "DetailInfo2":[
-                               {
-                                   "prodcode":"10000001",
-                                   "countm":10,
-                                   "ProPrice":12,
-                                   "promemo":"",
-                                   "kccount":10
-                               },
-                               {
-                                    "prodcode":"10000002",
-                                    "countm":10,
-                                    "ProPrice":12,
-                                    "promemo":"",
-                                    "kccount":10
-                                },
-                                {
-                                   "prodcode":"10000003",
-                                   "countm":10,
-                                   "ProPrice":12,
-                                   "promemo":"",
-                                   "kccount":10
-                               },
-                               {
-                                    "prodcode":"10000005",
-                                    "countm":10,
-                                    "ProPrice":12,
-                                    "promemo":"",
-                                    "kccount":10
-                                },
-                               {
-                                     "prodcode":"10000006",
-                                     "countm":10,
-                                     "ProPrice":12,
-                                     "promemo":"",
-                                     "kccount":10
-                               },
-                               {
-                                      "prodcode":"10000007",
-                                      "countm":10,
-                                      "ProPrice":12,
-                                      "promemo":"",
-                                      "kccount":10
-                               }
-                           ]
-        };
-        WebUtils.Post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',params, (data)=>{
-            if(data.retcode == 1){
-    //          alert(JSON.stringify(data))
-                 alert("提交成功")
-              }else{
-                   alert("提交失败")
-              }
+        Storage.get('code').then((tags) => {
+            DataUtils.get("usercode","").then((usercode)=>{
+                DataUtils.get("username","").then((username)=>{
+                    let params = {
+                        ClientCode: this.state.ClientCode,
+                        username: this.state.Username,
+                        usercode: this.state.Userpwd,
+                    };
+                });
+            });
+            let params = {
+                reqCode: "App_PosReq",
+                reqDetailCode: this.state.reqDetailCode,
+                ClientCode: this.state.ClientCode,
+                sDateTime: "2017-08-09 12:12:12",
+                Sign: NetUtils.MD5("App_PosReq" + "##" +this.state.reqDetailCode + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',
+                username: this.state.Username,
+                usercode: this.state.Userpwd,
+                DetailInfo1: {"ShopCode": tags, "OrgFormno": this.state.orgFormno, "ProMemo": ""},
+                DetailInfo2: [{"prodcode": this.state.procode, "countm": 10, "ProPrice": 12, "promemo": "", "kccount": '10'}]
+            };
+            FetchUtils.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
+                if(data.retcode == 1){
+                   alert("提交成功")
+                }else{
+//                   alert("提交失败");
+                     alert(JSON.stringify(data))
+                }
+            })
         })
+        dbAdapter.deleteData("shopInfo");
     }
     _rightButtonClick() {
           console.log('右侧按钮点击了');
@@ -179,90 +230,11 @@ constructor(props){
             </View>
             <View style={styles.ContList}>
                 <ScrollView>
-                    <View style={styles.ShopList}>
-                        <TouchableOpacity style={styles.ShopContList} onPress={this.OrderDetails.bind(this)}>
-                            <View style={styles.ShopTop}>
-                                <Text style={styles.ShopLeft}>10000001</Text>
-                                <Text style={styles.ShopRight}>单位：件</Text>
-                            </View>
-                            <View style={styles.ShopTop}>
-                                <Text style={[styles.Name,styles.Name1]}></Text>
-                                <Text style={[styles.Number,styles.Name1]}>{this.state.Number1}</Text>
-                                <Text style={[styles.Price,styles.Name1]}>25.00</Text>
-                                <Text style={[styles.SmallScale,styles.Name2]}>{this.state.Text1}</Text>
-                            </View>
-                        </TouchableOpacity>
-                    </View>
-                    <View style={styles.ShopList}>
-                        <TouchableOpacity style={styles.ShopContList} onPress={this.OrderDetails.bind(this)}>
-                            <View style={styles.ShopTop}>
-                                <Text style={styles.ShopLeft}>10000002</Text>
-                                <Text style={styles.ShopRight}>单位：件</Text>
-                            </View>
-                            <View style={styles.ShopTop}>
-                                <Text style={[styles.Name,styles.Name1]}></Text>
-                                <Text style={[styles.Number,styles.Name1]} numberOfLines={1}>{this.state.Number1}</Text>
-                                <Text style={[styles.Price,styles.Name1]}>25.00</Text>
-                                <Text style={[styles.SmallScale,styles.Name2]}>{this.state.Text1}</Text>
-                            </View>
-                        </TouchableOpacity>
-                    </View>
-                    <View style={styles.ShopList}>
-                        <TouchableOpacity style={styles.ShopContList} onPress={this.OrderDetails.bind(this)}>
-                            <View style={styles.ShopTop}>
-                                <Text style={styles.ShopLeft}>10000003</Text>
-                                <Text style={styles.ShopRight}>单位：件</Text>
-                            </View>
-                            <View style={styles.ShopTop}>
-                                <Text style={[styles.Name,styles.Name1]}></Text>
-                                <Text style={[styles.Number,styles.Name1]}>{this.state.Number1}</Text>
-                                <Text style={[styles.Price,styles.Name1]}>25.00</Text>
-                                <Text style={[styles.SmallScale,styles.Name2]}>{this.state.Text1}</Text>
-                            </View>
-                        </TouchableOpacity>
-                    </View>
-                    <View style={styles.ShopList}>
-                        <TouchableOpacity style={styles.ShopContList} onPress={this.OrderDetails.bind(this)}>
-                            <View style={styles.ShopTop}>
-                                <Text style={styles.ShopLeft}>10000005</Text>
-                                <Text style={styles.ShopRight}>单位：件</Text>
-                            </View>
-                            <View style={styles.ShopTop}>
-                                <Text style={[styles.Name,styles.Name1]}></Text>
-                                <Text style={[styles.Number,styles.Name1]}>{this.state.Number1}</Text>
-                                <Text style={[styles.Price,styles.Name1]}>25.00</Text>
-                                <Text style={[styles.SmallScale,styles.Name2]}>{this.state.Text1}</Text>
-                            </View>
-                        </TouchableOpacity>
-                    </View>
-                    <View style={styles.ShopList}>
-                        <TouchableOpacity style={styles.ShopContList} onPress={this.OrderDetails.bind(this)}>
-                            <View style={styles.ShopTop}>
-                                <Text style={styles.ShopLeft}>10000006</Text>
-                                <Text style={styles.ShopRight}>单位：件</Text>
-                            </View>
-                            <View style={styles.ShopTop}>
-                                <Text style={[styles.Name,styles.Name1]}></Text>
-                                <Text style={[styles.Number,styles.Name1]}>{this.state.Number1}</Text>
-                                <Text style={[styles.Price,styles.Name1]}>25.00</Text>
-                                <Text style={[styles.SmallScale,styles.Name2]}>{this.state.Text1}</Text>
-                            </View>
-                        </TouchableOpacity>
-                    </View>
-                    <View style={styles.ShopList}>
-                        <TouchableOpacity style={styles.ShopContList} onPress={this.OrderDetails.bind(this)}>
-                            <View style={styles.ShopTop}>
-                                <Text style={styles.ShopLeft}>10000007</Text>
-                                <Text style={styles.ShopRight}>单位：件</Text>
-                            </View>
-                            <View style={styles.ShopTop}>
-                                <Text style={[styles.Name,styles.Name1]}></Text>
-                                <Text style={[styles.Number,styles.Name1]}>{this.state.Number1}</Text>
-                                <Text style={[styles.Price,styles.Name1]}>25.00</Text>
-                                <Text style={[styles.SmallScale,styles.Name2]}>{this.state.Text1}</Text>
-                            </View>
-                        </TouchableOpacity>
-                    </View>
+                    <ListView
+                        dataSource={this.state.dataSource}
+                        showsVerticalScrollIndicator={true}
+                        renderRow={this._renderRow.bind(this)}
+                    />
                 </ScrollView>
             </View>
         </View>
@@ -277,24 +249,9 @@ constructor(props){
                     </Text>
                     <Text style={styles.goodSNumber}>
                         <Text style={styles.goods}>货品：</Text>
-                        <Text style={styles.GoodsNumber}
-                            onPress={()=>{
-                               this.setState({goods:this.state.goods});
-                            }}
-                            numberOfLines={1}
-                        >
-                        {this.state.goods}
-                        </Text>
-                     </Text>
-                        <Text style={styles.Price1}
-                            onPress={() => {
-                                this.setState({totalPrice:this.state.totalPrice});
-                            }}
-                            numberOfLines={1}
-                        >
-                        ￥{this.state.totalPrice}
-                        </Text>
-
+                        <Text style={styles.GoodsNumber}>{this.state.ShopNumber}</Text>
+                    </Text>
+                    <Text style={styles.Price1}>￥{this.state.ShopAmount}</Text>
                 </View>
                 <View style={styles.Note}>
                     <TouchableOpacity onPress={this._rightButtonClick.bind(this)}>
@@ -326,47 +283,77 @@ constructor(props){
                           </View>
                 </Modal>
             </View>
+            <View style={styles.footer}>
+                <TouchableOpacity style={styles.Home} onPress={this.HISTORY.bind(this)}><Image source={require("../images/documents.png")}></Image><Text style={styles.home1}>历史单据</Text></TouchableOpacity>
+                <TouchableOpacity style={styles.Home} onPress={this.HOME.bind(this)}><Image source={require("../images/home.png")}></Image><Text style={styles.home1}>首页</Text></TouchableOpacity>
+                <TouchableOpacity style={styles.Home} onPress={this.SHOP.bind(this)}><Image source={require("../images/shop1.png")}></Image><Text style={styles.home2}>清单</Text></TouchableOpacity>
+            </View>
       </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
+        footer:{
+              position:"absolute",
+              bottom:0,
+              flex:1,
+              flexDirection:"row",
+              borderTopWidth:1,
+              borderTopColor:"#cacccb",
+              backgroundColor:"#ffffff"
+          },
+          Home:{
+              flex:1,
+              alignItems: 'center',
+              paddingTop:10,
+              paddingBottom:10,
+          },
+          home1:{
+              color:'black',
+              fontSize:16,
+              marginTop:5,
+          },
+          home2:{
+              color:'#f47882',
+              fontSize:16,
+              marginTop:5,
+          },
         container:{
             flex:1,
             backgroundColor:"#ffffff",
         },
        header:{
-               height:60,
-               backgroundColor:"#ffffff",
-               paddingTop:15,
-               paddingBottom:20,
-               borderBottomWidth:1,
-               borderBottomColor:"#cacccb"
-             },
-             cont:{
-               flexDirection:"row",
-               marginLeft:25,
-               marginRight:25,
-             },
-             HeaderImage1:{
-               marginRight:25,
-               marginTop:5
-             },
-             HeaderImage:{
-               marginTop:5
-             },
+           height:60,
+           backgroundColor:"#ffffff",
+           paddingTop:15,
+           paddingBottom:20,
+           borderBottomWidth:1,
+           borderBottomColor:"#cacccb"
+       },
+       cont:{
+           flexDirection:"row",
+           marginLeft:25,
+           marginRight:25,
+       },
+       HeaderImage1:{
+           marginRight:25,
+           marginTop:5
+       },
+       HeaderImage:{
+           marginTop:5
+       },
        HeaderList:{
             flex:6,
             textAlign:"center",
             color:"#323232",
             fontSize:20,
-        },
-        Line:{
+       },
+       Line:{
             height:10,
             backgroundColor:"#f1f5f6"
-        },
-        NameList:{
+       },
+       NameList:{
             paddingLeft:25,
             paddingRight:25,
             flexDirection:"row",
@@ -375,66 +362,66 @@ const styles = StyleSheet.create({
             backgroundColor:"#fafafa",
             borderTopWidth:1,
             borderTopColor:"#f1f1f1"
-        },
-        Name:{
+       },
+       Name:{
             flex:2,
             fontSize:16,
             color:"#333333",
-        },
-        Number:{
+       },
+       Number:{
             flex:1,
             textAlign:"right",
             fontSize:16,
             color:"#333333",
-        },
-        Price:{
+       },
+       Price:{
             flex:1,
             textAlign:"right",
             fontSize:16,
             color:"#333333",
-        },
-        SmallScale:{
+       },
+       SmallScale:{
             flex:1,
             textAlign:"right",
             fontSize:16,
             color:"#333333",
-        },
-        ShopList:{
+       },
+       ShopList:{
             marginLeft:25,
             marginRight:25,
-        },
-        ShopContList:{
+       },
+       ShopContList:{
             borderBottomWidth:1,
             borderBottomColor:"#f5f5f5",
             paddingTop:20,
-        },
-        ShopTop:{
+       },
+       ShopTop:{
             marginBottom:20,
             flexDirection:"row",
-        },
-        ShopLeft:{
+       },
+       ShopLeft:{
             flex:6,
             color:"#666666",
             fontSize:16,
-        },
-        ShopRight:{
+       },
+       ShopRight:{
             flex:1,
             textAlign:"right",
             color:"#666666",
             fontSize:16,
-        },
-        Name1:{
+       },
+       Name1:{
             color:"#333333",
             fontSize:16,
-        },
-        Name2:{
+       },
+       Name2:{
             color:"#f63e4d"
-        },
-        ContList1:{
+       },
+       ContList1:{
             marginBottom:60,
             flex:1,
-        },
-        CommoditySettlement:{
+       },
+       CommoditySettlement:{
             backgroundColor:"#ffffff",
             borderTopWidth:1,
             borderTopColor:"#f5f5f5",
@@ -442,51 +429,51 @@ const styles = StyleSheet.create({
             paddingRight:25,
             paddingTop:15,
             height:160,
-        },
-        Client:{
+       },
+       Client:{
             flexDirection:"row",
             marginTop:15,
             marginBottom:15,
-        },
-        Goods:{
+       },
+       Goods:{
             flexDirection:"row",
-        },
-        Note:{
+       },
+       Note:{
             flexDirection:"row",
-        },
-        CombinedText:{
+       },
+       CombinedText:{
             fontSize:16,
             color:"#555555",
-        },
-        client:{
+       },
+       client:{
             fontSize:16,
             color:"#555555",
-        },
-        ClientType:{
+       },
+       ClientType:{
             fontSize:16,
             color:"#555555",
-        },
-        goods:{
+       },
+       goods:{
             fontSize:16,
             color:"#555555",
             marginRight:3,
             width:45,
-        },
-        GoodsNumber:{
+       },
+       GoodsNumber:{
             fontSize:16,
             color:"#555555",
             flex:2
-        },
-        Price1:{
+       },
+       Price1:{
             fontSize:16,
             color:"#f47882",
             flex:2,
-        },
-        DocumentsNote:{
+       },
+       DocumentsNote:{
             fontSize:16,
             color:"#f47882"
-        },
-        Submit:{
+       },
+       Submit:{
             fontSize:16,
             color:"#ffffff",
             backgroundColor:"#f47882",
@@ -496,12 +483,12 @@ const styles = StyleSheet.create({
             paddingRight:50,
             position:"absolute",
             right:0,
-        },
-        goodSNumber:{
+       },
+       goodSNumber:{
             position:"absolute",
             right:120,
-        },
-        modalStyle: {
+       },
+       modalStyle: {
          flex:1,
        },
        LayerThickness:{
@@ -548,122 +535,120 @@ const styles = StyleSheet.create({
         fontSize:24,
        },
     viewStyle:{
-            backgroundColor:"#ffffff",
-            borderTopWidth:1,
-            borderTopColor:"#f5f5f5",
-            paddingLeft:25,
-            paddingRight:25,
-            paddingTop:15,
-            height:150,
-        },
+        backgroundColor:"#ffffff",
+        borderTopWidth:1,
+        borderTopColor:"#f5f5f5",
+        paddingLeft:25,
+        paddingRight:25,
+        paddingTop:15,
+        height:150,
+        marginBottom:68,
+    },
 
-        leftView:{
-            flexDirection:'row',
-            marginLeft: 8
-        },
+    leftView:{
+        flexDirection:'row',
+        marginLeft: 8
+    },
 
-        rightView:{
-            flexDirection:'row',
-            marginRight: 8
-        },
-            CombinedText:{
-                fontSize:16,
-                color:"#555555",
-            },
-            Client:{
-                marginTop:10,
-                marginBottom:10,
-                flexDirection:'row',
-            },
-            client:{
-                fontSize:16,
-                color:"#555555",
-            },
-            ClientType:{
-                fontSize:16,
-                color:"#555555",
-            },
-            goods:{
-                fontSize:16,
-                color:"#555555"
-            },
-            ClientText:{
-                flex:2
-            },
-            goodSNumber:{
-                flex:2
-            },
-            GoodsNumber:{
-                fontSize:16,
-                color:"#555555"
-            },
-            Price1:{
-                fontSize:16,
-                color:"#f47882",
-                flex:2,
-                textAlign:"right"
-            },
-            DocumentsNote:{
-                fontSize:16,
-                color:"#f47882",
-                marginTop:15,
-            },
-            Submit:{
-                backgroundColor:"#f47882",
-                paddingTop:15,
-                paddingBottom:15,
-                paddingLeft:50,
-                paddingRight:50,
-                position:"absolute",
-                right:0,
-            },
-           modalStyle: {
-             flex:1,
-           },
-           LayerThickness:{
-                backgroundColor:"#000000",
-                opacity:0.5,
-                flex:1,
-           },
-           ModalView:{
-                position:"absolute",
-                height:260,
-                backgroundColor:"#ffffff",
-                borderRadius:5,
-                marginLeft:100,
-                top:200,
-           },
-           DanJu:{
-            height:45,
-            backgroundColor:"#fbced2",
-            borderRadius:5,
-           },
-           DanText:{
-            color:"#f47882",
-            lineHeight:30,
-            textAlign:"center",
-            fontSize:16,
-           },
-           TextInput:{
-            width:350,
-            marginLeft:25,
-            marginRight:25,
-            height:180,
-            marginTop:15,
-            borderWidth:1,
-            borderColor:"#fbced2",
-            textAlignVertical: 'top'
-           },
-           ModalLeft:{
-            position:"absolute",
-            right:15,
-            top:3,
-           },
-           buttonText1:{
-            color:"#f47882",
-            fontSize:24,
-           }
-
-
-
+    rightView:{
+        flexDirection:'row',
+        marginRight: 8
+    },
+    CombinedText:{
+        fontSize:16,
+        color:"#555555",
+    },
+    Client:{
+        marginTop:10,
+        marginBottom:10,
+        flexDirection:'row',
+    },
+    client:{
+        fontSize:16,
+        color:"#555555",
+    },
+    ClientType:{
+        fontSize:16,
+        color:"#555555",
+    },
+    goods:{
+        fontSize:16,
+        color:"#555555"
+    },
+    ClientText:{
+        flex:2
+    },
+    goodSNumber:{
+        flex:2
+    },
+    GoodsNumber:{
+        fontSize:16,
+        color:"#555555"
+    },
+    Price1:{
+        fontSize:16,
+        color:"#f47882",
+        flex:2,
+        textAlign:"right"
+    },
+    DocumentsNote:{
+        fontSize:16,
+        color:"#f47882",
+        marginTop:15,
+    },
+    Submit:{
+        backgroundColor:"#f47882",
+        paddingTop:15,
+        paddingBottom:15,
+        paddingLeft:50,
+        paddingRight:50,
+        position:"absolute",
+        right:0,
+    },
+    modalStyle: {
+        flex:1,
+    },
+    LayerThickness:{
+        backgroundColor:"#000000",
+        opacity:0.5,
+        flex:1,
+    },
+    ModalView:{
+        position:"absolute",
+        height:260,
+        backgroundColor:"#ffffff",
+        borderRadius:5,
+        marginLeft:100,
+        top:200,
+    },
+    DanJu:{
+        height:45,
+        backgroundColor:"#fbced2",
+        borderRadius:5,
+    },
+    DanText:{
+        color:"#f47882",
+        lineHeight:30,
+        textAlign:"center",
+        fontSize:16,
+    },
+    TextInput:{
+        width:350,
+        marginLeft:25,
+        marginRight:25,
+        height:180,
+        marginTop:15,
+        borderWidth:1,
+        borderColor:"#fbced2",
+        textAlignVertical: 'top'
+    },
+    ModalLeft:{
+        position:"absolute",
+        right:15,
+        top:3,
+    },
+    buttonText1:{
+        color:"#f47882",
+        fontSize:24,
+    }
 });

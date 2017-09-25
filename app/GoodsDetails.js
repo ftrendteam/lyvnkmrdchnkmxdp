@@ -12,33 +12,98 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
-  ListView
+  ListView,
+  ToastAndroid
 } from 'react-native';
+import HistoricalDocument from "./HistoricalDocument";
+import FetchUtils from "../utils/FetchUtils";
+import NetUtils from "../utils/NetUtils";
+import DBAdapter from "../adapter/DBAdapter";
+import DataUtils from '../utils/DataUtils';
+import Storage from "../utils/Storage";
 export default class GoodsDetails extends Component {
     constructor(props){
           super(props);
-          const ds = new ListView.DataSource({//ListView组件
-              rowHasChanged: (r1, r2) => r1 !== r2 //
-          });
           this.state = {
-             dataSource: ds.cloneWithRows(['1', '2', '3', '4', '5', '6', '7', '8','9', '10', '11', '12', '13', '14', '15','16','17','18', '19', '20', '21','22','23', ])
+             reqDetailCode:"",
+             ShopCountm:"",
+             dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
+             Formno:this.props.Formno ? this.props.Formno : "",
+             FormDate:this.props.FormDate ? this.props.FormDate : "",
+             promemo:this.props.promemo ? this.props.promemo : "",
           };
-      }
+          this.dataRows = [];
+    }
+    componentDidMount(){
+         //reqDetailCode获取
+          Storage.get('historyClass').then((tags) => {
+              this.setState({
+                  reqDetailCode: tags
+              });
+          });
+         //username获取
+         Storage.get('username').then((tags) => {
+           this.setState({
+               Username: tags
+           });
+         });
+         //usercode获取
+         Storage.get('userpwd').then((tags) => {
+           this.setState({
+               Userpwd: tags
+           });
+         });
+         Storage.get('code').then((tags) => {
+             DataUtils.get("usercode","").then((usercode)=>{
+                  DataUtils.get("username","").then((username)=>{
+                      let params = {
+                          ClientCode: this.state.ClientCode,
+                          username: this.state.Username,
+                          usercode: this.state.Userpwd,
+                      };
+                  });
+             });
+             let params = {
+                 reqCode:'App_PosReq',
+                 reqDetailCode:this.state.reqDetailCode,
+                 ClientCode:this.state.ClientCode,
+                 sDateTime:"2017-08-09 12:12:12",
+                 Sign:NetUtils.MD5("App_PosReq" + "##" +this.state.reqDetailCode + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',
+                 username:this.state.Username,
+                 usercode:this.state.Userpwd,
+                 BeginDate:"",
+                 EndDate:"",
+                 shopcode:tags,
+                 formno:this.state.Formno,
+                 prodcode:"",
+             };
+             FetchUtils.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
+                 if(data.retcode == 1){
+                    var DetailInfo2 = data.DetailInfo2;
+                    this.dataRows = this.dataRows.concat(DetailInfo2);
+                    this.setState({
+                       dataSource:this.state.dataSource.cloneWithRows(this.dataRows)
+                   })
+                 }else{
+                   ToastAndroid.show('网络请求失败', ToastAndroid.SHORT);
+                 }
+             })
+         })
+    }
     GoodsDetails(){
           this.props.navigator.pop();
     }
-        renderRow(rowData, sectionID, rowID) {
-            console.log(rowData, sectionID, rowID)
-            return (
-                <TouchableOpacity >
-                    <View style={styles.ShopList1}>
-                        <Text style={styles.Name1}>青柠</Text>
-                        <Text style={styles.ShopPrice1}>200.00</Text>
-                        <Text style={styles.ShopNumber1}>5.0件</Text>
-                    </View>
-                </TouchableOpacity>
-            );
-        }
+   _renderRow(rowData, sectionID, rowID){
+        return (
+            <TouchableOpacity >
+                <View style={styles.ShopList1}>
+                    <Text style={styles.Name1}>{rowData.prodname}</Text>
+                    <Text style={styles.ShopPrice1}>{rowData.prototal}</Text>
+                    <Text style={styles.ShopNumber1}>{rowData.countm}件</Text>
+                </View>
+            </TouchableOpacity>
+        );
+    }
   render() {
     return (
       <View style={styles.container}>
@@ -46,7 +111,7 @@ export default class GoodsDetails extends Component {
             <TouchableOpacity onPress={this.GoodsDetails.bind(this)} style={styles.HeaderImage}>
                  <Image source={require("../images/left.png")}></Image>
             </TouchableOpacity>
-            <Text style={styles.Text}>CR100001456567854774</Text>
+            <Text style={styles.Text}>{this.state.Formno}</Text>
         </View>
         <View style={styles.Cont}>
             <View style={styles.List}>
@@ -58,26 +123,21 @@ export default class GoodsDetails extends Component {
                 <View style={styles.ListRight}>
                     <Text style={styles.ListText}>货品数：</Text>
                     <Text style={styles.write}></Text>
-                    <Text style={styles.ListText}>3</Text>
+                    <Text style={styles.ListText}>{this.state.ShopCountm}</Text>
                 </View>
             </View>
             <View style={styles.List}>
                 <View style={styles.ListLeft}>
                     <Text style={styles.ListText}>单据备注</Text>
                     <Text style={styles.write}></Text>
-                    <Text style={styles.ListText}>大富科技高考了机构价格很快两个</Text>
+                    <Text style={styles.ListText}>{this.state.promemo}</Text>
                 </View>
             </View>
             <View style={styles.List}>
                 <View style={styles.ListLeft}>
                     <Text style={styles.ListText}>制单日期</Text>
                     <Text style={styles.write}></Text>
-                    <Text style={styles.ListText}>2017-08-03 15:31:25</Text>
-                </View>
-                <View style={styles.ListRight}>
-                    <Text style={styles.ListText}>货品数：</Text>
-                    <Text style={styles.write}></Text>
-                    <Text style={styles.ListText}>3</Text>
+                    <Text style={styles.ListText}>{this.state.FormDate}</Text>
                 </View>
             </View>
         </View>
@@ -87,10 +147,11 @@ export default class GoodsDetails extends Component {
                 <Text style={styles.ShopPrice}>金额</Text>
                 <Text style={styles.ShopNumber}>数量</Text>
             </View>
-            <ListView style={styles.listViewStyle}
-            showsVerticalScrollIndicator={true}
+            <ListView
+            style={styles.listViewStyle}
             dataSource={this.state.dataSource}
-            renderRow={(rowData, sectionID, rowID) => this.renderRow(rowData, sectionID, rowID)}
+            showsVerticalScrollIndicator={true}
+            renderRow={this._renderRow.bind(this)}
             />
         </View>
       </View>

@@ -18,13 +18,19 @@ export default class DataUtils {
   // 获取
   static async get(key, defaultValue) {
     return new Promise((resolve, reject) => {
-      AsyncStorage.getItem(key, (err,result) => {
-        if (result == null) {
-          resolve(defaultValue);
-        } else {
-          resolve(result);
-        }
-      });
+    try{
+       AsyncStorage.getItem(key, (err,result) => {
+           if (result == null) {
+              resolve(defaultValue);
+            } else {
+             resolve(result);
+           }
+          });
+          alert(err);
+          }catch(err){
+            console.log("wtf=",err);
+          }
+
     });
     
   }

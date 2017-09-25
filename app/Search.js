@@ -12,29 +12,72 @@ import {
   View,
   TextInput,
   Image,
+  ListView,
   TouchableOpacity
 } from 'react-native';
 import Code from "./Code";
+import NetUtils from "../utils/NetUtils";
+import FetchUtils from "../utils/FetchUtils";
+import DBAdapter from "../adapter/DBAdapter";
+import DataUtils from '../utils/DataUtils';
+import Storage from '../utils/Storage';
+let dbAdapter = new DBAdapter();
+let db;
 export default class Search extends Component {
   constructor(props){
-          super(props);
-          this.state = {text: ''};
-      }
-    pressPop(){
-        this.props.navigator.pop();
-    }
-   Code(){
-        var nextRoute={
-            name:"主页",
-            component:Code
-        };
-        this.props.navigator.push(nextRoute)
-    }
+    super(props);
+    this.state = {
+        Search:"",
+        dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
+    };
+    this.dataRows = [];
+  }
+  pressPop(){
+    this.props.navigator.pop();
+  }
+  Code(){
+    var nextRoute={
+        name:"主页",
+        component:Code
+    };
+    this.props.navigator.push(nextRoute)
+  }
+  inputOnBlur(){
+    dbAdapter.selectAidCode(this.state.Search).then((rows)=>{
+        for(let i =0;i<rows.length;i++){
+            var row = rows.item(i);
+            this.dataRows.push(row);
+        }
+        this.setState({
+            dataSource:this.state.dataSource.cloneWithRows(this.dataRows)
+        })
+    });
+  }
+  _renderRow(rowData, sectionID, rowID){
+       return (
+          <View style={styles.Block}>
+             <Text style={styles.BlockText}>{rowData.ProdName}</Text>
+          </View>
+       );
+  }
   render() {
     return (
       <View style={styles.container}>
         <View style={styles.Title}>
-            <TextInput  keyboardType="default" returnKeyType="search" onChangeText={(text) => this.setState({text})} placeholder="搜索商品名称" placeholderColor="#afafaf" underlineColorAndroid='transparent' style={styles.Search}></TextInput>
+            <TextInput
+             style={styles.Search}
+             value={this.state.Number}
+             returnKeyType="search"
+             placeholder="搜索商品名称"
+             placeholderColor="#afafaf"
+             underlineColorAndroid='transparent'
+             onSelectionChange={this.inputOnBlur.bind(this)}
+             onChangeText={(value)=>{
+                 this.setState({
+                     Search:value
+                 })
+             }}
+             />
             <View style={styles.Right}>
                 <TouchableOpacity onPress={this.Code.bind(this)} style={styles.HeaderImage1}>
                     <Image source={require("../images/sm.png")}></Image>
@@ -43,31 +86,14 @@ export default class Search extends Component {
             </View>
         </View>
         <View style={styles.list}>
-            <Text style={styles.ListText}>搜索“{this.state.text}”相关内容</Text>
+            <Text style={styles.ListText}>搜索“{this.state.Search}”相关内容</Text>
         </View>
         <View style={styles.BlockList}>
-            <View style={styles.Row}>
-                <View style={styles.Block}>
-                    <Text style={styles.BlockText}>YTT</Text>
-                </View>
-                <View style={styles.Block}>
-                    <Text style={styles.BlockText}>YTT</Text>
-                </View>
-                <View style={styles.Block}>
-                    <Text style={styles.BlockText}>YTT</Text>
-                </View>
-            </View>
-            <View style={styles.Row}>
-                <View style={styles.Block}>
-                    <Text style={styles.BlockText}>YTT</Text>
-                </View>
-                <View style={styles.Block}>
-                    <Text style={styles.BlockText}>YTT</Text>
-                </View>
-                <View style={styles.Block}>
-                    <Text style={styles.BlockText}>YTT</Text>
-                </View>
-            </View>
+             <ListView
+                dataSource={this.state.dataSource}
+                showsVerticalScrollIndicator={true}
+                renderRow={this._renderRow.bind(this)}
+              />
         </View>
       </View>
     );
@@ -132,14 +158,12 @@ const styles = StyleSheet.create({
   },
   Block:{
     flex:3,
-    paddingTop:40,
-    paddingBottom:40,
-    height:75,
-    borderWidth:1,
-    borderColor:"#e5e5e5",
+    paddingTop:20,
+    paddingBottom:20,
+    marginLeft:25,
+    marginRight:25,
+    borderBottomWidth:1,
+    borderBottomColor:"#e5e5e5",
     backgroundColor:"#ffffff"
   },
-  BlockText:{
-    textAlign:"center"
-  }
 });

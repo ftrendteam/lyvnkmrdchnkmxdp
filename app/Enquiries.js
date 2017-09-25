@@ -16,41 +16,68 @@ import {
   Button
 } from 'react-native';
 import HistoricalDocument from "./HistoricalDocument";
+import DateUtil from "../utils/DateUtil";
+import Storage from "../utils/Storage";
 import DateTimePicker from "react-native-datetime";
+let dateutil = new DateUtil();
+let db;
 export default class Enquiries extends Component {
   constructor(props){
-          super(props);
-          this.state={
-              startDate:new Date(),
-              endDate:new Date()
-          }
+      super(props);
+      this.state={
+          startDate:DateUtil.formatDateTime(new Date()),
+          endDate:DateUtil.formatDateTime(new Date()),
+          formno:"",
+          prodcode:"",
       }
-    pressPop(){
+  }
+  componentDidMount(){
+    Storage.get('code').then((tags) => {
+        this.setState({
+            reqDetailCode: tags
+        });
+    });
+  }
+  Return(){
         this.props.navigator.pop();
-    }
-        showDatePicker() {
-            var date = new Date();
-            this.picker.showDatePicker(date, (d)=>{
-                this.setState({date:d});
-            });
+  }
+  pressPop(){
+        if(this.props.reloadView){
+           this.props.reloadView(this.state.startDate,this.state.endDate,this.state.formno,this.state.prodcode)
         }
-        showTimePicker() {
-            var date = new Date();
-            this.picker.showTimePicker(date, (d)=>{
-                this.setState({date:d});
-            });
-        }
-        showDateTimePicker() {
-            var startDate = new Date();
-            this.picker.showDateTimePicker(startDate, (d)=>{
-                this.setState({startDate:d});
-            });
-        }
+        this.props.navigator.pop();
+//        Storage.save('startDate',this.state.startDate);
+//        Storage.save('endDate',this.state.endDate);
+//        Storage.save('formno',this.state.formno);
+//        Storage.save('prodcode',this.state.prodcode);
+  }
+  showDatePicker() {
+        var date = new Date();
+        this.picker.showDatePicker(date, (d)=>{
+            this.setState({date:d});
+        });
+  }
+  showTimePicker() {
+        var date = new Date();
+        this.picker.showTimePicker(date, (d)=>{
+            this.setState({date:d});
+        });
+  }
+  showDateTimePicker() {
+        var startDate = new Date();
+        this.picker.showDateTimePicker(startDate, (d)=>{
+            this.setState({startDate:DateUtil.formatDateTime(d)});
+        });
+        var endDate = new Date();
+        this.picker.showDateTimePicker(endDate, (d)=>{
+            this.setState({endDate:DateUtil.formatDateTime(d)});
+        });
+  }
   render() {
     return (
       <View style={styles.container}>
         <View style={styles.Title}>
-            <TouchableOpacity onPress={this.pressPop.bind(this)} style={styles.HeaderImage}>
+            <TouchableOpacity onPress={this.Return.bind(this)} style={styles.HeaderImage}>
                  <Image source={require("../images/left.png")}></Image>
             </TouchableOpacity>
             <Text style={styles.Text}>要货单查询</Text>
@@ -69,15 +96,29 @@ export default class Enquiries extends Component {
                 </View>
                 <View style={styles.ContList}>
                     <Text style={styles.ContLeft}>门店：</Text>
-                    <TextInput  underlineColorAndroid='transparent' style={styles.ContRight}/>
+                    <Text style={styles.ContLeft1}>{this.state.reqDetailCode}</Text>
                 </View>
                 <View style={styles.ContList}>
                     <Text style={styles.ContLeft}>单据号：</Text>
-                    <TextInput  underlineColorAndroid='transparent' style={styles.ContRight}/>
+                    <TextInput
+                    underlineColorAndroid='transparent'
+                    style={styles.ContRight}
+                    onChangeText={(value)=>{
+                        this.setState({
+                            formno:value
+                        })
+                    }}/>
                 </View>
                 <View style={styles.ContList}>
                     <Text style={styles.ContLeft}>商品编码：</Text>
-                    <TextInput  underlineColorAndroid='transparent' style={styles.ContRight}/>
+                    <TextInput
+                    underlineColorAndroid='transparent'
+                    style={styles.ContRight}
+                    onChangeText={(value)=>{
+                        this.setState({
+                            prodcode:value
+                        })
+                    }}/>
                 </View>
                 <View style={styles.button}>
                     <Text style={styles.ButtonText} onPress={this.pressPop.bind(this)}>搜索</Text>
@@ -136,6 +177,12 @@ const styles = StyleSheet.create({
     },
     ContLeft:{
         flex:2,
+        lineHeight:35,
+        color:"#636363",
+        fontSize:16,
+    },
+    ContLeft1:{
+        flex:8,
         lineHeight:35,
         color:"#636363",
         fontSize:16,

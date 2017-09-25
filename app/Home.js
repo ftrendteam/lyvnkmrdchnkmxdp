@@ -16,9 +16,9 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import Index from "./Index";
-import HistoricalDocument from "./HistoricalDocument";
-import ShoppingCart from "./ShoppingCart";
+//import Index from "./Index";
+//import HistoricalDocument from "./HistoricalDocument";
+//import ShoppingCart from "./ShoppingCart";
 import TabNavigator from "react-native-tab-navigator";
 //第二页面
 export default class home extends Component {
@@ -32,8 +32,8 @@ export default class home extends Component {
     return (
       <View style={styles.container}>
                   <TabNavigator
-      tabBarStyle={{height:60,}}
-      >
+                  tabBarStyle={{height:60,}}
+                  >
                      <TabNavigator.Item
                      			  	title="历史单据"
                      			    selected={this.state.selectedTab === 'history'}

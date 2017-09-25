@@ -20,7 +20,7 @@ import NetUtils from "../utils/NetUtils";
 import DataUtils from '../utils/DataUtils';
 import FetchUtils from "../utils/FetchUtils";
 import Storage from '../utils/Storage';
-export default class Query extends Component {
+export default class Distrition extends Component {
     constructor(props){
         super(props);
         this.state = {
@@ -46,10 +46,10 @@ export default class Query extends Component {
             this.props.navigator.pop();
         }
         Storage.save('OrgFormno',this.state.Number);
-        Storage.save('Name','商品盘点单');
-        Storage.save('valueOf','App_Client_ProPC');
-        Storage.save('history','App_Client_ProCurrPCQ');
-        Storage.save('historyClass','App_Client_ProPCDetailQ');
+        Storage.save('Name','配送收货单');
+        Storage.save('valueOf','App_Client_ProPSSH');
+        Storage.save('history','App_Client_ProPSSHQ');
+        Storage.save('historyClass','App_Client_ProPSSHDetailQ');
     }
     render() {
         return (

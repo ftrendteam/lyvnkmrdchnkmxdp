@@ -20,13 +20,13 @@ import {
   AsyncStorages,
   ToastAndroid
 } from 'react-native';
+import Index from "./Index";
 import DataUtils from "../utils/DataUtils";
-import home from "./Home";
 import NetUtils from "../utils/NetUtils";
 //import WebUtils from "../utils/WebUtils";
 import FetchUtil from "../utils/FetchUtils";
 import DBAdapter from "../adapter/DBAdapter";
-import Storage from 'react-native-storage';
+import Storage from "../utils/Storage";
 import Picker from 'react-native-picker';
 //第二页面
 let dbAdapter = new DBAdapter();
@@ -75,15 +75,18 @@ export default class admin extends Component {
             Usercode:"",
             UserPwd:"",
             pickedDate:"",
+            ClientCode:this.props.ClientCode ? this.props.ClientCode : "",
         };
         this.pickerData=[]
     }
  //直接跑数据 componentDidMount
     componentDidMount(){
+//        Storage.get('ClientCode').then((tags) => {
+
         let params = {
              reqCode:"App_PosReq",
              reqDetailCode:"App_Client_UseQry",
-             ClientCode:"800000001",
+             ClientCode:this.state.ClientCode,
              sDateTime:"2017-08-09 12:12:12",//获取当前时间转换成时间戳
              Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_UseQry" + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
         };
@@ -93,7 +96,6 @@ export default class admin extends Component {
                   //用户信息
                   var detailInfo1 = data.DetailInfo1;
                   //console.log("detailInfo1=",detailInfo1);打印debug
-                  //alert(detailInfo1)
                   dbAdapter.insertTShopItemData(detailInfo1);
                   //机构信息
                   var detailInfo2 = data.DetailInfo2;
@@ -109,13 +111,15 @@ export default class admin extends Component {
                  ToastAndroid.show('网络请求失败', ToastAndroid.SHORT);
              }
          })
+//         });
     }
  //失去焦点时 跑数据、存储、获取数据
     autoFocuss(){
+//    Storage.get('ClientCode').then((tags) => {
          let params = {
                 reqCode:"App_PosReq",
                 reqDetailCode:"App_Client_UseQry",
-                ClientCode:"800000001",
+                ClientCode:this.state.ClientCode,
                 sDateTime:"2017-08-09 12:12:12",//获取当前时间转换成时间戳
                 Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_UseQry" + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
          };
@@ -134,6 +138,7 @@ export default class admin extends Component {
                 alert("数据保存失败")
             }
          })
+//         })
     }
 // 失焦时触发事件
     inputOnBlur(){
@@ -143,16 +148,22 @@ export default class admin extends Component {
     pressPush(){
         var code = ""+this.state.pickedDate;//获取到之后前面加""+
         var Usercode=this.state.Usercode;
-        DataUtils.save("shopCode","0");
+        var UserPwd=this.state.UserPwd;
+        DataUtils.save("shopCode",this.state.pickedDate);
         //var UserPwd=NetUtils.MD5(this.state.UserPwd)+'';//获取到密码之后md5加密
         str1 = code.split('_');
         str2 = str1[1];
-        //alert(str2);
         dbAdapter.isLogin(Usercode, this.state.UserPwd, str2).then((isLogin)=>{
             if(isLogin){
+               var strin = this.state.pickedDate;
+               strjj = ""+strin;
+               code = strjj.substring(strjj.indexOf('_') + 1,strjj.length);
+               Storage.save('code',code);
+               Storage.save('username',Usercode);
+               Storage.save('userpwd',UserPwd);
                var nextRoute={
                    name:"主页",
-                   component:home,
+                   component:Index,
                };
                this.props.navigator.push(nextRoute);
             }else{
@@ -229,7 +240,7 @@ export default class admin extends Component {
         <View style={styles.AgencyInformation}>
             <View style={styles.InformationLeft}><Text style={styles.InformationLeftText}>机构信息</Text></View>
             <TouchableOpacity style={styles.PullDown} onPress={this._showDatePicker.bind(this)}>
-                <Text style={styles.PullClick}>{this.state.pickedDate}</Text>
+                <Text style={styles.PullClick}>{this.state.pickedDate.toString()}</Text>
             </TouchableOpacity>
         </View>
         <TouchableOpacity onPress={this.pressPush.bind(this)}>
