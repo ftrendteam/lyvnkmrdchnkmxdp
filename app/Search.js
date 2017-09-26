@@ -60,6 +60,17 @@ export default class Search extends Component {
           </View>
        );
   }
+  inputOnBlur(){
+      dbAdapter.selectAidCode(this.state.Search).then((rows)=>{
+          for(let i =0;i<rows.length;i++){
+              var row = rows.item(i);
+              this.dataRows.push(row);
+          }
+          this.setState({
+              dataSource:this.state.dataSource.cloneWithRows(this.dataRows)
+          })
+      });
+  }
   render() {
     return (
       <View style={styles.container}>

@@ -144,10 +144,11 @@ export default class admin extends Component {
     }
 //登录
     pressPush(){
+        ToastAndroid.show('正在下载商品信息，请稍等~', ToastAndroid.SHORT)
         var code = ""+this.state.pickedDate;//获取到之后前面加""+
         var Usercode=this.state.Usercode;
         var UserPwd=this.state.UserPwd;
-        DataUtils.save("shopCode",this.state.pickedDate);
+        //DataUtils.save("shopCode",this.state.pickedDate);//调用保存封装接口
         //var UserPwd=NetUtils.MD5(this.state.UserPwd)+'';//获取到密码之后md5加密
         str1 = code.split('_');
         str2 = str1[1];

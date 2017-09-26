@@ -31,20 +31,16 @@ export default class GoodsDetails extends Component {
         super(props);
         this.state = {
             ProdCode:this.props.ProdCode ? this.props.ProdCode : "",//接受传入的值
-            ProdName:this.props.ProdName ? this.props.ProdName : "",//接受传入的值
+            ProdName:this.props.ProdName ? this.props.ProdName : "",
             Pid:this.props.Pid ? this.props.Pid : "",
             ShopPrice:this.props.ShopPrice ? this.props.ShopPrice : "",
-            Number:this.props.Number ? this.props.Number : "1",
             Remark:this.props.Remark ? this.props.Remark : "",
             prototal:this.props.prototal ? this.props.prototal : "",
-            totalPrice:"",
-            Number:this.props.ShopNumber ? this.props.ShopNumber : "",
+            Number:this.props.countm ? this.props.countm : "1",
             Price:"",
+            totalPrice:"",
+            name:""
         }
-    }
-    componentDidMount(){
-
-    alert(this.state.ProdName)
     }
     GoodsDetails(){
         this.props.navigator.pop();
@@ -63,6 +59,13 @@ export default class GoodsDetails extends Component {
        };
        this.props.navigator.push(nextRoute)
     }
+    componentDidMount(){
+        Storage.get('Name').then((tags) => {
+            this.setState({
+                 name: tags
+            });
+        });
+    }
 // 失焦时触发事件
     inputOnBlur(){
        var Number=this.state.Number;
@@ -72,7 +75,6 @@ export default class GoodsDetails extends Component {
            totalPrice: this.state.totalPrice
        });
     }
-
     add(){
         var Number1=this.state.Number;
         this.setState({
@@ -118,6 +120,7 @@ export default class GoodsDetails extends Component {
         this.props.navigator.push(nextRoute);
 //        this.props.navigator.pop();
     }
+
   render() {
     return (
       <View style={styles.container}>
@@ -126,7 +129,7 @@ export default class GoodsDetails extends Component {
                     <TouchableOpacity   onPress={this.GoodsDetails.bind(this)}>
                           <Image source={require("../images/left1.png")} style={styles.HeaderImage}></Image>
                     </TouchableOpacity>
-                    <Text style={styles.HeaderList}>要货单</Text>
+                    <Text style={styles.HeaderList}>{this.state.name}</Text>
                     <TouchableOpacity onPress={this.Code.bind(this)}>
                           <Image source={require("../images/sm.png")} style={styles.HeaderImage1}></Image>
                     </TouchableOpacity>
@@ -144,10 +147,10 @@ export default class GoodsDetails extends Component {
                 <View style={styles.left1}>
                     <Text style={styles.NumberName}>数量</Text>
                     <TextInput style={styles.Number}
-                    underlineColorAndroid='transparent'
-                    value={this.state.Number.toString()}
-                    onBlur={this.inputOnBlur.bind(this)}
-                    onChangeText={(value)=>{this.setState({Number:value})}}/>
+                        underlineColorAndroid='transparent'
+                        value={this.state.Number.toString()}
+                        onBlur={this.inputOnBlur.bind(this)}
+                        onChangeText={(value)=>{this.setState({Number:value})}}/>
                     <Text style={styles.NumberText}>件</Text>
                 </View>
                 <View style={styles.right1}>

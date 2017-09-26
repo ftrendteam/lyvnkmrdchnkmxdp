@@ -151,7 +151,7 @@ export default class HistoricalDocument extends Component {
           this.setState({
               Username: tags
           });
-      });
+     });
       //usercode获取
      Storage.get('userpwd').then((tags) => {
           this.setState({

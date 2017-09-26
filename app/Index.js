@@ -113,6 +113,12 @@ export default class Index extends Component {
     }
     //左侧品级
     componentDidMount(){
+//        var title = this.state.head;
+//        if(title ==""){
+//            OrderDetails(){
+//                alert("请选择单据");
+//            }
+//        }
         dbAdapter.selectTDepSet('1').then((rows)=>{
             for(let i =0;i<rows.length;i++){
                 var row = rows.item(i);
@@ -200,15 +206,23 @@ export default class Index extends Component {
                 ProdName:item.item.ProdName,
                 ShopPrice:item.item.ShopPrice,
                 Pid:item.item.Pid,
-                countm:item.item.countm,
+                countm:item.item.ShopNumber,
                 promemo:item.item.promemo,
                 prototal:item.item.prototal,
                 ProdCode:item.item.ProdCode
             }
         })
-//        alert(JSON.stringify(item.item.ShopNumber))
+        //alert(JSON.stringify(item.item.ShopNumber))
     }
 
+    _onload(){
+        let timer =  setTimeout(()=>{
+            clearTimeout(timer)
+        },100)
+    }
+    keyExtractor(item: Object, index: number) {
+        return item.ProdName//FlatList使用json中的ProdName动态绑定key
+    }
 //  分类
     Home(){
         var abc = "要货单";
@@ -310,6 +324,8 @@ export default class Index extends Component {
                                     ItemSeparatorComponent={this._separator.bind(this)}
                                     ListEmptyComponent={this._createEmptyView()}
                                     data={data}
+                                    keyExtractor={this.keyExtractor}
+                                    onEndReached={this._onload}
                                />
                           </ScrollView>
                       </View>
