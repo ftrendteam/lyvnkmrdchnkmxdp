@@ -42,8 +42,9 @@ export default class Search extends Component {
     };
     this.props.navigator.push(nextRoute)
   }
-  inputOnBlur(){
-    dbAdapter.selectAidCode(this.state.Search).then((rows)=>{
+  inputOnBlur(value){
+    dbAdapter.selectAidCode(value).then((rows)=>{
+        this.dataRows=[];
         for(let i =0;i<rows.length;i++){
             var row = rows.item(i);
             this.dataRows.push(row);
@@ -60,17 +61,6 @@ export default class Search extends Component {
           </View>
        );
   }
-  inputOnBlur(){
-      dbAdapter.selectAidCode(this.state.Search).then((rows)=>{
-          for(let i =0;i<rows.length;i++){
-              var row = rows.item(i);
-              this.dataRows.push(row);
-          }
-          this.setState({
-              dataSource:this.state.dataSource.cloneWithRows(this.dataRows)
-          })
-      });
-  }
   render() {
     return (
       <View style={styles.container}>
@@ -82,11 +72,11 @@ export default class Search extends Component {
              placeholder="搜索商品名称"
              placeholderColor="#afafaf"
              underlineColorAndroid='transparent'
-             onSelectionChange={this.inputOnBlur.bind(this)}
              onChangeText={(value)=>{
                  this.setState({
                      Search:value
                  })
+                 this.inputOnBlur(value)
              }}
              />
             <View style={styles.Right}>
@@ -104,6 +94,7 @@ export default class Search extends Component {
                 dataSource={this.state.dataSource}
                 showsVerticalScrollIndicator={true}
                 renderRow={this._renderRow.bind(this)}
+                ref="myInput"
               />
         </View>
       </View>

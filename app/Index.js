@@ -113,12 +113,6 @@ export default class Index extends Component {
     }
     //左侧品级
     componentDidMount(){
-//        var title = this.state.head;
-//        if(title ==""){
-//            OrderDetails(){
-//                alert("请选择单据");
-//            }
-//        }
         dbAdapter.selectTDepSet('1').then((rows)=>{
             for(let i =0;i<rows.length;i++){
                 var row = rows.item(i);
@@ -149,7 +143,11 @@ export default class Index extends Component {
                 Number:value,
             })
         });
+//        var abc = this.state.Number;
+//        if(abc == ""){
+//        }
     }
+
     _renderRow(rowData, sectionID, rowID){
          return (
             <TouchableOpacity style={styles.Active} onPress={()=>this._pressRow(rowData)}>
@@ -200,19 +198,24 @@ export default class Index extends Component {
         );
     }
     OrderDetails(item){
-        this.props.navigator.push({
-            component:OrderDetails,
-            params:{
-                ProdName:item.item.ProdName,
-                ShopPrice:item.item.ShopPrice,
-                Pid:item.item.Pid,
-                countm:item.item.ShopNumber,
-                promemo:item.item.promemo,
-                prototal:item.item.prototal,
-                ProdCode:item.item.ProdCode
-            }
-        })
-        //alert(JSON.stringify(item.item.ShopNumber))
+        var title = this.state.head;
+        if(title ==""){
+            alert("请选择单据");
+        }else{
+            this.props.navigator.push({
+                component:OrderDetails,
+                params:{
+                    ProdName:item.item.ProdName,
+                    ShopPrice:item.item.ShopPrice,
+                    Pid:item.item.Pid,
+                    countm:item.item.ShopNumber,
+                    promemo:item.item.promemo,
+                    prototal:item.item.prototal,
+                    ProdCode:item.item.ProdCode
+                }
+            })
+            //alert(JSON.stringify(item.item.ShopNumber))
+        }
     }
 
     _onload(){
