@@ -75,7 +75,6 @@ export default class  login extends Component{
                    var items=str.replace('?wsdl',"")
                    var data='/FMJsonInterfaceByDownToPos';
                    var date=items+'/FMJsonInterfaceByDownToPos';
-                   //alert(date)
                    DataUtils.save('LinkUrl',date);
                 };
                 this.props.navigator.push({
@@ -85,7 +84,7 @@ export default class  login extends Component{
                     }
                 });
                 Storage.save('FirstTime','1');
-                Storage.save('ClientCode',this.state.ClientCode);
+//                Storage.save('ClientCode',this.state.ClientCode);
             }else{
                 ToastAndroid.show('商户号或密码错误', ToastAndroid.SHORT)
             }

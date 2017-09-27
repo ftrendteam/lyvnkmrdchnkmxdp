@@ -27,6 +27,7 @@ export default class GoodsDetails extends Component {
           this.state = {
              reqDetailCode:"",
              ShopCountm:"",
+             Number:"",
              dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
              Formno:this.props.Formno ? this.props.Formno : "",
              FormDate:this.props.FormDate ? this.props.FormDate : "",
@@ -80,9 +81,16 @@ export default class GoodsDetails extends Component {
              FetchUtils.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
                  if(data.retcode == 1){
                     var DetailInfo2 = data.DetailInfo2;
+                      var shopnumber = 0;
+                    for(let i =0;i<DetailInfo2.length;i++){
+                       var row = DetailInfo2[i];
+                       var number = row.countm;
+                       shopnumber += parseInt(row.countm);
+                    }
                     this.dataRows = this.dataRows.concat(DetailInfo2);
                     this.setState({
-                       dataSource:this.state.dataSource.cloneWithRows(this.dataRows)
+                       dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
+                       Number:shopnumber
                    })
                  }else{
                    ToastAndroid.show('网络请求失败', ToastAndroid.SHORT);
@@ -123,7 +131,7 @@ export default class GoodsDetails extends Component {
                 <View style={styles.ListRight}>
                     <Text style={styles.ListText}>货品数：</Text>
                     <Text style={styles.write}></Text>
-                    <Text style={styles.ListText}>{this.state.ShopCountm}</Text>
+                    <Text style={styles.ListText}>{this.state.Number}</Text>
                 </View>
             </View>
             <View style={styles.List}>

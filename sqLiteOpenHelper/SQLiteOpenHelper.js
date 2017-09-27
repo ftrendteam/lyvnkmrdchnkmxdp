@@ -99,8 +99,9 @@ export default class SQLiteOpenHelper {
         }, (err) => {
           this._errorCB('f', err);
         });
-      tx.executeSql("CREATE TABLE IF NOT EXISTS shopInfo(pid int null,ShopName varchar(40) null,ShopNumber int(20) null,"+
-        "ShopPrice float(8) null,ShopAmount float(8) null,ShopRemark varchar(50) null)",[],
+        //Pid,ProdCode,prodname,countm,ShopPrice,prototal,promemo,kccount
+      tx.executeSql("CREATE TABLE IF NOT EXISTS shopInfo(pid int null,ProdCode varchar(20) null,prodname varchar(255) null,countm float(8)  null,"+
+        "ShopPrice float(8) null,prototal float(8) null,promemo varchar(50) null,kccount float(8)  null)",[],
         ()=>{
         
         }, (err)=>{

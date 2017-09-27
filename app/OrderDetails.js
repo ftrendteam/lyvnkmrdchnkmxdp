@@ -31,19 +31,17 @@ export default class GoodsDetails extends Component {
         super(props);
         this.state = {
             ProdCode:this.props.ProdCode ? this.props.ProdCode : "",//接受传入的值
-            ProdName:this.props.ProdName ? this.props.ProdName : "",//接受传入的值
+            ProdName:this.props.ProdName ? this.props.ProdName : "",
             Pid:this.props.Pid ? this.props.Pid : "",
-            StdPrice:this.props.StdPrice ? this.props.StdPrice : "",
-            ShopNumber:this.props.ShopNumber ? this.props.ShopNumber : "1",
-            ShopRemark:this.props.ShopRemark ? this.props.ShopRemark : "",
-            ShopAmount:this.props.ShopAmount ? this.props.ShopAmount : "",
-            totalPrice:"",
-            Number:this.props.ShopNumber ? this.props.ShopNumber : "",
+            ShopPrice:this.props.ShopPrice ? this.props.ShopPrice : "",
+            Remark:this.props.Remark ? this.props.Remark : "",
+            prototal:this.props.prototal ? this.props.prototal : "",
+            Number:this.props.countm ? this.props.countm : "1",
             Price:"",
-            Remark:this.props.ShopRemark ? this.props.ShopRemark : "",
+            totalPrice:"",
+            name:""
         }
     }
-
     GoodsDetails(){
         this.props.navigator.pop();
     }
@@ -62,21 +60,21 @@ export default class GoodsDetails extends Component {
        this.props.navigator.push(nextRoute)
     }
     componentDidMount(){
-        var procode = this.state.ProdCode;
-        alert(procode)
-        Storage.save('procode',procode);
+        Storage.get('Name').then((tags) => {
+            this.setState({
+                 name: tags
+            });
+        });
     }
-
 // 失焦时触发事件
     inputOnBlur(){
        var Number=this.state.Number;
-       var StdPrice=this.state.StdPrice;
-       this.state.totalPrice =Number*StdPrice;
+       var ShopPrice=this.state.ShopPrice;
+       this.state.totalPrice =Number*ShopPrice;
        this.setState({
            totalPrice: this.state.totalPrice
        });
     }
-
     add(){
         var Number1=this.state.Number;
         this.setState({
@@ -106,11 +104,12 @@ export default class GoodsDetails extends Component {
         var shopInfoData = [];
         var shopInfo = {};
         shopInfo.Pid = this.state.Pid;
-        shopInfo.ShopName = this.state.ProdName;
-        shopInfo.ShopNumber = this.state.Number;
-        shopInfo.ShopPrice = this.state.StdPrice;
-        shopInfo.ShopAmount =(this.state.Number)*(this.state.StdPrice);
-        shopInfo.ShopRemark = this.state.Remark;
+        shopInfo.ProdCode=this.state.ProdCode;
+        shopInfo.prodname = this.state.ProdName;
+        shopInfo.countm = this.state.Number;
+        shopInfo.ShopPrice = this.state.ShopPrice;
+        shopInfo.prototal =(this.state.Number)*(this.state.ShopPrice);
+        shopInfo.promemo = this.state.Remark;
         shopInfoData.push(shopInfo);
         //然后调用方法
         dbAdapter.insertShopInfo(shopInfoData);
@@ -121,6 +120,7 @@ export default class GoodsDetails extends Component {
         this.props.navigator.push(nextRoute);
 //        this.props.navigator.pop();
     }
+
   render() {
     return (
       <View style={styles.container}>
@@ -129,7 +129,7 @@ export default class GoodsDetails extends Component {
                     <TouchableOpacity   onPress={this.GoodsDetails.bind(this)}>
                           <Image source={require("../images/left1.png")} style={styles.HeaderImage}></Image>
                     </TouchableOpacity>
-                    <Text style={styles.HeaderList}>要货单</Text>
+                    <Text style={styles.HeaderList}>{this.state.name}</Text>
                     <TouchableOpacity onPress={this.Code.bind(this)}>
                           <Image source={require("../images/sm.png")} style={styles.HeaderImage1}></Image>
                     </TouchableOpacity>
@@ -147,10 +147,10 @@ export default class GoodsDetails extends Component {
                 <View style={styles.left1}>
                     <Text style={styles.NumberName}>数量</Text>
                     <TextInput style={styles.Number}
-                    underlineColorAndroid='transparent'
-                    value={this.state.Number.toString()}
-                    onBlur={this.inputOnBlur.bind(this)}
-                    onChangeText={(value)=>{this.setState({Number:value})}}/>
+                        underlineColorAndroid='transparent'
+                        value={this.state.Number.toString()}
+                        onBlur={this.inputOnBlur.bind(this)}
+                        onChangeText={(value)=>{this.setState({Number:value})}}/>
                     <Text style={styles.NumberText}>件</Text>
                 </View>
                 <View style={styles.right1}>
@@ -162,7 +162,7 @@ export default class GoodsDetails extends Component {
             <View style={styles.List}>
                 <View style={styles.left2}>
                     <Text style={styles.Price}>单价</Text>
-                    <Text style={styles.Price1}>{this.state.StdPrice}</Text>
+                    <Text style={styles.Price1}>{this.state.ShopPrice}</Text>
                 </View>
                 <View style={styles.right2}>
                     <Text style={styles.price}>元/件</Text>
@@ -172,7 +172,7 @@ export default class GoodsDetails extends Component {
                 <View style={styles.left2}>
                     <Text style={styles.Price}>金额</Text>
                     <Text style={styles.Price1}>
-                    {(this.state.Number)*(this.state.StdPrice)}
+                    {(this.state.Number)*(this.state.ShopPrice)}
                     </Text>
                 </View>
                 <View style={styles.right2}>
