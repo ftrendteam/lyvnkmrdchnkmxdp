@@ -271,10 +271,10 @@ export default class DBAdapter extends SQLiteOpenHelper {
           let ShopPrice = shopInfo.ShopPrice;
           let ShopAmount = shopInfo.ShopAmount;
           let ShopRemark = shopInfo.ShopRemark;
-          let Pid=shopInfo.Pid;
+          let Pid = shopInfo.Pid;
           let sql = "INSERT INTO shopInfo(Pid,ShopName,ShopNumber,ShopPrice,ShopAmount,ShopRemark)" +
             "values(?,?,?,?,?,?)";
-          tx.executeSql(sql, [Pid,shopName, ShopNumber, ShopPrice, ShopAmount, ShopRemark], () => {
+          tx.executeSql(sql, [Pid, shopName, ShopNumber, ShopPrice, ShopAmount, ShopRemark], () => {
               resolve(true);
             }, (err) => {
               reject(false);
@@ -295,6 +295,84 @@ export default class DBAdapter extends SQLiteOpenHelper {
       db.transaction((tx) => {
         tx.executeSql("select * from shopInfo", [], (tx, results) => {
           resolve(results.rows);
+        });
+      }, (error) => {
+        this._errorCB('transaction', error);
+      });
+    });
+  }
+  
+  /***
+   * 查询shopInfo表中所有商品的数量和
+   */
+  selectShopInfoCountm() {
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        tx.executeSql('select sum(countm) from shopInfo', [], (tx, results) => {
+          try {
+            resolve(results.row);
+          } catch (err) {
+            reject(0);
+          }
+        })
+      }, (error) => {
+        this._errorCB('transaction', error);
+      });
+    });
+  }
+  
+  /***
+   * 查询shopInfo表中某个商品的数量
+   * @param ProdCode
+   * @return {Promise}
+   */
+  selectShopInfoCountm(ProdCode) {
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        tx.executeSql('select sum(countm) from shopInfo where ProdCode = ' + ProdCode + '', [], (tx, results) => {
+          try {
+            resolve(results.row);
+          } catch (err) {
+            reject(0);
+          }
+        });
+      }, (error) => {
+        this._errorCB('transaction', error);
+      });
+    });
+  }
+  
+  /***
+   * 修改某个商品的数量-1
+   */
+  upDataShopInfoCountm(ProdCode) {
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        tx.executeSql('update shopInfo set countm=countm-1 where ProdCode=' + ProdCode + '', [], (tx, results) => {
+          try {
+            resolve(true);
+          } catch (err) {
+            reject(false);
+          }
+        });
+      }, (error) => {
+        this._errorCB('transaction', error);
+      });
+    });
+  }
+  
+  /***
+   * 修改某个商品的数量+1
+   */
+  upDataShopInfoCountm(ProdCode) {
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        tx.executeSql('update shopInfo set countm=countm+1 where ProdCode=' + ProdCode + '', [], (tx, results) => {
+          try {
+            resolve(true);
+          } catch (err) {
+            reject(false);
+          }
         });
       }, (error) => {
         this._errorCB('transaction', error);
@@ -451,11 +529,11 @@ export default class DBAdapter extends SQLiteOpenHelper {
           //for (let i = 0; i < length; i++) {
           if (length === 1) {
             let item = results.rows.item(0);
-
+            
             if ((md5Pwd + '') == item.UserPwd) {//密码正确
               let userName = item.UserName;
-              DataUtils.save("userName",userName);
-              DataUtils.save("userCode",Usercode);
+              DataUtils.save("userName", userName);
+              DataUtils.save("userCode", Usercode);
               let shopCode;
               DataUtils.get('shopCode', '').then((data) => {
                 shopCode = data;
@@ -534,7 +612,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
 //     }
   downProductAndCategory(productBody, categoryBody) {
     return new Promise((resolve, reject) => {
-
+      
       DataUtils.get("LinkUrl", '').then((urlData) => {
         FetchUtils.post(urlData, productBody).then((data) => {
           if (data.retcode == 1) {
@@ -582,9 +660,9 @@ export default class DBAdapter extends SQLiteOpenHelper {
   selectProduct(DepCode) {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
-        tx.executeSql("select a.*,ifNull(b.ShopNumber,0) as ShopNumber,ifNull(b.ShopPrice,a.StdPrice) as ShopPrice ,ifNull(b.ShopAmount,0) as ShopAmount   "+
-        ",ifNull(b.ShopRemark,'') as ShopRemark "+
-        " from product a left join shopInfo b on a.Pid=b.Pid where IsDel='0' and prodtype<>'1' and DepCode in (select DepCode from tdepset where IsDel='0'" +
+        tx.executeSql("select a.*,ifNull(b.ShopNumber,0) as ShopNumber,ifNull(b.ShopPrice,a.StdPrice) as ShopPrice ,ifNull(b.ShopAmount,0) as ShopAmount   " +
+          ",ifNull(b.ShopRemark,'') as ShopRemark " +
+          " from product a left join shopInfo b on a.Pid=b.Pid where IsDel='0' and prodtype<>'1' and DepCode in (select DepCode from tdepset where IsDel='0'" +
           "and (DepCode=" + DepCode + " or SubCode like '%;" + DepCode + ";%'))", [], (tx, results) => {
           resolve(results.rows);
         });
@@ -593,37 +671,39 @@ export default class DBAdapter extends SQLiteOpenHelper {
       });
     })
   }
+  
   /***
-     * 助记码查询商品
-     */
-    selectAidCode(aidCode) {
-      return new Promise((resolve, reject) => {
-        db.transaction((tx) => {
-          tx.executeSql("select * from product where isdel='0' and (prodname like '%"+aidCode+"%' or aidcode like '%"+aidCode+"%' or prodcode like '%"+aidCode+"%' or barcode like '%"+aidCode+"%')", [], (tx, results) => {
+   * 助记码查询商品
+   */
+  selectAidCode(aidCode) {
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        tx.executeSql("select * from product where isdel='0' and (prodname like '%" + aidCode + "%' or aidcode like '%" + aidCode + "%' or prodcode like '%" + aidCode + "%' or barcode like '%" + aidCode + "%')", [], (tx, results) => {
 //            alert(results.rows.length);
-            resolve(results.rows);
-          });
-        }, (error) => {
-          this._errorCB('transaction', error);
+          resolve(results.rows);
         });
+      }, (error) => {
+        this._errorCB('transaction', error);
       });
-    }
-    /***
-     * 扫描查询商品
-     */
-    scaningCode(scanCode){
-      return new Promise((resolve, reject) => {
-        db.transaction((tx) => {
-          tx.executeSql("select * from product where isdel='0' and (barcode='"+scanCode+"' or prodcode='"+scanCode+"')", [], (tx, results) => {
-            alert(results.rows.length);
-            resolve(results.rows);
-          });
-        }, (error) => {
-          this._errorCB('transaction', error);
+    });
+  }
+  
+  /***
+   * 扫描查询商品
+   */
+  scaningCode(scanCode) {
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        tx.executeSql("select * from product where isdel='0' and (barcode='" + scanCode + "' or prodcode='" + scanCode + "')", [], (tx, results) => {
+          alert(results.rows.length);
+          resolve(results.rows);
         });
+      }, (error) => {
+        this._errorCB('transaction', error);
       });
-    }
-
+    });
+  }
+  
   /***
    * 关闭表
    */
