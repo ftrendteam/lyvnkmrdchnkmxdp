@@ -91,10 +91,9 @@ export default class HistoricalDocument extends Component {
         danzi1:danzi,
         codesw1:codesw,
     });
-    this.removeHandler = (function() {
-        _dpSearch()
-    })
-//    document.removeEventListener("mousedown",this._dpSearch(),true);
+//    this.removeHandler = (function() {
+//        _dpSearch()
+//    })
     Storage.get('code').then((tags) => {
          DataUtils.get("usercode","").then((usercode)=>{
               DataUtils.get("username","").then((username)=>{

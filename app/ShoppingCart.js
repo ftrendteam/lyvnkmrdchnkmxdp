@@ -43,6 +43,7 @@ export default class ShoppingCart extends Component {
             ShopNumber:"",
             ShopAmount:"",
             reqDetailCode:"",
+            Remark:"",
             dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
         };
         this.dataRows = [];
@@ -182,7 +183,7 @@ export default class ShoppingCart extends Component {
                 Sign: NetUtils.MD5("App_PosReq" + "##" +this.state.reqDetailCode + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',
                 username: this.state.Username,
                 usercode: this.state.Userpwd,
-                DetailInfo1: {"ShopCode": tags, "OrgFormno": this.state.orgFormno, "ProMemo": ""},
+                DetailInfo1: {"ShopCode": tags, "OrgFormno": this.state.orgFormno, "ProMemo": this.state.Remark},
                 DetailInfo2: this.dataRows
             };
             FetchUtils.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
@@ -275,7 +276,12 @@ export default class ShoppingCart extends Component {
                                           placeholder="请填写单据备注信息"
                                           underlineColorAndroid='transparent'
                                           placeholderTextColor="#bcbdc1"
-                                          style={styles.TextInput} />
+                                          style={styles.TextInput}
+                                          onChangeText={(value)=>{
+                                              this.setState({
+                                                  Remark:value
+                                              })
+                                          }}/>
                                           <View style={styles.ModalLeft} >
                                                <Text style={styles.buttonText1} onPress={this._setModalVisible.bind(this)}>×</Text>
                                     </View>
