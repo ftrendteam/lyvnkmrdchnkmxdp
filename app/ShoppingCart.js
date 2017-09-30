@@ -84,12 +84,16 @@ export default class ShoppingCart extends Component {
           };
           this.props.navigator.push(nextRoute)
     }
-    OrderDetails(){
-        var nextRoute={
-            name:"主页",
-            component:OrderDetails
-        };
-        this.props.navigator.push(nextRoute)
+    OrderDetails(rowData){
+        this.props.navigator.push({
+            component:OrderDetails,
+            params:{
+                ProdName:rowData.prodname,
+                ShopPrice:rowData.ShopPrice,
+                countm:rowData.countm,
+            }
+        })
+            alert(JSON.stringify(rowData.prodname))
     }
 //自动跑接口
     componentDidMount(){
@@ -125,6 +129,7 @@ export default class ShoppingCart extends Component {
        dbAdapter.selectShopInfo('1').then((rows)=>{
            var shopnumber = 0;
            var shopAmount = 0;
+           this.dataRows=[];
            for(let i =0;i<rows.length;i++){
                var row = rows.item(i);
                var number = row.countm;
@@ -143,7 +148,7 @@ export default class ShoppingCart extends Component {
      _renderRow(rowData, sectionID, rowID){
          return (
             <View style={styles.ShopList}>
-                <TouchableOpacity style={styles.ShopContList} onPress={this.OrderDetails.bind(this)}>
+                <TouchableOpacity style={styles.ShopContList} onPress={()=>this.OrderDetails(rowData)}>
                     <View style={styles.ShopTop}>
                         <Text style={styles.ShopLeft}>{rowData.prodname}</Text>
                         <Text style={styles.ShopRight}>单位：件</Text>
@@ -196,6 +201,7 @@ export default class ShoppingCart extends Component {
             })
         })
         dbAdapter.deleteData("shopInfo");
+        this.componentDidMount();
     }
     _rightButtonClick() {
           console.log('右侧按钮点击了');

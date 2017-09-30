@@ -61,6 +61,16 @@ export default class HistoricalDocument extends Component {
           component:Index
       };
       this.props.navigator.push(nextRoute);
+//      Storage.delete('history').then((tags) => {
+//            this.setState({
+//                reqDetailCode: tags
+//            });
+//      });
+//      Storage.delete('Name').then((tags) => {
+//           this.setState({
+//               name: tags
+//           });
+//      });
   }
   SHOP(){
       var nextRoute={
@@ -91,10 +101,42 @@ export default class HistoricalDocument extends Component {
         danzi1:danzi,
         codesw1:codesw,
     });
-//    this.removeHandler = (function() {
-//        _dpSearch()
-//    })
-    Storage.get('code').then((tags) => {
+    this.dataRows=[];
+    this._dpSearch()
+  }
+  componentDidMount(){
+     this._get();
+     this._dpSearch();
+  }
+  _get(){
+    //获取功能名字
+     Storage.get('Name').then((tags) => {
+         this.setState({
+             name: tags
+         });
+     });
+     //reqDetailCode获取
+     Storage.get('history').then((tags) => {
+         this.setState({
+             reqDetailCode: tags
+         });
+     });
+
+     //username获取
+     Storage.get('username').then((tags) => {
+          this.setState({
+              Username: tags
+          });
+     });
+      //usercode获取
+     Storage.get('userpwd').then((tags) => {
+          this.setState({
+              Userpwd: tags
+          });
+     });
+  }
+  _dpSearch(){
+     Storage.get('code').then((tags) => {
          DataUtils.get("usercode","").then((usercode)=>{
               DataUtils.get("username","").then((username)=>{
                   let params = {
@@ -120,83 +162,6 @@ export default class HistoricalDocument extends Component {
          };
          FetchUtils.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
              if(data.retcode == 1){
-                 var  DetailInfo1 = data.DetailInfo1;
-                 this.dataRows = this.dataRows.concat(DetailInfo1);
-                 this.setState({
-                    dataSource:this.state.dataSource.cloneWithRows(this.dataRows)
-                 })
-             }else{
-                ToastAndroid.show('网络请求失败', ToastAndroid.SHORT);
-                alert(JSON.stringify(data))
-             }
-         })
-    });
-  }
-  componentDidMount(){
-     //获取功能名字
-     Storage.get('Name').then((tags) => {
-         this.setState({
-             name: tags
-         });
-     });
-     //reqDetailCode获取
-     Storage.get('history').then((tags) => {
-         this.setState({
-             reqDetailCode: tags
-         });
-     });
-     //username获取
-     Storage.get('username').then((tags) => {
-          this.setState({
-              Username: tags
-          });
-     });
-      //usercode获取
-     Storage.get('userpwd').then((tags) => {
-          this.setState({
-              Userpwd: tags
-          });
-      });
-     this._dpSearch();
-  }
-  GoodsDetails(rowData){
-    this.props.navigator.push({
-        component:GoodsDetails,
-        params:{
-            Formno:rowData.Formno,
-            FormDate:rowData.FormDate,
-            promemo:rowData.promemo,
-        }
-    })
-//       alert(JSON.stringify(rowData.Formno))
-  }
-  _dpSearch(){
-     Storage.get('code').then((tags) => {
-         DataUtils.get("usercode","").then((usercode)=>{
-              DataUtils.get("username","").then((username)=>{
-                  let params = {
-                      ClientCode: this.state.ClientCode,
-                      username: this.state.Username,
-                      usercode: this.state.Userpwd,
-                  };
-              });
-         });
-         let params = {
-             reqCode:"App_PosReq",
-             reqDetailCode:this.state.reqDetailCode,
-             ClientCode:this.state.ClientCode,
-             sDateTime:"2017-08-09 12:12:12",
-             username:this.state.Username,
-             usercode:this.state.Userpwd,
-             BeginDate:this.state.startDate,
-             EndDate:this.state.endDate,
-             shopcode:tags,
-             formno:this.state.formno,
-             prodcode:this.state.prodcode,
-             Sign:NetUtils.MD5("App_PosReq" + "##" +this.state.reqDetailCode + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',
-         };
-         FetchUtils.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
-             if(data.retcode == 1){
                 var  DetailInfo1 = data.DetailInfo1;
                 this.dataRows = this.dataRows.concat(DetailInfo1);
                 this.setState({
@@ -209,8 +174,18 @@ export default class HistoricalDocument extends Component {
          })
      });
   }
-
- _renderRow(rowData, sectionID, rowID){
+  GoodsDetails(rowData){
+      this.props.navigator.push({
+          component:GoodsDetails,
+          params:{
+              Formno:rowData.Formno,
+              FormDate:rowData.FormDate,
+              promemo:rowData.promemo,
+          }
+      })
+  //       alert(JSON.stringify(rowData.Formno))
+   }
+  _renderRow(rowData, sectionID, rowID){
       return(
           <View style={styles.Cont}>
               <TouchableHighlight  onPress={()=>this.GoodsDetails(rowData)}>
@@ -239,7 +214,7 @@ export default class HistoricalDocument extends Component {
               </TouchableHighlight>
           </View>
       )
- }
+  }
   render() {
     return (
       <View style={styles.container}>

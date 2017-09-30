@@ -30,26 +30,26 @@ export default class Code extends Component {
        />
     );
   }
-     _renderTitleBar(){
-          return(
-              <View style={styles.Title}>
-                <TouchableOpacity onPress={this.pressPop.bind(this)} style={styles.HeaderImage}>
-                    <Image source={require("../images/left.png")}></Image>
-                 </TouchableOpacity>
-                <Text style={styles.Text1}>扫描商品</Text>
-              </View>
+  _renderTitleBar(){
+      return(
+          <View style={styles.Title}>
+            <TouchableOpacity onPress={this.pressPop.bind(this)} style={styles.HeaderImage}>
+                <Image source={require("../images/left.png")}></Image>
+             </TouchableOpacity>
+            <Text style={styles.Text1}>扫描商品</Text>
+          </View>
 
-          );
-      }
-      _renderMenu() {
-          return (
-              <Text style={{color:'white',textAlignVertical:'center', textAlign:'center',font:20,padding:12}}>Here is bottom menu</Text>
-          )
-      }
-      barcodeReceived(e) {
-          Toast.show('Type: ' + e.type + '\nData: ' + e.data);
-          //console.log(e)
-      }
+      );
+  }
+  _renderMenu() {
+      return (
+          <Text style={{color:'white',textAlignVertical:'center', textAlign:'center',font:20,padding:12}}>Here is bottom menu</Text>
+      )
+  }
+  barcodeReceived(e) {
+      Toast.show('Type: ' + e.type + '\nData: ' + e.data);
+      //console.log(e)
+  }
 }
 
 const styles = StyleSheet.create({

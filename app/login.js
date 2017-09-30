@@ -84,7 +84,7 @@ export default class  login extends Component{
                     }
                 });
                 Storage.save('FirstTime','1');
-//                Storage.save('ClientCode',this.state.ClientCode);
+                Storage.save('ClientCode',this.state.ClientCode);
             }else{
                 ToastAndroid.show('商户号或密码错误', ToastAndroid.SHORT)
             }

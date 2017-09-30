@@ -74,17 +74,17 @@ export default class admin extends Component {
             Usercode:"",
             UserPwd:"",
             pickedDate:"",
-            ClientCode:this.props.ClientCode ? this.props.ClientCode : "",
+//            ClientCode:this.props.ClientCode ? this.props.ClientCode : "",
         };
         this.pickerData=[]
     }
  //直接跑数据 componentDidMount
     componentDidMount(){
-//        Storage.get('ClientCode').then((tags) => {
+        Storage.get('ClientCode').then((tags) => {
         let params = {
              reqCode:"App_PosReq",
              reqDetailCode:"App_Client_UseQry",
-             ClientCode:this.state.ClientCode,
+             ClientCode:tags,
              sDateTime:"2017-08-09 12:12:12",//获取当前时间转换成时间戳
              Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_UseQry" + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
         };
@@ -105,19 +105,21 @@ export default class admin extends Component {
                   var detailInfo4 = data.DetailInfo4;
                   dbAdapter.insertTUsershopData(detailInfo4);
 //                  var acquiring = DataUtils.get("LinkUrl",LinkUrl);
+//                  alert(JSON.stringify(data))
              }else{
                  ToastAndroid.show('网络请求失败', ToastAndroid.SHORT);
+//                 alert(JSON.stringify(data))
              }
          })
-//         });
+         });
     }
  //失去焦点时 跑数据、存储、获取数据
     autoFocuss(){
-//    Storage.get('ClientCode').then((tags) => {
+    Storage.get('ClientCode').then((tags) => {
          let params = {
                 reqCode:"App_PosReq",
                 reqDetailCode:"App_Client_UseQry",
-                ClientCode:this.state.ClientCode,
+                ClientCode:tags,
                 sDateTime:"2017-08-09 12:12:12",//获取当前时间转换成时间戳
                 Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_UseQry" + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
          };
@@ -131,12 +133,12 @@ export default class admin extends Component {
                         var shopname = value.shopname;
                         this.pickerData .push(shopname+"_"+shopcode);
                    }
-                   //alert(JSON.stringify(data.DetailInfo1))
+//                   alert(JSON.stringify(data.DetailInfo1))
             }else{
-                alert("数据保存失败")
+//                alert("数据保存失败")
             }
          })
-//         })
+         })
     }
 // 失焦时触发事件
     inputOnBlur(){
@@ -147,13 +149,14 @@ export default class admin extends Component {
         var PickedDate = this.state.pickedDate;
         if(PickedDate == ""){
             ToastAndroid.show('请选择机构信息', ToastAndroid.SHORT)
+            return;
         }else{
             ToastAndroid.show('正在登录，请稍等~', ToastAndroid.SHORT)
         }
         var code = ""+this.state.pickedDate;//获取到之后前面加""+
         var Usercode=this.state.Usercode;
         var UserPwd=this.state.UserPwd;
-        //DataUtils.save("shopCode",this.state.pickedDate);//调用保存封装接口
+        Storage.save("shopCode",this.state.pickedDate);//调用保存封装接口
         str1 = code.split('_');
         str2 = str1[1];
         dbAdapter.isLogin(Usercode, this.state.UserPwd, str2).then((isLogin)=>{
@@ -169,6 +172,7 @@ export default class admin extends Component {
                    component:Index,
                };
                this.props.navigator.push(nextRoute);
+//               alert(JSON.stringify(data))
             }else{
                 ToastAndroid.show('用户编码或密码错误', ToastAndroid.SHORT)
             }
@@ -179,23 +183,27 @@ export default class admin extends Component {
     }
 //机构信息下拉数据
     _showDatePicker() {
-        Picker.init({
-            pickerData: this.pickerData,
-            selectedValue: [59],
-            onPickerConfirm: pickedValue => {
-            this.setState({//选择下拉内容
-                pickedDate:pickedValue,
-            });
-                console.log(pickedValue);
-            },
-            onPickerCancel: pickedValue => {
-                console.log(pickedValue);
-            },
-            onPickerSelect: pickedValue => {
-                console.log(pickedValue);
-            },
-        });
-        Picker.show();
+       if(this.state.UserPwd == ""){
+         ToastAndroid.show('请输入用户密码', ToastAndroid.SHORT)
+       }else{
+         Picker.init({
+              pickerData: this.pickerData,
+              selectedValue: [59],
+              onPickerConfirm: pickedValue => {
+              this.setState({//选择下拉内容
+                  pickedDate:pickedValue,
+              });
+                  console.log(pickedValue);
+              },
+              onPickerCancel: pickedValue => {
+                  console.log(pickedValue);
+              },
+              onPickerSelect: pickedValue => {
+                  console.log(pickedValue);
+              },
+         });
+         Picker.show();
+       }
     }
   render() {
     return (

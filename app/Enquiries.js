@@ -46,10 +46,6 @@ export default class Enquiries extends Component {
            this.props.reloadView(this.state.startDate,this.state.endDate,this.state.formno,this.state.prodcode)
         }
         this.props.navigator.pop();
-//        Storage.save('startDate',this.state.startDate);
-//        Storage.save('endDate',this.state.endDate);
-//        Storage.save('formno',this.state.formno);
-//        Storage.save('prodcode',this.state.prodcode);
   }
   showDatePicker() {
         var date = new Date();
