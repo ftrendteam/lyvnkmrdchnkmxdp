@@ -273,13 +273,15 @@ export default class DBAdapter extends SQLiteOpenHelper {
           let ShopRemark = shopInfo.promemo;
           let Pid=shopInfo.Pid;
           let ProdCode=shopInfo.ProdCode;
+          let DepCode = shopInfo.DepCode;
        //   "prodname":"海鲜菇","countm":1.0000,"kccount":0.0,"prototal":1.0000,"unit":"kg  ","promemo":""
-          let sql = "INSERT INTO shopInfo(Pid,ProdCode,prodname,countm,ShopPrice,prototal,promemo)" +
-            "values(?,?,?,?,?,?,?)";
-          tx.executeSql(sql, [Pid,ProdCode,shopName, ShopNumber, ShopPrice, ShopAmount, ShopRemark], () => {
+          let sql = "INSERT INTO shopInfo(pid,ProdCode,prodname,countm,ShopPrice,prototal,promemo,DepCode)" +
+            "values(?,?,?,?,?,?,?,?)";
+          tx.executeSql(sql, [Pid,ProdCode,shopName,ShopNumber, ShopPrice, ShopAmount, ShopRemark,DepCode], () => {
               resolve(true);
             }, (err) => {
               reject(false);
+              alert("err="+err);
               console.log(err);
             }
           );
@@ -303,19 +305,15 @@ export default class DBAdapter extends SQLiteOpenHelper {
       });
     });
   }
-  
+
   /***
-   * 查询shopInfo表中所有商品的数量和
+   * 查询shopInfo表中所有商品的数量总和
    */
-  selectShopInfoCountm() {
-    return new Promise((resolve, reject) => {
+  selectShopInfoAllCountm() {
+      return new Promise((resolve, reject) => {
       db.transaction((tx) => {
-        tx.executeSql('select sum(countm) from shopInfo', [], (tx, results) => {
-          try {
-            resolve(results.row);
-          } catch (err) {
-            reject(0);
-          }
+        tx.executeSql('select sum(countm) countm from shopInfo', [], (tx, results) => {
+            resolve(results.rows);
         })
       }, (error) => {
         this._errorCB('transaction', error);
@@ -324,16 +322,17 @@ export default class DBAdapter extends SQLiteOpenHelper {
   }
   
   /***
-   * 查询shopInfo表中某个商品的数量
+   * 查询shopInfo表中某品类的数量
    * @param ProdCode
    * @return {Promise}
    */
-  selectShopInfoCountm(ProdCode) {
+  selectShopInfoCountm(DepCode) {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
-        tx.executeSql('select sum(countm) from shopInfo where ProdCode = ' + ProdCode + '', [], (tx, results) => {
+        tx.executeSql('select sum(countm) countm from shopInfo where DepCode ='+DepCode+'', [], (tx, results) => {
           try {
-            resolve(results.row);
+//          alert(JSON.stringify(results))
+            resolve(results.rows);
           } catch (err) {
             reject(0);
           }
@@ -347,7 +346,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
   /***
    * 修改某个商品的数量-1
    */
-  upDataShopInfoCountm(ProdCode) {
+  upDataShopInfoCountmSub(ProdCode) {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
         tx.executeSql('update shopInfo set countm=countm-1 where ProdCode=' + ProdCode + '', [], (tx, results) => {
@@ -366,7 +365,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
   /***
    * 修改某个商品的数量+1
    */
-  upDataShopInfoCountm(ProdCode) {
+  upDataShopInfoCountmAdd(ProdCode) {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
         tx.executeSql('update shopInfo set countm=countm+1 where ProdCode=' + ProdCode + '', [], (tx, results) => {
@@ -527,16 +526,15 @@ export default class DBAdapter extends SQLiteOpenHelper {
       db.transaction((tx) => {
         tx.executeSql("select * from tuserset where Usercode = '" + Usercode + "'", [], (tx, results) => {
           let length = results.rows.length;//没有特殊情况 长度为1
-          console.log('length=', length);
           //for (let i = 0; i < length; i++) {
           if (length === 1) {
             let item = results.rows.item(0);
-
             if ((md5Pwd + '') == item.UserPwd) {//密码正确
               let userName = item.UserName;
               DataUtils.save("userName",userName);
               DataUtils.save("userCode",Usercode);
               let shopCode;
+//              alert("1223424")
               DataUtils.get('shopCode', '').then((data) => {
                 shopCode = data;
                 console.log("shopCode", shopCode);
@@ -644,7 +642,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
   selectTDepSet(DepLevel) {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
-        tx.executeSql('select * from tdepset where IsDel=0 and DepLevel=' + DepLevel + '', [], (tx, results) => {
+        tx.executeSql('select a.*,ifNull(b.countm,0) as ShopNumber from tdepset a left join (select depcode,sum(countm)  as countm from shopInfo group by depcode) b on a.depcode=b.depcode where IsDel=0 and DepLevel=' + DepLevel + '', [], (tx, results) => {
           console.log("wtf2=", results.rows.length)
           resolve(results.rows);
         });
@@ -663,9 +661,9 @@ export default class DBAdapter extends SQLiteOpenHelper {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
         tx.executeSql("select a.*,ifNull(b.countm,0) as ShopNumber,ifNull(b.ShopPrice,a.StdPrice) as ShopPrice ,ifNull(b.prototal,0) as ShopAmount   "+
-        ",ifNull(b.promemo,'') as ShopRemark "+
-        " from product a left join shopInfo b on a.Pid=b.Pid where IsDel='0' and prodtype<>'1' and DepCode in (select DepCode from tdepset where IsDel='0'" +
-          "and (DepCode=" + DepCode + " or SubCode like '%;" + DepCode + ";%'))", [], (tx, results) => {
+        ",ifNull(b.promemo,'') as ShopRemark,'"+DepCode+"' as DepCode1 "+
+        " from product a left join shopInfo b on a.Pid=b.Pid where IsDel='0' and prodtype<>'1' and a.DepCode in (select DepCode from tdepset where IsDel='0'" +
+          "and (a.DepCode='" + DepCode + "' or SubCode like '%;" + DepCode + ";%'))", [], (tx, results) => {
           resolve(results.rows);
         });
       }, (error) => {

@@ -16,9 +16,9 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-//import Index from "./Index";
-//import HistoricalDocument from "./HistoricalDocument";
-//import ShoppingCart from "./ShoppingCart";
+import Index from "./Index";
+import HistoricalDocument from "./HistoricalDocument";
+import ShoppingCart from "./ShoppingCart";
 import TabNavigator from "react-native-tab-navigator";
 //第二页面
 export default class home extends Component {

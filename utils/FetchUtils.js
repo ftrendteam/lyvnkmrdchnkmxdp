@@ -48,13 +48,13 @@ export default class FetchUtils {
   static post = (common_url, requstBody) => {
     console.log(requstBody);
     return new Promise(function (resolve, reject) {
-      fetch("http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos", {
+      fetch(common_url, {
         method: 'POST',
         //headers: headers,
         headers: {
           "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
         },
-        body: 'jsonStr=' +"{'TblName':'product','shopcode':'0','poscode':'0001','NeedPage':'0','PageSize':100,'CurrPage':'1','OrderFld':'pid','NeedYWDate':'0','LastYWDate':''}",
+        body: 'jsonStr=' +requstBody,
       }).then((response) => response.text()).then((responseText) => {
       console.log("wtf==",responseText);
         let jsonResult = JSON.parse(responseText);

@@ -7,7 +7,7 @@ export default class DataUtils {
   // 保存
   static async save(key, value) {
     try {
-      await AsyncStorage.setItem(key, value);
+       AsyncStorage.setItem(key, value);
       console.log('_save success: ', value);
     } catch (error) {
       console.log('_save error: ', error.message);

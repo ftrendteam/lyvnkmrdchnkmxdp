@@ -50,7 +50,10 @@ export default class Index extends Component {
             Number:"",
             pickedDate:"",
             pid:"",
+            DepCode:"",
             head:"",
+            shopcar:"",
+            Counmnmber:"",
         };
         this.dataRows = [];
     }
@@ -113,6 +116,9 @@ export default class Index extends Component {
     }
     //左侧品级
     componentDidMount(){
+        this._fetch();
+    }
+    _fetch(){
         dbAdapter.selectTDepSet('1').then((rows)=>{
             for(let i =0;i<rows.length;i++){
                 var row = rows.item(i);
@@ -133,21 +139,22 @@ export default class Index extends Component {
                 data:priductData,
             })
         });
+        this._fetch1();
+    }
+    _fetch1(){
         //获取商品信息
         dbAdapter.selectShopInfo("1").then((rows)=>{
             for(let i =0;i<rows.length;i++){
                 var row = rows.item(i);
-                var value = row.ShopNumber;
             }
+        });
+        dbAdapter.selectShopInfoAllCountm().then((rows)=>{
+            var ShopCar = rows.item(0).countm;
             this.setState({
-                Number:value,
+                shopcar:ShopCar
             })
         });
-//        var abc = this.state.Number;
-//        if(abc == ""){
-//        }
     }
-
     _renderRow(rowData, sectionID, rowID){
          return (
             <TouchableOpacity style={styles.Active} onPress={()=>this._pressRow(rowData)}>
@@ -166,16 +173,17 @@ export default class Index extends Component {
                 var row = rows.item(i);
                 priductData.push(row);
             }
-             this.setState({
-                 data:priductData,
-             })
+            this.setState({
+                data:priductData,
+            })
         });
+        this._fetch1()
     }
     _renderItem(item,index){
         return(
             <View style={styles.Border}>
                 <View style={styles.AddNumber}>
-                    <TouchableOpacity style={styles.Subtraction} >
+                    <TouchableOpacity style={styles.Subtraction} onPress={()=>this.Countm(item)}>
                         <Text style={styles.Number}>{item.item.ShopNumber}</Text>
                         <View style={styles.subtraction}><Text style={styles.Reduction}>-</Text></View>
                     </TouchableOpacity>
@@ -188,6 +196,13 @@ export default class Index extends Component {
                 </TouchableOpacity>
             </View>
         )
+    }
+    Countm(item){
+        dbAdapter.upDataShopInfoCountmSub(item.item.ProdCode).then((rows)=>{
+            //alert(JSON.stringify(rows));你需要在这里手动把数量减1，还要先判断数量是不是0
+        });
+        this._fetch1();
+        var abc = JSON.stringify(item.item.ShopNumber)
     }
     _separator = () => {
         return <View style={{height:1,backgroundColor:'#f5f5f5'}}/>;
@@ -211,10 +226,11 @@ export default class Index extends Component {
                     countm:item.item.ShopNumber,
                     promemo:item.item.promemo,
                     prototal:item.item.prototal,
-                    ProdCode:item.item.ProdCode
+                    ProdCode:item.item.ProdCode,
+                    DepCode:item.item.DepCode1,
                 }
             })
-            //alert(JSON.stringify(item.item.ShopNumber))
+//            alert(JSON.stringify(item.item.ShopNumber))
         }
     }
 
@@ -299,7 +315,7 @@ export default class Index extends Component {
                       <View style={styles.cont}>
                           <TouchableOpacity onPress={this._rightButtonClick.bind(this)}>
                                 <Image source={require("../images/list.png")} style={styles.HeaderImage}></Image>
-                           </TouchableOpacity>
+                          </TouchableOpacity>
                           <Text style={styles.HeaderList}>{this.state.head}</Text>
                           <TouchableOpacity onPress={this.Code.bind(this)}>
                             <Image source={require("../images/sm.png")} style={styles.HeaderImage1}></Image>
@@ -380,7 +396,10 @@ export default class Index extends Component {
                   <View style={styles.footer}>
                       <TouchableOpacity style={styles.Home} onPress={this.HISTORY.bind(this)}><Image source={require("../images/documents.png")}></Image><Text style={styles.home1}>历史单据</Text></TouchableOpacity>
                       <TouchableOpacity style={styles.Home} onPress={this.HOME.bind(this)}><Image source={require("../images/home1.png")}></Image><Text style={styles.home2}>首页</Text></TouchableOpacity>
-                      <TouchableOpacity style={styles.Home} onPress={this.SHOP.bind(this)}><Image source={require("../images/shop.png")}></Image><Text style={styles.home1}>清单</Text></TouchableOpacity>
+                      <TouchableOpacity style={styles.Home} onPress={this.SHOP.bind(this)}>
+                        <View style={styles.source}><Image source={require("../images/shop.png")}><Text style={styles.ShopCar}>{this.state.shopcar}</Text></Image></View>
+                        <Text style={styles.home1}>清单</Text>
+                      </TouchableOpacity>
                   </View>
               </View>
 
@@ -389,28 +408,41 @@ export default class Index extends Component {
 }
 const styles = StyleSheet.create({
   footer:{
-      position:"absolute",
-      bottom:0,
+//      position:"absolute",
+//      bottom:0,
       flex:1,
       flexDirection:"row",
       borderTopWidth:1,
       borderTopColor:"#cacccb"
   },
+  source:{
+    flexDirection:"row",
+    flex:1,
+
+  },
   Home:{
       flex:1,
       alignItems: 'center',
       paddingTop:10,
-      paddingBottom:14,
+      paddingBottom:10,
+      backgroundColor:"#ffffff",
   },
   home1:{
       color:'black',
       fontSize:16,
       marginTop:5,
+      flex:1,
   },
   home2:{
       color:'#f47882',
       fontSize:16,
       marginTop:5,
+      flex:1,
+  },
+  ShopCar:{
+    color:"red",
+    position:"absolute",
+    right:-35,
   },
   container:{
       flex:1,
@@ -431,8 +463,7 @@ const styles = StyleSheet.create({
   header:{
     height:60,
     backgroundColor:"#ffffff",
-    paddingTop:15,
-    paddingBottom:20,
+    paddingTop:16,
     borderBottomWidth:1,
     borderBottomColor:"#cacccb"
   },
@@ -443,10 +474,10 @@ const styles = StyleSheet.create({
   },
   HeaderImage1:{
     marginRight:25,
-    marginTop:5
+    marginTop:5,
   },
   HeaderImage:{
-    marginTop:5
+    marginTop:5,
   },
   HeaderList:{
     flex:6,
@@ -469,8 +500,8 @@ const styles = StyleSheet.create({
     fontSize:16,
   },
   Active:{
-      borderBottomWidth:1,
-      borderBottomColor:"#e5e5e5",
+      borderTopWidth:1,
+      borderTopColor:"#e5e5e5",
   },
   Active1:{
     height:80,
@@ -495,20 +526,7 @@ const styles = StyleSheet.create({
     marginRight:10,
   },
   ContList:{
-    flexDirection:"row",
-    marginBottom:55,
-  },
-  RightCont:{
-    height:125,
-    borderBottomWidth:1,
-    borderBottomColor:"#e5e5e5",
-    flex:3,
-  },
-  RightCont1:{
-    height:125,
-    borderBottomWidth:1,
-    borderBottomColor:"#e5e5e5",
-    flex:1,
+    flex:12,
     flexDirection:"row",
   },
   Image:{
@@ -535,7 +553,7 @@ const styles = StyleSheet.create({
     position:'absolute',
     right:4,
     top:4,
-    fontSize:10,
+    fontSize:14,
   },
   subtraction:{
     marginRight:10,

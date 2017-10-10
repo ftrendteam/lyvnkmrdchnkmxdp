@@ -15,7 +15,8 @@ import {
   ListView,
   TextInput,
   Button,
-  DeviceEventEmitter
+  DeviceEventEmitter,
+  ToastAndroid
 } from 'react-native';
 import Code from "./Code";
 import home from "./Home";
@@ -37,6 +38,7 @@ export default class GoodsDetails extends Component {
             Remark:this.props.Remark ? this.props.Remark : "",
             prototal:this.props.prototal ? this.props.prototal : "",
             Number:this.props.countm ? this.props.countm : "1",
+            DepCode:this.props.DepCode ? this.props.DepCode : "",
             Price:"",
             totalPrice:"",
             name:""
@@ -86,9 +88,8 @@ export default class GoodsDetails extends Component {
         this.setState({
            Number:parseInt(Number1)-1
         });
-
         if(Number1 == 0){
-            alert('商品数量不能小于0');
+            ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
             this.setState({
                Number:0
             });
@@ -101,24 +102,31 @@ export default class GoodsDetails extends Component {
         });
     }
     pressPop(){
-        var shopInfoData = [];
-        var shopInfo = {};
-        shopInfo.Pid = this.state.Pid;
-        shopInfo.ProdCode=this.state.ProdCode;
-        shopInfo.prodname = this.state.ProdName;
-        shopInfo.countm = this.state.Number;
-        shopInfo.ShopPrice = this.state.ShopPrice;
-        shopInfo.prototal =(this.state.Number)*(this.state.ShopPrice);
-        shopInfo.promemo = this.state.Remark;
-        shopInfoData.push(shopInfo);
-        //然后调用方法
-        dbAdapter.insertShopInfo(shopInfoData);
-        var nextRoute={
-           name:"主页",
-           component:Index,
-        };
-        this.props.navigator.push(nextRoute);
-//        this.props.navigator.pop();
+        if(this.state.Number=="0"){
+            ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
+            return;
+        }else{
+            var shopInfoData = [];
+            var shopInfo = {};
+            shopInfo.Pid = this.state.Pid;
+            shopInfo.ProdCode=this.state.ProdCode;
+            shopInfo.prodname = this.state.ProdName;
+            shopInfo.countm = this.state.Number;
+            shopInfo.ShopPrice = this.state.ShopPrice;
+            shopInfo.prototal =(this.state.Number)*(this.state.ShopPrice);
+            shopInfo.promemo = this.state.Remark;
+            shopInfo.DepCode = this.state.DepCode;
+            shopInfoData.push(shopInfo);
+            //调用插入表方法
+            dbAdapter.insertShopInfo(shopInfoData);
+    //        var nextRoute={
+    //           name:"主页",
+    //           component:Index,
+    //        };
+    //        this.props.navigator.push(nextRoute);
+            this.props.navigator.pop();
+        }
+
     }
 
   render() {
