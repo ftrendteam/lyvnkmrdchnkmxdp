@@ -91,9 +91,11 @@ export default class ShoppingCart extends Component {
                 ProdName:rowData.prodname,
                 ShopPrice:rowData.ShopPrice,
                 countm:rowData.countm,
+                Pid:rowData.pid,
+                ProdCode:rowData.ProdCode,
+                DepCode:rowData.DepCode,
             }
         })
-            alert(JSON.stringify(rowData.prodname))
     }
 //自动跑接口
     componentDidMount(){
@@ -204,15 +206,15 @@ export default class ShoppingCart extends Component {
         this.componentDidMount();
     }
     _rightButtonClick() {
-          console.log('右侧按钮点击了');
-          this._setModalVisible();
-      }
-      _setModalVisible() {
-          let isShow = this.state.show;
-          this.setState({
-            show:!isShow,
-          });
-      }
+        console.log('右侧按钮点击了');
+        this._setModalVisible();
+    }
+    _setModalVisible() {
+        let isShow = this.state.show;
+        this.setState({
+          show:!isShow,
+        });
+    }
   render() {
     return (
       <View style={styles.container}>

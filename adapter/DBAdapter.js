@@ -275,7 +275,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
           let ProdCode=shopInfo.ProdCode;
           let DepCode = shopInfo.DepCode;
        //   "prodname":"海鲜菇","countm":1.0000,"kccount":0.0,"prototal":1.0000,"unit":"kg  ","promemo":""
-          let sql = "INSERT INTO shopInfo(pid,ProdCode,prodname,countm,ShopPrice,prototal,promemo,DepCode)" +
+          let sql = " replace INTO shopInfo(pid,ProdCode,prodname,countm,ShopPrice,prototal,promemo,DepCode)" +
             "values(?,?,?,?,?,?,?,?)";
           tx.executeSql(sql, [Pid,ProdCode,shopName,ShopNumber, ShopPrice, ShopAmount, ShopRemark,DepCode], () => {
               resolve(true);
@@ -657,13 +657,28 @@ export default class DBAdapter extends SQLiteOpenHelper {
    * @param DepCode 品级编码
    * @return 返回指定品类下所有商品信息
    */
-  selectProduct(DepCode) {
+
+   selectProduct1(DepCode) {
+       return new Promise((resolve, reject) => {
+         db.transaction((tx) => {
+           tx.executeSql("select count(*) as countn "+
+           " from product a left join shopInfo b on a.Pid=b.Pid where IsDel='0' and prodtype<>'1' and a.DepCode in (select DepCode from tdepset where IsDel='0'" +
+             "and (a.DepCode='" + DepCode + "' or SubCode like '%;" + DepCode + ";%')) ", [], (tx, results) => {
+             resolve(results.rows);
+           });
+         }, (error) => {
+           this._errorCB('transaction', error);
+         });
+       })
+     }
+
+  selectProduct(DepCode,currpage) {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
         tx.executeSql("select a.*,ifNull(b.countm,0) as ShopNumber,ifNull(b.ShopPrice,a.StdPrice) as ShopPrice ,ifNull(b.prototal,0) as ShopAmount   "+
         ",ifNull(b.promemo,'') as ShopRemark,'"+DepCode+"' as DepCode1 "+
         " from product a left join shopInfo b on a.Pid=b.Pid where IsDel='0' and prodtype<>'1' and a.DepCode in (select DepCode from tdepset where IsDel='0'" +
-          "and (a.DepCode='" + DepCode + "' or SubCode like '%;" + DepCode + ";%'))", [], (tx, results) => {
+          "and (a.DepCode='" + DepCode + "' or SubCode like '%;" + DepCode + ";%')) limit 20 offset "+currpage, [], (tx, results) => {
           resolve(results.rows);
         });
       }, (error) => {

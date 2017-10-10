@@ -41,6 +41,9 @@ import SideMenu from 'react-native-side-menu';
 //第二页面
 let dbAdapter = new DBAdapter();
 let db;
+let page = 1;
+let total = 0;
+let totalPage = 0;
 export default class Index extends Component {
     constructor(props){
         super(props);
@@ -54,8 +57,12 @@ export default class Index extends Component {
             head:"",
             shopcar:"",
             Counmnmber:"",
+            Page:"",
+            data:"",
         };
         this.dataRows = [];
+        this.moreTime = 0;
+        var timer1 = null;
     }
     HISTORY(){
         var nextRoute={
@@ -116,6 +123,11 @@ export default class Index extends Component {
     }
     //左侧品级
     componentDidMount(){
+        Storage.get('Name').then((tags) => {
+            this.setState({
+                head:tags
+            })
+        });
         this._fetch();
     }
     _fetch(){
@@ -129,8 +141,19 @@ export default class Index extends Component {
             })
         });
         //触发点击第一个列表
+        dbAdapter.selectProduct1(1).then((rows)=>{
+           for(let i =0;i<rows.length;i++){
+               var row = rows.item(i);
+           };
+           var priductdata = JSON.stringify(row.countn);
+           this.setState({
+               Page:priductdata,
+           })
+        });
+
         let priductData=[];
-        dbAdapter.selectProduct('1').then((rows)=>{
+        let currpage = (page-1)*20;
+        dbAdapter.selectProduct(1,currpage).then((rows)=>
             for(let i =0;i<rows.length;i++){
                 var row = rows.item(i);
                 priductData.push(row);
@@ -152,7 +175,7 @@ export default class Index extends Component {
             var ShopCar = rows.item(0).countm;
             this.setState({
                 shopcar:ShopCar
-            })
+            });
         });
     }
     _renderRow(rowData, sectionID, rowID){
@@ -165,24 +188,36 @@ export default class Index extends Component {
             </TouchableOpacity>
          );
     }
- //右侧商品信息
+    //右侧商品信息
     _pressRow(rowData){
+        dbAdapter.selectProduct1(rowData.DepCode).then((rows)=>{
+           for(let i =0;i<rows.length;i++){
+               var row = rows.item(i);
+           };
+           var priductdata = JSON.stringify(row.countn);
+           this.setState({
+               Page:priductdata,
+           })
+        });
+
         let priductData=[];
-        dbAdapter.selectProduct(rowData.DepCode).then((rows)=>{
+        let currpage = (page-1)*20;
+        dbAdapter.selectProduct(rowData.DepCode,currpage).then((rows)=>{
             for(let i =0;i<rows.length;i++){
                 var row = rows.item(i);
                 priductData.push(row);
-            }
+            };
             this.setState({
                 data:priductData,
             })
         });
+
         this._fetch1()
     }
     _renderItem(item,index){
         return(
             <View style={styles.Border}>
-                <View style={styles.AddNumber}>
+                <View style={styles.AddNumber} ref="loadingToastComponent">
                     <TouchableOpacity style={styles.Subtraction} onPress={()=>this.Countm(item)}>
                         <Text style={styles.Number}>{item.item.ShopNumber}</Text>
                         <View style={styles.subtraction}><Text style={styles.Reduction}>-</Text></View>
@@ -198,18 +233,18 @@ export default class Index extends Component {
         )
     }
     Countm(item){
-        dbAdapter.upDataShopInfoCountmSub(item.item.ProdCode).then((rows)=>{
-            //alert(JSON.stringify(rows));你需要在这里手动把数量减1，还要先判断数量是不是0
-        });
+        //调取数量
+        dbAdapter.upDataShopInfoCountmSub(item.item.ProdCode).then((rows)=>{});
         this._fetch1();
-        var abc = JSON.stringify(item.item.ShopNumber)
+        var abc = JSON.stringify(item.item.ShopNumber);
+
     }
     _separator = () => {
         return <View style={{height:1,backgroundColor:'#f5f5f5'}}/>;
     }
     _createEmptyView() {
         return (
-            <Text style={{fontSize: 16, alignSelf: 'center',marginTop:10}}>商品更新中...</Text>
+            <Text style={{fontSize: 16, alignSelf: 'center',marginTop:10}}>还没有商品哦...</Text>
         );
     }
     OrderDetails(item){
@@ -230,18 +265,9 @@ export default class Index extends Component {
                     DepCode:item.item.DepCode1,
                 }
             })
-//            alert(JSON.stringify(item.item.ShopNumber))
         }
     }
 
-    _onload(){
-        let timer =  setTimeout(()=>{
-            clearTimeout(timer)
-        },100)
-    }
-    keyExtractor(item: Object, index: number) {
-        return item.ProdName//FlatList使用json中的ProdName动态绑定key
-    }
 //  分类
     Home(){
         var abc = "要货单";
@@ -307,6 +333,57 @@ export default class Index extends Component {
     Home3(){
         this._setModalVisible();
     }
+    keyExtractor(item: Object, index: number) {
+        return item.ProdName//FlatList使用json中的ProdName动态绑定key
+    }
+    refreshing(){
+        page=page+1;
+        let priductData=[];
+        let currpage = (page-1)*20;
+        dbAdapter.selectProduct(1,currpage).then((rows)=>{
+            for(let i =0;i<rows.length;i++){
+                var row = rows.item(i);
+                priductData.push(row);
+            };
+            this.setState({
+                data:priductData,
+            });
+            var productData = JSON.stringify(priductData);
+            var list = [];
+            var state = {};
+            let timer =  setTimeout(()=>{
+                clearTimeout(timer)
+            });
+            if (page == 1) {
+                total = this.state.Page;
+                totalPage = total % 20 == 0 ? total / 20 : Math.floor(total / 20) + 1;
+                if (!total > 0) {
+                    state.noData = true;
+                } else {
+                    state.noData = false;
+                }
+            } else {
+                list = list.concat(productData);
+                alert(list);
+            }
+            if (page < totalPage) {
+                state.nomore = false;
+            } else {
+                state.nomore = true;
+            }
+        });
+    }
+
+    _onload(){
+        if(page<totalPage){
+            page = page+1;
+        }else{
+            alert("已加载到底部")
+        }
+    }
+
+
+
     render() {
         const {data} = this.state;
         return (
@@ -326,27 +403,29 @@ export default class Index extends Component {
                       </View>
                   </View>
                   <View style={styles.ContList}>
-                      <ScrollView style={styles.scrollview}>
-                          <ListView
-                            style={styles.listViewStyle}
-                            dataSource={this.state.dataSource}
-                            showsVerticalScrollIndicator={true}
-                            renderRow={this._renderRow.bind(this)}
-                          />
-                      </ScrollView>
+                      <ListView
+                        style={styles.scrollview}
+                        dataSource={this.state.dataSource}
+                        showsVerticalScrollIndicator={true}
+                        renderRow={this._renderRow.bind(this)}
+                      />
                       <View style={styles.RightList1}>
-                          <ScrollView style={styles.ScrollView1}>
-                               <FlatList
-                                    numColumns={3}
-                                    key={item => item.Pid}
-                                    renderItem={this._renderItem.bind(this)}
-                                    ItemSeparatorComponent={this._separator.bind(this)}
-                                    ListEmptyComponent={this._createEmptyView()}
-                                    data={data}
-                                    keyExtractor={this.keyExtractor}
-                                    onEndReached={this._onload}
-                               />
-                          </ScrollView>
+                           <FlatList
+                                numColumns={3}
+                                key={item => item.Pid}
+                                style={styles.ScrollView1}
+                                renderItem={this._renderItem.bind(this)}
+                                ItemSeparatorComponent={this._separator.bind(this)}
+                                ListEmptyComponent={this._createEmptyView()}
+                                data={data}
+                                keyExtractor={this.keyExtractor}
+                                onRefresh={this.refreshing.bind(this)}
+                                refreshing={false}
+                                onEndReachedThreshold = {0.5}
+                                onEndReached={(info) => {
+                                    this._onload()
+                                } }
+                           />
                       </View>
                   </View>
                   <Modal
@@ -490,15 +569,6 @@ const styles = StyleSheet.create({
     backgroundColor:"#ffffff",
     flex:2,
   },
-  scrollText:{
-    borderBottomWidth:1,
-    borderBottomColor:"#e5e5e5",
-    height:80,
-    color:"#323232",
-    textAlign:"center",
-    lineHeight:45,
-    fontSize:16,
-  },
   Active:{
       borderTopWidth:1,
       borderTopColor:"#e5e5e5",
@@ -582,6 +652,8 @@ const styles = StyleSheet.create({
   Border:{
     borderRightWidth:1,
     borderRightColor:"#f5f5f5",
+    borderBottomWidth:1,
+    borderBottomColor:"#f5f5f5",
     flex:3,
     paddingBottom:10,
     paddingTop:5,
