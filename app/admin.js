@@ -108,7 +108,7 @@ export default class admin extends Component {
 //                  alert(JSON.stringify(data))
              }else{
                  ToastAndroid.show('网络请求失败', ToastAndroid.SHORT);
-//                 alert(JSON.stringify(data))
+                 alert(JSON.stringify(data))
              }
          })
          });
@@ -146,6 +146,8 @@ export default class admin extends Component {
     }
 //登录
     pressPush(){
+        Storage.save('Name','');
+        Storage.save('history','');
         var PickedDate = this.state.pickedDate;
         if(PickedDate == ""){
             ToastAndroid.show('请选择机构信息', ToastAndroid.SHORT)

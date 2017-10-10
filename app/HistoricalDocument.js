@@ -61,16 +61,6 @@ export default class HistoricalDocument extends Component {
           component:Index
       };
       this.props.navigator.push(nextRoute);
-//      Storage.delete('history').then((tags) => {
-//            this.setState({
-//                reqDetailCode: tags
-//            });
-//      });
-//      Storage.delete('Name').then((tags) => {
-//           this.setState({
-//               name: tags
-//           });
-//      });
   }
   SHOP(){
       var nextRoute={
@@ -109,12 +99,13 @@ export default class HistoricalDocument extends Component {
      this._dpSearch();
   }
   _get(){
-    //获取功能名字
-     Storage.get('Name').then((tags) => {
+    //单据name获取
+    Storage.get('Name').then((tags) => {
          this.setState({
-             name: tags
-         });
-     });
+             name:tags
+         })
+    });
+
      //reqDetailCode获取
      Storage.get('history').then((tags) => {
          this.setState({
@@ -128,6 +119,7 @@ export default class HistoricalDocument extends Component {
               Username: tags
           });
      });
+
       //usercode获取
      Storage.get('userpwd').then((tags) => {
           this.setState({
@@ -183,7 +175,6 @@ export default class HistoricalDocument extends Component {
               promemo:rowData.promemo,
           }
       })
-  //       alert(JSON.stringify(rowData.Formno))
    }
   _renderRow(rowData, sectionID, rowID){
       return(

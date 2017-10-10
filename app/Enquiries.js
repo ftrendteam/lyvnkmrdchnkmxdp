@@ -29,13 +29,23 @@ export default class Enquiries extends Component {
           endDate:DateUtil.formatDateTime(new Date()),
           formno:"",
           prodcode:"",
+          name:"",
       }
   }
   componentDidMount(){
+    this._get();
+  }
+
+  _get(){
     Storage.get('code').then((tags) => {
         this.setState({
             reqDetailCode: tags
         });
+    });
+    Storage.get('Name').then((tags) => {
+         this.setState({
+             name:tags
+         })
     });
   }
   Return(){
@@ -60,14 +70,18 @@ export default class Enquiries extends Component {
         });
   }
   showDateTimePicker() {
-        var startDate = new Date();
-        this.picker.showDateTimePicker(startDate, (d)=>{
-            this.setState({startDate:DateUtil.formatDateTime(d)});
-        });
-        var endDate = new Date();
-        this.picker.showDateTimePicker(endDate, (d)=>{
-            this.setState({endDate:DateUtil.formatDateTime(d)});
-        });
+        if(this.state.name == ""){
+            var startDate = new Date();
+            this.picker.showDateTimePicker(startDate, (d)=>{
+                this.setState({startDate:DateUtil.formatDateTime(d)});
+            });
+        }else{
+            var endDate = new Date();
+            this.picker.showDateTimePicker(endDate, (d)=>{
+                this.setState({endDate:DateUtil.formatDateTime(d)});
+            });
+        }
+
   }
   render() {
     return (
@@ -76,7 +90,7 @@ export default class Enquiries extends Component {
             <TouchableOpacity onPress={this.Return.bind(this)} style={styles.HeaderImage}>
                  <Image source={require("../images/left.png")}></Image>
             </TouchableOpacity>
-            <Text style={styles.Text}>要货单查询</Text>
+            <Text style={styles.Text}>{this.state.name}查询</Text>
         </View>
         <View style={styles.Cont}>
             <View style={styles.Content}>
@@ -87,6 +101,7 @@ export default class Enquiries extends Component {
                 </View>
                 <View style={styles.ContList}>
                     <Text style={styles.ContLeft}>结束日期：</Text>
+
                     <Text style={styles.ContLeft} onPress={this.showDateTimePicker.bind(this)}>{this.state.endDate.toString()}</Text>
                     <DateTimePicker ref={(picker)=>{this.picker=picker}}/>
                 </View>
