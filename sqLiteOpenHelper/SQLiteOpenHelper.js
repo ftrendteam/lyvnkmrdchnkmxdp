@@ -72,6 +72,22 @@ export default class SQLiteOpenHelper {
         }, (err) => {
           this._errorCB('d', err);
         });
+  
+      tx.executeSql('CREATE INDEX IF NOT EXISTS  [index_tdepset_depcode] ON [tdepset] ([DepCode] COLLATE NOCASE ASC)'
+        , [], () => {
+          this._successCB('executeSql');
+        }, (err) => {
+          this._errorCB('d', err);
+        });
+  
+      tx.executeSql('CREATE INDEX IF NOT EXISTS  [index_tdepset_subcode] ON [tdepset] ([SubCode] COLLATE NOCASE ASC)'
+        , [], () => {
+          this._successCB('executeSql');
+        }, (err) => {
+          this._errorCB('d', err);
+        });
+  
+  
       //用户信息列表
       tx.executeSql('CREATE TABLE IF NOT EXISTS tuserset(pid int null,Usercode varchar(20) null,Barcode varchar(20) null,' +
         'UserName varchar(20) null,UserPwd varchar(100) null,OpriceRight varchar(10) null,PriceRight varchar(10) null,IsCashier varchar(10) null,'
@@ -99,6 +115,28 @@ export default class SQLiteOpenHelper {
         }, (err) => {
           this._errorCB('f', err);
         });
+  
+      tx.executeSql('CREATE INDEX IF NOT EXISTS  [index_product_myprodcode] ON [Product] ([ProdCode] COLLATE NOCASE ASC)'
+        , [], () => {
+          this._successCB('executeSql');
+        }, (err) => {
+          this._errorCB('f', err);
+        });
+  
+      tx.executeSql('CREATE INDEX IF NOT EXISTS  [index_product_barcode] ON [Product] ([barcode] COLLATE NOCASE ASC)'
+        , [], () => {
+          this._successCB('executeSql');
+        }, (err) => {
+          this._errorCB('f', err);
+        });
+  
+      tx.executeSql('CREATE INDEX IF NOT EXISTS  [index_product_depcode] ON [Product] ([depcode] COLLATE NOCASE ASC)'
+        , [], () => {
+          this._successCB('executeSql');
+        }, (err) => {
+          this._errorCB('f', err);
+        });
+      
         //Pid,ProdCode,prodname,countm,ShopPrice,prototal,promemo,kccount
       tx.executeSql("CREATE TABLE IF NOT EXISTS shopInfo(pid int not null Primary Key,ProdCode varchar(20) null,prodname varchar(255) null,countm float(8) null,"+
         "ShopPrice float(8) null,prototal float(8) null,promemo varchar(50) null,DepCode varchar(20) null)",[],
