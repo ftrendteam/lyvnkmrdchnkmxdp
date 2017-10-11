@@ -40,7 +40,7 @@ export default class SQLiteOpenHelper {
     
     db.transaction((tx) => {
       //创建机构信息
-      tx.executeSql('CREATE TABLE IF NOT EXISTS tshopitem(pid int null,shopcode varchar(20) null,shopname varchar(200) null,' +
+      tx.executeSql('CREATE TABLE IF NOT EXISTS tshopitem(pid int not null Primary Key,shopcode varchar(20) null,shopname varchar(200) null,' +
         'UniqueCode varchar(5) null,shoplevel int null,subcode varchar(200) null,FNeedPS char(1) null,FCanPH char(1) null)'
         , [], () => {
           this._successCB('executeSql');
@@ -64,7 +64,7 @@ export default class SQLiteOpenHelper {
           this._errorCB('c', err);
         });
       //品级
-      tx.executeSql('CREATE TABLE IF NOT EXISTS tdepset(pid int null,DepCode varchar(20) null,DepName varchar(100) null,' +
+      tx.executeSql('CREATE TABLE IF NOT EXISTS tdepset(pid int not null Primary Key,DepCode varchar(20) null,DepName varchar(100) null,' +
         'AidCode varchar(20) null,SubCode varchar(20) null,DepMemo varchar(50) null,SpecTag int(4) null,IsLeaf int(4) null,' +
         'ProfitRate float(8) null,GatherRate float(8) null,DepLevel int(4) null,IsDel varchar(1) null)'
         , [], () => {
@@ -89,7 +89,7 @@ export default class SQLiteOpenHelper {
   
   
       //用户信息列表
-      tx.executeSql('CREATE TABLE IF NOT EXISTS tuserset(pid int null,Usercode varchar(20) null,Barcode varchar(20) null,' +
+      tx.executeSql('CREATE TABLE IF NOT EXISTS tuserset(pid int not null Primary Key,Usercode varchar(20) null,Barcode varchar(20) null,' +
         'UserName varchar(20) null,UserPwd varchar(100) null,OpriceRight varchar(10) null,PriceRight varchar(10) null,IsCashier varchar(10) null,'
         + 'IsClerk varchar(10) null,HDscRate varchar(10) null)'
         , [], () => {
@@ -98,7 +98,7 @@ export default class SQLiteOpenHelper {
           this._errorCB('e', err);
         });
       //商品表EditDate char(19) null,
-      tx.executeSql('CREATE TABLE IF NOT EXISTS product(Pid int null,ProdCode varchar(13) null,BarCode varchar(18) null,' +
+      tx.executeSql('CREATE TABLE IF NOT EXISTS product(Pid int not null Primary Key,ProdCode varchar(13) null,BarCode varchar(18) null,' +
         'ProdName varchar(40) null,ShortName varchar(20) null,AidCode varchar(20) null,OtherCode varchar(20)' +
         'null,DepCode varchar(12) null,SuppCode varchar(12) null,BrandCode varchar(12) null,Spec varchar(20) null,' +
         'ProdAdr varchar(20) null,Unit varchar(4) null,PUnitAmt float(8) null,PicInfo int(4) null,ProdMemo varchar(50) null,' +
