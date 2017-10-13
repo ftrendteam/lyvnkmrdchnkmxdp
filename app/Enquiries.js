@@ -92,12 +92,12 @@ export default class Enquiries extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <View style={styles.Title}>
-            <TouchableOpacity onPress={this.Return.bind(this)} style={styles.HeaderImage}>
-                 <Image source={require("../images/left.png")}></Image>
-            </TouchableOpacity>
-            <Text style={styles.Text}>{this.state.name}查询</Text>
-        </View>
+            <View style={styles.Title}>
+                <TouchableOpacity onPress={this.Return.bind(this)} style={styles.HeaderImage}>
+                     <Image source={require("../images/left.png")}></Image>
+                </TouchableOpacity>
+                <Text style={styles.Text}>{this.state.name}查询</Text>
+            </View>
             <View style={styles.Content}>
                 <View style={styles.ContList}>
                     <Text style={styles.ContLeft}>开始日期：</Text>
