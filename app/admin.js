@@ -82,6 +82,7 @@ export default class admin extends Component {
  //直接跑数据 componentDidMount
     componentDidMount(){
         Storage.get('ClientCode').then((tags) => {
+//        alert(tags)
             let params = {
                  reqCode:"App_PosReq",
                  reqDetailCode:"App_Client_UseQry",
@@ -108,7 +109,7 @@ export default class admin extends Component {
 //                      alert(JSON.stringify(data))
                  }else{
                      ToastAndroid.show('网络请求失败', ToastAndroid.SHORT);
-                     alert(JSON.stringify(data))
+//                     alert(JSON.stringify(data))
                  }
               })
          });

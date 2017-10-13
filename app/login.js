@@ -77,15 +77,14 @@ export default class  login extends Component{
                    var data='/FMJsonInterfaceByDownToPos';
                    var date=items+'/FMJsonInterfaceByDownToPos';
                    DataUtils.save('LinkUrl',date);
-                };
+                }
+                var frist = 1;
+                Storage.save('FirstTime',frist);
+                Storage.save('ClientCode',this.state.ClientCode);
                 this.props.navigator.push({
                     component:admin,
-                    params:{
-                        ClientCode:this.state.ClientCode,
-                    }
                 });
-                Storage.save('ytt','1');
-                Storage.save('ClientCode',this.state.ClientCode);
+
             }else if(this.state.ClientCode==0){
                 ToastAndroid.show('请输入商户号', ToastAndroid.SHORT);
                 return;
