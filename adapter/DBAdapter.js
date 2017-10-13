@@ -191,16 +191,10 @@ export default class DBAdapter extends SQLiteOpenHelper {
           let GatherRate = tdepSet.GatherRate;
           let DepLevel = tdepSet.DepLevel;
           let IsDel = tdepSet.IsDel;
-          let depcode1=tdepSet.depcode1;
-          let depcode2=tdepSet.depcode2;
-          let depcode3=tdepSet.depcode3;
-          let depcode4=tdepSet.depcode4;
-          let depcode5=tdepSet.depcode5;
-          let depcode6=tdepSet.depcode6;
           
-          let sql = "INSERT INTO tdepset(pid,DepCode,DepName,AidCode,SubCode,DepMemo,SpecTag,IsLeaf,ProfitRate,GatherRate,DepLevel,IsDel,depcode1,depcode2,depcode3,depcode4,depcode5,depcode6)" +
-            "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-          tx.executeSql(sql, [pid, DepCode, DepName, AidCode, SubCode, DepMemo, SpecTag, IsLeaf, ProfitRate, GatherRate, DepLevel, IsDel,depcode1,depcode2,depcode3,depcode4,depcode5,depcode6], () => {
+          let sql = "INSERT INTO tdepset(pid,DepCode,DepName,AidCode,SubCode,DepMemo,SpecTag,IsLeaf,ProfitRate,GatherRate,DepLevel,IsDel)" +
+            "values(?,?,?,?,?,?,?,?,?,?,?,?)";
+          tx.executeSql(sql, [pid, DepCode, DepName, AidCode, SubCode, DepMemo, SpecTag, IsLeaf, ProfitRate, GatherRate, DepLevel, IsDel], () => {
             
             }, (err) => {
               console.log(err);
@@ -540,6 +534,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
               DataUtils.save("userName",userName);
               DataUtils.save("userCode",Usercode);
               let shopCode;
+//              alert("1223424")
               DataUtils.get('shopCode', '').then((data) => {
                 shopCode = data;
                 console.log("shopCode", shopCode);
@@ -593,8 +588,31 @@ export default class DBAdapter extends SQLiteOpenHelper {
    * @param productBody
    * @param categoryBody
    */
+//   downProductAndCategory(productBody, categoryBody) {
+//       return new Promise((resolve, reject) => {
+//   //      DataUtils.get("LinkUrl", LinkUrl).then((urlData) => {
+//         Storage.get('LinkUrl').then((tags) => {
+//           FetchUtils.post(tags, productBody).then((data) => {
+//             if (data.retcode == 1) {
+//               this.insertProductData(data.TblRow).then((result) => {
+//                 FetchUtils.post(tags, categoryBody).then((data) => {
+//                   console.log("data=", data);
+//                   if (data.retcode == 1) {
+//                     this.insertTDepSetData(data.TblRow).then((result) => {
+//                       console.log("end");
+//                       resolve(true);
+//                     });
+//                   }
+//                 });
+//               });
+//             }
+//           });
+//         });
+//       });
+//     }
   downProductAndCategory(productBody, categoryBody) {
     return new Promise((resolve, reject) => {
+
       DataUtils.get("LinkUrl", '').then((urlData) => {
         FetchUtils.post(urlData, productBody).then((data) => {
           if (data.retcode == 1) {
@@ -640,13 +658,12 @@ export default class DBAdapter extends SQLiteOpenHelper {
    * @return 返回指定品类下所有商品信息
    */
 
-   selectProduct1(DepCode,DepLevel) {
+   selectProduct1(DepCode) {
        return new Promise((resolve, reject) => {
          db.transaction((tx) => {
-           let ssql="select count(*) as countn "+
-                   " from product a left join shopInfo b on a.Pid=b.Pid where IsDel='0' and prodtype<>'1' "
-           + " and a.DepCode in (select depcode from tdepset where IsDel='0' where depcode"+DepLevel+"='"+DepCode+"')";
-           tx.executeSql(ssql, [], (tx, results) => {
+           tx.executeSql("select count(*) as countn "+
+           " from product a left join shopInfo b on a.Pid=b.Pid where IsDel='0' and prodtype<>'1' and a.DepCode in (select DepCode from tdepset where IsDel='0'" +
+             "and (a.DepCode='" + DepCode + "' or SubCode like '%;" + DepCode + ";%')) ", [], (tx, results) => {
              resolve(results.rows);
            });
          }, (error) => {
@@ -655,55 +672,27 @@ export default class DBAdapter extends SQLiteOpenHelper {
        })
      }
 
-  selectProduct(DepCode,currpage,DepLevel) {
+  selectProduct(DepCode,currpage) {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
-        let ssql="select a.*,ifNull(b.countm,0) as ShopNumber,ifNull(b.ShopPrice,a.StdPrice) as ShopPrice ,ifNull(b.prototal,0) as ShopAmount   "+
-                 ",ifNull(b.promemo,'') as ShopRemark,'"+DepCode+"' as DepCode1 "+
-                 " from product a left join shopInfo b on a.Pid=b.Pid where IsDel='0' and prodtype<>'1' ";
-         ssql=ssql+ " and a.DepCode in (select depcode from tdepset where IsDel='0' and depcode"+DepLevel+"='"+DepCode+"')";
-         ssql=ssql+" limit 20 offset "+currpage;
-        tx.executeSql(ssql, [], (tx, results) => {
+        tx.executeSql("select a.*,ifNull(b.countm,0) as ShopNumber,ifNull(b.ShopPrice,a.StdPrice) as ShopPrice ,ifNull(b.prototal,0) as ShopAmount   "+
+        ",ifNull(b.promemo,'') as ShopRemark,'"+DepCode+"' as DepCode1 "+
+        " from product a left join shopInfo b on a.Pid=b.Pid where IsDel='0' and prodtype<>'1' and a.DepCode in (select DepCode from tdepset where IsDel='0'" +
+          "and (a.DepCode='" + DepCode + "' or SubCode like '%;" + DepCode + ";%')) limit 20 offset "+currpage, [], (tx, results) => {
           resolve(results.rows);
         });
       }, (error) => {
         this._errorCB('transaction', error);
       });
-
     })
   }
-   /***
-       * 条码扫描
-       */
-  selectBarCode(barcode,DepLevel) {
-        return new Promise((resolve, reject) => {
-          db.transaction((tx) => {
-          let ssql="select  a.*,ifNull(b.countm,0) as ShopNumber,ifNull(b.ShopPrice,a.StdPrice) as ShopPrice ,ifNull(b.prototal,0) as ShopAmount   "+
-                   ",ifNull(b.promemo,'') as ShopRemark,c.depcode"+DepLevel+" as DepCode1 "+
-                 " from product a left join shopInfo b on a.Pid=b.Pid  join tdepset c on a.depcode=c.depcode and c.isdel='0'"
-                  +" where a.IsDel='0'  and (barcode = '"+barcode+"' or a.prodcode='"+barcode+"')";
-            tx.executeSql(ssql, [], (tx, results) => {
-  //            alert(results.rows.length);
-              resolve(results.rows);
-            });
-          }, (error) => {
-            this._errorCB('transaction', error);
-          });
-        });
-      }
-
   /***
      * 助记码查询商品
      */
-    selectAidCode(aidCode,DepLevel) {
+    selectAidCode(aidCode) {
       return new Promise((resolve, reject) => {
         db.transaction((tx) => {
-        let ssql="select  a.*,ifNull(b.countm,0) as ShopNumber,ifNull(b.ShopPrice,a.StdPrice) as ShopPrice ,ifNull(b.prototal,0) as ShopAmount   "+
-                 ",ifNull(b.promemo,'') as ShopRemark, c.depcode"+DepLevel+" as DepCode1 "+
-               " from product a left join shopInfo b on a.Pid=b.Pid join tdepset c on a.depcode=c.depcode and c.isdel='0' where a.isdel='0' and (a.prodname like '%"
-               +aidCode+"%' or a.aidcode like '%"+aidCode+"%' or a.prodcode like '%"
-               +aidCode+"%' or a.barcode like '%"+aidCode+"%')";
-          tx.executeSql(ssql, [], (tx, results) => {
+          tx.executeSql("select * from product where isdel='0' and (prodname like '%"+aidCode+"%' or aidcode like '%"+aidCode+"%' or prodcode like '%"+aidCode+"%' or barcode like '%"+aidCode+"%')", [], (tx, results) => {
 //            alert(results.rows.length);
             resolve(results.rows);
           });
@@ -712,7 +701,21 @@ export default class DBAdapter extends SQLiteOpenHelper {
         });
       });
     }
-
+    /***
+     * 扫描查询商品
+     */
+    scaningCode(scanCode){
+      return new Promise((resolve, reject) => {
+        db.transaction((tx) => {
+          tx.executeSql("select * from product where isdel='0' and (barcode='"+scanCode+"' or prodcode='"+scanCode+"')", [], (tx, results) => {
+            alert(results.rows.length);
+            resolve(results.rows);
+          });
+        }, (error) => {
+          this._errorCB('transaction', error);
+        });
+      });
+    }
 
   /***
    * 关闭表

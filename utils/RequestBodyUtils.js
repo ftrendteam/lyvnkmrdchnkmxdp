@@ -3,7 +3,8 @@
  */
 import MD5Utils from './MD5Utils';
 import DateUtils from './DateUtils';
-import DataUtils from './DataUtils'
+import Storage from './Storage';
+import FetchUtils from './FetchUtils';
 export  default class RequestBodyUtils {
   static  currPage = 1;
   static currDate = '2017-1-1 10:00:00';
@@ -15,7 +16,6 @@ export  default class RequestBodyUtils {
   static createShopCode = (clientCode, pwd) => {
     let date = DateUtils.getCurrentDate(new Date());
     let md5Pwd = MD5Utils.encryptMD5(pwd);
-    console.log('date=' + date + ',pwd=' + md5Pwd);
     let sign = MD5Utils.encryptMD5('App_PosReq' + '##' + 'App_Client_Qry' + '##' + date + '##' + 'PosControlCs');
     return JSON.stringify({
       'reqCode': 'App_PosReq',
@@ -76,7 +76,7 @@ export  default class RequestBodyUtils {
    *   string, usercode: string, DetailInfo1: {ShopCode: string, OrgFormno: string, ProMemo: string}, DetailInfo2:
    *   [*]}}
    */
-  static createPS = (clientCode,orgFormno) => {
+  static createPS = (clientCode, orgFormno) => {
     let date = DateUtils.getCurrentDate(new Date());
     let sign = MD5Utils.encryptMD5('App_PosReq' + "##" + "App_Client_ProPSSH" + "##" + date + "##" + 'PosControlCs');
     let DetailInfo1 = {
@@ -87,7 +87,7 @@ export  default class RequestBodyUtils {
       "Sign": "",
       "username": "001",
       "usercode": "001",
-      "DetailInfo1": {"ShopCode": "0", "OrgFormno": ""+orgFormno+"", "ProMemo": "表单备注"},
+      "DetailInfo1": {"ShopCode": "0", "OrgFormno": "" + orgFormno + "", "ProMemo": "表单备注"},
       "DetailInfo2": [{"prodcode": "0101", "countm": 10, "ProPrice": 12, "promemo": "", "kccount": '10'}]
     };
     //let DetailInfo2 = {'prodcode': '0101', 'countm': 10, 'ProPrice': 12, 'promemo': '', 'kccount': '10'};
@@ -102,7 +102,7 @@ export  default class RequestBodyUtils {
    *   string, usercode: string, DetailInfo1: {ShopCode: string, OrgFormno: string, ProMemo: string}, DetailInfo2:
    *   [*]}}
    */
-  static createPD = (clientCode,orgFormno) => {
+  static createPD = (clientCode, orgFormno) => {
     let date = DateUtils.getCurrentDate(new Date());
     let sign = MD5Utils.encryptMD5('App_PosReq' + "##" + "App_Client_ProPC" + "##" + date + "##" + 'PosControlCs');
     let DetailInfo1 = {
@@ -113,7 +113,7 @@ export  default class RequestBodyUtils {
       "Sign": "",
       "username": "001",
       "usercode": "001",
-      "DetailInfo1": {"ShopCode": "0", "OrgFormno": ""+orgFormno+"", "ProMemo": "表单备注"},
+      "DetailInfo1": {"ShopCode": "0", "OrgFormno": "" + orgFormno + "", "ProMemo": "表单备注"},
       "DetailInfo2": [{"prodcode": "0101", "countm": 10, "ProPrice": 12, "promemo": "", "kccount": '10'}]
     };
     //let DetailInfo2 = {'prodcode': '0101', 'countm': 10, 'ProPrice': 12, 'promemo': '', 'kccount': '10'};
@@ -154,7 +154,7 @@ export  default class RequestBodyUtils {
    *   string, usercode: string, DetailInfo1: {ShopCode: string, OrgFormno: string, ProMemo: string}, DetailInfo2:
    *   [*]}}
    */
-  static createSY = (clientCode,userName,userCode) => {
+  static createSY = (clientCode, userName, userCode) => {
     let date = DateUtils.getCurrentDate(new Date());
     let sign = MD5Utils.encryptMD5('App_PosReq' + "##" + "App_Client_ProSY" + "##" + date + "##" + 'PosControlCs');
     let DetailInfo1 = {
@@ -162,7 +162,7 @@ export  default class RequestBodyUtils {
       "reqDetailCode": "App_Client_ProSY",
       "ClientCode": clientCode,
       "sDateTime": date,
-      "Sign": sign+"",
+      "Sign": sign + "",
       "username": userName,
       "usercode": userCode,
       "DetailInfo1": {"ShopCode": "0", "OrgFormno": "", "ProMemo": "表单备注"},
@@ -202,23 +202,23 @@ export  default class RequestBodyUtils {
    *  App_Client_ProSYDetailQ  商品损益
    *
    */
-  businessDetailSelect(reqDetailCode,clientCode,beginDate,endDate,shopcode,formno,prodcode) {
+  businessDetailSelect(reqDetailCode, clientCode, beginDate, endDate, shopcode, formno, prodcode) {
     let date = DateUtils.getCurrentDate(new Date());
     let sign = MD5Utils.encryptMD5('App_PosReq' + "##" + reqDetailCode + "##" + date + "##" + 'PosControlCs');
     return JSON.stringify({
-      'reqCode':'App_PosReq'  //固定内容
-      ,'reqDetailCode':reqDetailCode
-      ,'ClientCode':clientCode //商户号编码
-      ,'sDateTime':date //时间戳
-      ,'Sign':'sign'
+      'reqCode': 'App_PosReq'  //固定内容
+      , 'reqDetailCode': reqDetailCode
+      , 'ClientCode': clientCode //商户号编码
+      , 'sDateTime': date //时间戳
+      , 'Sign': 'sign'
       //校验MD5(reqCode + '##' + reqDetailCode + '##' + sDateTime + '##' + 'PosControlCs')
-      ,'username':'收银员1' //用户名称
-      ,'usercode':'001' //用户编码
-      ,'BeginDate':beginDate //开始日期
-      ,'EndDate':endDate //截止日期
-      ,'shopcode':shopcode //机构号
-      ,'formno':formno //过滤的单据信息
-      ,'prodcode':prodcode //过滤用的商品编码
+      , 'username': '收银员1' //用户名称
+      , 'usercode': '001' //用户编码
+      , 'BeginDate': beginDate //开始日期
+      , 'EndDate': endDate //截止日期
+      , 'shopcode': shopcode //机构号
+      , 'formno': formno //过滤的单据信息
+      , 'prodcode': prodcode //过滤用的商品编码
     });
   }
   
@@ -242,58 +242,81 @@ export  default class RequestBodyUtils {
   /**
    * 商品请求体  shopCode 根据当前的选择的机构下载商品
    */
-  static createProduct = (shopCode, currDate) => {
+  static createProduct = (shopCode, currDate, currentPage) => {
     return JSON.stringify({
       'TblName': 'product',
       'shopcode': shopCode,
       'poscode': '0001',
-      'NeedPage': '0',
-      'PageSize': 100,
-      'CurrPage': '1',
+      'NeedPage': '1',
+      'PageSize': 200,
+      'CurrPage': currentPage,
       'OrderFld': 'pid',
       'NeedYWDate': '0',
       'LastYWDate': currDate,
     });
   }
-  static CurrDate;
-  /**
-   * 轮询请求商品信息
-   */
-  //static async requestProduct = (url, shopCode, dbAdapter) => {
-  //RequestBodyUtils.CurrDate =  DataUtils.get("CurrDate");
-  //console.log("value2", RequestBodyUtils.CurrDate);
-  //alert(RequestBodyUtils.CurrDate);
-  ////do {
-  //let requestBody = RequestBodyUtils.createProduct(shopCode, RequestBodyUtils.currPage);
-  ////console.log("aaaa=", RequestBodyUtils.currPage);
-  //console.log("aaaa=", requestBody);
-  //
-  //FetchUtils.post(url, requestBody).then((json) => {
-  //  console.log("aaaa=", json);
-  //  if (!(json == "" || json == null || json == undefined || (json == "[]"))) {
-  //    const strJson = JSON.parse(json);
-  //    //alert(json);
-  //    let tablow = strJson.TblRow;
-  //    if (strJson.CurrDate != undefined) {
-  //      DataUtils.save("CurrDate", strJson.CurrDate);
-  //
-  //    }
-  //    let count = strJson.tblRowCount;
-  //    if ((count > 0)) {
-  //      dbAdapter.insertProductData(tablow);
-  //    }
-  //    RequestBodyUtils.currPage++;
-  //    RequestBodyUtils.requestProduct(url, shopCode, dbAdapter);
-  //  } else {
-  //    RequestBodyUtils.currPage = 1;
-  //  }
-  //}, (json) => {
-  //  //TODO 处理请求fail
-  //}).catch((err) => {
-  //  console.log('jsonE=' + err);
-  //});
-  //} while (RequestBodyUtils.currPage != 1)
-  //
-  //}
   
+  
+  static CurrDate;
+  static count = 0;//商品中行数
+  static currDate = '';
+  /**
+   * 商品信息增量下发
+   */
+  static requestProduct = (url, shopCode, dbAdapter) => {
+    return new Promise((resolve, reject) => {//Promise
+      Storage.get("CurrDate").then((currentData) => {
+        //console.log("currentDate", currentData)
+        let requestBody = RequestBodyUtils.createProduct(shopCode, currentData, RequestBodyUtils.currPage);
+        alert(requestBody);
+        FetchUtils.post(url, requestBody).then((json) => {
+          //console.log(json)
+          if (!(json == "" || json == null || json == undefined || (json == "[]"))) {
+            if (json.retcode == 99) {
+              RequestBodyUtils.currPage = 1;
+              RequestBodyUtils.count = 0;
+              RequestBodyUtils.currDate = '';
+              resolve(true);
+            }
+            let tablow = json.TblRow;//商品信息
+            if (RequestBodyUtils.currPage > 1) {
+              tablow = json;
+            } else if (RequestBodyUtils.currPage == 1) {
+              RequestBodyUtils.count = json.tblRowCount;//商品中行数
+              RequestBodyUtils.currDate = json.CurrDate;
+            }
+            let queryNum = 0;//需要轮询的次数
+            let num = RequestBodyUtils.count % 200;
+            if ((num != 0)) {//根据是否有余数判断确定轮询次数
+              queryNum = RequestBodyUtils.count / 200;
+              queryNum += 1;
+            } else {
+              queryNum = RequestBodyUtils.count / 200;
+            }
+            if ((RequestBodyUtils.count > 0)) {
+              dbAdapter.insertProductData(tablow);
+            }
+            if (RequestBodyUtils.currPage <= queryNum) {
+              RequestBodyUtils.currPage++;
+              //alert(RequestBodyUtils.currPage++);
+              RequestBodyUtils.requestProduct(url, shopCode, dbAdapter);
+            }
+          } else {
+            resolve(true);
+            alert("zhixingdaole");
+            Storage.save1("CurrDate", RequestBodyUtils.currDate);//保存上次请求时间
+            RequestBodyUtils.currPage = 1;
+            RequestBodyUtils.count = 0;
+            RequestBodyUtils.currDate = '';
+          }
+        }, (json) => {
+          //TODO 处理请求fail
+          alert(json, "错误");
+        }).catch((error) => {
+          console.log('jsonE=' + error);
+          reject(false);
+        });
+      });
+    });
+  }
 }

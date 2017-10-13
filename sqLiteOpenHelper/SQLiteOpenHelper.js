@@ -26,7 +26,7 @@ export default class SQLiteOpenHelper {
       database_displayname,
       database_size,
       () => {
-        this._successCB('open');
+        //this._successCB('open');
       }, (err) => {
         this._errorCB('open', err);
       });
@@ -43,14 +43,14 @@ export default class SQLiteOpenHelper {
       tx.executeSql('CREATE TABLE IF NOT EXISTS tshopitem(pid int not null Primary Key,shopcode varchar(20) null,shopname varchar(200) null,' +
         'UniqueCode varchar(5) null,shoplevel int null,subcode varchar(200) null,FNeedPS char(1) null,FCanPH char(1) null)'
         , [], () => {
-          this._successCB('executeSql');
+          //this._successCB('executeSql');
         }, (err) => {
           this._errorCB('a', err);
         });
       //创建用户管理机构
       tx.executeSql('CREATE TABLE IF NOT EXISTS tusershop(usercode varchar(20) null,shopcode varchar(20) null)'
         , [], () => {
-          this._successCB('executeSql');
+          //this._successCB('executeSql');
         }, (err) => {
           this._errorCB('b', err);
         });
@@ -59,7 +59,7 @@ export default class SQLiteOpenHelper {
         'isEnter int null,IsAdd int null,IsEdit int null,IsDel int null,IsQuery int null,IsPrint int null,IsPrnSet int null,' +
         'IsExPort int null,IsCheck int null,IsWrite int null,IsSpec int null)'
         , [], () => {
-          this._successCB('executeSql');
+          //this._successCB('executeSql');
         }, (err) => {
           this._errorCB('c', err);
         });
@@ -69,21 +69,21 @@ export default class SQLiteOpenHelper {
         'ProfitRate float(8) null,GatherRate float(8) null,DepLevel int(4) null,IsDel varchar(1) null,depcode1 varchar(12) null'+
         ',depcode2 varchar(12) null,depcode3 varchar(12) null,depcode4 varchar(12) null,depcode5 varchar(12) null,depcode6 varchar(12) null)'
         , [], () => {
-          this._successCB('executeSql');
+          //this._successCB('executeSql');
         }, (err) => {
           this._errorCB('d', err);
         });
   
       tx.executeSql('CREATE INDEX IF NOT EXISTS  [index_tdepset_depcode] ON [tdepset] ([DepCode] COLLATE NOCASE ASC)'
         , [], () => {
-          this._successCB('executeSql');
+          //this._successCB('executeSql');
         }, (err) => {
           this._errorCB('d', err);
         });
   
       tx.executeSql('CREATE INDEX IF NOT EXISTS  [index_tdepset_subcode] ON [tdepset] ([SubCode] COLLATE NOCASE ASC)'
         , [], () => {
-          this._successCB('executeSql');
+          //this._successCB('executeSql');
         }, (err) => {
           this._errorCB('d', err);
         });
@@ -94,7 +94,7 @@ export default class SQLiteOpenHelper {
         'UserName varchar(20) null,UserPwd varchar(100) null,OpriceRight varchar(10) null,PriceRight varchar(10) null,IsCashier varchar(10) null,'
         + 'IsClerk varchar(10) null,HDscRate varchar(10) null)'
         , [], () => {
-          this._successCB('executeSql');
+          //this._successCB('executeSql');
         }, (err) => {
           this._errorCB('e', err);
         });
@@ -112,28 +112,28 @@ export default class SQLiteOpenHelper {
         'HLimit money(8) null,LLimit money(8) null,BestKC money(8) null,PriceFlag varchar(2) null,FNoPromotion varchar(10) null,FNoCG varchar(10) null,'+
       'OperRange varchar(10) null,TakeRate varchar(10) null,TakeType varchar(10) null)'
         , [], () => {
-          this._successCB('executeSql');
+          //this._successCB('executeSql');
         }, (err) => {
           this._errorCB('f', err);
         });
   
       tx.executeSql('CREATE INDEX IF NOT EXISTS  [index_product_myprodcode] ON [Product] ([ProdCode] COLLATE NOCASE ASC)'
         , [], () => {
-          this._successCB('executeSql');
+          //this._successCB('executeSql');
         }, (err) => {
           this._errorCB('f', err);
         });
   
       tx.executeSql('CREATE INDEX IF NOT EXISTS  [index_product_barcode] ON [Product] ([barcode] COLLATE NOCASE ASC)'
         , [], () => {
-          this._successCB('executeSql');
+          //this._successCB('executeSql');
         }, (err) => {
           this._errorCB('f', err);
         });
   
       tx.executeSql('CREATE INDEX IF NOT EXISTS  [index_product_depcode] ON [Product] ([depcode] COLLATE NOCASE ASC)'
         , [], () => {
-          this._successCB('executeSql');
+          //this._successCB('executeSql');
         }, (err) => {
           this._errorCB('f', err);
         });
@@ -149,7 +149,7 @@ export default class SQLiteOpenHelper {
     }, (err) => {
       this._errorCB('transaction', err);
     }, () => {
-      this._successCB('transaction');
+      //this._successCB('transaction');
     })
     
   }
@@ -159,7 +159,7 @@ export default class SQLiteOpenHelper {
    */
   close() {
     if (db) {
-      this._successCB('close');
+      //this._successCB('close');
       db.close();
     } else {
       console.log("SQLiteStorage not open");

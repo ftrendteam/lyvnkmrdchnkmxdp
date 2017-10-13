@@ -27,7 +27,9 @@ import React, {
     static save(key, value) {
          return AsyncStorage.setItem(key, JSON.stringify(value));
     }
-
+   static save1(key, value) {
+       AsyncStorage.setItem(key, JSON.stringify(value));
+   }
 
      /**
      * 更新

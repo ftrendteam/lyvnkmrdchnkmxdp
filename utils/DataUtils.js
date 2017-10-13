@@ -7,7 +7,7 @@ export default class DataUtils {
   // 保存
   static async save(key, value) {
     try {
-       AsyncStorage.setItem(key, value);
+      AsyncStorage.setItem(key, value);
       console.log('_save success: ', value);
     } catch (error) {
       console.log('_save error: ', error.message);
@@ -18,19 +18,18 @@ export default class DataUtils {
   // 获取
   static async get(key, defaultValue) {
     return new Promise((resolve, reject) => {
-    try{
-       AsyncStorage.getItem(key, (err,result) => {
-           if (result == null) {
-              resolve(defaultValue);
-            } else {
-             resolve(result);
-           }
-          });
-          alert(err);
-          }catch(err){
-            console.log("wtf=",err);
+      try {
+        AsyncStorage.getItem(key, (error, result) => {
+          if (result == null) {
+            resolve(defaultValue);
+          } else {
+            resolve(result);
           }
-
+        });
+      } catch (error) {
+        reject(defaultValue);
+        console.log("wtf=", error);
+      }
     });
     
   }
