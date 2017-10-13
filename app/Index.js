@@ -21,6 +21,7 @@ import {
   TouchableHighlight,
   ListView,
   AnimatedFlatList,
+  DeviceEventEmitter,
   FlatList
 } from 'react-native';
 import HistoricalDocument from "./HistoricalDocument";
@@ -38,7 +39,9 @@ import DBAdapter from "../adapter/DBAdapter";
 import DataUtils from '../utils/DataUtils';
 import Storage from '../utils/Storage';
 import SideMenu from 'react-native-side-menu';
-//第二页面
+
+var {NativeModules} = require('react-native');
+var RNScannerAndroid = NativeModules.RNScannerAndroid;
 let dbAdapter = new DBAdapter();
 let db;
 let page = 1;
@@ -93,11 +96,30 @@ export default class Index extends Component {
         this.props.navigator.push(nextRoute)
     }
     Code(){
-        var nextRoute={
-            name:"主页",
-            component:Code
-        };
-        this.props.navigator.push(nextRoute)
+        RNScannerAndroid.openScanner();
+        DeviceEventEmitter.addListener("code", (reminder) => {
+            dbAdapter.selectAidCode(reminder,1).then((rows)=>{
+                var ShopCar = rows.item(0).ProdName;
+                this.props.navigator.push({
+                    component:OrderDetails,
+                    params:{
+                        ProdName:rows.item(0).ProdName,
+                        ShopPrice:rows.item(0).ShopPrice,
+                        Pid:rows.item(0).Pid,
+                        countm:rows.item(0).ShopNumber,
+                        promemo:rows.item(0).promemo,
+                        prototal:rows.item(0).prototal,
+                        ProdCode:rows.item(0).ProdCode,
+                        DepCode:rows.item(0).DepCode1,
+                    }
+                })
+            })
+        })
+        //var nextRoute={
+           // name:"主页",
+            //component:Code
+       // };
+       // this.props.navigator.push(nextRoute)
     }
     pullOut(){
         this._setModalVisible()
@@ -141,7 +163,7 @@ export default class Index extends Component {
             })
         });
         //触发点击第一个列表
-        dbAdapter.selectProduct1(1).then((rows)=>{
+        dbAdapter.selectProduct1(1,1).then((rows)=>{
            for(let i =0;i<rows.length;i++){
                var row = rows.item(i);
            };
@@ -152,11 +174,12 @@ export default class Index extends Component {
         });
 
         let priductData=[];
-        let currpage = (page-1)*20;
-        dbAdapter.selectProduct(1,currpage).then((rows)=>
+        let currpage = ((page-1)*20);
+        dbAdapter.selectProduct(1,currpage,1).then((rows)=>{
             for(let i =0;i<rows.length;i++){
                 var row = rows.item(i);
                 priductData.push(row);
+//                alert(JSON.stringify(row));
             }
             this.setState({
                 data:priductData,
@@ -181,16 +204,26 @@ export default class Index extends Component {
     _renderRow(rowData, sectionID, rowID){
          return (
             <TouchableOpacity style={styles.Active} onPress={()=>this._pressRow(rowData)}>
-                <View style={styles.addnumber}>
-                    <Text style={styles.Reduction1}>{rowData.ShopNumber}</Text>
-                </View>
+                {
+                    (rowData.ShopNumber==0)?
+                        null:
+                    <View style={styles.addnumber}>
+                        <Text style={styles.Reduction1}>{rowData.ShopNumber}</Text>
+                    </View>
+                }
                 <Text style={styles.Active1}>{rowData.DepName}</Text>
             </TouchableOpacity>
          );
     }
     //右侧商品信息
     _pressRow(rowData){
-        dbAdapter.selectProduct1(rowData.DepCode).then((rows)=>{
+//            this.refs.loadingToastComponent.hide();
+//            alert("123")
+        if ("Number"==0) {
+            this.refs.goodsCodeOrName({style: {display: "none"}});
+            alert("123")
+        }
+        dbAdapter.selectProduct1(rowData.DepCode,1).then((rows)=>{
            for(let i =0;i<rows.length;i++){
                var row = rows.item(i);
            };
@@ -201,8 +234,8 @@ export default class Index extends Component {
         });
 
         let priductData=[];
-        let currpage = (page-1)*20;
-        dbAdapter.selectProduct(rowData.DepCode,currpage).then((rows)=>{
+        let currpage = ((page-1)*20);
+        dbAdapter.selectProduct(rowData.DepCode,currpage,1).then((rows)=>{
             for(let i =0;i<rows.length;i++){
                 var row = rows.item(i);
                 priductData.push(row);
@@ -211,18 +244,25 @@ export default class Index extends Component {
                 data:priductData,
             })
         });
-
-        this._fetch1()
+        this._fetch1();
+//        var startTime = (new Date()).valueOf();//当前时间
+//        var endTime = (new Date()).valueOf();//结束时间
+//        alert(endTime-startTime);
     }
     _renderItem(item,index){
         return(
             <View style={styles.Border}>
-                <View style={styles.AddNumber} ref="loadingToastComponent">
-                    <TouchableOpacity style={styles.Subtraction} onPress={()=>this.Countm(item)}>
-                        <Text style={styles.Number}>{item.item.ShopNumber}</Text>
-                        <View style={styles.subtraction}><Text style={styles.Reduction}>-</Text></View>
-                    </TouchableOpacity>
+                <View style={styles.AddNumber} ref="goodsCodeOrName">
+                    {
+                        (item.item.ShopNumber==0)?
+                            null:
+                        <TouchableOpacity style={styles.Subtraction} onPress={()=>this.Countm(item)}>
+                             <Text style={styles.Number}>{item.item.ShopNumber}</Text>
+                             <View style={styles.subtraction}><Text style={styles.Reduction}>-</Text></View>
+                        </TouchableOpacity>
+                        }
                 </View>
+
                 <TouchableOpacity onPress={()=>this.OrderDetails(item)}>
                     <View style={styles.Image}>
                         <Image source={require("../images/image.png")}></Image>
@@ -237,14 +277,13 @@ export default class Index extends Component {
         dbAdapter.upDataShopInfoCountmSub(item.item.ProdCode).then((rows)=>{});
         this._fetch1();
         var abc = JSON.stringify(item.item.ShopNumber);
-
     }
     _separator = () => {
         return <View style={{height:1,backgroundColor:'#f5f5f5'}}/>;
     }
     _createEmptyView() {
         return (
-            <Text style={{fontSize: 16, alignSelf: 'center',marginTop:10}}>还没有商品哦...</Text>
+            <Text style={{fontSize: 16, alignSelf: 'center',marginTop:10}}>商品更新...</Text>
         );
     }
     OrderDetails(item){
@@ -339,8 +378,8 @@ export default class Index extends Component {
     refreshing(){
         page=page+1;
         let priductData=[];
-        let currpage = (page-1)*20;
-        dbAdapter.selectProduct(1,currpage).then((rows)=>{
+        let currpage = ((page-1)*20);
+        dbAdapter.selectProduct(1,currpage,1).then((rows)=>{
             for(let i =0;i<rows.length;i++){
                 var row = rows.item(i);
                 priductData.push(row);
@@ -364,25 +403,25 @@ export default class Index extends Component {
                 }
             } else {
                 list = list.concat(productData);
-                alert(list);
             }
-            if (page < totalPage) {
-                state.nomore = false;
-            } else {
-                state.nomore = true;
-            }
+//            if (page < totalPage) {
+//                state.nomore = false;
+//            } else {
+//                state.nomore = true;
+//            }
         });
     }
 
     _onload(){
-        if(page<totalPage){
-            page = page+1;
-        }else{
-            alert("已加载到底部")
-        }
+//        if(page<totalPage){
+//            page = page+1;
+//        }else{
+//           // alert("已加载到底部")
+//        }
+//        page = page+1;
+//        alert(page);
+        this.refreshing();
     }
-
-
 
     render() {
         const {data} = this.state;
@@ -421,10 +460,14 @@ export default class Index extends Component {
                                 keyExtractor={this.keyExtractor}
                                 onRefresh={this.refreshing.bind(this)}
                                 refreshing={false}
-                                onEndReachedThreshold = {0.5}
-                                onEndReached={(info) => {
-                                    this._onload()
-                                } }
+                                onEndReachedThreshold = {0.1}
+                                onEndReached={() =>{
+                                    this._onload();
+                                }}
+                                getItemLayout={(data, index) => (
+                                  // 120 是被渲染 item 的高度 ITEM_HEIGHT。
+                                  {length: 120, offset: 120 * index, index}
+                                )}
                            />
                       </View>
                   </View>
@@ -476,7 +519,7 @@ export default class Index extends Component {
                       <TouchableOpacity style={styles.Home} onPress={this.HISTORY.bind(this)}><Image source={require("../images/documents.png")}></Image><Text style={styles.home1}>历史单据</Text></TouchableOpacity>
                       <TouchableOpacity style={styles.Home} onPress={this.HOME.bind(this)}><Image source={require("../images/home1.png")}></Image><Text style={styles.home2}>首页</Text></TouchableOpacity>
                       <TouchableOpacity style={styles.Home} onPress={this.SHOP.bind(this)}>
-                        <View style={styles.source}><Image source={require("../images/shop.png")}><Text style={styles.ShopCar}>{this.state.shopcar}</Text></Image></View>
+                        <View><Image source={require("../images/shop.png")}><Text style={styles.ShopCar}>{this.state.shopcar}</Text></Image></View>
                         <Text style={styles.home1}>清单</Text>
                       </TouchableOpacity>
                   </View>
@@ -487,9 +530,7 @@ export default class Index extends Component {
 }
 const styles = StyleSheet.create({
   footer:{
-//      position:"absolute",
-//      bottom:0,
-      flex:1,
+      flex:2,
       flexDirection:"row",
       borderTopWidth:1,
       borderTopColor:"#cacccb"
@@ -497,24 +538,22 @@ const styles = StyleSheet.create({
   source:{
     flexDirection:"row",
     flex:1,
-
   },
   Home:{
       flex:1,
       alignItems: 'center',
-      paddingTop:10,
-      paddingBottom:10,
+      paddingTop:15,
       backgroundColor:"#ffffff",
   },
   home1:{
       color:'black',
-      fontSize:16,
+      fontSize:14,
       marginTop:5,
       flex:1,
   },
   home2:{
       color:'#f47882',
-      fontSize:16,
+      fontSize:14,
       marginTop:5,
       flex:1,
   },
@@ -540,9 +579,9 @@ const styles = StyleSheet.create({
       fontSize:18,
   },
   header:{
-    height:60,
+    height:50,
     backgroundColor:"#ffffff",
-    paddingTop:16,
+    paddingTop:10,
     borderBottomWidth:1,
     borderBottomColor:"#cacccb"
   },
@@ -562,7 +601,8 @@ const styles = StyleSheet.create({
     flex:6,
     textAlign:"center",
     color:"#323232",
-    fontSize:20,
+    fontSize:16,
+    marginTop:3,
   },
   scrollview:{
     width:130,
@@ -574,11 +614,12 @@ const styles = StyleSheet.create({
       borderTopColor:"#e5e5e5",
   },
   Active1:{
-    height:80,
+    height:50,
     color:"#323232",
     textAlign:"center",
-    lineHeight:45,
-    fontSize:16,
+    lineHeight:38,
+    fontSize:14,
+    overflow:"hidden"
   },
   RightList:{
     paddingLeft:15,
@@ -596,7 +637,7 @@ const styles = StyleSheet.create({
     marginRight:10,
   },
   ContList:{
-    flex:12,
+    flex:17,
     flexDirection:"row",
   },
   Image:{
@@ -608,6 +649,7 @@ const styles = StyleSheet.create({
     textAlign:"center",
     marginTop:10,
     height:20,
+    fontSize:14,
   },
   AddNumber:{
     height:15,
@@ -615,8 +657,8 @@ const styles = StyleSheet.create({
   addnumber:{
     height:20,
     position:'absolute',
-    right:10,
-    top:6,
+    right:5,
+    top:3,
   },
   Reduction1:{
     color:"red",
@@ -655,8 +697,7 @@ const styles = StyleSheet.create({
     borderBottomWidth:1,
     borderBottomColor:"#f5f5f5",
     flex:3,
-    paddingBottom:10,
-    paddingTop:5,
+    paddingBottom:15,
   },
   modalStyle: {
      flex:1,
@@ -666,7 +707,7 @@ const styles = StyleSheet.create({
     backgroundColor:"#000000",
     flex:2,
     opacity:0.6,
-    marginTop:60,
+    marginTop:50,
   },
   buttonText1:{
     opacity:0.1
@@ -674,23 +715,22 @@ const styles = StyleSheet.create({
   ModalView:{
     flex:6,
     backgroundColor:'#f1f5f6',
-    marginTop:60,
+    marginTop:50,
   },
   subView:{
     flex:2,
-    height:150,
+    height:100,
     borderRightWidth:1,
     borderRightColor:"#e5e5e5",
   },
   ModalViewList:{
-    height:150,
+    height:100,
     flexDirection:"row",
     borderBottomWidth:1,
     borderBottomColor:"#cccccc",
   },
   ModalViewList1:{
     flexDirection:"row",
-    height:50,
     marginTop:15,
   },
   subView1:{
@@ -705,12 +745,11 @@ const styles = StyleSheet.create({
   titleText:{
     flex:1,
     textAlign:"center",
-    paddingTop:52,
+    paddingTop:40,
     fontSize:16,
   },
   titleText1:{
     color:"#ffffff",
-    lineHeight:26,
     textAlign:"center"
   }
 });

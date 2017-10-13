@@ -24,7 +24,7 @@ export default class MainView extends Component{
         };
     }
     componentDidMount(){
-        Storage.get('FirstTime').then((tags) => {
+        Storage.get('ytt').then((tags) => {
             this.setState({
                 First: tags
             });

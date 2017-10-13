@@ -69,19 +69,25 @@ export default class Enquiries extends Component {
             this.setState({date:d});
         });
   }
-  showDateTimePicker() {
-        if(this.state.name == ""){
-            var startDate = new Date();
-            this.picker.showDateTimePicker(startDate, (d)=>{
-                this.setState({startDate:DateUtil.formatDateTime(d)});
-            });
-        }else{
-            var endDate = new Date();
-            this.picker.showDateTimePicker(endDate, (d)=>{
-                this.setState({endDate:DateUtil.formatDateTime(d)});
-            });
-        }
-
+  showDateTimePicker(data) {
+    if(data){
+        var startDate = new Date();
+        this.picker.showDateTimePicker(startDate, (d)=>{
+            this.setState({startDate:DateUtil.formatDateTime(d)});
+        });
+    }else{
+        var endDate = new Date();
+        this.picker.showDateTimePicker(endDate, (d)=>{
+            this.setState({endDate:DateUtil.formatDateTime(d)});
+        });
+    }
+  }
+  emptying(){
+    var nextRoute={
+        name:"主页",
+        component:HistoricalDocument
+    };
+    this.props.navigator.push(nextRoute)
   }
   render() {
     return (
@@ -92,7 +98,6 @@ export default class Enquiries extends Component {
             </TouchableOpacity>
             <Text style={styles.Text}>{this.state.name}查询</Text>
         </View>
-        <View style={styles.Cont}>
             <View style={styles.Content}>
                 <View style={styles.ContList}>
                     <Text style={styles.ContLeft}>开始日期：</Text>
@@ -101,16 +106,15 @@ export default class Enquiries extends Component {
                 </View>
                 <View style={styles.ContList}>
                     <Text style={styles.ContLeft}>结束日期：</Text>
-
                     <Text style={styles.ContLeft} onPress={this.showDateTimePicker.bind(this)}>{this.state.endDate.toString()}</Text>
                     <DateTimePicker ref={(picker)=>{this.picker=picker}}/>
                 </View>
                 <View style={styles.ContList}>
-                    <Text style={styles.ContLeft}>门店：</Text>
+                    <Text style={styles.ContLeft3}>门店：</Text>
                     <Text style={styles.ContLeft1}>{this.state.reqDetailCode}</Text>
                 </View>
                 <View style={styles.ContList}>
-                    <Text style={styles.ContLeft}>单据号：</Text>
+                    <Text style={styles.ContLeft2}>单据号：</Text>
                     <TextInput
                     underlineColorAndroid='transparent'
                     style={styles.ContRight}
@@ -121,7 +125,7 @@ export default class Enquiries extends Component {
                     }}/>
                 </View>
                 <View style={styles.ContList}>
-                    <Text style={styles.ContLeft}>商品编码：</Text>
+                    <Text style={styles.ContLeft2}>商品编码：</Text>
                     <TextInput
                     underlineColorAndroid='transparent'
                     style={styles.ContRight}
@@ -135,12 +139,11 @@ export default class Enquiries extends Component {
                     <Text style={styles.ButtonText} onPress={this.pressPop.bind(this)}>搜索</Text>
                 </View>
             </View>
-        </View>
-        <View style={styles.empty}>
             <View style={styles.Emptying}>
-                  <Text style={styles.EmptyingTxt}>清空历史查询</Text>
+                <TouchableOpacity onPress={this.emptying.bind(this)}>
+                    <Text style={styles.EmptyingTxt}>清空历史查询</Text>
+                </TouchableOpacity>
             </View>
-        </View>
       </View>
     );
   }
@@ -152,11 +155,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
   },
   Title:{
-    height:60,
+    height:50,
     backgroundColor:"#f47882",
-    paddingLeft:25,
-    paddingRight:25,
-    paddingTop:13,
+    paddingLeft:15,
+    paddingRight:15,
+    paddingTop:10,
     flexDirection:"row",
     borderBottomWidth:1,
     borderBottomColor:"#cacccb"
@@ -169,15 +172,13 @@ const styles = StyleSheet.create({
   Text:{
     flex:8,
     textAlign:"center",
-    fontSize:20,
+    fontSize:18,
     color:"#ffffff"
     },
-    Cont:{
-        flex:1
-    },
     Content:{
-        marginLeft:25,
-        marginRight:25,
+        marginLeft:15,
+        marginRight:15,
+        marginBottom:30,
     },
     ContList:{
         borderBottomWidth:1,
@@ -190,48 +191,52 @@ const styles = StyleSheet.create({
         flex:2,
         lineHeight:35,
         color:"#636363",
-        fontSize:16,
+        fontSize:14,
+    },
+    ContLeft2:{
+        flex:3,
+        lineHeight:35,
+        color:"#636363",
+        fontSize:14,
     },
     ContLeft1:{
         flex:8,
         lineHeight:35,
         color:"#636363",
-        fontSize:16,
+        fontSize:14,
+    },
+    ContLeft3:{
+        flex:3,
+        lineHeight:35,
+        color:"#636363",
+        fontSize:14,
     },
     ContRight:{
         flex:8
-    },
-    empty:{
-        height:45,
-        flex:1,
-        justifyContent: 'center',
-        alignItems: 'center',
     },
     Emptying:{
         borderWidth:1,
         borderColor:"#cccccc",
         borderRadius:5,
-        marginLeft:30,
-        marginRight:30,
-        paddingLeft:100,
-        paddingRight:100,
+        marginLeft:15,
+        marginRight:15,
     },
     EmptyingTxt:{
         height:40,
         color:"#cccccc",
-        lineHeight:26,
+        lineHeight:27,
+        textAlign:"center"
     },
     button:{
         marginTop:50,
-        flex:1,
     },
     ButtonText:{
         color:"#ffffff",
         backgroundColor:"#f47882",
-        height:45,
+        height:40,
         lineHeight:30,
         borderRadius:5,
         textAlign:"center",
-        fontSize:18,
+        fontSize:16,
     }
 });

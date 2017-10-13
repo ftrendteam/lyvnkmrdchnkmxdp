@@ -119,14 +119,13 @@ export default class GoodsDetails extends Component {
             shopInfoData.push(shopInfo);
             //调用插入表方法
             dbAdapter.insertShopInfo(shopInfoData);
-    //        var nextRoute={
-    //           name:"主页",
-    //           component:Index,
-    //        };
-    //        this.props.navigator.push(nextRoute);
-            this.props.navigator.pop();
+            var nextRoute={
+               name:"主页",
+               component:Index,
+            };
+            this.props.navigator.push(nextRoute);
+//            this.props.navigator.pop();
         }
-
     }
 
   render() {
@@ -236,7 +235,7 @@ const styles = StyleSheet.create({
     flex:6,
     textAlign:"center",
     color:"#323232",
-    fontSize:20,
+    fontSize:16,
   },
   Cont:{
     paddingTop:10,
@@ -252,7 +251,7 @@ const styles = StyleSheet.create({
     marginBottom:10,
   },
   left:{
-    fontSize:16,
+    fontSize:14,
     color:"#666666",
     position:"absolute",
     left:25,
@@ -263,7 +262,7 @@ const styles = StyleSheet.create({
     position:"absolute",
     right:25,
     top:10,
-    fontSize:16,
+    fontSize:14,
     color:"#666666",
     flexDirection:"row",
   },
@@ -271,21 +270,19 @@ const styles = StyleSheet.create({
     position:"absolute",
     left:76,
     top:10,
-    fontSize:16,
+    fontSize:14,
     color:"#666666",
     flexDirection:"row",
   },
   left1:{
     height:45,
     flexDirection:"row",
-    flex:6,
+    flex:3,
   },
   right1:{
     height:45,
     flexDirection:"row",
-    position:"absolute",
-    right:25,
-    top:8
+    flex:3,
   },
   left2:{
     height:45,
@@ -299,38 +296,38 @@ const styles = StyleSheet.create({
     flexDirection:"row",
   },
   price:{
-    fontSize:16,
+    fontSize:14,
     color:"#666666",
   },
   Price:{
-    fontSize:16,
+    fontSize:14,
     color:"#666666",
-    marginTop:5,
+    marginTop:10,
   },
   Price1:{
-    fontSize:16,
+    fontSize:14,
     color:"#666666",
-    marginTop:5,
+    marginTop:10,
     marginLeft:10,
   },
   Price2:{
-    fontSize:16,
+    fontSize:14,
     color:"#666666",
-    marginTop:8,
+    marginTop:10,
   },
   NumberName:{
-    fontSize:16,
+    fontSize:14,
     color:"#666666",
-    marginTop:5,
+    marginTop:10,
   },
   Number:{
-    fontSize:16,
+    fontSize:14,
     color:"#666666",
     height:40,
     width:220,
   },
   Number1:{
-    fontSize:16,
+    fontSize:14,
     color:"#666666",
     flex:6,
   },
@@ -355,21 +352,21 @@ const styles = StyleSheet.create({
     textAlign:"right"
   },
   sublime:{
-    width:50,
+    flex:1
   },
   button:{
     marginTop:50,
     flex:1,
-    marginLeft:60,
-    marginRight:60,
+    marginLeft:40,
+    marginRight:40,
   },
   ButtonText:{
     color:"#ffffff",
     backgroundColor:"#f47882",
-    height:45,
-    lineHeight:30,
+    height:35,
+    lineHeight:25,
     borderRadius:5,
     textAlign:"center",
-    fontSize:18,
+    fontSize:14,
   }
 });

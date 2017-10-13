@@ -40,7 +40,6 @@ public class RNScannerActivity extends ReactContextBaseJavaModule{
         public void openScanner() {
            Intent scannerIntent = new Intent(SCN_CUST_ACTION_START);
            getReactApplicationContext().sendBroadcast(scannerIntent);
-
         }
 
         private BroadcastReceiver mSamDataReceiver = new BroadcastReceiver() {

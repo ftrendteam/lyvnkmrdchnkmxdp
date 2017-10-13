@@ -18,7 +18,8 @@ import {
   Modal,
   TouchableHighlight,
   AsyncStorages,
-  ToastAndroid
+  ToastAndroid,
+  ScrollView
 } from 'react-native';
 import Index from "./Index";
 import DataUtils from "../utils/DataUtils";
@@ -81,36 +82,35 @@ export default class admin extends Component {
  //直接跑数据 componentDidMount
     componentDidMount(){
         Storage.get('ClientCode').then((tags) => {
-        let params = {
-             reqCode:"App_PosReq",
-             reqDetailCode:"App_Client_UseQry",
-             ClientCode:tags,
-             sDateTime:"2017-08-09 12:12:12",//获取当前时间转换成时间戳
-             Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_UseQry" + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
-        };
-         //console.log(loginParams);
-          FetchUtil.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
-             if(data.retcode == 1){
-                  //用户信息
-                  var detailInfo1 = data.DetailInfo1;
-                  //console.log("detailInfo1=",detailInfo1);打印debug
-                  dbAdapter.insertTShopItemData(detailInfo1);
-                  //机构信息
-                  var detailInfo2 = data.DetailInfo2;
-                  dbAdapter.insertTUserSetData(detailInfo2);
-                  //权限表
-                  var detailInfo3 = data.DetailInfo3;
-                  dbAdapter.insertTUserRrightData(detailInfo3);
-                  //用户管理机构表
-                  var detailInfo4 = data.DetailInfo4;
-                  dbAdapter.insertTUsershopData(detailInfo4);
-//                  var acquiring = DataUtils.get("LinkUrl",LinkUrl);
-//                  alert(JSON.stringify(data))
-             }else{
-                 ToastAndroid.show('网络请求失败', ToastAndroid.SHORT);
-                 alert(JSON.stringify(data))
-             }
-         })
+            let params = {
+                 reqCode:"App_PosReq",
+                 reqDetailCode:"App_Client_UseQry",
+                 ClientCode:tags,
+                 sDateTime:"2017-08-09 12:12:12",//获取当前时间转换成时间戳
+                 Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_UseQry" + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
+            };
+              FetchUtil.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
+                 if(data.retcode == 1){
+                      //用户信息
+                      var detailInfo1 = data.DetailInfo1;
+                      //console.log("detailInfo1=",detailInfo1);打印debug
+                      dbAdapter.insertTShopItemData(detailInfo1);
+                      //机构信息
+                      var detailInfo2 = data.DetailInfo2;
+                      dbAdapter.insertTUserSetData(detailInfo2);
+                      //权限表
+                      var detailInfo3 = data.DetailInfo3;
+                      dbAdapter.insertTUserRrightData(detailInfo3);
+                      //用户管理机构表
+                      var detailInfo4 = data.DetailInfo4;
+                      dbAdapter.insertTUsershopData(detailInfo4);
+    //                  var acquiring = DataUtils.get("LinkUrl",LinkUrl);
+//                      alert(JSON.stringify(data))
+                 }else{
+                     ToastAndroid.show('网络请求失败', ToastAndroid.SHORT);
+                     alert(JSON.stringify(data))
+                 }
+              })
          });
     }
  //失去焦点时 跑数据、存储、获取数据
@@ -132,13 +132,17 @@ export default class admin extends Component {
                         var shopcode = value.shopcode;
                         var shopname = value.shopname;
                         this.pickerData .push(shopname+"_"+shopcode);
+
                    }
-//                   alert(JSON.stringify(data.DetailInfo1))
+                   var moren1 = shopname+"_"+shopcode;
+                   this.setState({
+                        pickedDate:moren1
+                   })
             }else{
 //                alert("数据保存失败")
             }
          })
-         })
+     })
     }
 // 失焦时触发事件
     inputOnBlur(){
@@ -146,7 +150,6 @@ export default class admin extends Component {
     }
 //登录
     pressPush(){
-        Storage.save('Name','');
         Storage.save('history','');
         var PickedDate = this.state.pickedDate;
         if(PickedDate == ""){
@@ -162,6 +165,7 @@ export default class admin extends Component {
         str1 = code.split('_');
         str2 = str1[1];
         dbAdapter.isLogin(Usercode, this.state.UserPwd, str2).then((isLogin)=>{
+//            alert("123");
             if(isLogin){
                var strin = this.state.pickedDate;
                strjj = ""+strin;
@@ -174,7 +178,6 @@ export default class admin extends Component {
                    component:Index,
                };
                this.props.navigator.push(nextRoute);
-//               alert(JSON.stringify(data))
             }else{
                 ToastAndroid.show('用户编码或密码错误', ToastAndroid.SHORT)
             }
@@ -185,9 +188,6 @@ export default class admin extends Component {
     }
 //机构信息下拉数据
     _showDatePicker() {
-       if(this.state.UserPwd == ""){
-         ToastAndroid.show('请输入用户密码', ToastAndroid.SHORT)
-       }else{
          Picker.init({
               pickerData: this.pickerData,
               selectedValue: [59],
@@ -205,63 +205,66 @@ export default class admin extends Component {
               },
          });
          Picker.show();
-       }
+
     }
   render() {
     return (
       <View style={styles.container}>
-        <View style={styles.Image}>
-            <Image source={require("../images/logo.png")}></Image>
-        </View>
-        <View style={styles.TextInput}>
-            <TextInput
-                autofocus="{true}"
-                numberoflines="{1}"
-                keyboardType="numeric"
-                placeholder="用户编码"
-                textalign="center"
-                underlineColorAndroid='transparent'
-                placeholderTextColor="#bcbdc1"
-                style={styles.admin}
-                onBlur={this.inputOnBlur.bind(this)}
-                onChangeText={(value)=>{
-                    this.setState({
-                        Usercode:value
-                    })
-                }}/>
-            <Image source={require("../images/admin.png")} style={styles.TextImage}></Image>
-        </View>
-        <View style={styles.TextInput}>
-            <TextInput
-                autofocus="{true}"
-                 numberoflines="{1}"
-                keyboardType="numeric"
-                placeholder="用户密码"
-                maxLength={6}
-                textalign="center"
-                underlineColorAndroid='transparent'
-                placeholderTextColor="#bcbdc1"
-                style={styles.pass}
-                onChangeText={(value)=>{
-                    this.setState({
-                        UserPwd:value
-                    })
-                }}
-                />
-            <Image source={require("../images/admin1.png")} style={styles.TextImage1}></Image>
-        </View>
-        <View style={styles.AgencyInformation}>
-            <View style={styles.InformationLeft}><Text style={styles.InformationLeftText}>机构信息</Text></View>
-            <TouchableOpacity style={styles.PullDown} onPress={this._showDatePicker.bind(this)}>
-                <Text style={styles.PullClick}>{this.state.pickedDate.toString()}</Text>
+        <ScrollView style={styles.ScrollView} scrollEnabled={false}>
+            <View style={styles.Image}>
+                <Image source={require("../images/logo.png")}></Image>
+            </View>
+            <View style={styles.TextInput}>
+                <TextInput
+                    autofocus="{true}"
+                    numberoflines="{1}"
+                    keyboardType="numeric"
+                    placeholder="用户编码"
+                    textalign="center"
+                    underlineColorAndroid='transparent'
+                    placeholderTextColor="#bcbdc1"
+                    style={styles.admin}
+                    onBlur={this.inputOnBlur.bind(this)}
+                    onChangeText={(value)=>{
+                        this.setState({
+                            Usercode:value
+                        })
+                    }}/>
+                <Image source={require("../images/admin.png")} style={styles.TextImage}></Image>
+            </View>
+            <View style={styles.TextInput}>
+                <TextInput
+                    autofocus="{true}"
+                    secureTextEntry={true}
+                    numberoflines="{1}"
+                    keyboardType="numeric"
+                    placeholder="用户密码"
+                    maxLength={6}
+                    textalign="center"
+                    underlineColorAndroid='transparent'
+                    placeholderTextColor="#bcbdc1"
+                    style={styles.pass}
+                    onChangeText={(value)=>{
+                        this.setState({
+                            UserPwd:value
+                        })
+                    }}
+                    />
+                <Image source={require("../images/admin1.png")} style={styles.TextImage1}></Image>
+            </View>
+            <View style={styles.AgencyInformation}>
+                <View style={styles.InformationLeft}><Text style={styles.InformationLeftText}>机构信息</Text></View>
+                <TouchableOpacity style={styles.PullDown} onPress={this._showDatePicker.bind(this)}>
+                    <Text style={styles.PullClick}>{this.state.pickedDate.toString()}</Text>
+                </TouchableOpacity>
+            </View>
+            <TouchableOpacity onPress={this.pressPush.bind(this)}>
+               <Text style={styles.login}>登录</Text>
             </TouchableOpacity>
-        </View>
-        <TouchableOpacity onPress={this.pressPush.bind(this)}>
-           <Text style={styles.login}>登录</Text>
-        </TouchableOpacity>
-        <View style={styles.refresh}>
-            <Image source={require("../images/refresh.png")} style={styles.refreshImage}></Image>
-        </View>
+            <View style={styles.refresh}>
+                <Image source={require("../images/refresh.png")} style={styles.refreshImage}></Image>
+            </View>
+        </ScrollView>
       </View>
     );
   }
@@ -273,9 +276,9 @@ const styles = StyleSheet.create({
         backgroundColor:"#323642",
     },
     TextInput:{
-        marginLeft:60,
-        marginRight:60,
-        marginTop:30,
+        marginLeft:30,
+        marginRight:30,
+        marginTop:25,
     },
     admin:{
         borderRadius:5,
@@ -284,7 +287,7 @@ const styles = StyleSheet.create({
         paddingTop:5,
         paddingBottom:5,
         paddingLeft:50,
-        fontSize:16,
+        fontSize:14,
     },
     pass:{
         borderRadius:5,
@@ -293,18 +296,18 @@ const styles = StyleSheet.create({
         paddingTop:5,
         paddingBottom:5,
         paddingLeft:50,
-        fontSize:16,
+        fontSize:14,
     },
     Image:{
         marginTop:30,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom:50,
+        marginBottom:10,
     },
    AgencyInformation:{
-      marginLeft:60,
-      marginRight:60,
-      marginTop:20,
+      marginLeft:30,
+      marginRight:30,
+      marginTop:15,
       flexDirection:"row",
    },
    InformationLeft:{
@@ -326,8 +329,8 @@ const styles = StyleSheet.create({
    paddingLeft:10,
    },
    login:{
-      marginLeft:60,
-      marginRight:60,
+      marginLeft:30,
+      marginRight:30,
       marginTop:40,
       paddingTop:12,
       paddingBottom:12,
@@ -335,15 +338,15 @@ const styles = StyleSheet.create({
       color:"#ffffff",
       borderRadius:3,
       textAlign:"center",
-      fontSize:18,
+      fontSize:16,
    },
   refresh:{
-    marginTop:60,
+    marginTop:45,
+    marginLeft:30,
     marginRight:30,
+    alignItems: 'center',
   },
   refreshImage:{
-    position :'absolute',
-    right:30,
   },
   TextImage:{
       position:"absolute",

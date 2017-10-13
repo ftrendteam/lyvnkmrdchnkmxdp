@@ -6,6 +6,7 @@ import {
     View,
     Image,
     TextInput,
+    ScrollView,
     TouchableOpacity,
     Button,
     ToastAndroid
@@ -83,16 +84,24 @@ export default class  login extends Component{
                         ClientCode:this.state.ClientCode,
                     }
                 });
-                Storage.save('FirstTime','1');
+                Storage.save('ytt','1');
                 Storage.save('ClientCode',this.state.ClientCode);
+            }else if(this.state.ClientCode==0){
+                ToastAndroid.show('请输入商户号', ToastAndroid.SHORT);
+                return;
+            }else if(this.state.Pwd==0){
+                ToastAndroid.show('请输入密码', ToastAndroid.SHORT);
+                return;
             }else{
                 ToastAndroid.show('商户号或密码错误', ToastAndroid.SHORT)
             }
         })
     }
+
     render(){
         return (
             <View style={styles.container}>
+                <ScrollView style={styles.ScrollView} scrollEnabled={false}>
                 <View style={styles.Image}>
                     <Image source={require("../images/logo.png")}></Image>
                 </View>
@@ -100,6 +109,7 @@ export default class  login extends Component{
                     <TextInput
                         autofocus="{true}"
                         numberoflines="{1}"
+                        keyboardType="numeric"
                         placeholder="商户号"
                         textalign="center"
                         underlineColorAndroid='transparent'
@@ -115,7 +125,9 @@ export default class  login extends Component{
                 <View style={styles.TextInput}>
                     <TextInput
                         autofocus="{true}"
+                        secureTextEntry={true}
                         numberoflines="{1}"
+                        keyboardType="numeric"
                         placeholder="密码"
                         maxLength={6}
                         textalign="center"
@@ -133,6 +145,7 @@ export default class  login extends Component{
                 <TouchableOpacity onPress={this.pressPush.bind(this)}>
                     <Text style={styles.login}>确定</Text>
                 </TouchableOpacity>
+                </ScrollView>
             </View>
         );
     }
@@ -143,9 +156,9 @@ const styles = StyleSheet.create({
         backgroundColor:"#323642",
     },
     TextInput:{
-        marginLeft:60,
-        marginRight:60,
-        marginTop:30,
+        marginLeft:30,
+        marginRight:30,
+        marginTop:25,
     },
     admin:{
         borderRadius:5,
@@ -154,7 +167,7 @@ const styles = StyleSheet.create({
         paddingTop:5,
         paddingBottom:5,
         paddingLeft:50,
-        fontSize:16,
+        fontSize:14,
     },
     pass:{
         borderRadius:5,
@@ -163,17 +176,17 @@ const styles = StyleSheet.create({
         paddingTop:5,
         paddingBottom:5,
         paddingLeft:50,
-        fontSize:16,
+        fontSize:14,
     },
     Image:{
         marginTop:30,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom:50,
+        marginBottom:10,
     },
     login:{
-        marginLeft:60,
-        marginRight:60,
+        marginLeft:30,
+        marginRight:30,
         marginTop:40,
         paddingTop:12,
         paddingBottom:12,
@@ -181,7 +194,7 @@ const styles = StyleSheet.create({
         color:"#ffffff",
         borderRadius:3,
         textAlign:"center",
-        fontSize:18,
+        fontSize:16,
     },
     TextImage:{
         position:"absolute",

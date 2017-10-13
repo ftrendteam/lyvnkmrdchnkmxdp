@@ -252,13 +252,15 @@ const styles = StyleSheet.create({
     backgroundColor:"#ffffff",
     flexDirection:"row",
     borderBottomWidth:1,
-    borderBottomColor:"#fafafa"
+    borderBottomColor:"#fafafa",
+    overflow:"hidden"
    },
    Name1:{
     flex:1,
     color:"#333333",
     fontSize:14,
     lineHeight:30,
+    overflow:"hidden"
    },
    ShopPrice1:{
     flex:1,

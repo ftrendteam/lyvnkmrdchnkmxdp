@@ -13,14 +13,19 @@ import {
   TextInput,
   Image,
   ListView,
-  TouchableOpacity
+  TouchableOpacity,
+  DeviceEventEmitter
 } from 'react-native';
 import Code from "./Code";
+import OrderDetails from "./OrderDetails";
 import NetUtils from "../utils/NetUtils";
 import FetchUtils from "../utils/FetchUtils";
 import DBAdapter from "../adapter/DBAdapter";
 import DataUtils from '../utils/DataUtils';
 import Storage from '../utils/Storage';
+
+var {NativeModules} = require('react-native');
+var RNScannerAndroid = NativeModules.RNScannerAndroid;
 let dbAdapter = new DBAdapter();
 let db;
 export default class Search extends Component {
@@ -36,14 +41,28 @@ export default class Search extends Component {
     this.props.navigator.pop();
   }
   Code(){
-    var nextRoute={
-        name:"主页",
-        component:Code
-    };
-    this.props.navigator.push(nextRoute)
+      RNScannerAndroid.openScanner();
+      DeviceEventEmitter.addListener("code", (reminder) => {
+          dbAdapter.selectAidCode(reminder,1).then((rows)=>{
+              var ShopCar = rows.item(0).ProdName;
+              this.props.navigator.push({
+                  component:OrderDetails,
+                  params:{
+                      ProdName:rows.item(0).ProdName,
+                      ShopPrice:rows.item(0).ShopPrice,
+                      Pid:rows.item(0).Pid,
+                      countm:rows.item(0).ShopNumber,
+                      promemo:rows.item(0).promemo,
+                      prototal:rows.item(0).prototal,
+                      ProdCode:rows.item(0).ProdCode,
+                      DepCode:rows.item(0).DepCode1,
+                  }
+              })
+          })
+      })
   }
   inputOnBlur(value){
-    dbAdapter.selectAidCode(value).then((rows)=>{
+    dbAdapter.selectAidCode(value,1).then((rows)=>{
         this.dataRows=[];
         for(let i =0;i<rows.length;i++){
             var row = rows.item(i);
@@ -57,10 +76,29 @@ export default class Search extends Component {
   _renderRow(rowData, sectionID, rowID){
        return (
           <View style={styles.Block}>
-             <Text style={styles.BlockText}>{rowData.ProdName}</Text>
+              <TouchableOpacity onPress={()=>this.OrderDetails(rowData)}>
+                 <Text style={styles.BlockText}>{rowData.ProdName}</Text>
+              </TouchableOpacity>
           </View>
        );
   }
+
+  OrderDetails(rowData){
+     this.props.navigator.push({
+        component:OrderDetails,
+        params:{
+            ProdName:rowData.ProdName,
+            ShopPrice:rowData.ShopPrice,
+            Pid:rowData.Pid,
+            countm:rowData.ShopNumber,
+            promemo:rowData.promemo,
+            prototal:rowData.prototal,
+            ProdCode:rowData.ProdCode,
+            DepCode:rowData.DepCode1,
+        }
+     })
+  }
+
   render() {
     return (
       <View style={styles.container}>
@@ -83,7 +121,7 @@ export default class Search extends Component {
                 <TouchableOpacity onPress={this.Code.bind(this)} style={styles.HeaderImage1}>
                     <Image source={require("../images/sm.png")}></Image>
                 </TouchableOpacity>
-                <Text style={styles.Text}  onPress={this.pressPop.bind(this)}>取消</Text>
+                <View style={styles.Text1}><Text style={styles.Text} onPress={this.pressPop.bind(this)}>取消</Text></View>
             </View>
         </View>
         <View style={styles.list}>
@@ -110,8 +148,8 @@ const styles = StyleSheet.create({
   Title:{
     height:60,
     backgroundColor:"#ffffff",
-    paddingLeft:25,
-    paddingRight:25,
+    paddingLeft:15,
+    paddingRight:15,
     paddingTop:13,
     flexDirection:"row",
     borderBottomWidth:1,
@@ -122,23 +160,23 @@ const styles = StyleSheet.create({
     backgroundColor:"#f2f5f6",
     color: "#323232",
     height:35,
-    flex:7,
+    flex:6,
   },
   Right:{
-    flex:2
+    flex:2,
+    flexDirection:"row",
+    paddingTop:3,
+    paddingLeft:6
   },
   HeaderImage1:{
-    width:23,
+    flex:1,
     height:23,
-    position:"absolute",
-    right:60,
-    top:4,
+  },
+  Text1:{
+    flex:1,
   },
   Text:{
-    position:"absolute",
-    right:0,
-    top:4,
-    fontSize:16,
+    fontSize:14,
   },
   BlockList:{
     flex:1,
@@ -155,7 +193,7 @@ const styles = StyleSheet.create({
   },
   ListText:{
     color:"#323232",
-    fontSize:16,
+    fontSize:14,
     marginTop:20,
   },
   Block:{

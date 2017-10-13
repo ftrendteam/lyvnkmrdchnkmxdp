@@ -66,7 +66,8 @@ export default class SQLiteOpenHelper {
       //品级
       tx.executeSql('CREATE TABLE IF NOT EXISTS tdepset(pid int not null Primary Key,DepCode varchar(20) null,DepName varchar(100) null,' +
         'AidCode varchar(20) null,SubCode varchar(20) null,DepMemo varchar(50) null,SpecTag int(4) null,IsLeaf int(4) null,' +
-        'ProfitRate float(8) null,GatherRate float(8) null,DepLevel int(4) null,IsDel varchar(1) null)'
+        'ProfitRate float(8) null,GatherRate float(8) null,DepLevel int(4) null,IsDel varchar(1) null,depcode1 varchar(12) null'+
+        ',depcode2 varchar(12) null,depcode3 varchar(12) null,depcode4 varchar(12) null,depcode5 varchar(12) null,depcode6 varchar(12) null)'
         , [], () => {
           this._successCB('executeSql');
         }, (err) => {

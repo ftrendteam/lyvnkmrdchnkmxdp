@@ -100,11 +100,17 @@ export default class HistoricalDocument extends Component {
   }
   _get(){
     //单据name获取
-    Storage.get('Name').then((tags) => {
-         this.setState({
-             name:tags
-         })
-    });
+    if(this.state.name==""){
+        this.setState({
+            name:"历史单据"
+        })
+    }else{
+        Storage.get('Name').then((tags) => {
+             this.setState({
+                 name:tags
+             })
+        });
+    }
 
      //reqDetailCode获取
      Storage.get('history').then((tags) => {
@@ -156,9 +162,13 @@ export default class HistoricalDocument extends Component {
              if(data.retcode == 1){
                 var  DetailInfo1 = data.DetailInfo1;
                 this.dataRows = this.dataRows.concat(DetailInfo1);
-                this.setState({
-                   dataSource:this.state.dataSource.cloneWithRows(this.dataRows)
-                })
+                if(this.dataRows==0){
+                    return;
+                }else{
+                    this.setState({
+                       dataSource:this.state.dataSource.cloneWithRows(this.dataRows)
+                    })
+                }
              }else{
                ToastAndroid.show('网络请求失败', ToastAndroid.SHORT);
                alert(JSON.stringify(data))
@@ -218,18 +228,19 @@ export default class HistoricalDocument extends Component {
             </View>
         </View>
         <View style={styles.Rolling}>
-            <ScrollView>
-                <ListView
-                    dataSource={this.state.dataSource}
-                    showsVerticalScrollIndicator={true}
-                    renderRow={this._renderRow.bind(this)}
-                />
-            </ScrollView>
+            <ListView
+                dataSource={this.state.dataSource}
+                showsVerticalScrollIndicator={true}
+                renderRow={this._renderRow.bind(this)}
+            />
         </View>
         <View style={styles.footer}>
             <TouchableOpacity style={styles.Home} onPress={this.HISTORY.bind(this)}><Image source={require("../images/documents1.png")}></Image><Text style={styles.home2}>历史单据</Text></TouchableOpacity>
             <TouchableOpacity style={styles.Home} onPress={this.HOME.bind(this)}><Image source={require("../images/home.png")}></Image><Text style={styles.home1}>首页</Text></TouchableOpacity>
-            <TouchableOpacity style={styles.Home} onPress={this.SHOP.bind(this)}><Image source={require("../images/shop.png")}></Image><Text style={styles.home1}>清单</Text></TouchableOpacity>
+            <TouchableOpacity style={styles.Home} onPress={this.SHOP.bind(this)}>
+              <View><Image source={require("../images/shop.png")}><Text style={styles.ShopCar}>{this.state.shopcar}</Text></Image></View>
+              <Text style={styles.home1}>清单</Text>
+            </TouchableOpacity>
         </View>
       </View>
     );
@@ -237,39 +248,46 @@ export default class HistoricalDocument extends Component {
 }
 const styles = StyleSheet.create({
  footer:{
-     position:"absolute",
-     bottom:0,
-     flex:1,
-     flexDirection:"row",
-     borderTopWidth:1,
-     borderTopColor:"#cacccb",
-     backgroundColor:"#ffffff"
+   flex:2,
+   flexDirection:"row",
+   borderTopWidth:1,
+   borderTopColor:"#cacccb"
+},
+ source:{
+  flexDirection:"row",
+  flex:1,
  },
  Home:{
     flex:1,
     alignItems: 'center',
-    paddingTop:10,
-    paddingBottom:10,
+    paddingTop:15,
+    backgroundColor:"#ffffff",
  },
  home1:{
-    color:'black',
-    fontSize:16,
-    marginTop:5,
+   color:'black',
+   fontSize:14,
+   marginTop:5,
+   flex:1,
  },
  home2:{
     color:'#f47882',
-    fontSize:16,
+    fontSize:14,
     marginTop:5,
+    flex:1,
+ },
+ ShopCar:{
+  color:"red",
+  position:"absolute",
+  right:-35,
  },
  container:{
     flex:1,
     backgroundColor:"#ffffff",
  },
  header:{
-    height:60,
+    height:50,
     backgroundColor:"#f47882",
-    paddingTop:15,
-    paddingBottom:20,
+    paddingTop:10,
     borderBottomWidth:1,
     borderBottomColor:"#cacccb"
  },
@@ -286,10 +304,11 @@ const styles = StyleSheet.create({
     marginTop:5
  },
  HeaderList:{
+    marginTop:4,
     flex:6,
     textAlign:"center",
     color:"#ffffff",
-    fontSize:20,
+    fontSize:16,
  },
  Cont:{
     marginLeft:25,
@@ -314,7 +333,6 @@ const styles = StyleSheet.create({
     lineHeight:28,
  },
  Rolling:{
-    flex:1,
-    marginBottom:55,
+    flex:12,
  }
 });
