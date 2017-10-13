@@ -388,11 +388,6 @@ export default class DBAdapter extends SQLiteOpenHelper {
   insertProductData(productData) {
     return new Promise((resolve, reject) => {
       let len = productData.length;
-      if (!db) {
-        this.open();
-      }
-      //this.createTable();
-      this.deleteData("product");
       db.transaction((tx) => {
         for (let i = 0; i < len; i++) {
           let product = productData[i];
@@ -450,7 +445,13 @@ export default class DBAdapter extends SQLiteOpenHelper {
           let TakeRate = product.TakeRate;
           let PriceFlag = product.PriceFlag;
           let OperRange = product.OperRange;
+          let sqlDet = "delete from product where pid =?";
           
+          tx.executeSql(sqlDet, [Pid], () => {
+            }, (error) => {
+ 
+            }
+          );
           let sql = 'INSERT INTO product(Pid,ProdCode,BarCode,ProdName,ShortName,AidCode,OtherCode,DepCode,SuppCode,BrandCode,' +
             'Spec,ProdAdr,Unit,PUnitAmt,PicInfo,ProdMemo,StdOPrice,StdOutOPrice,StdPrice,WPrice,LowPrice,HighPrice,OTax,' +
             'STax,VipPrice1,VipPrice2,VipPrice3,BoxCode,IsIntCount,SaleType,GatherType,GatherRate,ProdType,SeasonCode,' +
@@ -460,16 +461,13 @@ export default class DBAdapter extends SQLiteOpenHelper {
               Spec, ProdAdr, Unit, PUnitAmt, PicInfo, ProdMemo, StdOPrice, StdOutOPrice, StdPrice, WPrice, LowPrice, HighPrice, OTax,
               STax, VipPrice1, VipPrice2, VipPrice3, BoxCode, IsIntCount, SaleType, GatherType, GatherRate, ProdType, SeasonCode,
               ProdMemo1, ProdMemo2, ProdMemo3, FNoCD, IsDel, FNoSale, FNoTH, FNoPromotion, FUseSalePrice, FNoYH, hlimit, llimit, bestkc, FNoCG, TakeType, TakeRate, PriceFlag, OperRange], () => {
-            }, (err) => {
-//                console.log(err);
+            }, (error) => {
+                console.log(error);
             }
           );
-          
         }
-        
       }, (error) => {
-        reject(false);
-        //this._errorCB('transaction', error);
+        this._errorCB('transaction', error);
       }, () => {
         resolve(true);
         //this._successCB('transaction insert data');
@@ -609,7 +607,6 @@ export default class DBAdapter extends SQLiteOpenHelper {
 //     }
   downProductAndCategory(categoryBody, currShopCode) {
     return new Promise((resolve, reject) => {
-      
       DataUtils.get("LinkUrl", '').then((urlData) => {
         RequestBodyUtils.requestProduct(urlData, currShopCode, this).then((prodResult) => {
           if (prodResult) {
@@ -638,7 +635,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
         tx.executeSql('select a.*,ifNull(b.countm,0) as ShopNumber from tdepset a left join (select depcode,sum(countm)  as countm from shopInfo group by depcode) b on a.depcode=b.depcode where IsDel=0 and DepLevel=' + DepLevel + '', [], (tx, results) => {
-          console.log("wtf2=", results.rows.length)
+          
           resolve(results.rows);
         });
       }, (error) => {

@@ -266,10 +266,10 @@ export  default class RequestBodyUtils {
   static requestProduct = (url, shopCode, dbAdapter) => {
     return new Promise((resolve, reject) => {//Promise
       Storage.get("CurrDate").then((currentData) => {
-        //console.log("currentDate", currentData)
+       
         let requestBody = RequestBodyUtils.createProduct(shopCode, currentData, RequestBodyUtils.currPage);
         FetchUtils.post(url, requestBody).then((json) => {
-          //console.log(json)
+       
           if (!(json == "" || json == null || json == undefined || (json == "[]"))) {
             if (json.retcode == 99) {
               RequestBodyUtils.currPage = 1;
