@@ -610,9 +610,9 @@ export default class DBAdapter extends SQLiteOpenHelper {
       DataUtils.get("LinkUrl", '').then((urlData) => {
         RequestBodyUtils.requestProduct(urlData, currShopCode, this).then((prodResult) => {
           if (prodResult) {
-            FetchUtils.post(urlData, categoryBody).then((data) => {
-              if (data.retcode == 1) {
-                this.insertTDepSetData(data.TblRow).then((result) => {
+            FetchUtils.post(urlData, categoryBody).then((datas) => {
+              if (datas.retcode == 1) {
+                this.insertTDepSetData(datas.TblRow).then((result) => {
                   resolve(true);
                 });
               } else {

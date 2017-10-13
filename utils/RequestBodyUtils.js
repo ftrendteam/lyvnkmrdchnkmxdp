@@ -309,7 +309,6 @@ export  default class RequestBodyUtils {
           }
         }, (json) => {
           //TODO 处理请求fail
-          alert(json, "错误");
         }).catch((error) => {
           console.log('jsonE=' + error);
           reject(false);
