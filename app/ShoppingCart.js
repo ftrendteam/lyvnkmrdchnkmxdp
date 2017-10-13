@@ -267,7 +267,6 @@ export default class ShoppingCart extends Component {
                 <Text style={styles.SmallScale}>小计</Text>
             </View>
             <View style={styles.ContList}>
-
                     <ListView
                         dataSource={this.state.dataSource}
                         showsVerticalScrollIndicator={true}

@@ -14,36 +14,38 @@ import {
 /*引入*/
 import login from "./app/login";
 import admin from "./app/admin";
+import File from "./app/file";
 import Storage from "./utils/Storage";
 import Navigator from "react-native-deprecated-custom-components";
 export default class MainView extends Component{
     constructor(props){
         super(props);
         this.state = {
-            First:""
+            first:""
         };
     }
-    componentDidMount(){
-        Storage.get('ytt').then((tags) => {
-            this.setState({
-                First: tags
-            });
-
-        });
-    }
+    //render之前执行的方法
+//    componentWillMount(){
+//         Storage.get('FirstTime').then((tags) => {
+////            alert(this.state.first);
+//            this.setState({
+//                first: tags
+//            });
+//         });
+//    }
     render() {
-            var rootRoute={
-                name:"测试",
-                component:login
-            };
-//        if(this.state.First = 1){
+        var rootRoute={
+            name:"login",
+            component:File
+        };
+//        if(this.state.first == 1 ){
 //            var rootRoute={
-//                name:"测试",
+//                name:"admin",
 //                component:admin
 //            };
-//        }else{
+//        }else {
 //            var rootRoute={
-//                name:"测试",
+//                name:"login",
 //                component:login
 //            };
 //        }
