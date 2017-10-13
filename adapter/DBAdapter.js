@@ -271,17 +271,17 @@ export default class DBAdapter extends SQLiteOpenHelper {
           let ShopPrice = shopInfo.ShopPrice;
           let ShopAmount = shopInfo.prototal;
           let ShopRemark = shopInfo.promemo;
-          let Pid=shopInfo.Pid;
-          let ProdCode=shopInfo.ProdCode;
+          let Pid = shopInfo.Pid;
+          let ProdCode = shopInfo.ProdCode;
           let DepCode = shopInfo.DepCode;
-       //   "prodname":"海鲜菇","countm":1.0000,"kccount":0.0,"prototal":1.0000,"unit":"kg  ","promemo":""
+          //   "prodname":"海鲜菇","countm":1.0000,"kccount":0.0,"prototal":1.0000,"unit":"kg  ","promemo":""
           let sql = " replace INTO shopInfo(pid,ProdCode,prodname,countm,ShopPrice,prototal,promemo,DepCode)" +
             "values(?,?,?,?,?,?,?,?)";
-          tx.executeSql(sql, [Pid,ProdCode,shopName,ShopNumber, ShopPrice, ShopAmount, ShopRemark,DepCode], () => {
+          tx.executeSql(sql, [Pid, ProdCode, shopName, ShopNumber, ShopPrice, ShopAmount, ShopRemark, DepCode], () => {
               resolve(true);
             }, (err) => {
               reject(false);
-              alert("err="+err);
+              alert("err=" + err);
               console.log(err);
             }
           );
@@ -305,15 +305,15 @@ export default class DBAdapter extends SQLiteOpenHelper {
       });
     });
   }
-
+  
   /***
    * 查询shopInfo表中所有商品的数量总和
    */
   selectShopInfoAllCountm() {
-      return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       db.transaction((tx) => {
         tx.executeSql('select sum(countm) countm from shopInfo', [], (tx, results) => {
-            resolve(results.rows);
+          resolve(results.rows);
         })
       }, (error) => {
         this._errorCB('transaction', error);
@@ -329,7 +329,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
   selectShopInfoCountm(DepCode) {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
-        tx.executeSql('select sum(countm) countm from shopInfo where DepCode ='+DepCode+'', [], (tx, results) => {
+        tx.executeSql('select sum(countm) countm from shopInfo where DepCode =' + DepCode + '', [], (tx, results) => {
           try {
 //          alert(JSON.stringify(results))
             resolve(results.rows);
@@ -531,8 +531,8 @@ export default class DBAdapter extends SQLiteOpenHelper {
             let item = results.rows.item(0);
             if ((md5Pwd + '') == item.UserPwd) {//密码正确
               let userName = item.UserName;
-              DataUtils.save("userName",userName);
-              DataUtils.save("userCode",Usercode);
+              DataUtils.save("userName", userName);
+              DataUtils.save("userCode", Usercode);
               let shopCode;
 //              alert("1223424")
               DataUtils.get('shopCode', '').then((data) => {
@@ -541,23 +541,20 @@ export default class DBAdapter extends SQLiteOpenHelper {
                 if (shopCode == currShopCode) {//当前登录的机构号 和本地保存的相同
                   resolve(true);
                 } else if (shopCode == '') {//本地没有保存机构号,根据当前的机构号下载商品和品类
-                  let productBody = RequestBodyUtils.createProduct(currShopCode, '');
                   let categoryBody = RequestBodyUtils.createCategory(currShopCode);
-                  this.downProductAndCategory(productBody, categoryBody).then((result) => {
+                  this.downProductAndCategory(categoryBody, currShopCode).then((result) => {
                     if (result) {
                       resolve(true);
                     }
                   });
-                  
                 } else {//当前登录的机构号和本地保存的机构号不同.重新保存并下载新的品类和商品信息
                   DataUtils.save('shopCode', currShopCode);
                   /***
                    * prductBody 商品信息下载请求体
                    * categoryBody 品类信息下载请求体
                    */
-                  let productBody = RequestBodyUtils.createProduct(currShopCode, '');
                   let categoryBody = RequestBodyUtils.createCategory(currShopCode);
-                  this.downProductAndCategory(productBody, categoryBody).then((result) => {
+                  this.downProductAndCategory(categoryBody, currShopCode).then((result) => {
                     if (result) {
                       resolve(true);
                     }
@@ -610,22 +607,20 @@ export default class DBAdapter extends SQLiteOpenHelper {
 //         });
 //       });
 //     }
-  downProductAndCategory(productBody, categoryBody) {
+  downProductAndCategory(categoryBody, currShopCode) {
     return new Promise((resolve, reject) => {
-
+      
       DataUtils.get("LinkUrl", '').then((urlData) => {
-        FetchUtils.post(urlData, productBody).then((data) => {
-          if (data.retcode == 1) {
-            this.insertProductData(data.TblRow).then((result) => {
-              FetchUtils.post(urlData, categoryBody).then((data) => {
-                console.log("data=", data);
-                if (data.retcode == 1) {
-                  this.insertTDepSetData(data.TblRow).then((result) => {
-                    console.log("end");
-                    resolve(true);
-                  });
-                }
-              });
+        RequestBodyUtils.requestProduct(urlData, currShopCode, this).then((prodResult) => {
+          if (prodResult) {
+            FetchUtils.post(urlData, categoryBody).then((data) => {
+              if (data.retcode == 1) {
+                this.insertTDepSetData(data.TblRow).then((result) => {
+                  resolve(true);
+                });
+              } else {
+                reject(false);
+              }
             });
           }
         });
@@ -657,28 +652,13 @@ export default class DBAdapter extends SQLiteOpenHelper {
    * @param DepCode 品级编码
    * @return 返回指定品类下所有商品信息
    */
-
-   selectProduct1(DepCode) {
-       return new Promise((resolve, reject) => {
-         db.transaction((tx) => {
-           tx.executeSql("select count(*) as countn "+
-           " from product a left join shopInfo b on a.Pid=b.Pid where IsDel='0' and prodtype<>'1' and a.DepCode in (select DepCode from tdepset where IsDel='0'" +
-             "and (a.DepCode='" + DepCode + "' or SubCode like '%;" + DepCode + ";%')) ", [], (tx, results) => {
-             resolve(results.rows);
-           });
-         }, (error) => {
-           this._errorCB('transaction', error);
-         });
-       })
-     }
-
-  selectProduct(DepCode,currpage) {
+  
+  selectProduct1(DepCode) {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
-        tx.executeSql("select a.*,ifNull(b.countm,0) as ShopNumber,ifNull(b.ShopPrice,a.StdPrice) as ShopPrice ,ifNull(b.prototal,0) as ShopAmount   "+
-        ",ifNull(b.promemo,'') as ShopRemark,'"+DepCode+"' as DepCode1 "+
-        " from product a left join shopInfo b on a.Pid=b.Pid where IsDel='0' and prodtype<>'1' and a.DepCode in (select DepCode from tdepset where IsDel='0'" +
-          "and (a.DepCode='" + DepCode + "' or SubCode like '%;" + DepCode + ";%')) limit 20 offset "+currpage, [], (tx, results) => {
+        tx.executeSql("select count(*) as countn " +
+          " from product a left join shopInfo b on a.Pid=b.Pid where IsDel='0' and prodtype<>'1' and a.DepCode in (select DepCode from tdepset where IsDel='0'" +
+          "and (a.DepCode='" + DepCode + "' or SubCode like '%;" + DepCode + ";%')) ", [], (tx, results) => {
           resolve(results.rows);
         });
       }, (error) => {
@@ -686,37 +666,54 @@ export default class DBAdapter extends SQLiteOpenHelper {
       });
     })
   }
+  
+  selectProduct(DepCode, currpage) {
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        tx.executeSql("select a.*,ifNull(b.countm,0) as ShopNumber,ifNull(b.ShopPrice,a.StdPrice) as ShopPrice ,ifNull(b.prototal,0) as ShopAmount   " +
+          ",ifNull(b.promemo,'') as ShopRemark,'" + DepCode + "' as DepCode1 " +
+          " from product a left join shopInfo b on a.Pid=b.Pid where IsDel='0' and prodtype<>'1' and a.DepCode in (select DepCode from tdepset where IsDel='0'" +
+          "and (a.DepCode='" + DepCode + "' or SubCode like '%;" + DepCode + ";%')) limit 20 offset " + currpage, [], (tx, results) => {
+          resolve(results.rows);
+        });
+      }, (error) => {
+        this._errorCB('transaction', error);
+      });
+    })
+  }
+  
   /***
-     * 助记码查询商品
-     */
-    selectAidCode(aidCode) {
-      return new Promise((resolve, reject) => {
-        db.transaction((tx) => {
-          tx.executeSql("select * from product where isdel='0' and (prodname like '%"+aidCode+"%' or aidcode like '%"+aidCode+"%' or prodcode like '%"+aidCode+"%' or barcode like '%"+aidCode+"%')", [], (tx, results) => {
+   * 助记码查询商品
+   */
+  selectAidCode(aidCode) {
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        tx.executeSql("select * from product where isdel='0' and (prodname like '%" + aidCode + "%' or aidcode like '%" + aidCode + "%' or prodcode like '%" + aidCode + "%' or barcode like '%" + aidCode + "%')", [], (tx, results) => {
 //            alert(results.rows.length);
-            resolve(results.rows);
-          });
-        }, (error) => {
-          this._errorCB('transaction', error);
+          resolve(results.rows);
         });
+      }, (error) => {
+        this._errorCB('transaction', error);
       });
-    }
-    /***
-     * 扫描查询商品
-     */
-    scaningCode(scanCode){
-      return new Promise((resolve, reject) => {
-        db.transaction((tx) => {
-          tx.executeSql("select * from product where isdel='0' and (barcode='"+scanCode+"' or prodcode='"+scanCode+"')", [], (tx, results) => {
-            alert(results.rows.length);
-            resolve(results.rows);
-          });
-        }, (error) => {
-          this._errorCB('transaction', error);
+    });
+  }
+  
+  /***
+   * 扫描查询商品
+   */
+  scaningCode(scanCode) {
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        tx.executeSql("select * from product where isdel='0' and (barcode='" + scanCode + "' or prodcode='" + scanCode + "')", [], (tx, results) => {
+          alert(results.rows.length);
+          resolve(results.rows);
         });
+      }, (error) => {
+        this._errorCB('transaction', error);
       });
-    }
-
+    });
+  }
+  
   /***
    * 关闭表
    */

@@ -268,7 +268,6 @@ export  default class RequestBodyUtils {
       Storage.get("CurrDate").then((currentData) => {
         //console.log("currentDate", currentData)
         let requestBody = RequestBodyUtils.createProduct(shopCode, currentData, RequestBodyUtils.currPage);
-        alert(requestBody);
         FetchUtils.post(url, requestBody).then((json) => {
           //console.log(json)
           if (!(json == "" || json == null || json == undefined || (json == "[]"))) {
@@ -303,8 +302,7 @@ export  default class RequestBodyUtils {
             }
           } else {
             resolve(true);
-            alert("zhixingdaole");
-            Storage.save1("CurrDate", RequestBodyUtils.currDate);//保存上次请求时间
+            Storage.save("CurrDate", RequestBodyUtils.currDate);//保存上次请求时间
             RequestBodyUtils.currPage = 1;
             RequestBodyUtils.count = 0;
             RequestBodyUtils.currDate = '';
