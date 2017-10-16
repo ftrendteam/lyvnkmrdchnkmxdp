@@ -46,7 +46,6 @@ export default class FetchUtils {
    * @returns {Promise}
    */
   static post = (common_url, requstBody) => {
-    console.log(requstBody);
     return new Promise(function (resolve, reject) {
       fetch(common_url, {
         method: 'POST',

@@ -171,9 +171,6 @@ export default class DBAdapter extends SQLiteOpenHelper {
   insertTDepSetData(tdepSetData) {
     return new Promise((resolve, reject) => {
       let len = tdepSetData.length;
-      if (!db) {
-        this.open();
-      }
       //this.createTable();
       this.deleteData('tdepset');
       db.transaction((tx) => {
@@ -195,9 +192,8 @@ export default class DBAdapter extends SQLiteOpenHelper {
           let sql = "INSERT INTO tdepset(pid,DepCode,DepName,AidCode,SubCode,DepMemo,SpecTag,IsLeaf,ProfitRate,GatherRate,DepLevel,IsDel)" +
             "values(?,?,?,?,?,?,?,?,?,?,?,?)";
           tx.executeSql(sql, [pid, DepCode, DepName, AidCode, SubCode, DepMemo, SpecTag, IsLeaf, ProfitRate, GatherRate, DepLevel, IsDel], () => {
-            
-            }, (err) => {
-              console.log(err);
+            }, (error) => {
+              console.log(error);
             }
           );
         }
@@ -449,7 +445,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
           
           tx.executeSql(sqlDet, [Pid], () => {
             }, (error) => {
- 
+            
             }
           );
           let sql = 'INSERT INTO product(Pid,ProdCode,BarCode,ProdName,ShortName,AidCode,OtherCode,DepCode,SuppCode,BrandCode,' +
@@ -462,7 +458,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
               STax, VipPrice1, VipPrice2, VipPrice3, BoxCode, IsIntCount, SaleType, GatherType, GatherRate, ProdType, SeasonCode,
               ProdMemo1, ProdMemo2, ProdMemo3, FNoCD, IsDel, FNoSale, FNoTH, FNoPromotion, FUseSalePrice, FNoYH, hlimit, llimit, bestkc, FNoCG, TakeType, TakeRate, PriceFlag, OperRange], () => {
             }, (error) => {
-                console.log(error);
+              console.log(error);
             }
           );
         }
