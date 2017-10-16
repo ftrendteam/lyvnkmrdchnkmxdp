@@ -176,6 +176,7 @@ export default class admin extends Component {
                    component:Index,
                };
                this.props.navigator.push(nextRoute);
+               alert(JSON.stringify(data))
             }else{
                 ToastAndroid.show('用户编码或密码错误', ToastAndroid.SHORT)
             }
