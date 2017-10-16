@@ -128,19 +128,14 @@ export default class admin extends Component {
             if(data.retcode == 1){
                 DetailInfo1 = JSON.stringify(data.DetailInfo1);// 在这里从接口取出要保存的数据，然后执行save方法
                    var  DetailInfo1 = JSON.stringify(data.DetailInfo1);
-                   this.setState({
-                        detailInfo1:DetailInfo1
-                   })
-                   alert(this.state.detailInfo1)
                    for(var value of data.DetailInfo1){
                         // alert(JSON.stringify(value))
                         var shopcode = value.shopcode;
                         var shopname = value.shopname;
                         this.pickerData .push(shopname+"_"+shopcode);
                    }
-                   var moren1 = shopname+"_"+shopcode;
                    this.setState({
-                        pickedDate:moren1
+                        pickedDate:this.pickerData
                    })
             }else{
 //                alert("数据保存失败")
@@ -163,13 +158,14 @@ export default class admin extends Component {
             ToastAndroid.show('正在登录，请稍等~', ToastAndroid.SHORT)
         }
         var code = ""+this.state.pickedDate;//获取到之后前面加""+
+//        alert(this.state.pickedDate)
         var Usercode=this.state.Usercode;
         var UserPwd=this.state.UserPwd;
         Storage.save("shopCode",this.state.pickedDate);//调用保存封装接口
         str1 = code.split('_');
         str2 = str1[1];
         dbAdapter.isLogin(Usercode, this.state.UserPwd, str2).then((isLogin)=>{
-//            alert("123");
+            alert("123");
             if(isLogin){
                var strin = this.state.pickedDate;
                strjj = ""+strin;
@@ -189,27 +185,6 @@ export default class admin extends Component {
     }
     pressPop(){
         this.props.navigator.pop();
-    }
-//机构信息下拉数据
-    _showDatePicker() {
-         Picker.init({
-              pickerData: this.pickerData,
-              selectedValue: [59],
-              onPickerConfirm: pickedValue => {
-              this.setState({//选择下拉内容
-                  pickedDate:pickedValue,
-              });
-                  console.log(pickedValue);
-              },
-              onPickerCancel: pickedValue => {
-                  console.log(pickedValue);
-              },
-              onPickerSelect: pickedValue => {
-                  console.log(pickedValue);
-              },
-         });
-         Picker.show();
-
     }
   render() {
     return (
@@ -258,7 +233,7 @@ export default class admin extends Component {
             </View>
             <View style={styles.AgencyInformation}>
                 <View style={styles.InformationLeft}><Text style={styles.InformationLeftText}>机构信息</Text></View>
-                <ModalDropdown style={styles.PullDown} dropdownStyle={styles.dropdown_2_dropdown} options={this.state.detailInfo1}/>
+                <ModalDropdown style={styles.PullDown} options={this.state.pickedDate}/>
             </View>
             <TouchableOpacity onPress={this.pressPush.bind(this)}>
                <Text style={styles.login}>登录</Text>
