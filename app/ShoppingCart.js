@@ -187,7 +187,7 @@ export default class ShoppingCart extends Component {
          );
      }
     pressPop(){
-          this._setModalVisible()
+          this._setModalVisible();
           this.props.navigator.pop();
     }
 //提交
@@ -227,10 +227,18 @@ export default class ShoppingCart extends Component {
         this.componentDidMount();
     }
     _rightButtonClick() {
+        Storage.get('textinput').then((tags) => {
+            alert(tags);
+            this.setState({
+                Remark:tags
+            })
+//            alert(this.state.Remark)
+        });
         console.log('右侧按钮点击了');
         this._setModalVisible();
     }
     _setModalVisible() {
+        Storage.save('textinput',this.state.Remark);
         let isShow = this.state.show;
         this.setState({
           show:!isShow,
@@ -305,7 +313,7 @@ export default class ShoppingCart extends Component {
                  <View style={styles.modalStyle}>
                       <View style={styles.LayerThickness}></View>
                       <View style={styles.ModalView}>
-                          <View style={styles.DanJu} onPress={this._setModalVisible.bind(this)}><Text style={styles.DanText}>单据备注</Text></View>
+                          <View style={styles.DanJu}><Text style={styles.DanText}>单据备注</Text></View>
                                 <TextInput
                                 multiline={true}
                                 placeholder="请填写单据备注信息"
@@ -552,7 +560,7 @@ const styles = StyleSheet.create({
       top:130,
       left:50,
       width:300,
-      paddingBottom:10
+      paddingBottom:20
    },
    DanJu:{
       height:45,
@@ -581,7 +589,8 @@ const styles = StyleSheet.create({
    },
    buttonText1:{
      color:"#f47882",
-     fontSize:20,
+     fontSize:24,
+     width:30,
    },
     viewStyle:{
         backgroundColor:"#ffffff",

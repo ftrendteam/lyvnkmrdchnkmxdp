@@ -14,7 +14,6 @@ import {
   TextInput,
   Navigator,
   TouchableOpacity,
-  ModalDropdown,
   Modal,
   TouchableHighlight,
   AsyncStorages,
@@ -24,11 +23,11 @@ import {
 import Index from "./Index";
 import DataUtils from "../utils/DataUtils";
 import NetUtils from "../utils/NetUtils";
-//import WebUtils from "../utils/WebUtils";
 import FetchUtil from "../utils/FetchUtils";
 import DBAdapter from "../adapter/DBAdapter";
 import Storage from "../utils/Storage";
 import Picker from 'react-native-picker';
+import ModalDropdown from 'react-native-modal-dropdown';
 //第二页面
 let dbAdapter = new DBAdapter();
 let db;
@@ -75,6 +74,7 @@ export default class admin extends Component {
             Usercode:"",
             UserPwd:"",
             pickedDate:"",
+            detailInfo1:"",
 //            ClientCode:this.props.ClientCode ? this.props.ClientCode : "",
         };
         this.pickerData=[]
@@ -128,12 +128,15 @@ export default class admin extends Component {
             if(data.retcode == 1){
                 DetailInfo1 = JSON.stringify(data.DetailInfo1);// 在这里从接口取出要保存的数据，然后执行save方法
                    var  DetailInfo1 = JSON.stringify(data.DetailInfo1);
+                   this.setState({
+                        detailInfo1:DetailInfo1
+                   })
+                   alert(this.state.detailInfo1)
                    for(var value of data.DetailInfo1){
                         // alert(JSON.stringify(value))
                         var shopcode = value.shopcode;
                         var shopname = value.shopname;
                         this.pickerData .push(shopname+"_"+shopcode);
-
                    }
                    var moren1 = shopname+"_"+shopcode;
                    this.setState({
@@ -255,9 +258,7 @@ export default class admin extends Component {
             </View>
             <View style={styles.AgencyInformation}>
                 <View style={styles.InformationLeft}><Text style={styles.InformationLeftText}>机构信息</Text></View>
-                <TouchableOpacity style={styles.PullDown} onPress={this._showDatePicker.bind(this)}>
-                    <Text style={styles.PullClick}>{this.state.pickedDate.toString()}</Text>
-                </TouchableOpacity>
+                <ModalDropdown style={styles.PullDown} dropdownStyle={styles.dropdown_2_dropdown} options={this.state.detailInfo1}/>
             </View>
             <TouchableOpacity onPress={this.pressPush.bind(this)}>
                <Text style={styles.login}>登录</Text>
@@ -324,11 +325,7 @@ const styles = StyleSheet.create({
     borderBottomWidth:1,
     borderBottomColor:"#474955",
    },
-   PullClick:{
-   color:"#bcbdc1",
-   lineHeight:30,
-   paddingLeft:10,
-   },
+
    login:{
       marginLeft:30,
       marginRight:30,
