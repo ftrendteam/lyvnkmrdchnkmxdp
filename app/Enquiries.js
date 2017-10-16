@@ -106,7 +106,7 @@ export default class Enquiries extends Component {
                 </View>
                 <View style={styles.ContList}>
                     <Text style={styles.ContLeft}>结束日期：</Text>
-                    <Text style={styles.ContLeft} onPress={this.showDateTimePicker.bind(this,false)}>{this.state.endDate.toString()}</Text>
+                    <Text style={styles.ContLeft} onPress={this.showDateTimePicker.bind(false)}>{this.state.endDate.toString()}</Text>
                     <DateTimePicker ref={(picker)=>{this.picker=picker}}/>
                 </View>
                 <View style={styles.ContList}>
