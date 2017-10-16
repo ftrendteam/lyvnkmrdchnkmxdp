@@ -6,8 +6,7 @@ import DateUtils from './DateUtils';
 import Storage from './Storage';
 import FetchUtils from './FetchUtils';
 export  default class RequestBodyUtils {
-  static  currPage = 1;
-  static currDate = '2017-1-1 10:00:00';
+  
   /***
    * 验证商户号请求
    * @param clientCode 商户号
@@ -260,60 +259,63 @@ export  default class RequestBodyUtils {
   static CurrDate;
   static count = 0;//商品中行数
   static currDate = '';
+  static currPage = 1;
+  static currDate = '2017-1-1 10:00:00';
   /**
    * 商品信息增量下发
    */
   static requestProduct = (url, shopCode, dbAdapter) => {
     return new Promise((resolve, reject) => {//Promise
-      Storage.get("CurrDate").then((currentData) => {
-       
-        let requestBody = RequestBodyUtils.createProduct(shopCode, currentData, RequestBodyUtils.currPage);
-        FetchUtils.post(url, requestBody).then((json) => {
-       
-          if (!(json == "" || json == null || json == undefined || (json == "[]"))) {
-            if (json.retcode == 99) {
-              RequestBodyUtils.currPage = 1;
-              RequestBodyUtils.count = 0;
-              RequestBodyUtils.currDate = '';
-              resolve(true);
-            }
-            let tablow = json.TblRow;//商品信息
-            if (RequestBodyUtils.currPage > 1) {
-              tablow = json;
-            } else if (RequestBodyUtils.currPage == 1) {
-              RequestBodyUtils.count = json.tblRowCount;//商品中行数
-              RequestBodyUtils.currDate = json.CurrDate;
-            }
-            let queryNum = 0;//需要轮询的次数
-            let num = RequestBodyUtils.count % 200;
-            if ((num != 0)) {//根据是否有余数判断确定轮询次数
-              queryNum = RequestBodyUtils.count / 200;
-              queryNum += 1;
-            } else {
-              queryNum = RequestBodyUtils.count / 200;
-            }
-            if ((RequestBodyUtils.count > 0)) {
-              dbAdapter.insertProductData(tablow);
-            }
-            if (RequestBodyUtils.currPage <= queryNum) {
-              RequestBodyUtils.currPage++;
-              //alert(RequestBodyUtils.currPage++);
-              RequestBodyUtils.requestProduct(url, shopCode, dbAdapter);
-            }
-          } else {
-            resolve(true);
-            Storage.save("CurrDate", RequestBodyUtils.currDate);//保存上次请求时间
+      RequestBodyUtils.extracted(shopCode, url, resolve, dbAdapter, reject);
+    });
+  }
+  
+  static extracted(shopCode, url, resolve, dbAdapter, reject) {
+    Storage.get("CurrDate").then((currentData) => {
+      let requestBody = RequestBodyUtils.createProduct(shopCode, currentData, RequestBodyUtils.currPage);
+      FetchUtils.post(url, requestBody).then((json) => {
+        if (!(json == "" || json == null || json == undefined || (json == "[]"))) {
+          if (json.retcode == 99) {
             RequestBodyUtils.currPage = 1;
             RequestBodyUtils.count = 0;
             RequestBodyUtils.currDate = '';
+            resolve(true);
           }
-        }, (json) => {
-          //TODO 处理请求fail
-          alert(json, "错误");
-        }).catch((error) => {
-          console.log('jsonE=' + error);
-          reject(false);
-        });
+          let tablow = json.TblRow;//商品信息
+          if (RequestBodyUtils.currPage > 1) {
+            tablow = json;
+          } else if (RequestBodyUtils.currPage == 1) {
+            RequestBodyUtils.count = json.tblRowCount;//商品中行数
+            RequestBodyUtils.currDate = json.CurrDate;
+          }
+          let queryNum = 0;//需要轮询的次数
+          let num = RequestBodyUtils.count % 200;
+          if ((num != 0)) {//根据是否有余数判断确定轮询次数
+            queryNum = RequestBodyUtils.count / 200;
+            queryNum += 1;
+          } else {
+            queryNum = RequestBodyUtils.count / 200;
+          }
+          if ((RequestBodyUtils.count > 0)) {
+            dbAdapter.insertProductData(tablow);
+          }
+          if (RequestBodyUtils.currPage < queryNum) {
+            RequestBodyUtils.currPage++;
+            //alert(RequestBodyUtils.currPage++);
+            RequestBodyUtils.extracted(shopCode, url, resolve, dbAdapter, reject);
+          }
+        } else {
+          Storage.save("CurrDate", RequestBodyUtils.currDate);//保存上次请求时间
+          RequestBodyUtils.currPage = 1;
+          RequestBodyUtils.count = 0;
+          RequestBodyUtils.currDate = '';
+          resolve(true);
+        }
+      }, (json) => {
+        //TODO 处理请求fail
+      }).catch((error) => {
+        console.log('jsonE=' + error);
+        reject(false);
       });
     });
   }

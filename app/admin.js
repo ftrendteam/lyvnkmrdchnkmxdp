@@ -129,7 +129,6 @@ export default class admin extends Component {
                 DetailInfo1 = JSON.stringify(data.DetailInfo1);// 在这里从接口取出要保存的数据，然后执行save方法
                    var  DetailInfo1 = JSON.stringify(data.DetailInfo1);
                    for(var value of data.DetailInfo1){
-                        // alert(JSON.stringify(value))
                         var shopcode = value.shopcode;
                         var shopname = value.shopname;
                         this.pickerData .push(shopname+"_"+shopcode);
@@ -151,23 +150,22 @@ export default class admin extends Component {
     pressPush(){
         Storage.save('history','');
         var PickedDate = this.state.pickedDate;
-        if(PickedDate == ""){
+        if(this.state.PickedDate == ""){
             ToastAndroid.show('请选择机构信息', ToastAndroid.SHORT)
             return;
         }else{
             ToastAndroid.show('正在登录，请稍等~', ToastAndroid.SHORT)
         }
         var code = ""+this.state.pickedDate;//获取到之后前面加""+
-//        alert(this.state.pickedDate)
         var Usercode=this.state.Usercode;
         var UserPwd=this.state.UserPwd;
         Storage.save("shopCode",this.state.pickedDate);//调用保存封装接口
         str1 = code.split('_');
         str2 = str1[1];
         dbAdapter.isLogin(Usercode, this.state.UserPwd, str2).then((isLogin)=>{
-            alert("123");
             if(isLogin){
                var strin = this.state.pickedDate;
+               alert(strin);
                strjj = ""+strin;
                code = strjj.substring(strjj.indexOf('_') + 1,strjj.length);
                Storage.save('code',code);
@@ -185,6 +183,12 @@ export default class admin extends Component {
     }
     pressPop(){
         this.props.navigator.pop();
+    }
+
+    _dropdown_4_onSelect(idx, value) {
+        this.setState({
+            pickedDate:value
+        })
     }
   render() {
     return (
@@ -233,7 +237,8 @@ export default class admin extends Component {
             </View>
             <View style={styles.AgencyInformation}>
                 <View style={styles.InformationLeft}><Text style={styles.InformationLeftText}>机构信息</Text></View>
-                <ModalDropdown style={styles.PullDown} options={this.state.pickedDate}/>
+                <ModalDropdown style={styles.PullDown} options={this.state.pickedDate} onSelect={(idx, value) => this._dropdown_4_onSelect(idx, value)}
+/>
             </View>
             <TouchableOpacity onPress={this.pressPush.bind(this)}>
                <Text style={styles.login}>登录</Text>
