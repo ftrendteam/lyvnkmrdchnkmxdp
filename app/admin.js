@@ -237,8 +237,7 @@ export default class admin extends Component {
             </View>
             <View style={styles.AgencyInformation}>
                 <View style={styles.InformationLeft}><Text style={styles.InformationLeftText}>机构信息</Text></View>
-                <ModalDropdown style={styles.PullDown} options={this.state.pickedDate} onSelect={(idx, value) => this._dropdown_4_onSelect(idx, value)}
-/>
+                <ModalDropdown style={styles.PullDown} options={this.state.pickedDate} onSelect={(idx, value) => this._dropdown_4_onSelect(idx, value)}/>
             </View>
             <TouchableOpacity onPress={this.pressPush.bind(this)}>
                <Text style={styles.login}>登录</Text>
