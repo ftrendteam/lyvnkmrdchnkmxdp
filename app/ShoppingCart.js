@@ -19,7 +19,8 @@ import {
   Dimensions,
   TouchableHighlight,
   ListView,
-  DeviceEventEmitter
+  DeviceEventEmitter,
+  InteractionManager
 } from 'react-native';
 import Index from "./Index";
 import HistoricalDocument from "./HistoricalDocument";
@@ -46,7 +47,6 @@ export default class ShoppingCart extends Component {
             ShopNumber:"",
             ShopAmount:"",
             reqDetailCode:"",
-            Remark:"",
             dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
         };
         this.dataRows = [];
@@ -116,6 +116,11 @@ export default class ShoppingCart extends Component {
     }
 //自动跑接口
     componentDidMount(){
+       InteractionManager.runAfterInteractions(() => {
+           this._dpSearch();
+       });
+    }
+    _dpSearch(){
        //取出保存本地的数据  'valueOf'是保存的时候自己定义的参数   tags就是保存的那个值
        //在一进来页面就取出来，就不会出现第一次点击为 空值
        Storage.get('valueOf').then((tags) => {
@@ -216,25 +221,22 @@ export default class ShoppingCart extends Component {
             };
             FetchUtils.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
                 if(data.retcode == 1){
-                   alert("提交成功")
+                        alert("提交成功");
                     }else{
-//                   alert("提交失败");
-                     alert(JSON.stringify(data))
+                        alert("提交失败");
                 }
             })
         })
         dbAdapter.deleteData("shopInfo");
-        this.componentDidMount();
+        this._dpSearch();
     }
     _rightButtonClick() {
         Storage.get('textinput').then((tags) => {
-            alert(tags);
+            alert(tags)
             this.setState({
                 Remark:tags
             })
-//            alert(this.state.Remark)
         });
-        console.log('右侧按钮点击了');
         this._setModalVisible();
     }
     _setModalVisible() {
@@ -276,9 +278,9 @@ export default class ShoppingCart extends Component {
             </View>
             <View style={styles.ContList}>
                     <ListView
-                        dataSource={this.state.dataSource}
-                        showsVerticalScrollIndicator={true}
-                        renderRow={this._renderRow.bind(this)}
+                    dataSource={this.state.dataSource}
+                    showsVerticalScrollIndicator={true}
+                    renderRow={this._renderRow.bind(this)}
                     />
             </View>
         </View>
@@ -313,23 +315,24 @@ export default class ShoppingCart extends Component {
                  <View style={styles.modalStyle}>
                       <View style={styles.LayerThickness}></View>
                       <View style={styles.ModalView}>
-                          <View style={styles.DanJu}><Text style={styles.DanText}>单据备注</Text></View>
-                                <TextInput
-                                multiline={true}
-                                placeholder="请填写单据备注信息"
-                                underlineColorAndroid='transparent'
-                                placeholderTextColor="#bcbdc1"
-                                style={styles.TextInput}
-                                onChangeText={(value)=>{
-                                    this.setState({
-                                        Remark:value
-                                    })
-                                }}/>
+                            <View style={styles.DanJu}>
+                                <View style={styles.danju}><Text style={styles.DanText}>单据备注</Text></View>
                                 <View style={styles.ModalLeft} >
                                      <Text style={styles.buttonText1} onPress={this._setModalVisible.bind(this)}>×</Text>
-                          </View>
+                                </View>
+                            </View>
+                            <TextInput
+                            multiline={true}
+                            placeholder="请填写单据备注信息"
+                            underlineColorAndroid='transparent'
+                            placeholderTextColor="#bcbdc1"
+                            style={styles.TextInput}
+                            onChangeText={(value)=>{
+                                this.setState({
+                                    Remark:value
+                                })
+                            }}/>
                       </View>
-
                  </View>
             </Modal>
         </View>
@@ -583,14 +586,15 @@ const styles = StyleSheet.create({
       borderColor:"#fbced2",
    },
    ModalLeft:{
-     position:"absolute",
-     right:15,
-     top:3,
+     flex:1,
+   },
+   danju:{
+    flex:3,
    },
    buttonText1:{
      color:"#f47882",
      fontSize:24,
-     width:30,
+     textAlign:"center"
    },
     viewStyle:{
         backgroundColor:"#ffffff",
@@ -674,6 +678,7 @@ const styles = StyleSheet.create({
         height:45,
         backgroundColor:"#fbced2",
         borderRadius:5,
+        flexDirection:'row',
     },
     DanText:{
         color:"#f47882",
@@ -690,13 +695,4 @@ const styles = StyleSheet.create({
         borderColor:"#fbced2",
         textAlignVertical: 'top'
     },
-    ModalLeft:{
-        position:"absolute",
-        right:15,
-        top:3,
-    },
-    buttonText1:{
-        color:"#f47882",
-        fontSize:20,
-    }
 });

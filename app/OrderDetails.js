@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
   left1:{
     height:45,
     flexDirection:"row",
-    flex:3,
+    flex:5,
   },
   right1:{
     height:45,
@@ -339,17 +339,20 @@ const styles = StyleSheet.create({
   Delete:{
     fontSize:18,
     color:"#f63e4d",
-    textAlign:"left"
+    flex:1,
+    textAlign:"center"
   },
   Reduce:{
     fontSize:18,
     color:"#f63e4d",
+    flex:1,
     textAlign:"center"
   },
   Increase:{
     fontSize:18,
     color:"#f63e4d",
-    textAlign:"right"
+    flex:1,
+    textAlign:"center"
   },
   sublime:{
     flex:1

@@ -274,6 +274,7 @@ export  default class RequestBodyUtils {
     Storage.get("CurrDate").then((currentData) => {
       let requestBody = RequestBodyUtils.createProduct(shopCode, currentData, RequestBodyUtils.currPage);
       FetchUtils.post(url, requestBody).then((json) => {
+      console.log();
         if (!(json == "" || json == null || json == undefined || (json == "[]"))) {
           if (json.retcode == 99) {
             RequestBodyUtils.currPage = 1;

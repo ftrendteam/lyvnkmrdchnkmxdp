@@ -16,7 +16,8 @@ import {
   TouchableOpacity,
   TouchableHighlight,
   ToastAndroid,
-  ListView
+  ListView,
+  InteractionManager
 } from 'react-native';
 import Index from "./Index";
 import ShoppingCart from "./ShoppingCart";
@@ -96,21 +97,17 @@ export default class HistoricalDocument extends Component {
   }
   componentDidMount(){
      this._get();
-     this._dpSearch();
+//     this._dpSearch();
+     InteractionManager.runAfterInteractions(() => {
+      this._dpSearch();
+     });
   }
   _get(){
-    //单据name获取
-    if(this.state.name==""){
-        this.setState({
-            name:"历史单据"
-        })
-    }else{
         Storage.get('Name').then((tags) => {
              this.setState({
                  name:tags
              })
         });
-    }
 
      //reqDetailCode获取
      Storage.get('history').then((tags) => {

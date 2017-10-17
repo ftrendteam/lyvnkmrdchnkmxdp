@@ -73,7 +73,7 @@ export default class admin extends Component {
             Sign:"",
             Usercode:"",
             UserPwd:"",
-            pickedDate:"",
+            Product:"",
             detailInfo1:"",
 //            ClientCode:this.props.ClientCode ? this.props.ClientCode : "",
         };
@@ -82,7 +82,6 @@ export default class admin extends Component {
  //直接跑数据 componentDidMount
     componentDidMount(){
         Storage.get('ClientCode').then((tags) => {
-//        alert(tags)
             let params = {
                  reqCode:"App_PosReq",
                  reqDetailCode:"App_Client_UseQry",
@@ -148,15 +147,13 @@ export default class admin extends Component {
     }
 //登录
     pressPush(){
-        Storage.save('history','');
-        var PickedDate = this.state.pickedDate;
-        if(this.state.PickedDate == ""){
+        if(this.state.Product == ""){
             ToastAndroid.show('请选择机构信息', ToastAndroid.SHORT)
             return;
         }else{
             ToastAndroid.show('正在登录，请稍等~', ToastAndroid.SHORT)
         }
-        var code = ""+this.state.pickedDate;//获取到之后前面加""+
+        var code = ""+this.state.Product;//获取到之后前面加""+
         var Usercode=this.state.Usercode;
         var UserPwd=this.state.UserPwd;
         Storage.save("shopCode",this.state.pickedDate);//调用保存封装接口
@@ -164,8 +161,7 @@ export default class admin extends Component {
         str2 = str1[1];
         dbAdapter.isLogin(Usercode, this.state.UserPwd, str2).then((isLogin)=>{
             if(isLogin){
-               var strin = this.state.pickedDate;
-               alert(strin);
+               var strin = this.state.Product;
                strjj = ""+strin;
                code = strjj.substring(strjj.indexOf('_') + 1,strjj.length);
                Storage.save('code',code);
@@ -176,7 +172,7 @@ export default class admin extends Component {
                    component:Index,
                };
                this.props.navigator.push(nextRoute);
-               alert(JSON.stringify(data))
+
             }else{
                 ToastAndroid.show('用户编码或密码错误', ToastAndroid.SHORT)
             }
@@ -185,10 +181,10 @@ export default class admin extends Component {
     pressPop(){
         this.props.navigator.pop();
     }
-
+    //下拉列表赋值
     _dropdown_4_onSelect(idx, value) {
         this.setState({
-            pickedDate:value
+            Product:value
         })
     }
   render() {
@@ -238,7 +234,7 @@ export default class admin extends Component {
             </View>
             <View style={styles.AgencyInformation}>
                 <View style={styles.InformationLeft}><Text style={styles.InformationLeftText}>机构信息</Text></View>
-                <ModalDropdown style={styles.PullDown} options={this.state.pickedDate} onSelect={(idx, value) => this._dropdown_4_onSelect(idx, value)}/>
+                <ModalDropdown style={styles.PullDown} options={this.state.pickedDate} textStyle={styles.dropdown_2_text} onSelect={(idx, value) => this._dropdown_4_onSelect(idx, value)}/>
             </View>
             <TouchableOpacity onPress={this.pressPush.bind(this)}>
                <Text style={styles.login}>登录</Text>
@@ -301,11 +297,14 @@ const styles = StyleSheet.create({
    },
    PullDown:{
     flex:7,
-    height:40,
     borderBottomWidth:1,
     borderBottomColor:"#474955",
    },
-
+   dropdown_2_text:{
+    paddingLeft:8,
+    color:"#bcbdc1",
+    lineHeight:25,
+   },
    login:{
       marginLeft:30,
       marginRight:30,

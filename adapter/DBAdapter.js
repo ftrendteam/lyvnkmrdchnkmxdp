@@ -533,16 +533,19 @@ export default class DBAdapter extends SQLiteOpenHelper {
                 shopCode = data;
                 console.log("shopCode", shopCode);
                 if (shopCode == currShopCode) {//当前登录的机构号 和本地保存的相同
+                  console.log("当前登录的机构号 和本地保存的相同");
                   resolve(true);
                 } else if (shopCode == '') {//本地没有保存机构号,根据当前的机构号下载商品和品类
                   let categoryBody = RequestBodyUtils.createCategory(currShopCode);
                   this.downProductAndCategory(categoryBody, currShopCode).then((result) => {
                     if (result) {
+                    console.log("本地没有保存机构号,根据当前的机构号下载商品和品类");
                       resolve(true);
                     }
                   });
                 } else {//当前登录的机构号和本地保存的机构号不同.重新保存并下载新的品类和商品信息
                   DataUtils.save('shopCode', currShopCode);
+                  console.log("重新保存并下载新的品类和商品信息");
                   /***
                    * prductBody 商品信息下载请求体
                    * categoryBody 品类信息下载请求体

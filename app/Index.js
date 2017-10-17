@@ -167,6 +167,7 @@ export default class Index extends Component {
            for(let i =0;i<rows.length;i++){
                var row = rows.item(i);
            };
+
            var priductdata = JSON.stringify(row.countn);
            this.setState({
                Page:priductdata,
@@ -217,12 +218,6 @@ export default class Index extends Component {
     }
     //右侧商品信息
     _pressRow(rowData){
-//            this.refs.loadingToastComponent.hide();
-//            alert("123")
-        if ("Number"==0) {
-            this.refs.goodsCodeOrName({style: {display: "none"}});
-            alert("123")
-        }
         dbAdapter.selectProduct1(rowData.DepCode,1).then((rows)=>{
            for(let i =0;i<rows.length;i++){
                var row = rows.item(i);
@@ -275,7 +270,6 @@ export default class Index extends Component {
         //调取数量
         dbAdapter.upDataShopInfoCountmSub(item.item.ProdCode).then((rows)=>{});
         this._fetch1();
-        var abc = JSON.stringify(item.item.ShopNumber);
     }
     _separator = () => {
         return <View style={{height:1,backgroundColor:'#f5f5f5'}}/>;
@@ -308,9 +302,9 @@ export default class Index extends Component {
 
 //  分类
     Home(){
-        var abc = "要货单";
+        var invoice = "要货单";
         this.setState({
-            head:abc,
+            head:invoice,
         });
         this._setModalVisible();
         //保存需要本地存储的值  第一个参数是自己定义的  第二个参数是要传的参数
@@ -321,9 +315,9 @@ export default class Index extends Component {
         Storage.save('historyClass','App_Client_ProYHDetailQ');
     }
     Home1(){
-        var abc="损益单";
+        var invoice="损益单";
         this.setState({
-            head:abc,
+            head:invoice,
         });
         this._setModalVisible();
         Storage.save('Name','损益单');
@@ -332,9 +326,9 @@ export default class Index extends Component {
         Storage.save('historyClass','App_Client_ProSYDetailQ');
     }
     Query(){
-        var abc="实时盘点单";
+        var invoice="实时盘点单";
         this.setState({
-            head:abc,
+            head:invoice,
         });
         this._setModalVisible();
         Storage.save('Name','实时盘点单');
@@ -343,9 +337,9 @@ export default class Index extends Component {
         Storage.save('historyClass','App_Client_ProCurrPCDetailQ');
     }
     Query1(){
-        var abc="商品盘点单";
+        var invoice="商品盘点单";
         this.setState({
-            head:abc,
+            head:invoice,
         });
         this._setModalVisible();
 
@@ -356,9 +350,9 @@ export default class Index extends Component {
         this.props.navigator.push(nextRoute);
     }
     Home2(){
-        var abc="配送收货单";
+        var invoice="配送收货单";
         this.setState({
-            head:abc,
+            head:invoice,
         });
         this._setModalVisible();
 
@@ -375,7 +369,7 @@ export default class Index extends Component {
         return item.ProdName//FlatList使用json中的ProdName动态绑定key
     }
     refreshing(){
-        page=page+1;
+        page=page-1;
         let priductData=[];
         let currpage = ((page-1)*20);
         dbAdapter.selectProduct(1,currpage,1).then((rows)=>{
@@ -407,14 +401,42 @@ export default class Index extends Component {
     }
 
     _onload(){
-//        if(page<totalPage){
-//            page = page+1;
-//        }else{
-//           // alert("已加载到底部")
-//        }
-//        page = page+1;
-//        alert(page);
-        this.refreshing();
+        if(page<totalPage){
+            page = page+1;
+            alert("111")
+        }else{
+            page=page+1;
+            let priductData=[];
+            let currpage = ((page-1)*20);
+            dbAdapter.selectProduct(1,currpage,1).then((rows)=>{
+                for(let i =0;i<rows.length;i++){
+                    var row = rows.item(i);
+                    priductData.push(row);
+                };
+                this.setState({
+                    data:priductData,
+                });
+                var productData = JSON.stringify(priductData);
+                var list = [];
+                var state = {};
+                let timer =  setTimeout(()=>{
+                    clearTimeout(timer)
+                });
+                if (page == 1) {
+                    total = this.state.Page;
+                    totalPage = total % 20 == 0 ? total / 20 : Math.floor(total / 20) + 1;
+                    if (!total > 0) {
+                        state.noData = true;
+                    } else {
+                        state.noData = false;
+                    }
+                } else {
+                    list = list.concat(productData);
+                }
+            });
+
+        }
+
     }
 
     render() {
@@ -688,8 +710,6 @@ const styles = StyleSheet.create({
   Border:{
     borderRightWidth:1,
     borderRightColor:"#f5f5f5",
-    borderBottomWidth:1,
-    borderBottomColor:"#f5f5f5",
     flex:3,
     paddingBottom:15,
   },
