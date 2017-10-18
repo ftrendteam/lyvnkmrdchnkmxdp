@@ -23,7 +23,8 @@ import {
   AnimatedFlatList,
   DeviceEventEmitter,
   FlatList,
-  ActivityIndicator
+  ActivityIndicator,
+  InteractionManager
 } from 'react-native';
 import HistoricalDocument from "./HistoricalDocument";
 import ShoppingCart from "./ShoppingCart";
@@ -45,9 +46,10 @@ var {NativeModules} = require('react-native');
 var RNScannerAndroid = NativeModules.RNScannerAndroid;
 let dbAdapter = new DBAdapter();
 let db;
-let page = 1;
+let page = 0;
 let total = 0;
 let totalPage = 0;
+const lastDepCode = "";
 export default class Index extends Component {
     constructor(props){
         super(props);
@@ -64,7 +66,8 @@ export default class Index extends Component {
             Page:"",
             data:"",
             ShopNumber:"",
-            nomore: false
+            nomore: false,
+            depcode:""
         };
         this.dataRows = [];
         this.productData = [];
@@ -149,12 +152,15 @@ export default class Index extends Component {
     }
     //左侧品级
     componentDidMount(){
-        Storage.get('Name').then((tags) => {
-            this.setState({
-                head:tags
-            })
-        });
-        this._fetch();
+        InteractionManager.runAfterInteractions(() => {
+            Storage.get('Name').then((tags) => {
+                this.setState({
+                    head:tags
+                })
+            });
+            this._fetch();
+         });
+
     }
     _fetch(){
         dbAdapter.selectTDepSet('1').then((rows)=>{
@@ -181,7 +187,7 @@ export default class Index extends Component {
 
         let priductData=[];
         let currpage = ((page-1)*18);
-        dbAdapter.selectProduct(1,currpage,1).then((rows)=>{
+        dbAdapter.selectProduct(this.state.depcode,currpage,1).then((rows)=>{
             for(let i =0;i<rows.length;i++){
                 var row = rows.item(i);
                 priductData.push(row);
@@ -223,6 +229,9 @@ export default class Index extends Component {
     }
     //右侧商品信息
     _pressRow(rowData){
+        if(lastDepCode ==""){
+            lastDepCode = rowData.DepCode;
+        }
         dbAdapter.selectProduct1(rowData.DepCode,1).then((rows)=>{
            for(let i =0;i<rows.length;i++){
                var row = rows.item(i);
@@ -235,6 +244,10 @@ export default class Index extends Component {
 
         let priductData=[];
         let currpage = ((page-1)*18);
+        var DEPCODE = (rowData.DepCode);
+        this.setState({
+            depcode:DEPCODE
+        })
         dbAdapter.selectProduct(rowData.DepCode,currpage,1).then((rows)=>{
             for(let i =0;i<rows.length;i++){
                 var row = rows.item(i);
@@ -381,43 +394,12 @@ export default class Index extends Component {
     keyExtractor(item: Object, index: number) {
         return item.ProdName//FlatList使用json中的ProdName动态绑定key
     }
-//    refreshing(){
-//        page=page;
-//        let priductData=[];
-//        let currpage = ((page-1)*20);
-//        dbAdapter.selectProduct(1,currpage,1).then((rows)=>{
-//            for(let i =0;i<rows.length;i++){
-//                var row = rows.item(i);
-//                priductData.push(row);
-//            };
-//
-//            var state = {};
-//            let timer =  setTimeout(()=>{
-//                clearTimeout(timer)
-//            });
-//            if (page == 1) {
-//                total = this.state.Page;
-//                totalPage = total % 20 == 0 ? total / 20 : Math.floor(total / 20) + 1;
-//                if (!total > 0) {
-//                    state.noData = true;
-//                } else {
-//                    state.noData = false;
-//                }
-//            }
-//            this.productData = this.productData.concat(priductData);
-////            alert(this.productData)
-//            this.setState({
-//                data:this.productData,
-//            });
-//        });
-//    }
-
-    _onload(rowData){
+    _onload(){
         this.setState({nomore: true});
-        page=page;
+        page=page+1;
         let priductData=[];
-        let currpage = ((page-1)*18);
-        dbAdapter.selectProduct(rowData.DepCode,currpage,1).then((rows)=>{
+        let currpage = (page*18);
+        dbAdapter.selectProduct(this.state.depcode,currpage,1).then((rows)=>{
             for(let i =0;i<rows.length;i++){
                 var row = rows.item(i);
                 priductData.push(row);
@@ -426,9 +408,9 @@ export default class Index extends Component {
             let timer =  setTimeout(()=>{
                 clearTimeout(timer)
             });
-            if (page == 1) {
+            if (page == 0) {
                 total = this.state.Page;
-                totalPage = total % 18 == 0 ? total / 18 : Math.floor(total / 18) + 1;
+                totalPage = total % 20 == 0 ? total / 20 : Math.floor(total / 20) + 1;
                 if (!total > 0) {
                     state.noData = true;
                 } else {
@@ -440,7 +422,13 @@ export default class Index extends Component {
             } else {
                 state.nomore = true;
             }
+//            alert(this.state.depcode!=lastDepCode);
+             if(this.state.depcode!=lastDepCode){
+                 this.productData.splice(0,this.productData.length);
+                 lastDepCode = this.state.depcode;
+             }
             this.productData = this.productData.concat(priductData);
+
 //            alert(JSON.stringify(this.productData));
             this.setState({
                 data:this.productData,
@@ -486,9 +474,7 @@ export default class Index extends Component {
                                 data={data}
                                 keyExtractor={this.keyExtractor}
                                 onEndReachedThreshold = {0.1}
-                                onEndReached={() =>{
-                                    this._onload();
-                                }}
+                                onEndReached={() =>{this._onload()}}
                                 getItemLayout={(data, index) => (
                                   // 120 是被渲染 item 的高度 ITEM_HEIGHT。
                                   {length: 120, offset: 120 * index, index}

@@ -102,8 +102,9 @@ export default class HistoricalDocument extends Component {
     this._renderSectionHeader();
   }
   componentDidMount(){
-     this._get();
+
      InteractionManager.runAfterInteractions(() => {
+     this._get();
       this._dpSearch();
      });
   }
