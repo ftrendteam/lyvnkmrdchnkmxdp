@@ -22,7 +22,8 @@ import {
   ListView,
   AnimatedFlatList,
   DeviceEventEmitter,
-  FlatList
+  FlatList,
+  ActivityIndicator
 } from 'react-native';
 import HistoricalDocument from "./HistoricalDocument";
 import ShoppingCart from "./ShoppingCart";
@@ -62,8 +63,11 @@ export default class Index extends Component {
             Counmnmber:"",
             Page:"",
             data:"",
+            ShopNumber:"",
+            nomore: false
         };
         this.dataRows = [];
+        this.productData = [];
         this.moreTime = 0;
         var timer1 = null;
     }
@@ -156,10 +160,10 @@ export default class Index extends Component {
         dbAdapter.selectTDepSet('1').then((rows)=>{
             for(let i =0;i<rows.length;i++){
                 var row = rows.item(i);
-                this.dataRows.push(row);
+                this.dataRows.push(row)
             }
             this.setState({
-                dataSource:this.state.dataSource.cloneWithRows(this.dataRows)
+                dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
             })
         });
         //触发点击第一个列表
@@ -180,8 +184,8 @@ export default class Index extends Component {
             for(let i =0;i<rows.length;i++){
                 var row = rows.item(i);
                 priductData.push(row);
-//                alert(JSON.stringify(row));
             }
+
             this.setState({
                 data:priductData,
             })
@@ -269,6 +273,9 @@ export default class Index extends Component {
     Countm(item){
         //调取数量
         dbAdapter.upDataShopInfoCountmSub(item.item.ProdCode).then((rows)=>{});
+        this.setState({
+            dataSource:this.state.dataSource.cloneWithRows(this.dataRows)
+        })
         this._fetch1();
     }
     _separator = () => {
@@ -276,9 +283,15 @@ export default class Index extends Component {
     }
     _createEmptyView() {
         return (
-            <Text style={{fontSize: 16, alignSelf: 'center',marginTop:10}}>商品更新...</Text>
+            <View style={styles.footerView}>
+                {
+                   this.state.nomore ?[<ActivityIndicator key="1"></ActivityIndicator>,<Text key="2" style={styles.fontColorGray}>商品更新</Text>]:[<ActivityIndicator key="1"></ActivityIndicator>,<Text key="2" style={styles.fontColorGray}>加载中</Text>]
+                }
+            </View>
         );
     }
+
+
     OrderDetails(item){
         var title = this.state.head;
         if(title ==null){
@@ -368,8 +381,40 @@ export default class Index extends Component {
     keyExtractor(item: Object, index: number) {
         return item.ProdName//FlatList使用json中的ProdName动态绑定key
     }
-    refreshing(){
-        page=page-1;
+//    refreshing(){
+//        page=page;
+//        let priductData=[];
+//        let currpage = ((page-1)*20);
+//        dbAdapter.selectProduct(1,currpage,1).then((rows)=>{
+//            for(let i =0;i<rows.length;i++){
+//                var row = rows.item(i);
+//                priductData.push(row);
+//            };
+//
+//            var state = {};
+//            let timer =  setTimeout(()=>{
+//                clearTimeout(timer)
+//            });
+//            if (page == 1) {
+//                total = this.state.Page;
+//                totalPage = total % 20 == 0 ? total / 20 : Math.floor(total / 20) + 1;
+//                if (!total > 0) {
+//                    state.noData = true;
+//                } else {
+//                    state.noData = false;
+//                }
+//            }
+//            this.productData = this.productData.concat(priductData);
+////            alert(this.productData)
+//            this.setState({
+//                data:this.productData,
+//            });
+//        });
+//    }
+
+    _onload(){
+        this.setState({nomore: true});
+        page=page;
         let priductData=[];
         let currpage = ((page-1)*20);
         dbAdapter.selectProduct(1,currpage,1).then((rows)=>{
@@ -377,11 +422,6 @@ export default class Index extends Component {
                 var row = rows.item(i);
                 priductData.push(row);
             };
-            this.setState({
-                data:priductData,
-            });
-            var productData = JSON.stringify(priductData);
-            var list = [];
             var state = {};
             let timer =  setTimeout(()=>{
                 clearTimeout(timer)
@@ -394,50 +434,23 @@ export default class Index extends Component {
                 } else {
                     state.noData = false;
                 }
-            } else {
-                list = list.concat(productData);
             }
-        });
-    }
-
-    _onload(){
-        if(page<totalPage){
-            page = page+1;
-            alert("111")
-        }else{
-            page=page+1;
-            let priductData=[];
-            let currpage = ((page-1)*20);
-            dbAdapter.selectProduct(1,currpage,1).then((rows)=>{
-                for(let i =0;i<rows.length;i++){
-                    var row = rows.item(i);
-                    priductData.push(row);
-                };
-                this.setState({
-                    data:priductData,
-                });
-                var productData = JSON.stringify(priductData);
-                var list = [];
-                var state = {};
-                let timer =  setTimeout(()=>{
-                    clearTimeout(timer)
-                });
-                if (page == 1) {
-                    total = this.state.Page;
-                    totalPage = total % 20 == 0 ? total / 20 : Math.floor(total / 20) + 1;
-                    if (!total > 0) {
-                        state.noData = true;
-                    } else {
-                        state.noData = false;
-                    }
-                } else {
-                    list = list.concat(productData);
-                }
+            if (page < totalPage) {
+                state.nomore = false;
+            } else {
+                state.nomore = true;
+            }
+            this.productData = this.productData.concat(priductData);
+//            alert(JSON.stringify(this.productData));
+            this.setState({
+                data:this.productData,
             });
 
-        }
+        });
 
     }
+
+
 
     render() {
         const {data} = this.state;
@@ -471,11 +484,9 @@ export default class Index extends Component {
                                 style={styles.ScrollView1}
                                 renderItem={this._renderItem.bind(this)}
                                 ItemSeparatorComponent={this._separator.bind(this)}
-                                ListEmptyComponent={this._createEmptyView()}
+                                ListFooterComponent={this._createEmptyView()}
                                 data={data}
                                 keyExtractor={this.keyExtractor}
-                                onRefresh={this.refreshing.bind(this)}
-                                refreshing={false}
                                 onEndReachedThreshold = {0.1}
                                 onEndReached={() =>{
                                     this._onload();
@@ -535,8 +546,16 @@ export default class Index extends Component {
                       <TouchableOpacity style={styles.Home} onPress={this.HISTORY.bind(this)}><Image source={require("../images/documents.png")}></Image><Text style={styles.home1}>历史单据</Text></TouchableOpacity>
                       <TouchableOpacity style={styles.Home} onPress={this.HOME.bind(this)}><Image source={require("../images/home1.png")}></Image><Text style={styles.home2}>首页</Text></TouchableOpacity>
                       <TouchableOpacity style={styles.Home} onPress={this.SHOP.bind(this)}>
-                        <View><Image source={require("../images/shop.png")}><Text style={styles.ShopCar}>{this.state.shopcar}</Text></Image></View>
-                        <Text style={styles.home1}>清单</Text>
+                         <View>
+                            <Image source={require("../images/shop.png")}>
+                                {
+                                   (this.state.shopcar==0)?
+                                    null:
+                                    <Text style={styles.ShopCar}>{this.state.shopcar}</Text>
+                                }
+                            </Image>
+                         </View>
+                         <Text style={styles.home1}>清单</Text>
                       </TouchableOpacity>
                   </View>
               </View>
@@ -765,5 +784,8 @@ const styles = StyleSheet.create({
   titleText1:{
     color:"#ffffff",
     textAlign:"center"
+  },
+  fontColorGray:{
+   textAlign:"center"
   }
 });

@@ -17,7 +17,8 @@ import {
   TouchableHighlight,
   ToastAndroid,
   ListView,
-  InteractionManager
+  InteractionManager,
+  ActivityIndicator
 } from 'react-native';
 import Index from "./Index";
 import ShoppingCart from "./ShoppingCart";
@@ -45,6 +46,8 @@ export default class HistoricalDocument extends Component {
             jieshu1:"",
             danzi1:"",
             codesw1:"",
+            animating:true,
+            nomore:false,
             dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
         };
         this.dataRows = [];
@@ -95,9 +98,11 @@ export default class HistoricalDocument extends Component {
     this.dataRows=[];
     this._dpSearch()
   }
+  componentWillMount(){
+    this._renderSectionHeader();
+  }
   componentDidMount(){
      this._get();
-//     this._dpSearch();
      InteractionManager.runAfterInteractions(() => {
       this._dpSearch();
      });
@@ -111,6 +116,7 @@ export default class HistoricalDocument extends Component {
 
      //reqDetailCode获取
      Storage.get('history').then((tags) => {
+//        alert(tags)
          this.setState({
              reqDetailCode: tags
          });
@@ -166,10 +172,7 @@ export default class HistoricalDocument extends Component {
                        dataSource:this.state.dataSource.cloneWithRows(this.dataRows)
                     })
                 }
-             }else{
-               ToastAndroid.show('网络请求失败', ToastAndroid.SHORT);
-               alert(JSON.stringify(data))
-             }
+             }else{}
          })
      });
   }
@@ -212,6 +215,16 @@ export default class HistoricalDocument extends Component {
               </TouchableHighlight>
           </View>
       )
+  }
+
+  _renderSectionHeader(){
+    return (
+        <View style={styles.footerView}>
+            {
+               this.state.nomore ?<Text style={{fontSize: 16, alignSelf: 'center',marginTop:10}}>商品更新...</Text>:[<ActivityIndicator key="1"></ActivityIndicator>,<Text key="2" style={styles.fontColorGray}>加载中</Text>]
+            }
+        </View>
+    );
   }
   render() {
     return (
@@ -331,5 +344,12 @@ const styles = StyleSheet.create({
  },
  Rolling:{
     flex:12,
+ },
+ centering:{
+    position:"absolute",
+    top:50,
+ },
+ fontColorGray:{
+    textAlign:"center"
  }
 });

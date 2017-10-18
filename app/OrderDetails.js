@@ -102,30 +102,24 @@ export default class GoodsDetails extends Component {
         });
     }
     pressPop(){
-        if(this.state.Number=="0"){
-            ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
-            return;
-        }else{
-            var shopInfoData = [];
-            var shopInfo = {};
-            shopInfo.Pid = this.state.Pid;
-            shopInfo.ProdCode=this.state.ProdCode;
-            shopInfo.prodname = this.state.ProdName;
-            shopInfo.countm = this.state.Number;
-            shopInfo.ShopPrice = this.state.ShopPrice;
-            shopInfo.prototal =(this.state.Number)*(this.state.ShopPrice);
-            shopInfo.promemo = this.state.Remark;
-            shopInfo.DepCode = this.state.DepCode;
-            shopInfoData.push(shopInfo);
-            //调用插入表方法
-            dbAdapter.insertShopInfo(shopInfoData);
-            var nextRoute={
-               name:"主页",
-               component:Index,
-            };
-            this.props.navigator.push(nextRoute);
-//            this.props.navigator.pop();
-        }
+        var shopInfoData = [];
+        var shopInfo = {};
+        shopInfo.Pid = this.state.Pid;
+        shopInfo.ProdCode=this.state.ProdCode;
+        shopInfo.prodname = this.state.ProdName;
+        shopInfo.countm = this.state.Number;
+        shopInfo.ShopPrice = this.state.ShopPrice;
+        shopInfo.prototal =(this.state.Number)*(this.state.ShopPrice);
+        shopInfo.promemo = this.state.Remark;
+        shopInfo.DepCode = this.state.DepCode;
+        shopInfoData.push(shopInfo);
+        //调用插入表方法
+        dbAdapter.insertShopInfo(shopInfoData);
+        var nextRoute={
+           name:"主页",
+           component:Index,
+        };
+        this.props.navigator.push(nextRoute);
     }
 
   render() {
@@ -280,7 +274,7 @@ const styles = StyleSheet.create({
     flex:5,
   },
   right1:{
-    height:45,
+    marginTop:5,
     flexDirection:"row",
     flex:3,
   },
@@ -319,12 +313,13 @@ const styles = StyleSheet.create({
     fontSize:14,
     color:"#666666",
     marginTop:10,
+    flex:1
   },
   Number:{
     fontSize:14,
     color:"#666666",
     height:40,
-    width:220,
+    flex:3
   },
   Number1:{
     fontSize:14,
@@ -335,6 +330,7 @@ const styles = StyleSheet.create({
     fontSize:18,
     color:"#666666",
     marginTop:5,
+    flex:1
   },
   Delete:{
     fontSize:18,

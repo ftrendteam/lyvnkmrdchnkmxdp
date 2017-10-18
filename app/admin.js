@@ -18,7 +18,8 @@ import {
   TouchableHighlight,
   AsyncStorages,
   ToastAndroid,
-  ScrollView
+  ScrollView,
+  ActivityIndicator
 } from 'react-native';
 import Index from "./Index";
 import DataUtils from "../utils/DataUtils";
@@ -75,11 +76,13 @@ export default class admin extends Component {
             UserPwd:"",
             Product:"",
             detailInfo1:"",
+            animating:false,
 //            ClientCode:this.props.ClientCode ? this.props.ClientCode : "",
         };
         this.pickerData=[]
     }
  //直接跑数据 componentDidMount
+
     componentDidMount(){
         Storage.get('ClientCode').then((tags) => {
             let params = {
@@ -147,6 +150,11 @@ export default class admin extends Component {
     }
 //登录
     pressPush(){
+        setTimeout(() => {
+           this.setState({
+                animating: this.state.animating
+           });
+        },880);
         if(this.state.Product == ""){
             ToastAndroid.show('请选择机构信息', ToastAndroid.SHORT)
             return;
@@ -239,6 +247,7 @@ export default class admin extends Component {
             <TouchableOpacity onPress={this.pressPush.bind(this)}>
                <Text style={styles.login}>登录</Text>
             </TouchableOpacity>
+
             <View style={styles.refresh}>
                 <Image source={require("../images/refresh.png")} style={styles.refreshImage}></Image>
             </View>
@@ -339,5 +348,8 @@ const styles = StyleSheet.create({
     backgroundColor:"#ffffff",
     width:200,
     height:100,
+  },
+  centering:{
+    marginTop:20,
   }
 });

@@ -49,7 +49,7 @@ export default class Search extends Component {
                   component:OrderDetails,
                   params:{
                       ProdName:rows.item(0).ProdName,
-                      ShopPrice:rows.item(0).ShopPrice,
+                      ShopPrice:rows.item(0).StdPrice,
                       Pid:rows.item(0).Pid,
                       countm:rows.item(0).ShopNumber,
                       promemo:rows.item(0).promemo,
@@ -88,7 +88,7 @@ export default class Search extends Component {
         component:OrderDetails,
         params:{
             ProdName:rowData.ProdName,
-            ShopPrice:rowData.ShopPrice,
+            ShopPrice:rowData.StdPrice,
             Pid:rowData.Pid,
             countm:rowData.ShopNumber,
             promemo:rowData.promemo,

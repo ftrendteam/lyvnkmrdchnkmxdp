@@ -74,12 +74,12 @@ export default class ShoppingCart extends Component {
         this.props.navigator.push(nextRoute)
     }
     pressPush(){
-          var nextRoute={
-              name:"主页",
-              component:Search
-          };
-          this.props.navigator.push(nextRoute)
-        }
+       var nextRoute={
+          name:"主页",
+          component:Search
+       };
+       this.props.navigator.push(nextRoute)
+    }
     Code(){
         RNScannerAndroid.openScanner();
         DeviceEventEmitter.addListener("code", (reminder) => {
@@ -192,8 +192,8 @@ export default class ShoppingCart extends Component {
          );
      }
     pressPop(){
-          this._setModalVisible();
-          this.props.navigator.pop();
+       this._setModalVisible();
+       this.props.navigator.pop();
     }
 //提交
     submit(){
@@ -217,22 +217,26 @@ export default class ShoppingCart extends Component {
                 username: this.state.Username,
                 usercode: this.state.Userpwd,
                 DetailInfo1: {"ShopCode": tags, "OrgFormno": this.state.orgFormno, "ProMemo": this.state.Remark},
-                DetailInfo2: this.dataRows
+                DetailInfo2: this.dataRows,
             };
             FetchUtils.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
                 if(data.retcode == 1){
-                        alert("提交成功");
-                    }else{
-                        alert("提交失败");
+                    alert("提交成功");
+                    dbAdapter.deleteData("shopInfo");
+                    this.dataRows=[];
+                    this.setState({
+                        dataSource:this.state.dataSource.cloneWithRows(this.dataRows)
+                    })
+                }else{
+                    alert("提交失败");
                 }
             })
         })
-        dbAdapter.deleteData("shopInfo");
-        this._dpSearch();
+
     }
     _rightButtonClick() {
         Storage.get('textinput').then((tags) => {
-            alert(tags)
+//            alert(tags)
             this.setState({
                 Remark:tags
             })
@@ -313,26 +317,26 @@ export default class ShoppingCart extends Component {
             onShow={() => {}}
             onRequestClose={() => {}} >
                  <View style={styles.modalStyle}>
-                      <View style={styles.LayerThickness}></View>
-                      <View style={styles.ModalView}>
-                            <View style={styles.DanJu}>
-                                <View style={styles.danju}><Text style={styles.DanText}>单据备注</Text></View>
-                                <View style={styles.ModalLeft} >
-                                     <Text style={styles.buttonText1} onPress={this._setModalVisible.bind(this)}>×</Text>
-                                </View>
+                    <View style={styles.ModalView}>
+                        <View style={styles.DanJu}>
+                            <View style={styles.danju}><Text style={styles.DanText}>单据备注</Text></View>
+                            <View style={styles.ModalLeft} >
+                                 <Text style={styles.buttonText1} onPress={this._setModalVisible.bind(this)}>×</Text>
                             </View>
-                            <TextInput
-                            multiline={true}
-                            placeholder="请填写单据备注信息"
-                            underlineColorAndroid='transparent'
-                            placeholderTextColor="#bcbdc1"
-                            style={styles.TextInput}
-                            onChangeText={(value)=>{
-                                this.setState({
-                                    Remark:value
-                                })
-                            }}/>
-                      </View>
+                        </View>
+                        <TextInput
+                        multiline={true}
+                        placeholder="请填写单据备注信息"
+                        underlineColorAndroid='transparent'
+                        placeholderTextColor="#bcbdc1"
+                        style={styles.TextInput}
+                        onChangeText={(value)=>{
+                            this.setState({
+                                Remark:value
+                            })
+                        }}/>
+                    </View>
+
                  </View>
             </Modal>
         </View>
@@ -559,11 +563,10 @@ const styles = StyleSheet.create({
    ModalView:{
       backgroundColor:"#ffffff",
       borderRadius:5,
-      position:"absolute",
-      top:130,
-      left:50,
-      width:300,
-      paddingBottom:20
+      paddingBottom:20,
+      marginLeft:50,
+      marginRight:50,
+      marginTop:200,
    },
    DanJu:{
       height:45,
@@ -667,11 +670,8 @@ const styles = StyleSheet.create({
         right:0,
     },
     modalStyle: {
-        flex:1,
-    },
-    LayerThickness:{
-        backgroundColor:"#000000",
-        opacity:0.5,
+        backgroundColor:"#3e3d3d",
+        opacity:0.9,
         flex:1,
     },
     DanJu:{
