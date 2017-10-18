@@ -188,10 +188,16 @@ export default class DBAdapter extends SQLiteOpenHelper {
           let GatherRate = tdepSet.GatherRate;
           let DepLevel = tdepSet.DepLevel;
           let IsDel = tdepSet.IsDel;
+          let depcode1 =tdepSet.depcode1;
+          let depcode2 =tdepSet.depcode2;
+          let depcode3 =tdepSet.depcode3;
+          let depcode4 =tdepSet.depcode4;
+          let depcode5 =tdepSet.depcode5;
+          let depcode6 =tdepSet.depcode6;
           
-          let sql = "INSERT INTO tdepset(pid,DepCode,DepName,AidCode,SubCode,DepMemo,SpecTag,IsLeaf,ProfitRate,GatherRate,DepLevel,IsDel)" +
-            "values(?,?,?,?,?,?,?,?,?,?,?,?)";
-          tx.executeSql(sql, [pid, DepCode, DepName, AidCode, SubCode, DepMemo, SpecTag, IsLeaf, ProfitRate, GatherRate, DepLevel, IsDel], () => {
+          let sql = "INSERT INTO tdepset(pid,DepCode,DepName,AidCode,SubCode,DepMemo,SpecTag,IsLeaf,ProfitRate,GatherRate,DepLevel,IsDel,depcode1,depcode2,depcode3,depcode4,depcode5,depcode6)" +
+            "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+          tx.executeSql(sql, [pid, DepCode, DepName, AidCode, SubCode, DepMemo, SpecTag, IsLeaf, ProfitRate, GatherRate, DepLevel, IsDel,depcode1,depcode2,depcode3,depcode4,depcode5,depcode6], () => {
             }, (error) => {
               console.log(error);
             }
@@ -199,7 +205,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
         }
       }, (error) => {
         reject(false);
-        //this._errorCB('transaction', error);
+        this._errorCB('transaction', error);
       }, () => {
         //this._successCB('transaction insert data');
         resolve(true);
@@ -608,9 +614,11 @@ export default class DBAdapter extends SQLiteOpenHelper {
     return new Promise((resolve, reject) => {
       DataUtils.get("LinkUrl", '').then((urlData) => {
         RequestBodyUtils.requestProduct(urlData, currShopCode, this).then((prodResult) => {
+          console.log("prodResult",prodResult);
           if (prodResult) {
             FetchUtils.post(urlData, categoryBody).then((datas) => {
               if (datas.retcode == 1) {
+                console.log("datas","aaa");
                 this.insertTDepSetData(datas.TblRow).then((result) => {
                   resolve(true);
                 });
@@ -633,6 +641,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
   selectTDepSet(DepLevel) {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
+      	  
         tx.executeSql('select a.*,ifNull(b.countm,0) as ShopNumber from tdepset a left join (select depcode,sum(countm)  as countm from shopInfo group by depcode) b on a.depcode=b.depcode where IsDel=0 and DepLevel=' + DepLevel + '', [], (tx, results) => {
           
           resolve(results.rows);
@@ -649,12 +658,13 @@ export default class DBAdapter extends SQLiteOpenHelper {
    * @return 返回指定品类下所有商品信息
    */
   
-  selectProduct1(DepCode) {
+  selectProduct1(DepCode,DepLevel) {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
-        tx.executeSql("select count(*) as countn " +
-          " from product a left join shopInfo b on a.Pid=b.Pid where IsDel='0' and prodtype<>'1' and a.DepCode in (select DepCode from tdepset where IsDel='0'" +
-          "and (a.DepCode='" + DepCode + "' or SubCode like '%;" + DepCode + ";%')) ", [], (tx, results) => {
+      	 let ssql="select count(*) as countn "+
+                 "from product a left join shopInfo b on a.Pid=b.Pid where IsDel='0' and prodtype<>'1'";
+         ssql=ssql+ "and a.DepCode in (select depcode from tdepset where IsDel='0' and depcode"+DepLevel+"='"+DepCode+"')";
+        tx.executeSql(ssql, [], (tx, results) => {
           resolve(results.rows);
         });
       }, (error) => {
@@ -663,13 +673,16 @@ export default class DBAdapter extends SQLiteOpenHelper {
     })
   }
   
-  selectProduct(DepCode, currpage) {
+  selectProduct(DepCode, currpage,DepLevel) {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
-        tx.executeSql("select a.*,ifNull(b.countm,0) as ShopNumber,ifNull(b.ShopPrice,a.StdPrice) as ShopPrice ,ifNull(b.prototal,0) as ShopAmount   " +
-          ",ifNull(b.promemo,'') as ShopRemark,'" + DepCode + "' as DepCode1 " +
-          " from product a left join shopInfo b on a.Pid=b.Pid where IsDel='0' and prodtype<>'1' and a.DepCode in (select DepCode from tdepset where IsDel='0'" +
-          "and (a.DepCode='" + DepCode + "' or SubCode like '%;" + DepCode + ";%')) limit 20 offset " + currpage, [], (tx, results) => {
+      	let ssql="select a.*,ifNull(b.countm,0) as ShopNumber,ifNull(b.ShopPrice,a.StdPrice) as ShopPrice ,ifNull(b.prototal,0) as ShopAmount   "+
+                 ",ifNull(b.promemo,'') as ShopRemark,'"+DepCode+"' as DepCode1 "+
+                 " from product a left join shopInfo b on a.Pid=b.Pid where IsDel='0' and prodtype<>'1' ";
+         ssql=ssql+ " and a.DepCode in (select depcode from tdepset where IsDel='0' and depcode"+DepLevel+"='"+DepCode+"')";
+         ssql=ssql+" limit 20 offset "+currpage;
+         
+        tx.executeSql(ssql, [], (tx, results) => {
           resolve(results.rows);
         });
       }, (error) => {
@@ -681,10 +694,16 @@ export default class DBAdapter extends SQLiteOpenHelper {
   /***
    * 助记码查询商品
    */
-  selectAidCode(aidCode) {
+  selectAidCode(aidCode,DepLevel) {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
-        tx.executeSql("select * from product where isdel='0' and (prodname like '%" + aidCode + "%' or aidcode like '%" + aidCode + "%' or prodcode like '%" + aidCode + "%' or barcode like '%" + aidCode + "%')", [], (tx, results) => {
+      	  let ssql="select a.*,ifNull(b.countm,0) as ShopNumber,ifNull(b.ShopPrice,a.StdPrice) as ShopPrice ,ifNull(b.prototal,0) as ShopAmount   "+
+                 ",ifNull(b.promemo,'') as ShopRemark,c.depcode"+DepLevel+" as DepCode1 "+
+                 " from product a left join shopInfo b on a.Pid=b.Pid  ";
+         ssql=ssql+ " left join  from tdepset c on c.IsDel='0' and a.depcode=c.depcode where a.IsDel='0' and prodtype<>'1'";
+         ssql=ssql+"  and (a.prodname like '%" + aidCode + "%' or a.aidcode like '%" + aidCode + "%' or a.prodcode like '%" + aidCode + "%' or a.barcode like '%" + aidCode + "%')" ;
+         
+        tx.executeSql(ssql, [], (tx, results) => {
 //            alert(results.rows.length);
           resolve(results.rows);
         });
@@ -697,10 +716,16 @@ export default class DBAdapter extends SQLiteOpenHelper {
   /***
    * 扫描查询商品
    */
-  scaningCode(scanCode) {
+  scaningCode(scanCode,DepLevel) {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
-        tx.executeSql("select * from product where isdel='0' and (barcode='" + scanCode + "' or prodcode='" + scanCode + "')", [], (tx, results) => {
+      	  let ssql="select a.*,ifNull(b.countm,0) as ShopNumber,ifNull(b.ShopPrice,a.StdPrice) as ShopPrice ,ifNull(b.prototal,0) as ShopAmount   "+
+                 ",ifNull(b.promemo,'') as ShopRemark,c.depcode"+DepLevel+" as DepCode1 "+
+                 " from product a left join shopInfo b on a.Pid=b.Pid  ";
+         ssql=ssql+ " left join  from tdepset c on c.IsDel='0' and a.depcode=c.depcode where a.IsDel='0' and prodtype<>'1'";
+         ssql=ssql+"  and (a.barcode = '" + scanCode + "' or a.prodcode = '" + scanCode + "' )" ;
+         
+        tx.executeSql(ssql, [], (tx, results) => {
           alert(results.rows.length);
           resolve(results.rows);
         });
