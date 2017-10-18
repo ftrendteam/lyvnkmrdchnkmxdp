@@ -160,7 +160,8 @@ export default class Index extends Component {
         dbAdapter.selectTDepSet('1').then((rows)=>{
             for(let i =0;i<rows.length;i++){
                 var row = rows.item(i);
-                this.dataRows.push(row)
+                this.dataRows.push(row);
+                var ShopCar = rows.item(0).ShopNumber;
             }
             this.setState({
                 dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
@@ -179,7 +180,7 @@ export default class Index extends Component {
         });
 
         let priductData=[];
-        let currpage = ((page-1)*20);
+        let currpage = ((page-1)*18);
         dbAdapter.selectProduct(1,currpage,1).then((rows)=>{
             for(let i =0;i<rows.length;i++){
                 var row = rows.item(i);
@@ -233,7 +234,7 @@ export default class Index extends Component {
         });
 
         let priductData=[];
-        let currpage = ((page-1)*20);
+        let currpage = ((page-1)*18);
         dbAdapter.selectProduct(rowData.DepCode,currpage,1).then((rows)=>{
             for(let i =0;i<rows.length;i++){
                 var row = rows.item(i);
@@ -259,7 +260,7 @@ export default class Index extends Component {
                              <Text style={styles.Number}>{item.item.ShopNumber}</Text>
                              <View style={styles.subtraction}><Text style={styles.Reduction}>-</Text></View>
                         </TouchableOpacity>
-                        }
+                    }
                 </View>
                 <TouchableOpacity onPress={()=>this.OrderDetails(item)}>
                     <View style={styles.Image}>
@@ -285,12 +286,11 @@ export default class Index extends Component {
         return (
             <View style={styles.footerView}>
                 {
-                   this.state.nomore ?[<ActivityIndicator key="1"></ActivityIndicator>,<Text key="2" style={styles.fontColorGray}>商品更新</Text>]:[<ActivityIndicator key="1"></ActivityIndicator>,<Text key="2" style={styles.fontColorGray}>加载中</Text>]
+                   this.state.nomore ?[<ActivityIndicator key="1"></ActivityIndicator>,<Text key="2" style={styles.fontColorGray}>加载中</Text>]:[<ActivityIndicator key="1"></ActivityIndicator>,<Text key="2" style={styles.fontColorGray}>加载中</Text>]
                 }
             </View>
         );
     }
-
 
     OrderDetails(item){
         var title = this.state.head;
@@ -412,12 +412,12 @@ export default class Index extends Component {
 //        });
 //    }
 
-    _onload(){
+    _onload(rowData){
         this.setState({nomore: true});
         page=page;
         let priductData=[];
-        let currpage = ((page-1)*20);
-        dbAdapter.selectProduct(1,currpage,1).then((rows)=>{
+        let currpage = ((page-1)*18);
+        dbAdapter.selectProduct(rowData.DepCode,currpage,1).then((rows)=>{
             for(let i =0;i<rows.length;i++){
                 var row = rows.item(i);
                 priductData.push(row);
@@ -428,7 +428,7 @@ export default class Index extends Component {
             });
             if (page == 1) {
                 total = this.state.Page;
-                totalPage = total % 20 == 0 ? total / 20 : Math.floor(total / 20) + 1;
+                totalPage = total % 18 == 0 ? total / 18 : Math.floor(total / 18) + 1;
                 if (!total > 0) {
                     state.noData = true;
                 } else {
@@ -449,8 +449,6 @@ export default class Index extends Component {
         });
 
     }
-
-
 
     render() {
         const {data} = this.state;

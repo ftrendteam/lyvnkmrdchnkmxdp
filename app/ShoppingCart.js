@@ -47,6 +47,7 @@ export default class ShoppingCart extends Component {
             ShopNumber:"",
             ShopAmount:"",
             reqDetailCode:"",
+            Remark:"",
             dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
         };
         this.dataRows = [];
@@ -236,7 +237,6 @@ export default class ShoppingCart extends Component {
     }
     _rightButtonClick() {
         Storage.get('textinput').then((tags) => {
-//            alert(tags)
             this.setState({
                 Remark:tags
             })
