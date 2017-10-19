@@ -160,7 +160,9 @@ export default class ShoppingCart extends Component {
                var number = row.countm;
                shopAmount += parseInt(row.prototal);
                shopnumber += parseInt(row.countm);
-               this.dataRows.push(row);
+               if(number!==0){
+                  this.dataRows.push(row);
+               }
            }
            if(this.dataRows==0){
                 return;
@@ -176,10 +178,6 @@ export default class ShoppingCart extends Component {
     }
      _renderRow(rowData, sectionID, rowID){
          return (
-             <View>
-                {
-                    (rowData.countm==0)?
-                        null:
                     <View style={styles.ShopList}>
                         <TouchableOpacity style={styles.ShopContList} onPress={()=>this.OrderDetails(rowData)}>
                             <View style={styles.ShopTop}>
@@ -194,8 +192,6 @@ export default class ShoppingCart extends Component {
                             </View>
                         </TouchableOpacity>
                     </View>
-                }
-             </View>
          );
      }
     pressPop(){
