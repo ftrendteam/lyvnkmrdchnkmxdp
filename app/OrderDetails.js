@@ -127,14 +127,14 @@ export default class GoodsDetails extends Component {
       <View style={styles.container}>
         <View style={styles.header}>
               <View style={styles.cont}>
-                    <TouchableOpacity   onPress={this.GoodsDetails.bind(this)}>
+                    <TouchableOpacity onPress={this.GoodsDetails.bind(this)} style={styles.Headeronclick}>
                           <Image source={require("../images/left1.png")} style={styles.HeaderImage}></Image>
                     </TouchableOpacity>
                     <Text style={styles.HeaderList}>{this.state.name}</Text>
-                    <TouchableOpacity onPress={this.Code.bind(this)}>
+                    <TouchableOpacity onPress={this.Code.bind(this)} style={styles.onclick}>
                           <Image source={require("../images/sm.png")} style={styles.HeaderImage1}></Image>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={this.pressPush.bind(this)}>
+                    <TouchableOpacity onPress={this.pressPush.bind(this)} style={styles.onclick}>
                             <Image source={require("../images/search.png")} style={styles.HeaderImage}></Image>
                     </TouchableOpacity>
               </View>
@@ -216,7 +216,12 @@ const styles = StyleSheet.create({
   cont:{
     flexDirection:"row",
     marginLeft:25,
-    marginRight:25,
+  },
+  Headeronclick:{
+    width:30,
+  },
+  onclick:{
+    width:50,
   },
   HeaderImage1:{
     marginRight:25,

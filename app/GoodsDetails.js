@@ -181,18 +181,18 @@ const styles = StyleSheet.create({
       flexDirection:"row",
       borderBottomWidth:2,
       borderBottomColor:"#e36871",
-    },
-    HeaderImage:{
-      width:15,
+   },
+   HeaderImage:{
+      width:30,
       height:22,
       marginTop:5,
-    },
-    Text:{
+   },
+   Text:{
       flex:8,
       textAlign:"center",
       fontSize:18,
       color:"#ffffff"
-      },
+   },
    Cont:{
     paddingLeft:25,
     paddingRight:25,
@@ -248,7 +248,8 @@ const styles = StyleSheet.create({
    ShopList1:{
     paddingLeft:25,
     paddingRight:25,
-    height:50,
+    paddingTop:10,
+    paddingBottom:10,
     backgroundColor:"#ffffff",
     flexDirection:"row",
     borderBottomWidth:1,
@@ -259,21 +260,18 @@ const styles = StyleSheet.create({
     flex:1,
     color:"#333333",
     fontSize:14,
-    lineHeight:30,
     overflow:"hidden"
    },
    ShopPrice1:{
     flex:1,
     color:"#333333",
     fontSize:14,
-    lineHeight:30,
     textAlign:"center"
    },
    ShopNumber1:{
     flex:1,
     color:"#333333",
     fontSize:14,
-    lineHeight:30,
     textAlign:"right"
    },
    ContList:{

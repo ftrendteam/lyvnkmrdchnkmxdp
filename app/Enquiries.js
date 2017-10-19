@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
     borderBottomColor:"#cacccb"
   },
   HeaderImage:{
-    width:15,
+    width:30,
     height:22,
     marginTop:5,
   },

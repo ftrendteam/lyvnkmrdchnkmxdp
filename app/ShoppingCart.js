@@ -176,20 +176,26 @@ export default class ShoppingCart extends Component {
     }
      _renderRow(rowData, sectionID, rowID){
          return (
-            <View style={styles.ShopList}>
-                <TouchableOpacity style={styles.ShopContList} onPress={()=>this.OrderDetails(rowData)}>
-                    <View style={styles.ShopTop}>
-                        <Text style={styles.ShopLeft}>{rowData.prodname}</Text>
-                        <Text style={styles.ShopRight}>单位：件</Text>
+             <View>
+                {
+                    (rowData.countm==0)?
+                        null:
+                    <View style={styles.ShopList}>
+                        <TouchableOpacity style={styles.ShopContList} onPress={()=>this.OrderDetails(rowData)}>
+                            <View style={styles.ShopTop}>
+                                <Text style={styles.ShopLeft}>{rowData.prodname}</Text>
+                                <Text style={styles.ShopRight}>单位：件</Text>
+                            </View>
+                            <View style={styles.ShopTop}>
+                                <Text style={[styles.Name,styles.Name1]}></Text>
+                                <Text style={[styles.Number,styles.Name1]}>{rowData.countm}</Text>
+                                <Text style={[styles.Price,styles.Name1]}>{rowData.ShopPrice}</Text>
+                                <Text style={[styles.SmallScale,styles.Name2]}>{rowData.prototal}</Text>
+                            </View>
+                        </TouchableOpacity>
                     </View>
-                    <View style={styles.ShopTop}>
-                        <Text style={[styles.Name,styles.Name1]}></Text>
-                        <Text style={[styles.Number,styles.Name1]}>{rowData.countm}</Text>
-                        <Text style={[styles.Price,styles.Name1]}>{rowData.ShopPrice}</Text>
-                        <Text style={[styles.SmallScale,styles.Name2]}>{rowData.prototal}</Text>
-                    </View>
-                </TouchableOpacity>
-            </View>
+                }
+             </View>
          );
      }
     pressPop(){
@@ -264,10 +270,10 @@ export default class ShoppingCart extends Component {
         <View style={styles.header}>
             <View style={styles.cont}>
                 <Text style={styles.HeaderList}>商品清单</Text>
-                <TouchableOpacity onPress={this.Code.bind(this)}>
+                <TouchableOpacity onPress={this.Code.bind(this)} style={styles.onclick}>
                     <Image source={require("../images/sm.png")} style={styles.HeaderImage1}></Image>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={this.pressPush.bind(this)}>
+                <TouchableOpacity onPress={this.pressPush.bind(this)} style={styles.onclick}>
                     <Image source={require("../images/search.png")} style={styles.HeaderImage}></Image>
                 </TouchableOpacity>
             </View>
@@ -401,7 +407,9 @@ const styles = StyleSheet.create({
    cont:{
       flexDirection:"row",
       marginLeft:25,
-      marginRight:25,
+   },
+   onclick:{
+      width:50,
    },
    HeaderImage1:{
       marginRight:25,

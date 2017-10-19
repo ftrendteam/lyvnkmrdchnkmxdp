@@ -233,7 +233,7 @@ export default class HistoricalDocument extends Component {
         <View style={styles.header}>
             <View style={styles.cont}>
                 <Text style={styles.HeaderList}>{this.state.name}</Text>
-                <TouchableOpacity onPress={this.pressPush.bind(this)}>
+                <TouchableOpacity onPress={this.pressPush.bind(this)} style={styles.onclick}>
                     <Image source={require("../images/search1.png")} style={styles.HeaderImage}></Image>
                 </TouchableOpacity>
             </View>
@@ -311,8 +311,11 @@ const styles = StyleSheet.create({
     marginRight:25,
     marginTop:5
  },
+ onclick:{
+    width:30,
+ },
  HeaderImage:{
-    marginTop:5
+    marginTop:5,
  },
  HeaderList:{
     marginTop:4,

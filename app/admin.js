@@ -180,9 +180,8 @@ export default class admin extends Component {
                    component:Index,
                };
                this.props.navigator.push(nextRoute);
-
             }else{
-                ToastAndroid.show('用户编码或密码错误', ToastAndroid.SHORT)
+               ToastAndroid.show('用户编码或密码错误', ToastAndroid.SHORT)
             }
         });
     }
