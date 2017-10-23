@@ -240,12 +240,11 @@ export default class Index extends Component {
                Page:priductdata,
            })
         });
-
         let priductData=[];
         var DEPCODE = (rowData.DepCode);
         this.setState({
             depcode:DEPCODE,
-             isloading:true
+             isloading:true,
         })
         dbAdapter.selectProduct(rowData.DepCode,page,1).then((rows)=>{
             for(let i =0;i<rows.length;i++){
@@ -259,6 +258,11 @@ export default class Index extends Component {
                 data:priductData,
                  isloading:false
             })
+            if(totalPage==0){
+                this.setState({
+                     nomore: false,
+                })
+            }
         });
         this._fetch1();
         //var startTime = (new Date()).valueOf();//获取当前时间

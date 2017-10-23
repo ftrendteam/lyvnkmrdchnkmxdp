@@ -103,13 +103,11 @@ export default class GoodsDetails extends Component {
     }
    _renderRow(rowData, sectionID, rowID){
         return (
-            <TouchableOpacity >
-                <View style={styles.ShopList1}>
-                    <Text style={styles.Name1}>{rowData.prodname}</Text>
-                    <Text style={styles.ShopPrice1}>{rowData.prototal}</Text>
-                    <Text style={styles.ShopNumber1}>{rowData.countm}件</Text>
-                </View>
-            </TouchableOpacity>
+            <View style={styles.ShopList1}>
+                <Text style={styles.Name1}>{rowData.prodname}</Text>
+                <Text style={styles.ShopPrice1}>{rowData.prototal}</Text>
+                <Text style={styles.ShopNumber1}>{rowData.countm}件</Text>
+            </View>
         );
    }
   render() {

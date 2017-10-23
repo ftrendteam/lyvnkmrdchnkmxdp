@@ -42,9 +42,9 @@ export default class  login extends Component{
     save(){
         var object = {
             ClientCode:this.state.ClientCode,
-            sDateTime:"2017-08-09 12:12:12",//获取当前时间转换成时间戳
+            sDateTime:Date.parse(new Date()),//获取当前时间转换成时间戳
             Pwd:NetUtils.MD5(this.state.Pwd)+'',//获取到密码之后md5加密
-            Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_Qry" + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
+            Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_Qry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
         };
         // JSON.stringify(object): JSON对象转换为字符串 用来存储
         AsyncStorage.setItem('object',JSON.stringify(object),(error)=>{
@@ -69,9 +69,9 @@ export default class  login extends Component{
             reqCode:"App_PosReq",
             reqDetailCode:"App_Client_Qry",
             ClientCode:this.state.ClientCode,
-            sDateTime:"2017-08-09 12:12:12",//获取当前时间转换成时间戳
+            sDateTime:Date.parse(new Date()),//获取当前时间转换成时间戳
             Pwd:NetUtils.MD5(this.state.Pwd)+'',//获取到密码之后md5加密
-            Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_Qry" + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
+            Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_Qry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
         };
         FetchUtil.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
             if(data.retcode == 1){

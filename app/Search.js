@@ -30,15 +30,15 @@ let dbAdapter = new DBAdapter();
 let db;
 export default class Search extends Component {
   constructor(props){
-    super(props);
-    this.state = {
-        Search:"",
-        dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
-    };
-    this.dataRows = [];
+      super(props);
+      this.state = {
+          Search:"",
+          dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
+      };
+      this.dataRows = [];
   }
   pressPop(){
-    this.props.navigator.pop();
+      this.props.navigator.pop();
   }
   Code(){
       RNScannerAndroid.openScanner();
@@ -62,29 +62,25 @@ export default class Search extends Component {
       })
   }
   inputOnBlur(value){
-    dbAdapter.selectAidCode(value,1).then((rows)=>{
-        if(value==null){
-            alert("暂无此商品")
-        }else{
-            this.dataRows=[];
-            for(let i =0;i<rows.length;i++){
-                var row = rows.item(i);
-                this.dataRows.push(row);
-            }
-            this.setState({
-                dataSource:this.state.dataSource.cloneWithRows(this.dataRows)
-            })
-        }
-    });
+      dbAdapter.selectAidCode(value,1).then((rows)=>{
+          this.dataRows=[];
+          for(let i =0;i<rows.length;i++){
+              var row = rows.item(i);
+              this.dataRows.push(row);
+          }
+          this.setState({
+              dataSource:this.state.dataSource.cloneWithRows(this.dataRows)
+          })
+      });
   }
   _renderRow(rowData, sectionID, rowID){
-       return (
+      return (
           <View style={styles.Block}>
               <TouchableOpacity onPress={()=>this.OrderDetails(rowData)}>
                  <Text style={styles.BlockText}>{rowData.ProdName}</Text>
               </TouchableOpacity>
           </View>
-       );
+      );
   }
 
   OrderDetails(rowData){
