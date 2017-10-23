@@ -258,7 +258,6 @@ export default class Index extends Component {
                 data:priductData,
                  isloading:false
             })
-            alert(totalPage)
             if(totalPage==0){
                 this.setState({
                      nomore: false,
