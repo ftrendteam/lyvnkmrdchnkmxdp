@@ -1,4 +1,4 @@
-package com.myproject;
+package com.smartpos.hspos;
 
 
 import com.facebook.react.bridge.Callback;
