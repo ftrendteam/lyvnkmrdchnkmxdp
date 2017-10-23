@@ -46,7 +46,7 @@ var {NativeModules} = require('react-native');
 var RNScannerAndroid = NativeModules.RNScannerAndroid;
 let dbAdapter = new DBAdapter();
 let db;
-let page = 0;
+let page =1;
 let total = 0;
 let totalPage = 0;
 const lastDepCode = "";
@@ -66,8 +66,9 @@ export default class Index extends Component {
             Page:"",
             data:"",
             ShopNumber:"",
-            nomore: false,
+            nomore: true,
             depcode:"",
+            isloading:true,
         };
         this.dataRows = [];
         this.productData = [];
@@ -105,6 +106,7 @@ export default class Index extends Component {
     Code(){
         RNScannerAndroid.openScanner();
         DeviceEventEmitter.addListener("code", (reminder) => {
+            alert(reminder)
             dbAdapter.selectAidCode(reminder,1).then((rows)=>{
                 var ShopCar = rows.item(0).ProdName;
                 this.props.navigator.push({
@@ -166,6 +168,7 @@ export default class Index extends Component {
             this.setState({
                 depcode :ShopCar,
                 dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
+                isloading:true
             })
             //触发点击第一个列表
             let priductData=[];
@@ -174,9 +177,12 @@ export default class Index extends Component {
                     var row = rows.item(i);
                     priductData.push(row);
                 }
+                total = this.state.Page;
+                totalPage = total % 20 == 0 ? total / 20 : Math.floor(total / 20) + 1;
                 this.productData=priductData;
                 this.setState({
                     data:priductData,
+                    isloading:false
                 })
             });
         });
@@ -238,16 +244,20 @@ export default class Index extends Component {
         let priductData=[];
         var DEPCODE = (rowData.DepCode);
         this.setState({
-            depcode:DEPCODE
+            depcode:DEPCODE,
+             isloading:true
         })
         dbAdapter.selectProduct(rowData.DepCode,page,1).then((rows)=>{
             for(let i =0;i<rows.length;i++){
                 var row = rows.item(i);
                 priductData.push(row);
             };
+            total = this.state.Page;
+            totalPage = total % 20 == 0 ? total / 20 : Math.floor(total / 20) + 1;
             this.productData=priductData;
             this.setState({
                 data:priductData,
+                 isloading:false
             })
         });
         this._fetch1();
@@ -281,6 +291,19 @@ export default class Index extends Component {
         //调取数量
         dbAdapter.upDataShopInfoCountmSub(item.item.ProdCode).then((rows)=>{});
         item.item.ShopNumber=item.item.ShopNumber-1;
+        let select =0;
+        for (let i = 0; i < this.dataRows.length; i++) {
+            if (item.item.DepCode1 == this.dataRows[i].DepCode) {//判断当前品类是否相等
+                select = i;
+                let ShopNumber = this.dataRows[i].ShopNumber;
+                this.dataRows[i].ShopNumber = ShopNumber - 1;
+            }
+        }
+        if ((select != 0)) {
+            this.setState({
+                dataSource: this.state.dataSource.cloneWithRowsAndSections(this.dataRows,select),
+            })
+        }
         this._fetch1();
     }
     _separator = () => {
@@ -290,7 +313,7 @@ export default class Index extends Component {
         return (
             <View style={styles.footerView}>
                 {
-                   this.state.nomore ?[<ActivityIndicator key="1"></ActivityIndicator>,<Text key="2" style={styles.fontColorGray}>加载中</Text>]:null
+                   this.state.nomore ?[<ActivityIndicator key="1"></ActivityIndicator>,<Text key="2" style={styles.fontColorGray}>加载中</Text>]:<Text style={styles.nomore}>没有更多了</Text>
                 }
             </View>
         );
@@ -386,26 +409,24 @@ export default class Index extends Component {
         return item.ProdName//FlatList使用json中的ProdName动态绑定key
     }
     _onload(){
-        this.setState({nomore: true});
-        if(this.state.depcode!=lastDepCode){
-             page= 0;
+        if(this.state.isloading){
+            return false
         }
         page=page+1;
+        this.setState({
+            nomore: true,
+            isloading:true
+        });
+        if(this.state.depcode!=lastDepCode){
+            page= 1;
+        }
         let priductData=[];
-        dbAdapter.selectProduct(this.state.depcode,page,1).then((rows)=>{
-            for(let i =0;i<rows.length;i++){
-                var row = rows.item(i);
-                priductData.push(row);
-            };
-            var state = {};
-            let timer =  setTimeout(()=>{
-                clearTimeout(timer)
-            });
-            if(priductData!==""){
-                if (page == 0) {
-                    total = this.state.Page;
-                    totalPage = total % 20 == 0 ? total / 20 : Math.floor(total / 20) + 1;
-                }
+        if(totalPage>1&&page<totalPage){
+            dbAdapter.selectProduct(this.state.depcode,page,1).then((rows)=>{
+                for(let i =0;i<rows.length;i++){
+                    var row = rows.item(i);
+                    priductData.push(row);
+                };
                 if(this.state.depcode!=lastDepCode){
                      this.productData.splice(0,this.productData.length);
                      lastDepCode = this.state.depcode;
@@ -413,11 +434,14 @@ export default class Index extends Component {
                 this.productData = this.productData.concat(priductData);
                 this.setState({
                     data:this.productData,
+                    isloading:false
                 });
-            }else{
-                return
-            }
-        });
+            });
+        }else{
+            this.setState({
+                 nomore: false,
+            });
+        }
     }
 
     render() {
@@ -563,7 +587,7 @@ const styles = StyleSheet.create({
   ShopCar:{
     color:"red",
     position:"absolute",
-    right:-35,
+    right:-42,
   },
   container:{
       flex:1,
@@ -758,5 +782,10 @@ const styles = StyleSheet.create({
   },
   fontColorGray:{
    textAlign:"center"
+  },
+  nomore:{
+    textAlign:"center",
+    marginTop:20,
+    marginBottom:10,
   }
 });

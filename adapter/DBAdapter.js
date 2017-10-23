@@ -698,13 +698,12 @@ export default class DBAdapter extends SQLiteOpenHelper {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
       	  let ssql="select a.*,ifNull(b.countm,0) as ShopNumber,ifNull(b.ShopPrice,a.StdPrice) as ShopPrice ,ifNull(b.prototal,0) as ShopAmount   "+
-                 ",ifNull(b.promemo,'') as ShopRemark,c.depcode"+DepLevel+" as DepCode1 "+
-                 " from product a left join shopInfo b on a.Pid=b.Pid  ";
-         ssql=ssql+ " left join  from tdepset c on c.IsDel='0' and a.depcode=c.depcode where a.IsDel='0' and prodtype<>'1'";
-         ssql=ssql+"  and (a.prodname like '%" + aidCode + "%' or a.aidcode like '%" + aidCode + "%' or a.prodcode like '%" + aidCode + "%' or a.barcode like '%" + aidCode + "%')" ;
-         
+                ",ifNull(b.promemo,'') as ShopRemark,c.depcode"+DepLevel+" as DepCode1 "+
+                " from product a left join shopInfo b on a.Pid=b.Pid  ";
+        ssql=ssql+ " left join  tdepset c on c.IsDel='0' and a.depcode=c.depcode where a.IsDel='0' and prodtype<>'1'";
+        ssql=ssql+"  and (a.prodname like '%" + aidCode + "%' or a.aidcode like '%" + aidCode + "%' or a.prodcode like '%" + aidCode + "%' or a.barcode like '%" + aidCode + "%')" ;
+        console.log(ssql);
         tx.executeSql(ssql, [], (tx, results) => {
-//            alert(results.rows.length);
           resolve(results.rows);
         });
       }, (error) => {

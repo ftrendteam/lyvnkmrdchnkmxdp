@@ -12,6 +12,7 @@ import {
   View,
   Image,
   TextInput,
+  Modal,
   ScrollView,
   TouchableOpacity,
   TouchableHighlight,
@@ -46,6 +47,7 @@ export default class HistoricalDocument extends Component {
             jieshu1:"",
             danzi1:"",
             codesw1:"",
+            shopcar:"",
             animating:true,
             nomore:false,
             dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
@@ -102,11 +104,18 @@ export default class HistoricalDocument extends Component {
     this._renderSectionHeader();
   }
   componentDidMount(){
-
      InteractionManager.runAfterInteractions(() => {
-     this._get();
-      this._dpSearch();
+        this._setModalVisible();
+        this._get();
+        this._dpSearch();
+        this._fetch();
      });
+  }
+  _setModalVisible() {
+      let isShow = this.state.show;
+      this.setState({
+          show:!isShow,
+      });
   }
   _get(){
         Storage.get('Name').then((tags) => {
@@ -163,19 +172,28 @@ export default class HistoricalDocument extends Component {
              Sign:NetUtils.MD5("App_PosReq" + "##" +this.state.reqDetailCode + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',
          };
          FetchUtils.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
-             if(data.retcode == 1){
-                var  DetailInfo1 = data.DetailInfo1;
-                this.dataRows = this.dataRows.concat(DetailInfo1);
-                if(this.dataRows==0){
-                    return;
-                }else{
-                    this.setState({
-                       dataSource:this.state.dataSource.cloneWithRows(this.dataRows)
-                    })
-                }
-             }else{}
+            this._setModalVisible();
+              if(data.retcode == 1){
+                  var  DetailInfo1 = data.DetailInfo1;
+                  this.dataRows = this.dataRows.concat(DetailInfo1);
+                  if(this.dataRows==0){
+                      return;
+                  }else{
+                      this.setState({
+                         dataSource:this.state.dataSource.cloneWithRows(this.dataRows)
+                      })
+                  }
+              }
          })
      });
+  }
+  _fetch(){
+      dbAdapter.selectShopInfoAllCountm().then((rows)=>{
+          var ShopCar = rows.item(0).countm;
+          this.setState({
+              shopcar:ShopCar
+          });
+      });
   }
   GoodsDetails(rowData){
       this.props.navigator.push({
@@ -249,48 +267,35 @@ export default class HistoricalDocument extends Component {
             <TouchableOpacity style={styles.Home} onPress={this.HISTORY.bind(this)}><Image source={require("../images/documents1.png")}></Image><Text style={styles.home2}>历史单据</Text></TouchableOpacity>
             <TouchableOpacity style={styles.Home} onPress={this.HOME.bind(this)}><Image source={require("../images/home.png")}></Image><Text style={styles.home1}>首页</Text></TouchableOpacity>
             <TouchableOpacity style={styles.Home} onPress={this.SHOP.bind(this)}>
-              <View><Image source={require("../images/shop.png")}><Text style={styles.ShopCar}>{this.state.shopcar}</Text></Image></View>
-              <Text style={styles.home1}>清单</Text>
+                 <View>
+                    <Image source={require("../images/shop.png")}>
+                        {
+                           (this.state.shopcar==0)?
+                            null:
+                            <Text style={styles.ShopCar}>{this.state.shopcar}</Text>
+                        }
+                    </Image>
+                 </View>
+                 <Text style={styles.home1}>清单</Text>
             </TouchableOpacity>
         </View>
+        <Modal
+        animationType='fade'
+        transparent={true}
+        visible={this.state.show}
+        onShow={() => {}}
+        onRequestClose={() => {}} >
+            <View style={styles.loading}>
+                <View style={styles.LoadCenter}>
+                    <ActivityIndicator key="1" color="#ffffff" size="large" style={styles.activity}></ActivityIndicator>
+                </View>
+            </View>
+        </Modal>
       </View>
     );
   }
 }
 const styles = StyleSheet.create({
- footer:{
-   flex:2,
-   flexDirection:"row",
-   borderTopWidth:1,
-   borderTopColor:"#cacccb"
-},
- source:{
-  flexDirection:"row",
-  flex:1,
- },
- Home:{
-    flex:1,
-    alignItems: 'center',
-    paddingTop:15,
-    backgroundColor:"#ffffff",
- },
- home1:{
-   color:'black',
-   fontSize:14,
-   marginTop:5,
-   flex:1,
- },
- home2:{
-    color:'#f47882',
-    fontSize:14,
-    marginTop:5,
-    flex:1,
- },
- ShopCar:{
-  color:"red",
-  position:"absolute",
-  right:-35,
- },
  container:{
     flex:1,
     backgroundColor:"#ffffff",
@@ -355,5 +360,45 @@ const styles = StyleSheet.create({
  },
  fontColorGray:{
     textAlign:"center"
- }
+ },
+ footer:{
+    flex:2,
+    flexDirection:"row",
+    borderTopWidth:1,
+    borderTopColor:"#cacccb"
+ },
+  source:{
+   flexDirection:"row",
+   flex:1,
+  },
+  Home:{
+     flex:1,
+     alignItems: 'center',
+     paddingTop:15,
+     backgroundColor:"#ffffff",
+  },
+  home1:{
+    color:'black',
+    fontSize:14,
+    marginTop:5,
+    flex:1,
+  },
+  home2:{
+     color:'#f47882',
+     fontSize:14,
+     marginTop:5,
+     flex:1,
+  },
+  ShopCar:{
+   color:"red",
+   position:"absolute",
+   right:-42,
+  },
+ loading:{
+    flex:1,
+    backgroundColor:"#000000",
+    opacity:0.5,
+    justifyContent: 'center',
+    alignItems: 'center',
+ },
 });

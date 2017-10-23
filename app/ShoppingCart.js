@@ -16,6 +16,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Modal,
+  ActivityIndicator,
   Dimensions,
   TouchableHighlight,
   ListView,
@@ -118,7 +119,9 @@ export default class ShoppingCart extends Component {
 //自动跑接口
     componentDidMount(){
        InteractionManager.runAfterInteractions(() => {
+//           this._ModalVisible();
            this._dpSearch();
+           this._fetch()
        });
     }
     _dpSearch(){
@@ -128,7 +131,7 @@ export default class ShoppingCart extends Component {
             this.setState({
                 reqDetailCode: tags
             })
-        });
+       });
        Storage.get('OrgFormno').then((tags) => {
             this.setState({
                 orgFormno: tags
@@ -151,7 +154,9 @@ export default class ShoppingCart extends Component {
                 Userpwd: tags
             });
        });
+
        dbAdapter.selectShopInfo('1').then((rows)=>{
+//           this._ModalVisible();
            var shopnumber = 0;
            var shopAmount = 0;
            this.dataRows=[];
@@ -175,23 +180,32 @@ export default class ShoppingCart extends Component {
            })
            }
        });
+
     }
-     _renderRow(rowData, sectionID, rowID){
+    _fetch(){
+       dbAdapter.selectShopInfoAllCountm().then((rows)=>{
+           var ShopCar = rows.item(0).countm;
+           this.setState({
+               shopcar:ShopCar
+           });
+       });
+     }
+    _renderRow(rowData, sectionID, rowID){
          return (
-                    <View style={styles.ShopList}>
-                        <TouchableOpacity style={styles.ShopContList} onPress={()=>this.OrderDetails(rowData)}>
-                            <View style={styles.ShopTop}>
-                                <Text style={styles.ShopLeft}>{rowData.prodname}</Text>
-                                <Text style={styles.ShopRight}>单位：件</Text>
-                            </View>
-                            <View style={styles.ShopTop}>
-                                <Text style={[styles.Name,styles.Name1]}></Text>
-                                <Text style={[styles.Number,styles.Name1]}>{rowData.countm}</Text>
-                                <Text style={[styles.Price,styles.Name1]}>{rowData.ShopPrice}</Text>
-                                <Text style={[styles.SmallScale,styles.Name2]}>{rowData.prototal}</Text>
-                            </View>
-                        </TouchableOpacity>
+            <View style={styles.ShopList}>
+                <TouchableOpacity style={styles.ShopContList} onPress={()=>this.OrderDetails(rowData)}>
+                    <View style={styles.ShopTop}>
+                        <Text style={styles.ShopLeft}>{rowData.prodname}</Text>
+                        <Text style={styles.ShopRight}>单位：件</Text>
                     </View>
+                    <View style={styles.ShopTop}>
+                        <Text style={[styles.Name,styles.Name1]}></Text>
+                        <Text style={[styles.Number,styles.Name1]}>{rowData.countm}</Text>
+                        <Text style={[styles.Price,styles.Name1]}>{rowData.ShopPrice}</Text>
+                        <Text style={[styles.SmallScale,styles.Name2]}>{rowData.prototal}</Text>
+                    </View>
+                </TouchableOpacity>
+            </View>
          );
      }
     pressPop(){
@@ -200,58 +214,68 @@ export default class ShoppingCart extends Component {
     }
 //提交
     submit(){
-        Storage.get('code').then((tags) => {
-            DataUtils.get("usercode","").then((usercode)=>{
-                DataUtils.get("username","").then((username)=>{
-                    let params = {
-                        ClientCode: this.state.ClientCode,
-                        username: this.state.Username,
-                        usercode: this.state.Userpwd,
-                        Remark: this.state.ShopRemark,
-                    };
+        if(this.dataRows==0){
+            alert("请添加商品")
+        }else{
+            Storage.get('code').then((tags) => {
+                DataUtils.get("usercode","").then((usercode)=>{
+                    DataUtils.get("username","").then((username)=>{
+                        let params = {
+                            ClientCode: this.state.ClientCode,
+                            username: this.state.Username,
+                            usercode: this.state.Userpwd,
+                            Remark: this.state.ShopRemark,
+                        };
+                    });
                 });
-            });
-            let params = {
-                reqCode: "App_PosReq",
-                reqDetailCode: this.state.reqDetailCode,
-                ClientCode: this.state.ClientCode,
-                sDateTime: "2017-08-09 12:12:12",
-                Sign: NetUtils.MD5("App_PosReq" + "##" +this.state.reqDetailCode + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',
-                username: this.state.Username,
-                usercode: this.state.Userpwd,
-                DetailInfo1: {"ShopCode": tags, "OrgFormno": this.state.orgFormno, "ProMemo": this.state.Remark},
-                DetailInfo2: this.dataRows,
-            };
-            FetchUtils.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
-                if(data.retcode == 1){
-                    alert("提交成功");
-                    dbAdapter.deleteData("shopInfo");
-                    this.dataRows=[];
-                    this.setState({
-                        dataSource:this.state.dataSource.cloneWithRows(this.dataRows)
-                    })
-                }else{
-                    alert("提交失败");
-                }
+                let params = {
+                    reqCode: "App_PosReq",
+                    reqDetailCode: this.state.reqDetailCode,
+                    ClientCode: this.state.ClientCode,
+                    sDateTime: "2017-08-09 12:12:12",
+                    Sign: NetUtils.MD5("App_PosReq" + "##" +this.state.reqDetailCode + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',
+                    username: this.state.Username,
+                    usercode: this.state.Userpwd,
+                    DetailInfo1: {"ShopCode": tags, "OrgFormno": this.state.orgFormno, "ProMemo": this.state.Remark},
+                    DetailInfo2: this.dataRows,
+                };
+                FetchUtils.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
+                    if(data.retcode == 1){
+                        alert("提交成功");
+                        dbAdapter.deleteData("shopInfo");
+                        this.dataRows=[];
+                        this.setState({
+                            dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
+                            shopcar:""
+                        })
+                    }else{
+                        alert("提交失败");
+                    }
+                })
             })
-        })
+        }
 
     }
     _rightButtonClick() {
-        Storage.get('textinput').then((tags) => {
-            this.setState({
-                Remark:tags
-            })
-        });
-        this._setModalVisible();
+        if(this.dataRows==0){
+            alert("请添加商品")
+        }else{
+            this._setModalVisible();
+        }
     }
+
     _setModalVisible() {
-        Storage.save('textinput',this.state.Remark);
         let isShow = this.state.show;
         this.setState({
-          show:!isShow,
+            show:!isShow,
         });
     }
+//    _ModalVisible() {
+//      let isShow = this.state.Show;
+//      this.setState({
+//          Show:!isShow,
+//      });
+//    }
 
     renderLoadingView(){
        return (<View style={styles.container} >
@@ -331,6 +355,7 @@ export default class ShoppingCart extends Component {
                         placeholder="请填写单据备注信息"
                         underlineColorAndroid='transparent'
                         placeholderTextColor="#bcbdc1"
+                        value={this.state.Remark}
                         style={styles.TextInput}
                         onChangeText={(value)=>{
                             this.setState({
@@ -338,7 +363,6 @@ export default class ShoppingCart extends Component {
                             })
                         }}/>
                     </View>
-
                  </View>
             </Modal>
         </View>
@@ -346,8 +370,16 @@ export default class ShoppingCart extends Component {
             <TouchableOpacity style={styles.Home} onPress={this.HISTORY.bind(this)}><Image source={require("../images/documents.png")}></Image><Text style={styles.home1}>历史单据</Text></TouchableOpacity>
             <TouchableOpacity style={styles.Home} onPress={this.HOME.bind(this)}><Image source={require("../images/home.png")}></Image><Text style={styles.home1}>首页</Text></TouchableOpacity>
             <TouchableOpacity style={styles.Home} onPress={this.SHOP.bind(this)}>
-              <View><Image source={require("../images/shop1.png")}><Text style={styles.ShopCar}>{this.state.shopcar}</Text></Image></View>
-              <Text style={styles.home2}>清单</Text>
+                <View>
+                   <Image source={require("../images/shop.png")}>
+                       {
+                          (this.state.shopcar==0)?
+                           null:
+                           <Text style={styles.ShopCar}>{this.state.shopcar}</Text>
+                       }
+                   </Image>
+                </View>
+                <Text style={styles.home1}>清单</Text>
             </TouchableOpacity>
         </View>
       </View>
@@ -387,7 +419,7 @@ const styles = StyleSheet.create({
      ShopCar:{
        color:"red",
        position:"absolute",
-       right:-35,
+       right:-42,
      },
     container:{
       flex:1,
@@ -699,4 +731,11 @@ const styles = StyleSheet.create({
         borderColor:"#fbced2",
         textAlignVertical: 'top'
     },
+    loading:{
+        flex:1,
+        backgroundColor:"#000000",
+        opacity:0.5,
+        justifyContent: 'center',
+        alignItems: 'center',
+     },
 });

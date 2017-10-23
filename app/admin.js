@@ -148,18 +148,34 @@ export default class admin extends Component {
     inputOnBlur(){
         this.autoFocuss();
     }
+    _setModalVisible() {
+        let isShow = this.state.show;
+        this.setState({
+            show:!isShow,
+        });
+    }
 //登录
     pressPush(){
+        //等待对话框 显示隐藏
         setTimeout(() => {
            this.setState({
                 animating: this.state.animating
            });
         },880);
+        if(this.state.Usercode == ""){
+            ToastAndroid.show('请输入用户编码', ToastAndroid.SHORT)
+            return;
+        }
+        if(this.state.UserPwd == ""){
+            ToastAndroid.show('请输入密码', ToastAndroid.SHORT)
+            return;
+        }
         if(this.state.Product == ""){
             ToastAndroid.show('请选择机构信息', ToastAndroid.SHORT)
             return;
         }else{
-            ToastAndroid.show('正在登录，请稍等~', ToastAndroid.SHORT)
+//            ToastAndroid.show('正在登录，请稍等~', ToastAndroid.SHORT);
+            <ActivityIndicator key="1"></ActivityIndicator>
         }
         var code = ""+this.state.Product;//获取到之后前面加""+
         var Usercode=this.state.Usercode;
@@ -167,6 +183,7 @@ export default class admin extends Component {
         Storage.save("shopCode",this.state.pickedDate);//调用保存封装接口
         str1 = code.split('_');
         str2 = str1[1];
+        this._setModalVisible();
         dbAdapter.isLogin(Usercode, this.state.UserPwd, str2).then((isLogin)=>{
             if(isLogin){
                var strin = this.state.Product;
@@ -180,6 +197,7 @@ export default class admin extends Component {
                    component:Index,
                };
                this.props.navigator.push(nextRoute);
+               this._setModalVisible();
             }else{
                ToastAndroid.show('用户编码或密码错误', ToastAndroid.SHORT)
             }
@@ -194,6 +212,7 @@ export default class admin extends Component {
             Product:value
         })
     }
+
   render() {
     return (
       <View style={styles.container}>
@@ -246,11 +265,23 @@ export default class admin extends Component {
             <TouchableOpacity onPress={this.pressPush.bind(this)}>
                <Text style={styles.login}>登录</Text>
             </TouchableOpacity>
-
             <View style={styles.refresh}>
                 <Image source={require("../images/refresh.png")} style={styles.refreshImage}></Image>
             </View>
         </ScrollView>
+        <Modal
+        animationType='fade'
+        transparent={true}
+        visible={this.state.show}
+        onShow={() => {}}
+        onRequestClose={() => {}} >
+            <View style={styles.LoadCenter}>
+                <View style={styles.loading}>
+                    <ActivityIndicator key="1" color="#414240" size="large" style={styles.activity}></ActivityIndicator>
+                    <Text style={styles.TextLoading}>登录中...</Text>
+                </View>
+            </View>
+        </Modal>
       </View>
     );
   }
@@ -350,5 +381,28 @@ const styles = StyleSheet.create({
   },
   centering:{
     marginTop:20,
-  }
+  },
+  LoadCenter:{
+    flex:1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loading:{
+      width:230,
+      paddingLeft:50,
+      paddingTop:10,
+      paddingBottom:10,
+      backgroundColor:"#ffffff",
+      borderRadius:3,
+      flexDirection:"row",
+  },
+  TextLoading:{
+    width:90,
+    marginLeft:15,
+    marginTop:6,
+    fontSize:16,
+  },
+  activity:{
+    width:30,
+  },
 });

@@ -12,7 +12,6 @@ import {
   View,
   Image,
   TouchableOpacity,
-  Toast
 } from 'react-native';
 import { QRScannerView } from 'ac-qrcode';
 export default class Code extends Component {

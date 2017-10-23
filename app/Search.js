@@ -63,14 +63,18 @@ export default class Search extends Component {
   }
   inputOnBlur(value){
     dbAdapter.selectAidCode(value,1).then((rows)=>{
-        this.dataRows=[];
-        for(let i =0;i<rows.length;i++){
-            var row = rows.item(i);
-            this.dataRows.push(row);
+        if(value==null){
+            alert("暂无此商品")
+        }else{
+            this.dataRows=[];
+            for(let i =0;i<rows.length;i++){
+                var row = rows.item(i);
+                this.dataRows.push(row);
+            }
+            this.setState({
+                dataSource:this.state.dataSource.cloneWithRows(this.dataRows)
+            })
         }
-        this.setState({
-            dataSource:this.state.dataSource.cloneWithRows(this.dataRows)
-        })
     });
   }
   _renderRow(rowData, sectionID, rowID){
@@ -121,7 +125,7 @@ export default class Search extends Component {
                 <TouchableOpacity onPress={this.Code.bind(this)} style={styles.HeaderImage1}>
                     <Image source={require("../images/sm.png")}></Image>
                 </TouchableOpacity>
-                <View style={styles.Text1}><Text style={styles.Text} onPress={this.pressPop.bind(this)}>取消</Text></View>
+                <TouchableOpacity style={styles.Text1}><Text style={styles.Text} onPress={this.pressPop.bind(this)}>取消</Text></TouchableOpacity>
             </View>
         </View>
         <View style={styles.list}>
@@ -160,7 +164,7 @@ const styles = StyleSheet.create({
     backgroundColor:"#f2f5f6",
     color: "#323232",
     height:35,
-    flex:6,
+    flex:5,
   },
   Right:{
     flex:2,
@@ -177,6 +181,7 @@ const styles = StyleSheet.create({
   },
   Text:{
     fontSize:14,
+    marginTop:2
   },
   BlockList:{
     flex:1,

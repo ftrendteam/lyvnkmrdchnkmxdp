@@ -32,11 +32,21 @@ export default class Query extends Component {
         this.props.navigator.pop();
     }
     pressPush(){
-        var nextRoute={
-            name:"主页",
-            component:Search
-        };
-        this.props.navigator.push(nextRoute)
+        var str=this.state.Number;
+        if(str.length != 16){
+            alert("请输入16位数的单号");
+        }else{
+            var nextRoute={
+                name:"主页",
+                component:Search
+            };
+            this.props.navigator.push(nextRoute)
+        }
+        Storage.save('OrgFormno',this.state.Number);
+        Storage.save('Name','配送收货单');
+        Storage.save('valueOf','App_Client_ProPSSH');
+        Storage.save('history','App_Client_ProPSSHQ');
+        Storage.save('historyClass','App_Client_ProPSSHDetailQ');
     }
     Home(){
         var str=this.state.Number;
@@ -98,41 +108,40 @@ const styles = StyleSheet.create({
         paddingBottom:8,
         paddingLeft:12,
         fontSize:16,
-        marginLeft:50,
-        marginRight:50,
+        marginLeft:30,
+        marginRight:30,
         marginTop:50,
     },
     search:{
         flexDirection:"row",
+        marginTop:20,
     },
     textsearch:{
-        marginLeft:50,
-        marginTop:20,
+        marginLeft:30,
+        marginRight:20,
         backgroundColor:"#f47882",
         borderRadius:15,
         flex:5,
-        height:45,
+        paddingTop:10,
+        paddingBottom:10,
     },
     textsearch1:{
         textAlign:"center",
         fontSize:14,
         color:"#ffffff",
-        lineHeight:28
     },
     determine:{
-        flex:1,
-        marginTop:20,
-        marginLeft:50,
-        marginRight:50,
+        flex:2,
         backgroundColor:"#f47882",
         borderRadius:3,
-        height:44,
+        paddingTop:10,
+        paddingBottom:10,
+        marginRight:30,
     },
     determine1:{
         textAlign:"center",
         fontSize:14,
         color:"#ffffff",
-        lineHeight:27
     },
     images:{
         height:50,

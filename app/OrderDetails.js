@@ -21,12 +21,15 @@ import {
 import Code from "./Code";
 import home from "./Home";
 import Index from "./Index";
+import OrderDetails from "./OrderDetails";
 import Search from "./Search";
 import Storage from "../utils/Storage";
 import FetchUtils from "../utils/FetchUtils";
 import DBAdapter from "../adapter/DBAdapter";
 import DataUtils from '../utils/DataUtils';
 let dbAdapter = new DBAdapter();
+var {NativeModules} = require('react-native');
+var RNScannerAndroid = NativeModules.RNScannerAndroid;
 export default class GoodsDetails extends Component {
     constructor(props){
         super(props);
@@ -55,11 +58,31 @@ export default class GoodsDetails extends Component {
        this.props.navigator.push(nextRoute)
     }
     Code(){
-       var nextRoute={
-            name:"主页",
-            component:Code
-       };
-       this.props.navigator.push(nextRoute)
+        RNScannerAndroid.openScanner();
+        DeviceEventEmitter.addListener("code", (reminder) => {
+            dbAdapter.selectAidCode(reminder,1).then((rows)=>{
+                var ShopCar = rows.item(0).ProdName;
+                this.props.navigator.push({
+                    component:OrderDetails,
+                    params:{
+                        ProdName:rows.item(0).ProdName,
+                        ShopPrice:rows.item(0).ShopPrice,
+                        Pid:rows.item(0).Pid,
+                        countm:rows.item(0).ShopNumber,
+                        promemo:rows.item(0).promemo,
+                        prototal:rows.item(0).prototal,
+                        ProdCode:rows.item(0).ProdCode,
+                        DepCode:rows.item(0).DepCode1,
+                    }
+                })
+            })
+        })
+        //二维码扫描商品
+       //var nextRoute={
+            //name:"主页",
+            //component:Code
+       //};
+       //this.props.navigator.push(nextRoute)
     }
     componentDidMount(){
         Storage.get('Name').then((tags) => {
@@ -149,6 +172,7 @@ export default class GoodsDetails extends Component {
                     <Text style={styles.NumberName}>数量</Text>
                     <TextInput style={styles.Number}
                         underlineColorAndroid='transparent'
+                        keyboardType="numeric"
                         value={this.state.Number.toString()}
                         onBlur={this.inputOnBlur.bind(this)}
                         onChangeText={(value)=>{this.setState({Number:value})}}/>

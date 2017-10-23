@@ -57,6 +57,14 @@ export default class  login extends Component{
         });
     }
     pressPush(){
+        if(this.state.ClientCode == ""){
+            ToastAndroid.show('请输入商户号', ToastAndroid.SHORT)
+            return;
+        }
+        if(this.state.Pwd == ""){
+            ToastAndroid.show('请输入密码', ToastAndroid.SHORT)
+            return;
+        }
         let params = {
             reqCode:"App_PosReq",
             reqDetailCode:"App_Client_Qry",
@@ -84,13 +92,6 @@ export default class  login extends Component{
                 this.props.navigator.push({
                     component:admin,
                 });
-
-            }else if(this.state.ClientCode==0){
-                ToastAndroid.show('请输入商户号', ToastAndroid.SHORT);
-                return;
-            }else if(this.state.Pwd==0){
-                ToastAndroid.show('请输入密码', ToastAndroid.SHORT);
-                return;
             }else{
                 ToastAndroid.show('商户号或密码错误', ToastAndroid.SHORT)
             }
