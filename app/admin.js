@@ -174,7 +174,6 @@ export default class admin extends Component {
             ToastAndroid.show('请选择机构信息', ToastAndroid.SHORT)
             return;
         }else{
-//            ToastAndroid.show('正在登录，请稍等~', ToastAndroid.SHORT);
             <ActivityIndicator key="1"></ActivityIndicator>
         }
         var code = ""+this.state.Product;//获取到之后前面加""+
@@ -265,9 +264,9 @@ export default class admin extends Component {
             <TouchableOpacity onPress={this.pressPush.bind(this)}>
                <Text style={styles.login}>登录</Text>
             </TouchableOpacity>
-            <View style={styles.refresh}>
+            <TouchableOpacity style={styles.refresh}>
                 <Image source={require("../images/refresh.png")} style={styles.refreshImage}></Image>
-            </View>
+            </TouchableOpacity>
         </ScrollView>
         <Modal
         animationType='fade'

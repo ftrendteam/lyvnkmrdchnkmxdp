@@ -35,6 +35,8 @@ import Search from "./Search";
 import list from "./HomeLeftList";
 import Query from "./Query";
 import Distrition from "./Distrition";
+import Product from "./Product";
+import Product1 from "./Product1";
 import NetUtils from "../utils/NetUtils";
 import FetchUtils from "../utils/FetchUtils";
 import DBAdapter from "../adapter/DBAdapter";
@@ -106,7 +108,6 @@ export default class Index extends Component {
     Code(){
         RNScannerAndroid.openScanner();
         DeviceEventEmitter.addListener("code", (reminder) => {
-            alert(reminder)
             dbAdapter.selectAidCode(reminder,1).then((rows)=>{
                 var ShopCar = rows.item(0).ProdName;
                 this.props.navigator.push({
@@ -411,6 +412,54 @@ export default class Index extends Component {
         };
         this.props.navigator.push(nextRoute);
     }
+    Shopp(){
+        var invoice="商品采购";
+        this.setState({
+            head:invoice,
+        });
+        this._setModalVisible();
+        var nextRoute={
+            name:"主页",
+            component:Product
+        };
+        this.props.navigator.push(nextRoute);
+    }
+    Shopp1(){
+        var invoice="商品验收";
+        this.setState({
+            head:invoice,
+        });
+        this._setModalVisible();
+        var nextRoute={
+            name:"主页",
+            component:Product
+        };
+        this.props.navigator.push(nextRoute);
+    }
+    Shopp2(){
+        var invoice="协配采购";
+        this.setState({
+            head:invoice,
+        });
+        this._setModalVisible();
+        var nextRoute={
+            name:"主页",
+            component:Product1
+        };
+        this.props.navigator.push(nextRoute);
+    }
+    Shopp3(){
+        var invoice="协配收货";
+        this.setState({
+            head:invoice,
+        });
+        this._setModalVisible();
+        var nextRoute={
+            name:"主页",
+            component:Product1
+        };
+        this.props.navigator.push(nextRoute);
+    }
     Home3(){
         this._setModalVisible();
     }
@@ -529,6 +578,22 @@ export default class Index extends Component {
                                 </TouchableOpacity>
                                 <TouchableOpacity style={styles.subView} onPress={this.Home3.bind(this)}>
                                     <Text style={styles.titleText}>数据更新</Text>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={styles.ModalViewList}>
+                                <TouchableOpacity style={styles.subView} onPress={this.Shopp.bind(this)}>
+                                    <Text style={styles.titleText}>商品采购</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.subView} onPress={this.Shopp1.bind(this)}>
+                                    <Text style={styles.titleText}>商品验收</Text>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={styles.ModalViewList}>
+                                <TouchableOpacity style={styles.subView} onPress={this.Shopp2.bind(this)}>
+                                    <Text style={styles.titleText}>协配采购</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.subView} onPress={this.Shopp3.bind(this)}>
+                                    <Text style={styles.titleText}>协配收货</Text>
                                 </TouchableOpacity>
                             </View>
                             <View style={styles.ModalViewList1}>
