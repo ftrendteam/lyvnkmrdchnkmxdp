@@ -283,7 +283,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
               resolve(true);
             }, (err) => {
               reject(false);
-              alert("err=" + err);
+              
               console.log(err);
             }
           );
@@ -333,7 +333,6 @@ export default class DBAdapter extends SQLiteOpenHelper {
       db.transaction((tx) => {
         tx.executeSql('select sum(countm) countm from shopInfo where DepCode =' + DepCode + '', [], (tx, results) => {
           try {
-//          alert(JSON.stringify(results))
             resolve(results.rows);
           } catch (err) {
             reject(0);
@@ -534,7 +533,6 @@ export default class DBAdapter extends SQLiteOpenHelper {
               DataUtils.save("userName", userName);
               DataUtils.save("userCode", Usercode);
               let shopCode;
-//              alert("1223424")
               DataUtils.get('shopCode', '').then((data) => {
                 shopCode = data;
                 console.log("shopCode", shopCode);
@@ -742,7 +740,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
   selectUserRight(userCode, funcCode) {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
-        let sql = "select * from tuserright where usercode='" + userCode + "' and Funccode='" + funcCode + "' and IsDel='0'";
+        let sql = "select * from tuserright where usercode='" + userCode + "' and Funccode='" + funcCode;
         tx.executeSql(sql, [], (tx, results) => {
           resolve(results.rows.length != 0);
         })
@@ -761,7 +759,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
   selecUserRightA1012(userCode) {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
-        let sql = "select * from tuserright where usercode='" + userCode + "' and Funccode='A1012' and IsDel='0'";
+        let sql = "select * from tuserright where usercode='" + userCode + "' and Funccode='A1012'";
         tx.executeSql(sql, [], (tx, results) => {
           resolve((results.rows.length != 0));
         })
@@ -771,6 +769,34 @@ export default class DBAdapter extends SQLiteOpenHelper {
       });
     });
   }
+  
+  
+  /***
+   * 插入供应商信息表
+   */
+  insertSuppeset = (datas) => {
+    for (let i = 0; i < datas.length; i++) {
+      let data = datas[i];
+      let pid = data.pid;
+      let sCode = data.sCode;
+      let sname = data.sname;
+      let levelno = data.levelno;
+      let aidcode = data.aidcode;
+      let subcode = data.subcode;
+      let suppType = data.SuppType;
+      db.transaction((tx) => {
+        let sql = " replace INTO tsuppset(pid,sCode,sname,levelno,aidcode,subcode,SuppType)" +
+          "values(?,?,?,?,?,?,?)";
+        tx.executeSql(sql, [pid, sCode, sname, levelno, aidcode, subcode, suppType], () => {
+          
+          }, (err) => {
+            console.log("err===",err);
+          }
+        );
+      });
+    }
+  }
+  
   
   /***
    * 关闭表
