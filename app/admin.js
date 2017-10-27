@@ -41,26 +41,6 @@ export default class admin extends Component {
     //建表
     dbAdapter.createTable();
   }
-  read(){
-          AsyncStorage.getItem('object',(error,result)=>{
-              if (!error) {
-                  console.log(result);
-                  alert(result);
-              }
-          })
-      }
-  //存储数据
-  save(){
-      // JSON.stringify(object): JSON对象转换为字符串 用来存储
-      AsyncStorage.setItem('object',JSON.stringify(object),(error)=>{
-          if (error) {
-              alert('存储失败');
-          } else  {
-              alert('存储成功');
-              read();
-          }
-      });
-  }
     constructor(props){
         super(props);
         this.state = {
@@ -81,16 +61,15 @@ export default class admin extends Component {
         };
         this.pickerData=[]
     }
- //直接跑数据 componentDidMount
-
+    //进入页面执行事件
     componentDidMount(){
         Storage.get('ClientCode').then((tags) => {
             let params = {
                  reqCode:"App_PosReq",
                  reqDetailCode:"App_Client_UseQry",
                  ClientCode:tags,
-                 sDateTime:"2017-08-09 12:12:12",//获取当前时间转换成时间戳
-                 Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_UseQry" + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
+                 sDateTime:Date.parse(new Date()),//获取当前时间转换成时间戳
+                 Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_UseQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
             };
               FetchUtil.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
                  if(data.retcode == 1){
@@ -103,48 +82,48 @@ export default class admin extends Component {
                       dbAdapter.insertTUserSetData(detailInfo2);
                       //权限表
                       var detailInfo3 = data.DetailInfo3;
+                      console.log("userright=",detailInfo3);
                       dbAdapter.insertTUserRrightData(detailInfo3);
                       //用户管理机构表
                       var detailInfo4 = data.DetailInfo4;
                       dbAdapter.insertTUsershopData(detailInfo4);
-    //                  var acquiring = DataUtils.get("LinkUrl",LinkUrl);
-//                      alert(JSON.stringify(data))
+                      //var acquiring = DataUtils.get("LinkUrl",LinkUrl);
                  }else{
                      ToastAndroid.show('网络请求失败', ToastAndroid.SHORT);
-//                     alert(JSON.stringify(data))
                  }
               })
          });
     }
- //失去焦点时 跑数据、存储、获取数据
+
+    //失去焦点时 跑数据、存储、获取数据
     autoFocuss(){
-    Storage.get('ClientCode').then((tags) => {
-         let params = {
-                reqCode:"App_PosReq",
-                reqDetailCode:"App_Client_UseQry",
-                ClientCode:tags,
-                sDateTime:Date.parse(new Date()),//获取当前时间转换成时间戳
-                Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_UseQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
-         };
-         FetchUtil.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
-            if(data.retcode == 1){
-                DetailInfo1 = JSON.stringify(data.DetailInfo1);// 在这里从接口取出要保存的数据，然后执行save方法
-                   var  DetailInfo1 = JSON.stringify(data.DetailInfo1);
-                   for(var value of data.DetailInfo1){
-                        var shopcode = value.shopcode;
-                        var shopname = value.shopname;
-                        this.pickerData .push(shopname+"_"+shopcode);
-                   }
-                   this.setState({
-                        pickedDate:this.pickerData
-                   })
-            }else{
-//                alert("数据保存失败")
-            }
+        Storage.get('ClientCode').then((tags) => {
+             let params = {
+                    reqCode:"App_PosReq",
+                    reqDetailCode:"App_Client_UseQry",
+                    ClientCode:tags,
+                    sDateTime:Date.parse(new Date()),//获取当前时间转换成时间戳
+                    Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_UseQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
+             };
+             FetchUtil.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
+                if(data.retcode == 1){
+                    DetailInfo1 = JSON.stringify(data.DetailInfo1);// 在这里从接口取出要保存的数据，然后执行save方法
+                       var  DetailInfo1 = JSON.stringify(data.DetailInfo1);
+                       for(var value of data.DetailInfo1){
+                            var shopcode = value.shopcode;
+                            var shopname = value.shopname;
+                            this.pickerData .push(shopname+"_"+shopcode);
+                       }
+                       this.setState({
+                            pickedDate:this.pickerData
+                       })
+                }else{
+                }
+             })
          })
-     })
     }
-// 失焦时触发事件
+
+    // 失焦时触发事件
     inputOnBlur(){
         this.autoFocuss();
     }
@@ -154,14 +133,9 @@ export default class admin extends Component {
             show:!isShow,
         });
     }
-//登录
+    //登录
     pressPush(){
         //等待对话框 显示隐藏
-        setTimeout(() => {
-           this.setState({
-                animating: this.state.animating
-           });
-        },880);
         if(this.state.Usercode == ""){
             ToastAndroid.show('请输入用户编码', ToastAndroid.SHORT)
             return;
@@ -174,7 +148,6 @@ export default class admin extends Component {
             ToastAndroid.show('请选择机构信息', ToastAndroid.SHORT)
             return;
         }else{
-//            ToastAndroid.show('正在登录，请稍等~', ToastAndroid.SHORT);
             <ActivityIndicator key="1"></ActivityIndicator>
         }
         var code = ""+this.state.Product;//获取到之后前面加""+
@@ -199,13 +172,12 @@ export default class admin extends Component {
                this.props.navigator.push(nextRoute);
                this._setModalVisible();
             }else{
-               ToastAndroid.show('用户编码或密码错误', ToastAndroid.SHORT)
+               this._setModalVisible();
+               ToastAndroid.show('用户编码或密码错误', ToastAndroid.SHORT);
             }
         });
     }
-    pressPop(){
-        this.props.navigator.pop();
-    }
+
     //下拉列表赋值
     _dropdown_4_onSelect(idx, value) {
         this.setState({
@@ -265,9 +237,9 @@ export default class admin extends Component {
             <TouchableOpacity onPress={this.pressPush.bind(this)}>
                <Text style={styles.login}>登录</Text>
             </TouchableOpacity>
-            <View style={styles.refresh}>
+            <TouchableOpacity style={styles.refresh}>
                 <Image source={require("../images/refresh.png")} style={styles.refreshImage}></Image>
-            </View>
+            </TouchableOpacity>
         </ScrollView>
         <Modal
         animationType='fade'

@@ -35,6 +35,7 @@ export default class GoodsDetails extends Component {
           };
           this.dataRows = [];
     }
+
     componentDidMount(){
          //reqDetailCode获取
           Storage.get('historyClass').then((tags) => {
@@ -54,6 +55,7 @@ export default class GoodsDetails extends Component {
                Userpwd: tags
            });
          });
+
          Storage.get('code').then((tags) => {
              DataUtils.get("usercode","").then((usercode)=>{
                   DataUtils.get("username","").then((username)=>{
@@ -98,9 +100,11 @@ export default class GoodsDetails extends Component {
              })
          })
     }
+
     GoodsDetails(){
           this.props.navigator.pop();
     }
+
    _renderRow(rowData, sectionID, rowID){
         return (
             <View style={styles.ShopList1}>

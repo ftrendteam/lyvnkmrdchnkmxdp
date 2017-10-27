@@ -35,10 +35,8 @@ import Search from "./Search";
 import list from "./HomeLeftList";
 import Query from "./Query";
 import Distrition from "./Distrition";
-import ProductCG from "./ProductCG";
-import ProductYS from "./ProductYS";
-import ProductXP from "./ProductXP";
-import ProductSH from "./ProductSH";
+import Product from "./Product";
+import Product1 from "./Product1";
 import NetUtils from "../utils/NetUtils";
 import FetchUtils from "../utils/FetchUtils";
 import DBAdapter from "../adapter/DBAdapter";
@@ -82,7 +80,6 @@ export default class Index extends Component {
         this.moreTime = 0;
         var timer1 = null;
     }
-
     HISTORY(){
         var nextRoute={
             name:"主页",
@@ -90,7 +87,6 @@ export default class Index extends Component {
         };
         this.props.navigator.push(nextRoute)
     }
-
     HOME(){
         var nextRoute={
             name:"主页",
@@ -98,7 +94,6 @@ export default class Index extends Component {
         };
         this.props.navigator.push(nextRoute)
     }
-
     SHOP(){
         var nextRoute={
             name:"主页",
@@ -106,7 +101,6 @@ export default class Index extends Component {
         };
         this.props.navigator.push(nextRoute)
     }
-
     pressPush(){
         var nextRoute={
             name:"主页",
@@ -114,7 +108,6 @@ export default class Index extends Component {
         };
         this.props.navigator.push(nextRoute)
     }
-
     Code(){
         RNScannerAndroid.openScanner();
         DeviceEventEmitter.addListener("code", (reminder) => {
@@ -136,7 +129,6 @@ export default class Index extends Component {
             })
         })
     }
-
     pullOut(){
         this._setModalVisible()
         var nextRoute={
@@ -145,32 +137,27 @@ export default class Index extends Component {
         };
         this.props.navigator.push(nextRoute)
     }
-
     pressPop(){
         this._setModalVisible()
         this.props.navigator.pop();
     }
-
     _rightButtonClick() {
         console.log('右侧按钮点击了');
         this._setModalVisible();
     }
-
     _setModalVisible() {
         let isShow = this.state.show;
         this.setState({
             show:!isShow,
         });
     }
-
     Modal(){
         let isshow = this.state.Show;
         this.setState({
             Show:!isshow,
         });
     }
-
-    //进入页面执行方法
+    //左侧品级
     componentDidMount(){
         InteractionManager.runAfterInteractions(() => {
             Storage.get('Name').then((tags) => {
@@ -182,8 +169,6 @@ export default class Index extends Component {
             this.function();
          });
     }
-
-   //获取左侧商品品类信息、商品总数、触发第一个列表
     _fetch(){
         dbAdapter.selectTDepSet('1').then((rows)=>{
             for(let i =0;i<rows.length;i++){
@@ -225,6 +210,7 @@ export default class Index extends Component {
         this._fetch1();
     }
     _fetch1(){
+        //获取商品信息
         dbAdapter.selectShopInfo("1").then((rows)=>{
             for(let i =0;i<rows.length;i++){
                 var row = rows.item(i);
@@ -251,8 +237,7 @@ export default class Index extends Component {
             </TouchableOpacity>
          );
     }
-
-    //点击商品品类获取商品信息
+    //右侧商品信息
     _pressRow(rowData){
         if(lastDepCode ==""){
             lastDepCode = rowData.DepCode;
@@ -300,7 +285,6 @@ export default class Index extends Component {
         //var endTime = (new Date()).valueOf();//获取结束时间
         //alert(endTime-startTime);
     }
-
     _renderItem(item,index){
         return(
             <View style={styles.Border}>
@@ -323,8 +307,6 @@ export default class Index extends Component {
             </View>
         )
     }
-
-    //商品减少查询
     Countm(item){
         //调取数量
         dbAdapter.upDataShopInfoCountmSub(item.item.ProdCode).then((rows)=>{});
@@ -344,11 +326,9 @@ export default class Index extends Component {
         }
         this._fetch1();
     }
-
     _separator = () => {
         return <View style={{height:1,backgroundColor:'#f5f5f5'}}/>;
     }
-
     _createEmptyView() {
         return (
             <View style={styles.footerView}>
@@ -380,7 +360,7 @@ export default class Index extends Component {
         }
     }
 
-    //功能授权
+//功能授权
     function(){
         Storage.get('username').then((tags) => {
             this.setState({
@@ -388,94 +368,66 @@ export default class Index extends Component {
             })
         });
     }
-
-    //弹层关闭按钮
-    Close(){
-        this.Modal();
-    }
-    //授权号查询判断
     Determine(){
         dbAdapter.selectUserRight(this.state.License,"K0801").then((rows)=>{
             if(rows==true){
                 this.Modal();
                 this._setModalVisible();
-                Storage.get('Name').then((tags) => {
-                    if(tags=="要货单"){
-                        this.setState({
-                            head:tags
-                        })
-                    }else if(tags=="损益单"){
-                        this.setState({
-                            head:tags
-                        })
-                    }else if(tags=="实时盘点单"){
-                        this.setState({
-                            head:tags
-                        })
-                    }else{
-                        this.save();
-                    }
+                Storage.get('invoice').then((tags) => {
+                    this.setState({
+                        head:tags
+                    })
+                    return
                 });
+                Storage.get('invoice1').then((tags) => {
+                    if(tags=="功能"){
+                        var nextRoute={
+                            name:"主页",
+                            component:Query
+                        };
+                        this.props.navigator.push(nextRoute);
+                    }
+                })
+                Storage.get('invoice2').then((tags) => {
+                    if(tags=="功能1"){
+                        var nextRoute={
+                            name:"主页",
+                            component:Distrition
+                        };
+                        this.props.navigator.push(nextRoute);
+                    }
+                })
+                Storage.get('invoice3').then((tags) => {
+                    if(tags=="功能2" && tags=="功能2"){
+                        var nextRoute={
+                            name:"主页",
+                            component:Product
+                        };
+                        this.props.navigator.push(nextRoute);
+                    }
+                })
+                Storage.get('invoice4').then((tags) => {
+                    if(tags=="功能3" && tags=="功能3"){
+                        var nextRoute={
+                            name:"主页",
+                            component:Product1
+                        };
+                        this.props.navigator.push(nextRoute);
+                    }
+                })
+
             }else if(rows==false){
                 alert("请输入正确的授权号")
             }
         })
     }
-
-    //获取本地保存名字并跳转
-    save(){
-        Storage.get('invoice').then((tags) => {
-            if(tags=="商品盘点"){
-                var nextRoute={
-                    name:"主页",
-                    component:Query
-                };
-                this.props.navigator.push(nextRoute);
-            }
-            if(tags=="配送收货"){
-                var nextRoute={
-                    name:"主页",
-                    component:Distrition
-                };
-                this.props.navigator.push(nextRoute);
-            }
-            if(tags=="商品采购"){
-                var nextRoute={
-                    name:"主页",
-                    component:ProductCG
-                };
-                this.props.navigator.push(nextRoute);
-            }
-            if(tags=="商品验收"){
-                var nextRoute={
-                    name:"主页",
-                    component:ProductYS
-                };
-                this.props.navigator.push(nextRoute);
-            }
-            if(tags=="协配采购"){
-                var nextRoute={
-                    name:"主页",
-                    component:ProductXP
-                };
-                this.props.navigator.push(nextRoute);
-            }
-            if(tags=="协配收货"){
-                var nextRoute={
-                    name:"主页",
-                    component:ProductSH
-                };
-                this.props.navigator.push(nextRoute);
-            }
-        });
-    }
-    //  功能分类
+//  分类
     Home(){
         dbAdapter.selectUserRight(this.state.usercode,"K0801").then((rows)=>{
             if(rows==true){
                 dbAdapter.selecUserRightA1012(this.state.usercode).then((rows)=>{
                    if(rows==true){
-                       Storage.save('Name','要货单');
+                       Storage.save("invoice","要货单");
                        this.Modal();
                    }
                 })
@@ -487,6 +439,7 @@ export default class Index extends Component {
 
         //保存需要本地存储的值  第一个参数是自己定义的  第二个参数是要传的参数
         //下面那几个地方也是这种形式，把第二个参数改一些就行，点击的时候会自己覆盖以前的值
+        Storage.save('Name','要货单');
         Storage.save('valueOf','App_Client_ProYH');
         Storage.save('history','App_Client_ProYHQ');
         Storage.save('historyClass','App_Client_ProYHDetailQ');
@@ -496,7 +449,7 @@ export default class Index extends Component {
             if(rows==true){
                 dbAdapter.selecUserRightA1012(this.state.usercode).then((rows)=>{
                    if(rows==true){
-                       Storage.save("Name","损益单");
+                       Storage.save("invoice","损益单");
                        this.Modal();
                    }
                 })
@@ -505,16 +458,17 @@ export default class Index extends Component {
                 this._setModalVisible();
             }
         })
+        Storage.save('Name','损益单');
         Storage.save('valueOf','App_Client_ProSY');
         Storage.save('history','App_Client_ProSYQ');
         Storage.save('historyClass','App_Client_ProSYDetailQ');
     }
     Query(){
-        dbAdapter.selectUserRight(this.state.usercode,"K0611").then((rows)=>{
+        dbAdapter.selectUserRight(this.state.usercode,"K0604").then((rows)=>{
             if(rows==true){
                 dbAdapter.selecUserRightA1012(this.state.usercode).then((rows)=>{
                    if(rows==true){
-                       Storage.save("Name","实时盘点单");
+                       Storage.save("invoice","实时盘点单");
                        this.Modal();
                    }
                 })
@@ -523,17 +477,18 @@ export default class Index extends Component {
                 this._setModalVisible();
             }
         })
+
+        Storage.save('Name','实时盘点单');
         Storage.save('valueOf','App_Client_ProCurrPC');
         Storage.save('history','App_Client_ProCurrPCQ');
         Storage.save('historyClass','App_Client_ProCurrPCDetailQ');
     }
     Query1(){
-        Storage.delete("Name");
-        dbAdapter.selectUserRight(this.state.usercode,"K0607").then((rows)=>{
+        dbAdapter.selectUserRight(this.state.usercode,"K0604").then((rows)=>{
             if(rows==true){
                 dbAdapter.selecUserRightA1012(this.state.usercode).then((rows)=>{
                    if(rows==true){
-                       Storage.save("invoice","商品盘点");
+                       Storage.save("invoice1","功能");
                        this.Modal();
                    }
                 })
@@ -542,15 +497,13 @@ export default class Index extends Component {
                 this._setModalVisible();
             }
         })
-
     }
     Home2(){
-        Storage.delete("Name");
-        dbAdapter.selectUserRight(this.state.usercode,"K0802").then((rows)=>{
+        dbAdapter.selectUserRight(this.state.usercode,"K0604").then((rows)=>{
             if(rows==true){
                 dbAdapter.selecUserRightA1012(this.state.usercode).then((rows)=>{
                    if(rows==true){
-                       Storage.save("invoice","配送收货");
+                       Storage.save("invoice2","功能1");
                        this.Modal();
                    }
                 })
@@ -559,15 +512,13 @@ export default class Index extends Component {
                 this._setModalVisible();
             }
         })
-
     }
     Shopp(){
-        Storage.delete("Name");
-        dbAdapter.selectUserRight(this.state.usercode,"K0504").then((rows)=>{
+        dbAdapter.selectUserRight(this.state.usercode,"K0604").then((rows)=>{
             if(rows==true){
                 dbAdapter.selecUserRightA1012(this.state.usercode).then((rows)=>{
                    if(rows==true){
-                       Storage.save("invoice","商品采购");
+                       Storage.save("invoice3","商品采购");
                        this.Modal();
                    }
                 })
@@ -576,14 +527,18 @@ export default class Index extends Component {
                 this._setModalVisible();
             }
         })
+        var nextRoute={
+            name:"主页",
+            component:Product
+        };
+        this.props.navigator.push(nextRoute);
     }
     Shopp1(){
-        Storage.delete("Name");
-        dbAdapter.selectUserRight(this.state.usercode,"K0505").then((rows)=>{
+        dbAdapter.selectUserRight(this.state.usercode,"K0604").then((rows)=>{
             if(rows==true){
                 dbAdapter.selecUserRightA1012(this.state.usercode).then((rows)=>{
                    if(rows==true){
-                       Storage.save("invoice","商品验收");
+                       Storage.save("invoice3","商品验收");
                        this.Modal();
                    }
                 })
@@ -592,14 +547,18 @@ export default class Index extends Component {
                 this._setModalVisible();
             }
         })
+        var nextRoute={
+            name:"主页",
+            component:Product
+        };
+        this.props.navigator.push(nextRoute);
     }
     Shopp2(){
-        Storage.delete("Name");
-        dbAdapter.selectUserRight(this.state.usercode,"K0707").then((rows)=>{
+        dbAdapter.selectUserRight(this.state.usercode,"K0604").then((rows)=>{
             if(rows==true){
                 dbAdapter.selecUserRightA1012(this.state.usercode).then((rows)=>{
                    if(rows==true){
-                       Storage.save("invoice","协配采购");
+                       Storage.save("invoice4","协配采购");
                        this.Modal();
                    }
                 })
@@ -608,14 +567,18 @@ export default class Index extends Component {
                 this._setModalVisible();
             }
         })
+        var nextRoute={
+            name:"主页",
+            component:Product1
+        };
+        this.props.navigator.push(nextRoute);
     }
     Shopp3(){
-        Storage.delete("Name");
-        dbAdapter.selectUserRight(this.state.usercode,"K0803").then((rows)=>{
+        dbAdapter.selectUserRight(this.state.usercode,"K0604").then((rows)=>{
             if(rows==true){
                 dbAdapter.selecUserRightA1012(this.state.usercode).then((rows)=>{
                    if(rows==true){
-                       Storage.save("invoice","协配收货");
+                       Storage.save("invoice4","协配收货");
                        this.Modal();
                    }
                 })
@@ -624,6 +587,11 @@ export default class Index extends Component {
                 this._setModalVisible();
             }
         })
+        var nextRoute={
+            name:"主页",
+            component:Product1
+        };
+        this.props.navigator.push(nextRoute);
     }
     Home3(){
         this._setModalVisible();
@@ -631,7 +599,6 @@ export default class Index extends Component {
     keyExtractor(item: Object, index: number) {
         return item.ProdName//FlatList使用json中的ProdName动态绑定key
     }
-    //翻页列表
     _onload(){
         if(this.state.isloading){
             return false
@@ -782,9 +749,6 @@ export default class Index extends Component {
                       onRequestClose={() => {}} >
                       <View style={styles.License}>
                             <View style={styles.LicenseConter}>
-                                <TouchableOpacity style={styles.close} onPress={this.Close.bind(this)}>
-                                     <Text style={styles.CloseText}>×</Text>
-                                </TouchableOpacity>
                                 <Text style={styles.LicenseText}>请输入授权号</Text>
                                 <TextInput
                                     style={styles.LicenseTextInput}
@@ -1106,16 +1070,5 @@ const styles = StyleSheet.create({
     color:"#ffffff",
     fontSize:14,
     textAlign:"center"
-  },
-  close:{
-    width:40,
-    height:40,
-    position:"absolute",
-    right:0,
-    top:5
-  },
-  CloseText:{
-    color:"#323232",
-    fontSize:20
   }
 });

@@ -28,9 +28,12 @@ export default class Distrition extends Component {
             Number:"",
         };
     }
+    //返回前一页面
     Return(){
         this.props.navigator.pop();
     }
+
+    //判断当前输入是否为正确的单号 并保存
     pressPush(){
         var str=this.state.Number;
         if(str.length != 16){
@@ -47,8 +50,8 @@ export default class Distrition extends Component {
         Storage.save('valueOf','App_Client_ProPSSH');
         Storage.save('history','App_Client_ProPSSHQ');
         Storage.save('historyClass','App_Client_ProPSSHDetailQ');
-
     }
+
     Home(){
         var str=this.state.Number;
         if(str.length != 16){
@@ -70,7 +73,6 @@ export default class Distrition extends Component {
                     <TextInput
                         autofocus="{true}"
                         numberoflines="{1}"
-                        keyboardType="numeric"
                         placeholder="请输入原始单号"
                         textalign="center"
                         underlineColorAndroid='transparent'

@@ -16,8 +16,10 @@ import {
   TouchableOpacity,
   DeviceEventEmitter
 } from 'react-native';
+import Index from "./Index";
 import Code from "./Code";
 import OrderDetails from "./OrderDetails";
+import OrderDetails2 from "./OrderDetails2";
 import NetUtils from "../utils/NetUtils";
 import FetchUtils from "../utils/FetchUtils";
 import DBAdapter from "../adapter/DBAdapter";
@@ -38,15 +40,20 @@ export default class Search extends Component {
       this.dataRows = [];
   }
   pressPop(){
-      this.props.navigator.pop();
+      var nextRoute={
+         name:"主页",
+         component:Index,
+      };
+      this.props.navigator.push(nextRoute);
   }
+
   Code(){
       RNScannerAndroid.openScanner();
       DeviceEventEmitter.addListener("code", (reminder) => {
           dbAdapter.selectAidCode(reminder,1).then((rows)=>{
               var ShopCar = rows.item(0).ProdName;
               this.props.navigator.push({
-                  component:OrderDetails,
+                  component:OrderDetails2,
                   params:{
                       ProdName:rows.item(0).ProdName,
                       ShopPrice:rows.item(0).StdPrice,
@@ -61,6 +68,7 @@ export default class Search extends Component {
           })
       })
   }
+
   inputOnBlur(value){
       dbAdapter.selectAidCode(value,1).then((rows)=>{
           this.dataRows=[];
@@ -73,6 +81,7 @@ export default class Search extends Component {
           })
       });
   }
+
   _renderRow(rowData, sectionID, rowID){
       return (
           <View style={styles.Block}>
@@ -85,7 +94,7 @@ export default class Search extends Component {
 
   OrderDetails(rowData){
      this.props.navigator.push({
-        component:OrderDetails,
+        component:OrderDetails2,
         params:{
             ProdName:rowData.ProdName,
             ShopPrice:rowData.StdPrice,

@@ -31,40 +31,40 @@ export default class home extends Component {
   render() {
     return (
       <View style={styles.container}>
-                  <TabNavigator
-                  tabBarStyle={{height:60,}}
-                  >
-                     <TabNavigator.Item
-                     			  	title="历史单据"
-                     			    selected={this.state.selectedTab === 'history'}
-                     			    selectedTitleStyle={styles.selectedTextStyle}
-                     			    titleStyle={styles.textStyle}
-                                    renderIcon={() => <Image source={require("../images/documents.png")} resizeMode={"contain"} style={styles.iconStyle}/>}
-                     			    renderSelectedIcon={() => <Image source={require("../images/documents1.png")} resizeMode={"contain"} style={styles.iconStyle}/>}
-                     			    onPress={() => this.setState({ selectedTab: 'history' })}>
-                     			    <HistoricalDocument {...this.props}/>
-                     </TabNavigator.Item>
-                     <TabNavigator.Item
-                      			  	title="商品"
-                      			    selected={this.state.selectedTab === 'home'}
-                      			    selectedTitleStyle={styles.selectedTextStyle}
-                      			    titleStyle={styles.textStyle}
-                      			    renderIcon={() => <Image source={require("../images/home.png")} resizeMode={"contain"} style={styles.iconStyle}/>}
-                                    renderSelectedIcon={() => <Image source={require("../images/home1.png")} resizeMode={"contain"} style={styles.iconStyle}/>}
-                      			    onPress={() => this.setState({ selectedTab: 'home' })}>
-                      			    <Index {...this.props}/>
-                     </TabNavigator.Item>
-                     <TabNavigator.Item
-                      			  	title="清单"
-                      			    selected={this.state.selectedTab === 'shoppingCart'}
-                      			    selectedTitleStyle={styles.selectedTextStyle}
-                      			    titleStyle={styles.textStyle}
-                      			    renderIcon={() => <Image source={require("../images/shop.png")} resizeMode={"contain"} style={styles.iconStyle1}/>}
-                                    renderSelectedIcon={() => <Image source={require("../images/shop1.png")} resizeMode={"contain"} style={styles.iconStyle1}/>}
-                      			    onPress={() => this.setState({ selectedTab: 'shoppingCart' })}>
-                      			    <ShoppingCart {...this.props}/>
-                     </TabNavigator.Item>
-                  </TabNavigator>
+          <TabNavigator
+          tabBarStyle={{height:60,}}
+          >
+             <TabNavigator.Item
+                title="历史单据"
+                selected={this.state.selectedTab === 'history'}
+                selectedTitleStyle={styles.selectedTextStyle}
+                titleStyle={styles.textStyle}
+                renderIcon={() => <Image source={require("../images/documents.png")} resizeMode={"contain"} style={styles.iconStyle}/>}
+                renderSelectedIcon={() => <Image source={require("../images/documents1.png")} resizeMode={"contain"} style={styles.iconStyle}/>}
+                onPress={() => this.setState({ selectedTab: 'history' })}>
+                <HistoricalDocument {...this.props}/>
+             </TabNavigator.Item>
+             <TabNavigator.Item
+                title="商品"
+                selected={this.state.selectedTab === 'home'}
+                selectedTitleStyle={styles.selectedTextStyle}
+                titleStyle={styles.textStyle}
+                renderIcon={() => <Image source={require("../images/home.png")} resizeMode={"contain"} style={styles.iconStyle}/>}
+                renderSelectedIcon={() => <Image source={require("../images/home1.png")} resizeMode={"contain"} style={styles.iconStyle}/>}
+                onPress={() => this.setState({ selectedTab: 'home' })}>
+                <Index {...this.props}/>
+             </TabNavigator.Item>
+             <TabNavigator.Item
+                title="清单"
+                selected={this.state.selectedTab === 'shoppingCart'}
+                selectedTitleStyle={styles.selectedTextStyle}
+                titleStyle={styles.textStyle}
+                renderIcon={() => <Image source={require("../images/shop.png")} resizeMode={"contain"} style={styles.iconStyle1}/>}
+                renderSelectedIcon={() => <Image source={require("../images/shop1.png")} resizeMode={"contain"} style={styles.iconStyle1}/>}
+                onPress={() => this.setState({ selectedTab: 'shoppingCart' })}>
+                <ShoppingCart {...this.props}/>
+             </TabNavigator.Item>
+          </TabNavigator>
       </View>
     );
   }

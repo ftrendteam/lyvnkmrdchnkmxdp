@@ -21,7 +21,8 @@ import NetUtils from "../utils/NetUtils";
 import DataUtils from '../utils/DataUtils';
 import FetchUtils from "../utils/FetchUtils";
 import Storage from '../utils/Storage';
-export default class Query extends Component {
+import ModalDropdown from 'native';
+export default class ProductSH extends Component {
     constructor(props){
         super(props);
         this.state = {
@@ -34,24 +35,7 @@ export default class Query extends Component {
     }
     pressPush(){
         var str=this.state.Number;
-        if(str.length != 16){
-            alert("请输入16位数的单号");
-        }else{
-            var nextRoute={
-                name:"主页",
-                component:Search
-            };
-            this.props.navigator.push(nextRoute)
-        }
-        Storage.save('OrgFormno',this.state.Number);
-        Storage.save('Name','配送收货单');
-        Storage.save('valueOf','App_Client_ProPSSH');
-        Storage.save('history','App_Client_ProPSSHQ');
-        Storage.save('historyClass','App_Client_ProPSSHDetailQ');
-    }
-    Home(){
-        var str=this.state.Number;
-        if(str.length != 16){
+        if(str.length != 6){
             alert("请输入16位数的单号");
         }else{
             var nextRoute={
@@ -61,10 +45,16 @@ export default class Query extends Component {
             this.props.navigator.push(nextRoute)
         }
         Storage.save('OrgFormno',this.state.Number);
-        Storage.save('Name','商品盘点单');
-        Storage.save('valueOf','App_Client_ProPC');
-        Storage.save('history','App_Client_ProCurrPCQ');
-        Storage.save('historyClass','App_Client_ProPCDetailQ');
+        Storage.save('Name','协配收货');
+        Storage.save('valueOf','App_Client_ProXP');
+        Storage.save('history','App_Client_ProXPYSQ');
+        Storage.save('historyClass','App_Client_ProXPDetailYSQ');
+
+    }
+    _dropdown_4_onSelect(idx, value) {
+        this.setState({
+            Product:value
+        })
     }
     render() {
         return (
@@ -74,7 +64,8 @@ export default class Query extends Component {
                     <TextInput
                         autofocus="{true}"
                         numberoflines="{1}"
-                        placeholder="请输入原始单号"
+                        keyboardType="numeric"
+                        placeholder="请输入供应商编码"
                         textalign="center"
                         underlineColorAndroid='transparent'
                         placeholderTextColor="#cccccc"
@@ -86,12 +77,34 @@ export default class Query extends Component {
                         }}
                         />
                 </View>
+                <View style={styles.AgencyInformation}>
+                    <View style={styles.InformationLeft}><Text style={styles.InformationLeftText}>供应商编码</Text></View>
+                    <ModalDropdown style={styles.PullDown} options={[1,2,3,4,5]} textStyle={styles.dropdown_2_text} onSelect={(idx, value) => this._dropdown_4_onSelect(idx, value)}/>
+                </View>
+                <View style={styles.TextInput}>
+                    <TextInput
+                        autofocus="{true}"
+                        numberoflines="{1}"
+                        keyboardType="numeric"
+                        placeholder="请输入机构编码"
+                        textalign="center"
+                        underlineColorAndroid='transparent'
+                        placeholderTextColor="#cccccc"
+                        style={styles.admin}
+                        onChangeText={(value)=>{
+                            this.setState({
+                                Number:value
+                            })
+                        }}
+                        />
+                </View>
+                <View style={styles.AgencyInformation}>
+                    <View style={styles.InformationLeft}><Text style={styles.InformationLeftText}>机构编码</Text></View>
+                    <ModalDropdown style={styles.PullDown} options={[1,2,3,4,5]} textStyle={styles.dropdown_2_text} onSelect={(idx, value) => this._dropdown_4_onSelect(idx, value)}/>
+                </View>
                 <View style={styles.search}>
                     <TouchableOpacity style={styles.textsearch} onPress={this.pressPush.bind(this)}>
-                        <Text style={styles.textsearch1}>查询/扫描</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.determine} onPress={this.Home.bind(this)}>
-                        <Text style={styles.determine1}>确定</Text>
+                        <Text style={styles.textsearch1}>确定</Text>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -104,6 +117,13 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#ffffff',
     },
+    images:{
+        height:50,
+        paddingLeft:30,
+        borderBottomWidth:1,
+        borderBottomColor:"#cacccb",
+        justifyContent: 'center',
+    },
     admin:{
         borderRadius:3,
         backgroundColor:"#f5f5f5",
@@ -111,21 +131,21 @@ const styles = StyleSheet.create({
         paddingTop:8,
         paddingBottom:8,
         paddingLeft:12,
-        fontSize:16,
+        fontSize:14,
         marginLeft:30,
         marginRight:30,
         marginTop:50,
     },
     search:{
         flexDirection:"row",
-        marginTop:20,
+        marginTop:30,
     },
     textsearch:{
         marginLeft:30,
-        marginRight:20,
+        marginRight:30,
         backgroundColor:"#f47882",
         borderRadius:15,
-        flex:5,
+        flex:1,
         paddingTop:10,
         paddingBottom:10,
     },
@@ -134,26 +154,27 @@ const styles = StyleSheet.create({
         fontSize:14,
         color:"#ffffff",
     },
-    determine:{
-        flex:2,
-        backgroundColor:"#f47882",
-        borderRadius:3,
-        paddingTop:10,
-        paddingBottom:10,
+    AgencyInformation:{
+        marginLeft:30,
         marginRight:30,
+        marginTop:20,
+        flexDirection:"row",
     },
-    determine1:{
-        textAlign:"center",
-        fontSize:14,
-        color:"#ffffff",
+    InformationLeft:{
+        flex:2,
     },
-    images:{
-        height:50,
-        paddingLeft:30,
+    InformationLeftText:{
+        lineHeight:32,
+    },
+    PullDown:{
+        flex:7,
         borderBottomWidth:1,
         borderBottomColor:"#cacccb",
-        justifyContent: 'center',
-    }
+    },
+    dropdown_2_text:{
+        paddingLeft:15,
+        lineHeight:25,
+    },
 });
 
 

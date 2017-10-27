@@ -54,6 +54,7 @@ export default class HistoricalDocument extends Component {
         };
         this.dataRows = [];
   }
+
   HISTORY(){
       var nextRoute={
           name:"主页",
@@ -61,6 +62,7 @@ export default class HistoricalDocument extends Component {
       };
       this.props.navigator.push(nextRoute)
   }
+
   HOME(){
       var nextRoute={
           name:"主页",
@@ -68,6 +70,7 @@ export default class HistoricalDocument extends Component {
       };
       this.props.navigator.push(nextRoute);
   }
+
   SHOP(){
       var nextRoute={
           name:"主页",
@@ -76,6 +79,7 @@ export default class HistoricalDocument extends Component {
       };
       this.props.navigator.push(nextRoute)
   }
+
   pressPush(){
     var nextRoute={
         name:"主页",
@@ -86,6 +90,8 @@ export default class HistoricalDocument extends Component {
     };
     this.props.navigator.push(nextRoute)
   }
+
+  //不同页面传值
   _reloadView(startDate,endDate,formno,prodcode) {
     kaishi = String(startDate);
     jieshu = String(endDate);
@@ -100,9 +106,7 @@ export default class HistoricalDocument extends Component {
     this.dataRows=[];
     this._dpSearch()
   }
-  componentWillMount(){
-    this._renderSectionHeader();
-  }
+
   componentDidMount(){
      InteractionManager.runAfterInteractions(() => {
         this._setModalVisible();
@@ -126,7 +130,7 @@ export default class HistoricalDocument extends Component {
 
      //reqDetailCode获取
      Storage.get('history').then((tags) => {
-//        alert(tags)
+        //alert(tags)
          this.setState({
              reqDetailCode: tags
          });
@@ -172,18 +176,23 @@ export default class HistoricalDocument extends Component {
              Sign:NetUtils.MD5("App_PosReq" + "##" +this.state.reqDetailCode + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',
          };
          FetchUtils.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
-            this._setModalVisible();
-              if(data.retcode == 1){
-                  var  DetailInfo1 = data.DetailInfo1;
-                  this.dataRows = this.dataRows.concat(DetailInfo1);
-                  if(this.dataRows==0){
-                      return;
-                  }else{
-                      this.setState({
-                         dataSource:this.state.dataSource.cloneWithRows(this.dataRows)
-                      })
-                  }
-              }
+            var DetailInfo1 = JSON.stringify(data.DetailInfo1)
+            if(Detailnfo1 = null){
+                this._setModalVisible();
+            }else{
+                this._setModalVisible();
+            }
+            if(data.retcode == 1){
+                var DetailInfo1 = data.DetailInfo1;
+                this.dataRows = this.dataRows.concat(DetailInfo1);
+                if(this.dataRows==0){
+                    return;
+                }else{
+                    this.setState({
+                       dataSource:this.state.dataSource.cloneWithRows(this.dataRows)
+                    })
+                }
+            }
          })
      });
   }
@@ -236,15 +245,6 @@ export default class HistoricalDocument extends Component {
       )
   }
 
-  _renderSectionHeader(){
-    return (
-        <View style={styles.footerView}>
-            {
-               this.state.nomore ?<Text style={{fontSize: 16, alignSelf: 'center',marginTop:10}}>商品更新...</Text>:[<ActivityIndicator key="1"></ActivityIndicator>,<Text key="2" style={styles.fontColorGray}>加载中</Text>]
-            }
-        </View>
-    );
-  }
   render() {
     return (
       <View style={styles.container}>
