@@ -53,6 +53,7 @@ export default class ShoppingCart extends Component {
         };
         this.dataRows = [];
     }
+
     HISTORY(){
         var nextRoute={
             name:"主页",
@@ -60,6 +61,7 @@ export default class ShoppingCart extends Component {
         };
         this.props.navigator.push(nextRoute)
     }
+
     HOME(){
         var nextRoute={
             name:"主页",
@@ -67,6 +69,7 @@ export default class ShoppingCart extends Component {
         };
         this.props.navigator.push(nextRoute)
     }
+
     SHOP(){
         var nextRoute={
             name:"主页",
@@ -75,6 +78,7 @@ export default class ShoppingCart extends Component {
         };
         this.props.navigator.push(nextRoute)
     }
+
     pressPush(){
        var nextRoute={
           name:"主页",
@@ -82,6 +86,8 @@ export default class ShoppingCart extends Component {
        };
        this.props.navigator.push(nextRoute)
     }
+
+    //扫描商品
     Code(){
         RNScannerAndroid.openScanner();
         DeviceEventEmitter.addListener("code", (reminder) => {
@@ -103,6 +109,8 @@ export default class ShoppingCart extends Component {
             })
         })
     }
+
+    //点击商品列表跳转到修改商品数量页面
     OrderDetails(rowData){
         this.props.navigator.push({
             component:OrderDetails,
@@ -116,10 +124,11 @@ export default class ShoppingCart extends Component {
             }
         })
     }
-//自动跑接口
+
+    //自动跑接口
     componentDidMount(){
        InteractionManager.runAfterInteractions(() => {
-//           this._ModalVisible();
+           //this._ModalVisible();
            this._dpSearch();
            this._fetch()
        });
@@ -132,22 +141,26 @@ export default class ShoppingCart extends Component {
                 reqDetailCode: tags
             })
        });
+
        Storage.get('OrgFormno').then((tags) => {
             this.setState({
                 orgFormno: tags
             });
        });
+
        Storage.get('procode').then((tags) => {
             this.setState({
                 procode: tags
             });
        });
+
        //username获取
        Storage.get('username').then((tags) => {
             this.setState({
                 Username: tags
             });
        });
+
        //usercode获取
        Storage.get('userpwd').then((tags) => {
             this.setState({
@@ -155,8 +168,9 @@ export default class ShoppingCart extends Component {
             });
        });
 
+       //查询shopInfo表中某品类的数量
        dbAdapter.selectShopInfo('1').then((rows)=>{
-//           this._ModalVisible();
+           //this._ModalVisible();
            var shopnumber = 0;
            var shopAmount = 0;
            this.dataRows=[];
@@ -183,6 +197,7 @@ export default class ShoppingCart extends Component {
 
     }
     _fetch(){
+        //查询shopInfo表中所有商品的数量总和
        dbAdapter.selectShopInfoAllCountm().then((rows)=>{
            var ShopCar = rows.item(0).countm;
            this.setState({
@@ -212,7 +227,8 @@ export default class ShoppingCart extends Component {
        this._setModalVisible();
        this.props.navigator.pop();
     }
-//提交
+
+    //提交
     submit(){
         if(this.dataRows==0){
             alert("请添加商品")
@@ -254,8 +270,9 @@ export default class ShoppingCart extends Component {
                 })
             })
         }
-
     }
+
+    //单据备注对话框
     _rightButtonClick() {
         if(this.dataRows==0){
             alert("请添加商品")
@@ -270,19 +287,13 @@ export default class ShoppingCart extends Component {
             show:!isShow,
         });
     }
+    //执行 等待状态
 //    _ModalVisible() {
 //      let isShow = this.state.Show;
 //      this.setState({
 //          Show:!isShow,
 //      });
 //    }
-
-    renderLoadingView(){
-       return (<View style={styles.container} >
-               <Text>Loading movies......</Text>
-           </View>
-       );
-    }
 
   render() {
     return (

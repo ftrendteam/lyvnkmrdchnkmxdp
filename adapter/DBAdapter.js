@@ -742,7 +742,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
   selectUserRight(userCode, funcCode) {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
-        let sql = "select * from tuserright where usercode='" + userCode + "' and Funccode='" + funcCode + "' and IsDel='0'";
+        let sql = "select * from tuserright where usercode='" + userCode + "' and Funccode='" + funcCode + "'";
         tx.executeSql(sql, [], (tx, results) => {
           resolve(results.rows.length != 0);
         })
@@ -761,7 +761,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
   selecUserRightA1012(userCode) {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
-        let sql = "select * from tuserright where usercode='" + userCode + "' and Funccode='A1012' and IsDel='0'";
+        let sql = "select * from tuserright where usercode='" + userCode + "' and Funccode='A1012'";
         tx.executeSql(sql, [], (tx, results) => {
           resolve((results.rows.length != 0));
         })

@@ -46,6 +46,7 @@ export default class Search extends Component {
       };
       this.props.navigator.push(nextRoute);
   }
+
   Code(){
       RNScannerAndroid.openScanner();
       DeviceEventEmitter.addListener("code", (reminder) => {
@@ -67,6 +68,7 @@ export default class Search extends Component {
           })
       })
   }
+
   inputOnBlur(value){
       dbAdapter.selectAidCode(value,1).then((rows)=>{
           this.dataRows=[];
@@ -79,6 +81,7 @@ export default class Search extends Component {
           })
       });
   }
+
   _renderRow(rowData, sectionID, rowID){
       return (
           <View style={styles.Block}>

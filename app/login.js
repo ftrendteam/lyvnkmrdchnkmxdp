@@ -29,33 +29,6 @@ export default class  login extends Component{
             LinkUrl:""
         };
     }
-//获取数据
-    read(){
-        AsyncStorage.getItem('object',(error,result)=>{
-            if (!error) {
-                console.log(result);
-                alert(result);
-            }
-        })
-    }
-//本地存储数据
-    save(){
-        var object = {
-            ClientCode:this.state.ClientCode,
-            sDateTime:Date.parse(new Date()),//获取当前时间转换成时间戳
-            Pwd:NetUtils.MD5(this.state.Pwd)+'',//获取到密码之后md5加密
-            Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_Qry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
-        };
-        // JSON.stringify(object): JSON对象转换为字符串 用来存储
-        AsyncStorage.setItem('object',JSON.stringify(object),(error)=>{
-            if (error) {
-                alert('存储失败');
-            } else  {
-                alert('存储成功');
-                read();
-            }
-        });
-    }
     pressPush(){
         if(this.state.ClientCode == ""){
             ToastAndroid.show('请输入商户号', ToastAndroid.SHORT)
@@ -77,7 +50,6 @@ export default class  login extends Component{
             if(data.retcode == 1){
                 DetailInfo = JSON.stringify(data.DetailInfo);// 在这里从接口取出要保存的数据，然后执行save方法
                 var  DetailInfo = JSON.stringify(data.DetailInfo);
-                //alert(JSON.stringify(data))
                 for(var value of data.DetailInfo){//获取DetailInfo数据
                    LinkUrl = value.LinkUrl;//获取url地址
                    var str=LinkUrl;

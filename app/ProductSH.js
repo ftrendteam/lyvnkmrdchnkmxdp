@@ -14,6 +14,7 @@ import {
     TouchableOpacity,
     Image
 } from 'react-native';
+import Index from "./Index";
 import Home from "./Home";
 import Search from "./Search";
 import NetUtils from "../utils/NetUtils";
@@ -21,7 +22,7 @@ import DataUtils from '../utils/DataUtils';
 import FetchUtils from "../utils/FetchUtils";
 import Storage from '../utils/Storage';
 import ModalDropdown from 'native';
-export default class Product1 extends Component {
+export default class ProductSH extends Component {
     constructor(props){
         super(props);
         this.state = {
@@ -34,20 +35,20 @@ export default class Product1 extends Component {
     }
     pressPush(){
         var str=this.state.Number;
-        if(str.length != 16){
+        if(str.length != 6){
             alert("请输入16位数的单号");
         }else{
             var nextRoute={
                 name:"主页",
-                component:Search
+                component:Index
             };
             this.props.navigator.push(nextRoute)
         }
         Storage.save('OrgFormno',this.state.Number);
-        Storage.save('Name','配送收货单');
-        Storage.save('valueOf','App_Client_ProPSSH');
-        Storage.save('history','App_Client_ProPSSHQ');
-        Storage.save('historyClass','App_Client_ProPSSHDetailQ');
+        Storage.save('Name','协配收货');
+        Storage.save('valueOf','App_Client_ProXP');
+        Storage.save('history','App_Client_ProXPYSQ');
+        Storage.save('historyClass','App_Client_ProXPDetailYSQ');
 
     }
     _dropdown_4_onSelect(idx, value) {

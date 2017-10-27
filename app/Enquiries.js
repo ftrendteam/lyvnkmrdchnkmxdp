@@ -32,6 +32,7 @@ export default class Enquiries extends Component {
           name:"",
       }
   }
+
   componentDidMount(){
     this._get();
   }
@@ -48,27 +49,33 @@ export default class Enquiries extends Component {
          })
     });
   }
+
   Return(){
-        this.props.navigator.pop();
+    this.props.navigator.pop();
   }
+
+  //接受从上一个页面传过来的值and修改后并返回上一个页面
   pressPop(){
-        if(this.props.reloadView){
-           this.props.reloadView(this.state.startDate,this.state.endDate,this.state.formno,this.state.prodcode)
-        }
-        this.props.navigator.pop();
+    if(this.props.reloadView){
+       this.props.reloadView(this.state.startDate,this.state.endDate,this.state.formno,this.state.prodcode)
+    }
+    this.props.navigator.pop();
   }
+  //日期时间，以下是三种不同方式
   showDatePicker() {
         var date = new Date();
         this.picker.showDatePicker(date, (d)=>{
             this.setState({date:d});
         });
   }
+
   showTimePicker() {
         var date = new Date();
         this.picker.showTimePicker(date, (d)=>{
             this.setState({date:d});
         });
   }
+
   showDateTimePicker(data) {
     if(data){
         var startDate = new Date();
@@ -82,6 +89,7 @@ export default class Enquiries extends Component {
         });
     }
   }
+
   emptying(){
     var nextRoute={
         name:"主页",
@@ -89,6 +97,7 @@ export default class Enquiries extends Component {
     };
     this.props.navigator.push(nextRoute)
   }
+
   render() {
     return (
       <View style={styles.container}>
@@ -114,7 +123,7 @@ export default class Enquiries extends Component {
                     <Text style={styles.ContLeft1}>{this.state.reqDetailCode}</Text>
                 </View>
                 {
-                    (this.state.name=="商品采购"&&this.state.name=="商品验收")?
+                    (this.state.name=="商品采购"&&this.state.name=="商品验收"&&this.state.name=="协配采购"&&this.state.name=="协配收货")?
                     <View style={styles.ContList}>
                         <Text style={styles.ContLeft3}>供应商编码：</Text>
                         <Text style={styles.ContLeft1}>001</Text>
