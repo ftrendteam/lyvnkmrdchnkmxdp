@@ -226,7 +226,7 @@ export  default class RequestBodyUtils {
   /***
    * 供应商信息请求体
    */
-  static createSuppset = (shopCode, posCode, userCode) => {
+  static createSuppset = (shopCode) => {
     return JSON.stringify({
       "TblName": "BasicInfo",
       "reqCode": "tsuppset",
@@ -271,11 +271,7 @@ export  default class RequestBodyUtils {
   }
   
   
-  /***
-   * 协配收货单请求体
-   */
-  static createProXP = () => {
-  }
+ 
   /***
    * 品级请求体
    */
