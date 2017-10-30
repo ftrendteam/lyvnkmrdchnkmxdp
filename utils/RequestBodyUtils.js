@@ -271,11 +271,7 @@ export  default class RequestBodyUtils {
   }
   
   
-  /***
-   * 协配收货单请求体
-   */
-  static createProXP = () => {
-  }
+ 
   /***
    * 品级请求体
    */
