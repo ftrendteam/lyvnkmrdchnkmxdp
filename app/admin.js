@@ -153,11 +153,11 @@ export default class admin extends Component {
         var code = ""+this.state.Product;//获取到之后前面加""+
         var Usercode=this.state.Usercode;
         var UserPwd=this.state.UserPwd;
-        Storage.save("shopCode",this.state.pickedDate);//调用保存封装接口
+        //DataUtils.save("shopCode",this.state.pickedDate);//调用保存封装接口
         str1 = code.split('_');
         str2 = str1[1];
         this._setModalVisible();
-        dbAdapter.isLogin(Usercode, this.state.UserPwd, str2,'','').then((isLogin)=>{
+        dbAdapter.isLogin(Usercode, this.state.UserPwd, str2).then((isLogin)=>{
             if(isLogin){
                var strin = this.state.Product;
                strjj = ""+strin;
