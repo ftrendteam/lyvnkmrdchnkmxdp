@@ -171,6 +171,7 @@ export default class admin extends Component {
                };
                this.props.navigator.push(nextRoute);
                this._setModalVisible();
+
             }else{
                this._setModalVisible();
                ToastAndroid.show('用户编码或密码错误', ToastAndroid.SHORT);
