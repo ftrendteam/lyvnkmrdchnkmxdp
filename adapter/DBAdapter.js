@@ -519,7 +519,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
     });
   }
   
-  isLogin(Usercode, userpwd, currShopCode,posCode) {
+  isLogin(Usercode, userpwd, currShopCode) {
     let md5Pwd = MD5Utils.encryptMD5(userpwd);
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
@@ -533,23 +533,22 @@ export default class DBAdapter extends SQLiteOpenHelper {
               DataUtils.save("userName", userName);
               DataUtils.save("userCode", Usercode);
               let shopCode;
-              DataUtils.get('shopCode', '').then((data) => {
+              DataUtils.get('code', '').then((data) => {
                 shopCode = data;
-                console.log("shopCode", shopCode);
                 if (shopCode == currShopCode) {//当前登录的机构号 和本地保存的相同
-                  console.log("当前登录的机构号 和本地保存的相同");
+                  console.log("aaaa当前登录的机构号 和本地保存的相同");
                   resolve(true);
                 } else if (shopCode == '') {//本地没有保存机构号,根据当前的机构号下载商品和品类
                   let categoryBody = RequestBodyUtils.createCategory(currShopCode);
                   this.downProductAndCategory(categoryBody, currShopCode).then((result) => {
                     //if (result) {
-                    console.log("本地没有保存机构号,根据当前的机构号下载商品和品类");
+                    console.log("bbb本地没有保存机构号,根据当前的机构号下载商品和品类");
                     resolve(true);
                     //}
                   });
                 } else {//当前登录的机构号和本地保存的机构号不同.重新保存并下载新的品类和商品信息
                   DataUtils.save('shopCode', currShopCode);
-                  console.log("重新保存并下载新的品类和商品信息");
+                  console.log("cccc重新保存并下载新的品类和商品信息");
                   /***
                    * prductBody 商品信息下载请求体
                    * categoryBody 品类信息下载请求体
@@ -612,7 +611,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
     return new Promise((resolve, reject) => {
       DataUtils.get("LinkUrl", '').then((urlData) => {
         RequestBodyUtils.requestProduct(urlData, currShopCode, this).then((prodResult) => {
-          console.log("prodResult", prodResult);
+          
           FetchUtils.post(urlData, categoryBody).then((datas) => {
             this.insertTDepSetData(datas.TblRow).then((result) => {
               let suppset = RequestBodyUtils.createSuppset(currShopCode);
