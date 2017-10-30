@@ -201,7 +201,7 @@ export  default class RequestBodyUtils {
    *  App_Client_ProSYDetailQ  商品损益
    *
    */
-  businessDetailSelect(reqDetailCode, clientCode, beginDate, endDate, shopcode, formno, prodcode) {
+  businessDetailSelect(reqDetailCode, clientCode, beginDate, endDate, shopcode, formno, prodcode, childshopcode) {
     let date = DateUtils.getCurrentDate(new Date());
     let sign = MD5Utils.encryptMD5('App_PosReq' + "##" + reqDetailCode + "##" + date + "##" + 'PosControlCs');
     return JSON.stringify({
@@ -216,38 +216,33 @@ export  default class RequestBodyUtils {
       , 'BeginDate': beginDate //开始日期
       , 'EndDate': endDate //截止日期
       , 'shopcode': shopcode //机构号
+      , "childshopcode": childshopcode//协配采购，协配收货时候可以根据这个号进行查询
       , 'formno': formno //过滤的单据信息
       , 'prodcode': prodcode //过滤用的商品编码
     });
   }
   
-  /***
-   * 商品采购单请求体
-   */
-  static createProCG = () => {
-    let date = DateUtils.getCurrentDate(new Date());
-    let sign = MD5Utils.encryptMD5('App_PosReq' + "##" + "App_Client_ProYH" + "##" + date + "##" + 'PosControlCs');
-  }
- 
+  
   /***
    * 供应商信息请求体
    */
-  static createSuppset=(shopCode,posCode,userCode)=>{
+  static createSuppset = (shopCode, posCode, userCode) => {
     return JSON.stringify({
-      "TblName":"BasicInfo",
-      "reqCode":"tsuppset",
-      "ShopCode":shopCode,
-      "PosCode":posCode,
-      "UserCode":userCode
-      ,"Code":""
-      ,"NeedPage":"0"
-      ,"PageCount":"200"
-      ,"CurrPage":"1"
+      "TblName": "BasicInfo",
+      "reqCode": "tsuppset",
+      "ShopCode": shopCode,
+      "PosCode": posCode,
+      "UserCode": userCode
+      , "Code": ""
+      , "NeedPage": "0"
+      , "PageCount": "200"
+      , "CurrPage": "1"
     });
   }
+  
   /***
    *    单据提交
-   *App_Client_ProCG商品采购单
+   *App_Client_ProCG商品采购单  App_Client_ProCG
    *App_Client_ProYS商品验收单
    *App_Client_ProXP协配采购单
    *App_Client_ProXP协配收货单
@@ -255,72 +250,26 @@ export  default class RequestBodyUtils {
    * @param username 用户登录名
    * @param usercode 用户登编码
    */
-  static businessPut = (reqDetailCode, DetailInfo1, DetailInfo2) => {
+  static async businessPut(reqDetailCode, DetailInfo1, DetailInfo2) {
     let date = DateUtils.getCurrentDate(new Date());
     let sign = MD5Utils.encryptMD5('App_PosReq' + "##" + reqDetailCode + "##" + date + "##" + 'PosControlCs');
-    let userName = Storage.get("userName").then((userName) => {
-      Storage.get("userCode").then((userCode) => {
-        Storage.get("ClientCode").then((clientCode) => {
-          let a =JSON.stringify({
-            "reqCode": "App_PosReq",
-            "reqDetailCode": reqDetailCode,
-            "ClientCode": clientCode+"",
-            "sDateTime": date,
-            "Sign": sign + "",
-            "username": userName+"",
-            "usercode": userCode+"",
-            "DetailInfo1": DetailInfo1,
-            "DetailInfo2": DetailInfo2
-          });
-          console.log("a=",a)
-          return a;
-        });
-      });
+    let userName = await Storage.get("userName");
+    let userCode = await  Storage.get("userCode");
+    let clientCode = await  Storage.get("ClientCode");
+    let a = JSON.stringify({
+      "reqCode": "App_PosReq",
+      "reqDetailCode": reqDetailCode,
+      "ClientCode": clientCode + "",
+      "sDateTime": date,
+      "Sign": sign + "",
+      "username": userName + "",
+      "usercode": userCode + "",
+      "DetailInfo1": DetailInfo1,
+      "DetailInfo2": DetailInfo2
     });
-    //let userCode = Storage.get("userCode");
-    //let clientCode = Storage.get("ClientCode");
-    
-    
-    
+    return a;
   }
   
-  /***
-   *    单据查询
-   *App_Client_ProCG商品采购单
-   *App_Client_ProYS商品验收单
-   *App_Client_ProXP协配采购单
-   *App_Client_ProXP协配收货单
-   * @param reqDetailCode 单据标识
-   * @param clientCode 商户号
-   */
-  static businessSelect = (reqDetailCode, BeginDate, EndDate, formno, prodcode) => {
-    let userName = Storage.get("userName");
-    let userCode = Storage.get("userCode");
-    let shopCode = Storage.get("shopCode");
-    let clientCode = Storage.get("ClientCode");
-    
-    let date = DateUtils.getCurrentDate(new Date());
-    let sign = MD5Utils.encryptMD5('App_PosReq' + "##" + reqDetailCode + "##" + date + "##" + 'PosControlCs');
-    return JSON.stringify({
-      'reqCode': 'App_PosReq'  //固定内容
-      , 'reqDetailCode': reqDetailCode,
-      //*App_Client_ProCG商品采购单
-      //*App_Client_ProYS商品验收单
-      //*App_Client_ProXP协配采购单
-      //*App_Client_ProXP协配收货单
-      'ClientCode': clientCode + ''
-      , 'sDateTime': date
-      , 'Sign': sign + ''
-      , 'username': userName + ''//用户名称
-      , 'usercode': userCode + ''//用户编码
-      , 'BeginDate': BeginDate  //开始日期
-      , 'EndDate': EndDate //截止日期
-      , 'shopcode': shopCode //机构号
-      , 'childshopcode': '0' //协配采购，协配收货时候可以根据这个号进行查询
-      , 'formno': formno //过滤的单据信息
-      , 'prodcode': prodcode //过滤用的商品编码
-    });
-  }
   
   /***
    * 协配收货单请求体

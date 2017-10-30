@@ -542,10 +542,10 @@ export default class DBAdapter extends SQLiteOpenHelper {
                 } else if (shopCode == '') {//本地没有保存机构号,根据当前的机构号下载商品和品类
                   let categoryBody = RequestBodyUtils.createCategory(currShopCode);
                   this.downProductAndCategory(categoryBody, currShopCode).then((result) => {
-                    if (result) {
-                      console.log("本地没有保存机构号,根据当前的机构号下载商品和品类");
-                      resolve(true);
-                    }
+                    //if (result) {
+                    console.log("本地没有保存机构号,根据当前的机构号下载商品和品类");
+                    resolve(true);
+                    //}
                   });
                 } else {//当前登录的机构号和本地保存的机构号不同.重新保存并下载新的品类和商品信息
                   DataUtils.save('shopCode', currShopCode);
@@ -556,9 +556,9 @@ export default class DBAdapter extends SQLiteOpenHelper {
                    */
                   let categoryBody = RequestBodyUtils.createCategory(currShopCode);
                   this.downProductAndCategory(categoryBody, currShopCode).then((result) => {
-                    if (result) {
-                      resolve(true);
-                    }
+                    //if (result) {
+                    resolve(true);
+                    //}
                   });
                   
                 }
@@ -613,18 +613,16 @@ export default class DBAdapter extends SQLiteOpenHelper {
       DataUtils.get("LinkUrl", '').then((urlData) => {
         RequestBodyUtils.requestProduct(urlData, currShopCode, this).then((prodResult) => {
           console.log("prodResult", prodResult);
-          if (prodResult) {
-            FetchUtils.post(urlData, categoryBody).then((datas) => {
-              if (datas.retcode == 1) {
-                console.log("datas", "aaa");
-                this.insertTDepSetData(datas.TblRow).then((result) => {
-                  resolve(true);
+          FetchUtils.post(urlData, categoryBody).then((datas) => {
+            this.insertTDepSetData(datas.TblRow).then((result) => {
+              let suppset = RequestBodyUtils.createSuppset(currShopCode, posCode, userCode);
+              FetchUtils.post(urlData, suppset).then((suppData) => {
+                this.insertSuppeset(suppData.TblRow).then((result) => {
+                  resolve(result);
                 });
-              } else {
-                reject(false);
-              }
+              })
             });
-          }
+          });
         });
       });
     });
@@ -775,26 +773,55 @@ export default class DBAdapter extends SQLiteOpenHelper {
    * 插入供应商信息表
    */
   insertSuppeset = (datas) => {
-    for (let i = 0; i < datas.length; i++) {
-      let data = datas[i];
-      let pid = data.pid;
-      let sCode = data.sCode;
-      let sname = data.sname;
-      let levelno = data.levelno;
-      let aidcode = data.aidcode;
-      let subcode = data.subcode;
-      let suppType = data.SuppType;
+    return new Promise((resolve, reject) => {
       db.transaction((tx) => {
-        let sql = " replace INTO tsuppset(pid,sCode,sname,levelno,aidcode,subcode,SuppType)" +
-          "values(?,?,?,?,?,?,?)";
-        tx.executeSql(sql, [pid, sCode, sname, levelno, aidcode, subcode, suppType], () => {
-          
-          }, (err) => {
-            console.log("err===",err);
+        for (let i = 0; i < datas.length; i++) {
+          let data = datas[i];
+          let pid = data.pid;
+          let sCode = data.sCode;
+          let sname = data.sname;
+          let levelno = data.levelno;
+          let aidcode = data.aidcode;
+          let subcode = data.subcode;
+          let suppType = data.SuppType;
+          let sql = " replace INTO tsuppset(pid,sCode,sname,levelno,aidcode,subcode,SuppType)" +
+            "values(?,?,?,?,?,?,?)";
+          tx.executeSql(sql, [pid, sCode, sname, levelno, aidcode, subcode, suppType], () => {
+            }, (err) => {
+              console.log("err===", err);
+            }
+          );
+        }
+      }, (error) => {
+        reject(false);
+        this._errorCB('transaction', error);
+      }, () => {
+        //this._successCB('transaction insert data');
+        resolve(true);
+      });
+      
+    });
+    
+  }
+  
+  /***
+   * 查询某个表中的所有数据
+   * @param dbName 表明
+   * @return {Promise}
+   */
+  selectAllData = (dbName) => {
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        let sql = "select * from" + dbName;
+        tx.executeSql(sql, [], (tx, results) => {
+            resolve((results.rows));
+          }, (error) => {
+            console.log("err===", error);
           }
         );
       });
-    }
+    });
+    
   }
   
   
