@@ -24,31 +24,11 @@ export default class MainView extends Component{
             first:""
         };
     }
-    //render之前执行的方法
-//    componentWillMount(){
-//         Storage.get('FirstTime').then((tags) => {
-////            alert(this.state.first);
-//            this.setState({
-//                first: tags
-//            });
-//         });
-//    }
     render() {
         var rootRoute={
             name:"login",
             component:File
         };
-//        if(this.state.first == 1 ){
-//            var rootRoute={
-//                name:"admin",
-//                component:admin
-//            };
-//        }else {
-//            var rootRoute={
-//                name:"login",
-//                component:login
-//            };
-//        }
         return (
             <Navigator.Navigator
                 initialRoute={rootRoute}
