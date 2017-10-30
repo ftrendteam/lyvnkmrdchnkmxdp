@@ -226,13 +226,13 @@ export  default class RequestBodyUtils {
   /***
    * 供应商信息请求体
    */
-  static createSuppset = (shopCode, posCode, userCode) => {
+  static createSuppset = (shopCode) => {
     return JSON.stringify({
       "TblName": "BasicInfo",
       "reqCode": "tsuppset",
       "ShopCode": shopCode,
-      "PosCode": posCode,
-      "UserCode": userCode
+      "PosCode": '',
+      "UserCode": ''
       , "Code": ""
       , "NeedPage": "0"
       , "PageCount": "200"

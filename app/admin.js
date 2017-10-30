@@ -27,7 +27,7 @@ import NetUtils from "../utils/NetUtils";
 import FetchUtil from "../utils/FetchUtils";
 import DBAdapter from "../adapter/DBAdapter";
 import Storage from "../utils/Storage";
-// import Picker from 'react-native-picker';
+import Picker from 'react-native-picker';
 import ModalDropdown from 'react-native-modal-dropdown';
 //第二页面
 let dbAdapter = new DBAdapter();
@@ -157,7 +157,7 @@ export default class admin extends Component {
         str1 = code.split('_');
         str2 = str1[1];
         this._setModalVisible();
-        dbAdapter.isLogin(Usercode, this.state.UserPwd, str2).then((isLogin)=>{
+        dbAdapter.isLogin(Usercode, this.state.UserPwd, str2,'','').then((isLogin)=>{
             if(isLogin){
                var strin = this.state.Product;
                strjj = ""+strin;
@@ -171,7 +171,6 @@ export default class admin extends Component {
                };
                this.props.navigator.push(nextRoute);
                this._setModalVisible();
-
             }else{
                this._setModalVisible();
                ToastAndroid.show('用户编码或密码错误', ToastAndroid.SHORT);
@@ -232,9 +231,7 @@ export default class admin extends Component {
                 <Image source={require("../images/admin1.png")} style={styles.TextImage1}></Image>
             </View>
             <View style={styles.AgencyInformation}>
-                <View style={styles.InformationLeft}>
-                    <Text style={styles.InformationLeftText}>机构信息</Text>
-                </View>
+                <View style={styles.InformationLeft}><Text style={styles.InformationLeftText}>机构信息</Text></View>
                 <ModalDropdown style={styles.PullDown} options={this.state.pickedDate} textStyle={styles.dropdown_2_text} onSelect={(idx, value) => this._dropdown_4_onSelect(idx, value)}/>
             </View>
             <TouchableOpacity onPress={this.pressPush.bind(this)}>
@@ -258,7 +255,7 @@ export default class admin extends Component {
             </View>
         </Modal>
       </View>
-    )
+    );
   }
 }
 

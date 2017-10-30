@@ -58,9 +58,8 @@ export default class  login extends Component{
                    var date=items+'/FMJsonInterfaceByDownToPos';
                    DataUtils.save('LinkUrl',date);
                 }
-                var frist = 1;
-                Storage.save('FirstTime',frist);
-                Storage.save('ClientCode',this.state.ClientCode);
+                DataUtils.save('FirstTime','1');
+                DataUtils.save('ClientCode',this.state.ClientCode);
                 this.props.navigator.push({
                     component:admin,
                 });
