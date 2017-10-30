@@ -48,6 +48,7 @@ export default class HistoricalDocument extends Component {
             danzi1:"",
             codesw1:"",
             shopcar:"",
+            show:false,
             animating:true,
             nomore:false,
             dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
@@ -93,6 +94,7 @@ export default class HistoricalDocument extends Component {
 
   //不同页面传值
   _reloadView(startDate,endDate,formno,prodcode) {
+    this._setModalVisible();
     kaishi = String(startDate);
     jieshu = String(endDate);
     danzi = String(formno);
@@ -108,12 +110,16 @@ export default class HistoricalDocument extends Component {
   }
 
   componentDidMount(){
+     console.log("componentDidMount");
      InteractionManager.runAfterInteractions(() => {
         this._setModalVisible();
         this._get();
         this._dpSearch();
         this._fetch();
      });
+  }
+  componentWillUnmount(){
+  console.log("componentWillUnmount");
   }
   _setModalVisible() {
       let isShow = this.state.show;
@@ -179,9 +185,9 @@ export default class HistoricalDocument extends Component {
             var DetailInfo1 = JSON.stringify(data.DetailInfo1)
             if(Detailnfo1 = null){
                 this._setModalVisible();
-            }else{
-                this._setModalVisible();
             }
+            this._setModalVisible();
+
             if(data.retcode == 1){
                 var DetailInfo1 = data.DetailInfo1;
                 this.dataRows = this.dataRows.concat(DetailInfo1);
