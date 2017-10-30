@@ -66,29 +66,29 @@ export default class SQLiteOpenHelper {
       //品级
       tx.executeSql('CREATE TABLE IF NOT EXISTS tdepset(pid int not null Primary Key,DepCode varchar(20) null,DepName varchar(100) null,' +
         'AidCode varchar(20) null,SubCode varchar(20) null,DepMemo varchar(50) null,SpecTag int(4) null,IsLeaf int(4) null,' +
-        'ProfitRate float(8) null,GatherRate float(8) null,DepLevel int(4) null,IsDel varchar(1) null,depcode1 varchar(12) null'+
+        'ProfitRate float(8) null,GatherRate float(8) null,DepLevel int(4) null,IsDel varchar(1) null,depcode1 varchar(12) null' +
         ',depcode2 varchar(12) null,depcode3 varchar(12) null,depcode4 varchar(12) null,depcode5 varchar(12) null,depcode6 varchar(12) null)'
         , [], () => {
           //this._successCB('executeSql');
         }, (err) => {
           this._errorCB('d', err);
         });
-  
+      
       tx.executeSql('CREATE INDEX IF NOT EXISTS  [index_tdepset_depcode] ON [tdepset] ([DepCode] COLLATE NOCASE ASC)'
         , [], () => {
           //this._successCB('executeSql');
         }, (err) => {
           this._errorCB('d', err);
         });
-  
+      
       tx.executeSql('CREATE INDEX IF NOT EXISTS  [index_tdepset_subcode] ON [tdepset] ([SubCode] COLLATE NOCASE ASC)'
         , [], () => {
           //this._successCB('executeSql');
         }, (err) => {
           this._errorCB('d', err);
         });
-  
-  
+      
+      
       //用户信息列表
       tx.executeSql('CREATE TABLE IF NOT EXISTS tuserset(pid int not null Primary Key,Usercode varchar(20) null,Barcode varchar(20) null,' +
         'UserName varchar(20) null,UserPwd varchar(100) null,OpriceRight varchar(10) null,PriceRight varchar(10) null,IsCashier varchar(10) null,'
@@ -109,49 +109,54 @@ export default class SQLiteOpenHelper {
         'GatherType char(1) null,GatherRate float(8) null,ProdType char(1) null,SeasonCode varchar(12) null,' +
         'ProdMemo1 varchar(20) null,ProdMemo2 varchar(20) null,ProdMemo3 varchar(20) null,FNoCD char(1) null,IsDel char(1) null,' +
         'FNoSale char(1) null,FNoTH char(1) null,FNoPromoton char(1) null,FUseSalePrice char(1) null,StdOutOPrice float(8) null,FNoYH char(1) null,' +
-        'HLimit money(8) null,LLimit money(8) null,BestKC money(8) null,PriceFlag varchar(2) null,FNoPromotion varchar(10) null,FNoCG varchar(10) null,'+
-      'OperRange varchar(10) null,TakeRate varchar(10) null,TakeType varchar(10) null)'
-        , [], () => {
-          //this._successCB('executeSql');
-        }, (err) => {
-          this._errorCB('f', err);
-        });
-  
-      tx.executeSql('CREATE INDEX IF NOT EXISTS  [index_product_myprodcode] ON [Product] ([ProdCode] COLLATE NOCASE ASC)'
-        , [], () => {
-          //this._successCB('executeSql');
-        }, (err) => {
-          this._errorCB('f', err);
-        });
-  
-      tx.executeSql('CREATE INDEX IF NOT EXISTS  [index_product_barcode] ON [Product] ([barcode] COLLATE NOCASE ASC)'
-        , [], () => {
-          //this._successCB('executeSql');
-        }, (err) => {
-          this._errorCB('f', err);
-        });
-  
-      tx.executeSql('CREATE INDEX IF NOT EXISTS  [index_product_depcode] ON [Product] ([depcode] COLLATE NOCASE ASC)'
+        'HLimit money(8) null,LLimit money(8) null,BestKC money(8) null,PriceFlag varchar(2) null,FNoPromotion varchar(10) null,FNoCG varchar(10) null,' +
+        'OperRange varchar(10) null,TakeRate varchar(10) null,TakeType varchar(10) null)'
         , [], () => {
           //this._successCB('executeSql');
         }, (err) => {
           this._errorCB('f', err);
         });
       
-        //Pid,ProdCode,prodname,countm,ShopPrice,prototal,promemo,kccount
-      tx.executeSql("CREATE TABLE IF NOT EXISTS shopInfo(pid int not null Primary Key,ProdCode varchar(20) null,prodname varchar(255) null,countm float(8) null,"+
-        "ShopPrice float(8) null,prototal float(8) null,promemo varchar(50) null,DepCode varchar(20) null)",[],
-        ()=>{
+      tx.executeSql('CREATE INDEX IF NOT EXISTS  [index_product_myprodcode] ON [Product] ([ProdCode] COLLATE NOCASE ASC)'
+        , [], () => {
+          //this._successCB('executeSql');
+        }, (err) => {
+          this._errorCB('f', err);
+        });
+      
+      tx.executeSql('CREATE INDEX IF NOT EXISTS  [index_product_barcode] ON [Product] ([barcode] COLLATE NOCASE ASC)'
+        , [], () => {
+          //this._successCB('executeSql');
+        }, (err) => {
+          this._errorCB('f', err);
+        });
+      
+      tx.executeSql('CREATE INDEX IF NOT EXISTS  [index_product_depcode] ON [Product] ([depcode] COLLATE NOCASE ASC)'
+        , [], () => {
+          //this._successCB('executeSql');
+        }, (err) => {
+          this._errorCB('f', err);
+        });
+      //Pid,ProdCode,prodname,countm,ShopPrice,prototal,promemo,kccount
+      tx.executeSql("CREATE TABLE IF NOT EXISTS shopInfo(pid int not null Primary Key,ProdCode varchar(20) null,prodname varchar(255) null,countm float(8) null," +
+        "ShopPrice float(8) null,prototal float(8) null,promemo varchar(50) null,DepCode varchar(20) null)", [],
+        () => {
         
-        }, (err)=>{
-        console.log(err);
-      });
+        }, (err) => {
+          console.log(err);
+        });
+      tx.executeSql("CREATE TABLE IF NOT EXISTS tsuppset(pid int not null Primary Key,sCode varchar(20) null,sname varchar(255) null,levelno int(8) null," +
+        "aidcode varchar(8) null,subcode varchar(8) null,SuppType varchar(50) null)", [],
+        () => {
+        
+        }, (err) => {
+          console.log(err);
+        });
     }, (err) => {
       this._errorCB('transaction', err);
     }, () => {
       //this._successCB('transaction');
     })
-    
   }
   
   /***

@@ -201,7 +201,7 @@ export  default class RequestBodyUtils {
    *  App_Client_ProSYDetailQ  商品损益
    *
    */
-  businessDetailSelect(reqDetailCode, clientCode, beginDate, endDate, shopcode, formno, prodcode) {
+  businessDetailSelect(reqDetailCode, clientCode, beginDate, endDate, shopcode, formno, prodcode, childshopcode) {
     let date = DateUtils.getCurrentDate(new Date());
     let sign = MD5Utils.encryptMD5('App_PosReq' + "##" + reqDetailCode + "##" + date + "##" + 'PosControlCs');
     return JSON.stringify({
@@ -216,11 +216,66 @@ export  default class RequestBodyUtils {
       , 'BeginDate': beginDate //开始日期
       , 'EndDate': endDate //截止日期
       , 'shopcode': shopcode //机构号
+      , "childshopcode": childshopcode//协配采购，协配收货时候可以根据这个号进行查询
       , 'formno': formno //过滤的单据信息
       , 'prodcode': prodcode //过滤用的商品编码
     });
   }
   
+  
+  /***
+   * 供应商信息请求体
+   */
+  static createSuppset = (shopCode, posCode, userCode) => {
+    return JSON.stringify({
+      "TblName": "BasicInfo",
+      "reqCode": "tsuppset",
+      "ShopCode": shopCode,
+      "PosCode": posCode,
+      "UserCode": userCode
+      , "Code": ""
+      , "NeedPage": "0"
+      , "PageCount": "200"
+      , "CurrPage": "1"
+    });
+  }
+  
+  /***
+   *    单据提交
+   *App_Client_ProCG商品采购单  App_Client_ProCG
+   *App_Client_ProYS商品验收单
+   *App_Client_ProXP协配采购单
+   *App_Client_ProXP协配收货单
+   * @param reqDetailCode 单据标识
+   * @param username 用户登录名
+   * @param usercode 用户登编码
+   */
+  static async businessPut(reqDetailCode, DetailInfo1, DetailInfo2) {
+    let date = DateUtils.getCurrentDate(new Date());
+    let sign = MD5Utils.encryptMD5('App_PosReq' + "##" + reqDetailCode + "##" + date + "##" + 'PosControlCs');
+    let userName = await Storage.get("userName");
+    let userCode = await  Storage.get("userCode");
+    let clientCode = await  Storage.get("ClientCode");
+    let a = JSON.stringify({
+      "reqCode": "App_PosReq",
+      "reqDetailCode": reqDetailCode,
+      "ClientCode": clientCode + "",
+      "sDateTime": date,
+      "Sign": sign + "",
+      "username": userName + "",
+      "usercode": userCode + "",
+      "DetailInfo1": DetailInfo1,
+      "DetailInfo2": DetailInfo2
+    });
+    return a;
+  }
+  
+  
+  /***
+   * 协配收货单请求体
+   */
+  static createProXP = () => {
+  }
   /***
    * 品级请求体
    */
@@ -274,7 +329,7 @@ export  default class RequestBodyUtils {
     Storage.get("CurrDate").then((currentData) => {
       let requestBody = RequestBodyUtils.createProduct(shopCode, currentData, RequestBodyUtils.currPage);
       FetchUtils.post(url, requestBody).then((json) => {
-      console.log();
+        //console.log(json);
         if (!(json == "" || json == null || json == undefined || (json == "[]"))) {
           if (json.retcode == 99) {
             RequestBodyUtils.currPage = 1;
