@@ -259,7 +259,7 @@ export default class ShoppingCart extends Component {
                 FetchUtils.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
                     if(data.retcode == 1){
                         alert("提交成功");
-                        dbAdapter.deleteData("shopInfo");
+                        Storage.delete("shopInfo");
                         this.dataRows=[];
                         this.setState({
                             dataSource:this.state.dataSource.cloneWithRows(this.dataRows),

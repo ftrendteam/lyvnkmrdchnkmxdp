@@ -533,7 +533,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
               DataUtils.save("userName", userName);
               DataUtils.save("userCode", Usercode);
               let shopCode;
-              DataUtils.get('shopCode', '').then((data) => {
+              DataUtils.get('code', '').then((data) => {
                 shopCode = data;
                 console.log("shopCode", shopCode);
                 if (shopCode == currShopCode) {//当前登录的机构号 和本地保存的相同

@@ -50,7 +50,7 @@ var {NativeModules} = require('react-native');
 var RNScannerAndroid = NativeModules.RNScannerAndroid;
 let dbAdapter = new DBAdapter();
 let db;
-let page =1;
+let page =0;
 let total = 0;
 let totalPage = 0;
 const lastDepCode = "";
@@ -180,7 +180,7 @@ export default class Index extends Component {
             });
             this._fetch();
             this.function();
-         });
+        });
     }
 
    //获取左侧商品品类信息、商品总数、触发第一个列表
