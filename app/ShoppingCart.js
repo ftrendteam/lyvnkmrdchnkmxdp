@@ -252,7 +252,8 @@ export default class ShoppingCart extends Component {
                     Sign: NetUtils.MD5("App_PosReq" + "##" +this.state.reqDetailCode + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',
                     username: this.state.Username,
                     usercode: this.state.Userpwd,
-                    DetailInfo1: {"ShopCode": tags, "OrgFormno": this.state.orgFormno, "ProMemo": this.state.Remark},
+                    //"SuppCode":this.state.suppcode,"ChildShop":this.state.childshop:
+                    DetailInfo1: {"ShopCode": tags, "OrgFormno": this.state.orgFormno, "ProMemo": this.state.Remark,},
                     DetailInfo2: this.dataRows,
                 };
                 FetchUtils.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{

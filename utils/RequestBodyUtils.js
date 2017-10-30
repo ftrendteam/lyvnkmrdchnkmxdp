@@ -231,8 +231,8 @@ export  default class RequestBodyUtils {
       "TblName": "BasicInfo",
       "reqCode": "tsuppset",
       "ShopCode": shopCode,
-      "PosCode": posCode,
-      "UserCode": userCode
+      "PosCode": '',
+      "UserCode": ''
       , "Code": ""
       , "NeedPage": "0"
       , "PageCount": "200"

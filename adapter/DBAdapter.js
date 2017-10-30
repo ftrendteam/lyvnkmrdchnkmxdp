@@ -519,7 +519,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
     });
   }
   
-  isLogin(Usercode, userpwd, currShopCode) {
+  isLogin(Usercode, userpwd, currShopCode,posCode) {
     let md5Pwd = MD5Utils.encryptMD5(userpwd);
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {

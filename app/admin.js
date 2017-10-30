@@ -157,7 +157,7 @@ export default class admin extends Component {
         str1 = code.split('_');
         str2 = str1[1];
         this._setModalVisible();
-        dbAdapter.isLogin(Usercode, this.state.UserPwd, str2).then((isLogin)=>{
+        dbAdapter.isLogin(Usercode, this.state.UserPwd, str2,'','').then((isLogin)=>{
             if(isLogin){
                var strin = this.state.Product;
                strjj = ""+strin;
@@ -171,7 +171,6 @@ export default class admin extends Component {
                };
                this.props.navigator.push(nextRoute);
                this._setModalVisible();
-
             }else{
                this._setModalVisible();
                ToastAndroid.show('用户编码或密码错误', ToastAndroid.SHORT);
