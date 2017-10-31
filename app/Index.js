@@ -118,9 +118,8 @@ export default class Index extends Component {
         RNScannerAndroid.openScanner();
         DeviceEventEmitter.addListener("code", (reminder) => {
             dbAdapter.selectAidCode(reminder,1).then((rows)=>{
-                alert(rows.item(0).ProdName);
-                var ShopCar = rows.item(0).ProdName;
-
+                var ShopCar = rows.item.ShopPrice
+                alert(ShopCar);
                 if(reminder==object){
                     alert("没有此商品");
                     return;

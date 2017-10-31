@@ -51,7 +51,6 @@ export default class Search extends Component {
       RNScannerAndroid.openScanner();
       DeviceEventEmitter.addListener("code", (reminder) => {
           dbAdapter.selectAidCode(reminder,1).then((rows)=>{
-              al
               var ShopCar = rows.item(0).ProdName;
               this.props.navigator.push({
                   component:OrderDetails2,

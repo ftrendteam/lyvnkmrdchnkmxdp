@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
     dropdown_2_text:{
         paddingLeft:15,
         lineHeight:25,
-    },
+    }
 });
 
 

@@ -751,5 +751,5 @@ const styles = StyleSheet.create({
         opacity:0.5,
         justifyContent: 'center',
         alignItems: 'center',
-     },
+     }
 });

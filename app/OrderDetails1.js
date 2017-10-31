@@ -396,5 +396,5 @@ const styles = StyleSheet.create({
     borderRadius:5,
     textAlign:"center",
     fontSize:16,
-  }
+  },
 });

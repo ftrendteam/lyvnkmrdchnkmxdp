@@ -31,7 +31,7 @@ import Picker from 'react-native-picker';
 import ModalDropdown from 'react-native-modal-dropdown';
 //第二页面
 let dbAdapter = new DBAdapter();
-let db;
+let db
 export default class admin extends Component {
   componentWillMount() {
     //开启数据库
