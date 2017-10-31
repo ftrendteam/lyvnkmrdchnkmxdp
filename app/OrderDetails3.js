@@ -21,6 +21,7 @@ import {
 import Code from "./Code";
 import home from "./Home";
 import Index from "./Index";
+import ShoppingCart from "./ShoppingCart";
 import OrderDetails from "./OrderDetails";
 import Search from "./Search";
 import Storage from "../utils/Storage";
@@ -146,7 +147,7 @@ export default class GoodsDetails extends Component {
         dbAdapter.insertShopInfo(shopInfoData);
         var nextRoute={
            name:"主页",
-           component:Index,
+           component:ShoppingCart,
             params:{
                DepCode:this.state.DepCode,
             }

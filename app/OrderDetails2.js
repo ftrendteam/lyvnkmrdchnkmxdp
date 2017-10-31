@@ -21,7 +21,7 @@ import {
 import Code from "./Code";
 import home from "./Home";
 import Index from "./Index";
-import OrderDetails from "./OrderDetails";
+import OrderDetails from "./OrderDetails2";
 import Search from "./Search";
 import Storage from "../utils/Storage";
 import FetchUtils from "../utils/FetchUtils";
@@ -61,20 +61,26 @@ export default class GoodsDetails extends Component {
         RNScannerAndroid.openScanner();
         DeviceEventEmitter.addListener("code", (reminder) => {
             dbAdapter.selectAidCode(reminder,1).then((rows)=>{
-                var ShopCar = rows.item(0).ProdName;
-                this.props.navigator.push({
-                    component:OrderDetails,
-                    params:{
-                        ProdName:rows.item(0).ProdName,
-                        ShopPrice:rows.item(0).ShopPrice,
-                        Pid:rows.item(0).Pid,
-                        countm:rows.item(0).ShopNumber,
-                        promemo:rows.item(0).promemo,
-                        prototal:rows.item(0).prototal,
-                        ProdCode:rows.item(0).ProdCode,
-                        DepCode:rows.item(0).DepCode1,
-                    }
-                })
+                if(rows.length==0){
+                    alert("该商品不存在")
+                }else{
+                    var ShopCar = rows.item(0).ProdName;
+                    var nextRoute={
+                        name:"主页",
+                        component:OrderDetails2,
+                        params:{
+                            ProdName:rows.item(0).ProdName,
+                            ShopPrice:rows.item(0).ShopPrice,
+                            Pid:rows.item(0).Pid,
+                            countm:rows.item(0).ShopNumber,
+                            promemo:rows.item(0).promemo,
+                            prototal:rows.item(0).prototal,
+                            ProdCode:rows.item(0).ProdCode,
+                            DepCode:rows.item(0).DepCode1,
+                        }
+                    };
+                    this.props.navigator.push(nextRoute);
+                }
             })
         })
         //二维码扫描商品
@@ -154,12 +160,7 @@ export default class GoodsDetails extends Component {
                           <Image source={require("../images/left1.png")} style={styles.HeaderImage}></Image>
                     </TouchableOpacity>
                     <Text style={styles.HeaderList}>{this.state.name}</Text>
-                    <TouchableOpacity onPress={this.Code.bind(this)} style={styles.onclick}>
-                          <Image source={require("../images/sm.png")} style={styles.HeaderImage1}></Image>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={this.pressPush.bind(this)} style={styles.onclick}>
-                            <Image source={require("../images/search.png")} style={styles.HeaderImage}></Image>
-                    </TouchableOpacity>
+
               </View>
         </View>
         <View style={styles.Cont}>

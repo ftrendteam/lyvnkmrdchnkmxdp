@@ -17,6 +17,7 @@ import {
   DeviceEventEmitter
 } from 'react-native';
 import Index from "./Index";
+import ShoppingCart from "./ShoppingCart";
 import Code from "./Code";
 import OrderDetails from "./OrderDetails2";
 import NetUtils from "../utils/NetUtils";
@@ -41,7 +42,7 @@ export default class Search extends Component {
   pressPop(){
       var nextRoute={
          name:"主页",
-         component:Index,
+         component:ShoppingCart,
       };
       this.props.navigator.push(nextRoute);
   }

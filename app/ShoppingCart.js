@@ -26,8 +26,8 @@ import {
 import Index from "./Index";
 import HistoricalDocument from "./HistoricalDocument";
 import Code from "./Code";
-import Search from "./Search";
-import OrderDetails from "./OrderDetails";
+import Search from "./Search1";
+import OrderDetails from "./OrderDetails3";
 import NetUtils from "../utils/NetUtils";
 import FetchUtils from "../utils/FetchUtils";
 import DataUtils from '../utils/DataUtils';
@@ -393,7 +393,7 @@ export default class ShoppingCart extends Component {
                        }
                    </Image>
                 </View>
-                <Text style={styles.home1}>清单</Text>
+                <Text style={styles.home2}>清单</Text>
             </TouchableOpacity>
         </View>
       </View>
