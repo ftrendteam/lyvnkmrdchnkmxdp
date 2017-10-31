@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
    },
    HeaderImage:{
       width:30,
-      height:22,
+      height:26,
       marginTop:5,
    },
    Text:{
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
     flexDirection:"row",
    },
    ListText:{
-    fontSize:14,
+    fontSize:16,
     color:"#ffffff"
    },
    ListLeft:{
@@ -230,20 +230,20 @@ const styles = StyleSheet.create({
    Name:{
     flex:1,
     color:"#333333",
-    fontSize:16,
+    fontSize:18,
     lineHeight:36,
    },
    ShopPrice:{
     flex:1,
     color:"#333333",
-    fontSize:16,
+    fontSize:18,
     lineHeight:36,
     textAlign:"center"
    },
    ShopNumber:{
     flex:1,
     color:"#333333",
-    fontSize:16,
+    fontSize:18,
     lineHeight:36,
     textAlign:"right"
    },
@@ -261,19 +261,19 @@ const styles = StyleSheet.create({
    Name1:{
     flex:1,
     color:"#333333",
-    fontSize:14,
+    fontSize:16,
     overflow:"hidden"
    },
    ShopPrice1:{
     flex:1,
     color:"#333333",
-    fontSize:14,
+    fontSize:16,
     textAlign:"center"
    },
    ShopNumber1:{
     flex:1,
     color:"#333333",
-    fontSize:14,
+    fontSize:16,
     textAlign:"right"
    },
    ContList:{

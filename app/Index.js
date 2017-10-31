@@ -6,25 +6,25 @@
 
 import React, { Component } from 'react';
 import {
-  AppRegistry,
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  TextInput,
-  Navigator,
-  TouchableOpacity,
-  ScrollableTabView,
-  ScrollView,
-  Modal,
-  Dimensions,
-  TouchableHighlight,
-  ListView,
-  AnimatedFlatList,
-  DeviceEventEmitter,
-  FlatList,
-  ActivityIndicator,
-  InteractionManager
+    AppRegistry,
+    StyleSheet,
+    Text,
+    View,
+    Image,
+    TextInput,
+    Navigator,
+    TouchableOpacity,
+    ScrollableTabView,
+    ScrollView,
+    Modal,
+    Dimensions,
+    TouchableHighlight,
+    ListView,
+    AnimatedFlatList,
+    DeviceEventEmitter,
+    FlatList,
+    ActivityIndicator,
+    InteractionManager
 } from 'react-native';
 import HistoricalDocument from "./HistoricalDocument";
 import ShoppingCart from "./ShoppingCart";
@@ -32,7 +32,6 @@ import Code from "./Code";
 import admin from "./admin";
 import OrderDetails from "./OrderDetails";
 import Search from "./Search";
-import list from "./HomeLeftList";
 import Query from "./Query";
 import Distrition from "./Distrition";
 import ProductCG from "./ProductCG";
@@ -50,7 +49,7 @@ var {NativeModules} = require('react-native');
 var RNScannerAndroid = NativeModules.RNScannerAndroid;
 let dbAdapter = new DBAdapter();
 let db;
-let page =0;
+let page =1;
 let total = 0;
 let totalPage = 0;
 const lastDepCode = "";
@@ -71,7 +70,7 @@ export default class Index extends Component {
             Page:"",
             data:"",
             ShopNumber:"",
-            depcode:"",
+            depcode:this.props.DepCode ? this.props.DepCode : "",
             usercode:"",
             License:"",
             nomore: true,
@@ -119,7 +118,14 @@ export default class Index extends Component {
         RNScannerAndroid.openScanner();
         DeviceEventEmitter.addListener("code", (reminder) => {
             dbAdapter.selectAidCode(reminder,1).then((rows)=>{
+                alert(rows.item(0).ProdName);
                 var ShopCar = rows.item(0).ProdName;
+
+                if(reminder==object){
+                    alert("没有此商品");
+                    return;
+                }
+
                 this.props.navigator.push({
                     component:OrderDetails,
                     params:{
@@ -180,10 +186,14 @@ export default class Index extends Component {
             });
             this._fetch();
             this.function();
+            // alert(lastDepCode)
+            if(lastDepCode ==1){
+                page= 1;
+            }
         });
     }
 
-   //获取左侧商品品类信息、商品总数、触发第一个列表
+    //获取左侧商品品类信息、商品总数、触发第一个列表
     _fetch(){
         dbAdapter.selectTDepSet('1').then((rows)=>{
             for(let i =0;i<rows.length;i++){
@@ -191,14 +201,23 @@ export default class Index extends Component {
                 this.dataRows.push(row);
                 var ShopCar = rows.item(0).DepCode;
             }
+            if (this.state.depcode == "") {
+                this.setState({
+                    depcode :ShopCar,
+                })
+                lastDepCode = this.state.depcode;
+            }
             this.setState({
-                depcode :ShopCar,
                 dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
                 isloading:true
             })
             //触发点击第一个列表
             let priductData=[];
-            dbAdapter.selectProduct(ShopCar,page,1).then((rows)=>{
+            dbAdapter.selectProduct(this.state.depcode,page,1).then((rows)=>{
+                // alert(lastDepCode);
+                if(lastDepCode !==""){
+                    page= 1;
+                }
                 for(let i =0;i<rows.length;i++){
                     var row = rows.item(i);
                     priductData.push(row);
@@ -214,13 +233,13 @@ export default class Index extends Component {
         });
         //获取商品总数
         dbAdapter.selectProduct1(1,1).then((rows)=>{
-           for(let i =0;i<rows.length;i++){
-               var row = rows.item(i);
-           };
-           var priductdata = JSON.stringify(row.countn);
-           this.setState({
-               Page:priductdata,
-           })
+            for(let i =0;i<rows.length;i++){
+                var row = rows.item(i);
+            };
+            var priductdata = JSON.stringify(row.countn);
+            this.setState({
+                Page:priductdata,
+            })
         });
         this._fetch1();
     }
@@ -238,18 +257,18 @@ export default class Index extends Component {
         });
     }
     _renderRow(rowData, sectionID, rowID){
-         return (
+        return (
             <TouchableOpacity style={styles.Active} onPress={()=>this._pressRow(rowData)}>
                 {
                     (rowData.ShopNumber==0)?
                         null:
-                    <View style={styles.addnumber}>
-                        <Text style={styles.Reduction1}>{rowData.ShopNumber}</Text>
-                    </View>
+                        <View style={styles.addnumber}>
+                            <Text style={styles.Reduction1}>{rowData.ShopNumber}</Text>
+                        </View>
                 }
                 <Text style={styles.Active1}>{rowData.DepName}</Text>
             </TouchableOpacity>
-         );
+        );
     }
 
     //点击商品品类获取商品信息
@@ -258,40 +277,43 @@ export default class Index extends Component {
             lastDepCode = rowData.DepCode;
         }
         dbAdapter.selectProduct1(rowData.DepCode,1).then((rows)=>{
-           for(let i =0;i<rows.length;i++){
-               var row = rows.item(i);
-           };
-           var priductdata = JSON.stringify(row.countn);
-           this.setState({
-               Page:priductdata,
-           })
+            for(let i =0;i<rows.length;i++){
+                var row = rows.item(i);
+            };
+            var priductdata = JSON.stringify(row.countn);
+            this.setState({
+                Page:priductdata,
+            })
         });
         let priductData=[];
         var DEPCODE = (rowData.DepCode);
         this.setState({
             depcode:DEPCODE,
-             isloading:true,
+            isloading:true,
         })
         dbAdapter.selectProduct(rowData.DepCode,page,1).then((rows)=>{
             for(let i =0;i<rows.length;i++){
                 var row = rows.item(i);
                 priductData.push(row);
             };
+            if(lastDepCode ==1){
+                page= 1;
+            }
             total = this.state.Page;
             totalPage = total % 20 == 0 ? total / 20 : Math.floor(total / 20) + 1;
             this.productData=priductData;
             this.setState({
                 data:priductData,
-                 isloading:false
+                isloading:false
             })
             if(totalPage==0){
                 this.setState({
-                     nomore: false,
+                    nomore: false,
                 })
             }
             if(totalPage>0){
                 this.setState({
-                     nomore: true,
+                    nomore: true,
                 })
             }
         });
@@ -308,10 +330,10 @@ export default class Index extends Component {
                     {
                         (item.item.ShopNumber==0)?
                             null:
-                        <TouchableOpacity style={styles.Subtraction} onPress={()=>this.Countm(item)}>
-                             <Text style={styles.Number}>{item.item.ShopNumber}</Text>
-                             <View style={styles.subtraction}><Text style={styles.Reduction}>-</Text></View>
-                        </TouchableOpacity>
+                            <TouchableOpacity style={styles.Subtraction} onPress={()=>this.Countm(item)}>
+                                <Text style={styles.Number}>{item.item.ShopNumber}</Text>
+                                <View style={styles.subtraction}><Text style={styles.Reduction}>-</Text></View>
+                            </TouchableOpacity>
                     }
                 </View>
                 <TouchableOpacity onPress={()=>this.OrderDetails(item)}>
@@ -353,7 +375,7 @@ export default class Index extends Component {
         return (
             <View style={styles.footerView}>
                 {
-                   this.state.nomore ?[<ActivityIndicator key="1"></ActivityIndicator>,<Text key="2" style={styles.fontColorGray}>加载中</Text>]:<Text style={styles.nomore}>没有更多了</Text>
+                    this.state.nomore ?[<ActivityIndicator key="1"></ActivityIndicator>,<Text key="2" style={styles.fontColorGray}>加载中</Text>]:<Text style={styles.nomore}>没有更多了</Text>
                 }
             </View>
         );
@@ -382,10 +404,11 @@ export default class Index extends Component {
 
     //功能授权
     function(){
-        Storage.get('username').then((tags) => {
+        DataUtils.get('username').then((tags) => {
             this.setState({
                 usercode:tags
             })
+
         });
     }
 
@@ -474,10 +497,10 @@ export default class Index extends Component {
         dbAdapter.selectUserRight(this.state.usercode,"K0801").then((rows)=>{
             if(rows==true){
                 dbAdapter.selecUserRightA1012(this.state.usercode).then((rows)=>{
-                   if(rows==true){
-                       Storage.save('Name','要货单');
-                       this.Modal();
-                   }
+                    if(rows==true){
+                        Storage.save('Name','要货单');
+                        this.Modal();
+                    }
                 })
             }else if(rows==false){
                 alert("该店铺没有此权限");
@@ -495,10 +518,10 @@ export default class Index extends Component {
         dbAdapter.selectUserRight(this.state.usercode,"K0604").then((rows)=>{
             if(rows==true){
                 dbAdapter.selecUserRightA1012(this.state.usercode).then((rows)=>{
-                   if(rows==true){
-                       Storage.save("Name","损益单");
-                       this.Modal();
-                   }
+                    if(rows==true){
+                        Storage.save("Name","损益单");
+                        this.Modal();
+                    }
                 })
             }else if(rows==false){
                 alert("该店铺没有此权限");
@@ -513,10 +536,10 @@ export default class Index extends Component {
         dbAdapter.selectUserRight(this.state.usercode,"K0611").then((rows)=>{
             if(rows==true){
                 dbAdapter.selecUserRightA1012(this.state.usercode).then((rows)=>{
-                   if(rows==true){
-                       Storage.save("Name","实时盘点单");
-                       this.Modal();
-                   }
+                    if(rows==true){
+                        Storage.save("Name","实时盘点单");
+                        this.Modal();
+                    }
                 })
             }else if(rows==false){
                 alert("该店铺没有此权限");
@@ -532,10 +555,10 @@ export default class Index extends Component {
         dbAdapter.selectUserRight(this.state.usercode,"K0607").then((rows)=>{
             if(rows==true){
                 dbAdapter.selecUserRightA1012(this.state.usercode).then((rows)=>{
-                   if(rows==true){
-                       Storage.save("invoice","商品盘点");
-                       this.Modal();
-                   }
+                    if(rows==true){
+                        Storage.save("invoice","商品盘点");
+                        this.Modal();
+                    }
                 })
             }else if(rows==false){
                 alert("该店铺没有此权限");
@@ -549,10 +572,10 @@ export default class Index extends Component {
         dbAdapter.selectUserRight(this.state.usercode,"K0802").then((rows)=>{
             if(rows==true){
                 dbAdapter.selecUserRightA1012(this.state.usercode).then((rows)=>{
-                   if(rows==true){
-                       Storage.save("invoice","配送收货");
-                       this.Modal();
-                   }
+                    if(rows==true){
+                        Storage.save("invoice","配送收货");
+                        this.Modal();
+                    }
                 })
             }else if(rows==false){
                 alert("该店铺没有此权限");
@@ -566,10 +589,10 @@ export default class Index extends Component {
         dbAdapter.selectUserRight(this.state.usercode,"K0504").then((rows)=>{
             if(rows==true){
                 dbAdapter.selecUserRightA1012(this.state.usercode).then((rows)=>{
-                   if(rows==true){
-                       Storage.save("invoice","商品采购");
-                       this.Modal();
-                   }
+                    if(rows==true){
+                        Storage.save("invoice","商品采购");
+                        this.Modal();
+                    }
                 })
             }else if(rows==false){
                 alert("该店铺没有此权限");
@@ -582,10 +605,10 @@ export default class Index extends Component {
         dbAdapter.selectUserRight(this.state.usercode,"K0505").then((rows)=>{
             if(rows==true){
                 dbAdapter.selecUserRightA1012(this.state.usercode).then((rows)=>{
-                   if(rows==true){
-                       Storage.save("invoice","商品验收");
-                       this.Modal();
-                   }
+                    if(rows==true){
+                        Storage.save("invoice","商品验收");
+                        this.Modal();
+                    }
                 })
             }else if(rows==false){
                 alert("该店铺没有此权限");
@@ -598,10 +621,10 @@ export default class Index extends Component {
         dbAdapter.selectUserRight(this.state.usercode,"K0707").then((rows)=>{
             if(rows==true){
                 dbAdapter.selecUserRightA1012(this.state.usercode).then((rows)=>{
-                   if(rows==true){
-                       Storage.save("invoice","协配采购");
-                       this.Modal();
-                   }
+                    if(rows==true){
+                        Storage.save("invoice","协配采购");
+                        this.Modal();
+                    }
                 })
             }else if(rows==false){
                 alert("该店铺没有此权限");
@@ -614,10 +637,10 @@ export default class Index extends Component {
         dbAdapter.selectUserRight(this.state.usercode,"K0803").then((rows)=>{
             if(rows==true){
                 dbAdapter.selecUserRightA1012(this.state.usercode).then((rows)=>{
-                   if(rows==true){
-                       Storage.save("invoice","协配收货");
-                       this.Modal();
-                   }
+                    if(rows==true){
+                        Storage.save("invoice","协配收货");
+                        this.Modal();
+                    }
                 })
             }else if(rows==false){
                 alert("该店铺没有此权限");
@@ -634,7 +657,7 @@ export default class Index extends Component {
     //翻页列表
     _onload(){
         if(this.state.isloading){
-            return false
+            return true
         }
         page=page+1;
         this.setState({
@@ -652,8 +675,8 @@ export default class Index extends Component {
                     priductData.push(row);
                 };
                 if(this.state.depcode!=lastDepCode){
-                     this.productData.splice(0,this.productData.length);
-                     lastDepCode = this.state.depcode;
+                    this.productData.splice(0,this.productData.length);
+                    lastDepCode = this.state.depcode;
                 }
                 this.productData = this.productData.concat(priductData);
                 this.setState({
@@ -661,9 +684,10 @@ export default class Index extends Component {
                     isloading:false
                 });
             });
+
         }else{
             this.setState({
-                 nomore: false,
+                nomore: false,
             });
         }
     }
@@ -671,50 +695,50 @@ export default class Index extends Component {
     render() {
         const {data} = this.state;
         return (
-              <View style={styles.container}>
-                  <View style={styles.header}>
-                      <View style={styles.cont}>
-                          <TouchableOpacity onPress={this._rightButtonClick.bind(this)}>
-                                <Image source={require("../images/list.png")} style={styles.HeaderImage}></Image>
-                          </TouchableOpacity>
-                          <Text style={styles.HeaderList}>{this.state.head}</Text>
-                          <TouchableOpacity onPress={this.Code.bind(this)} style={styles.onclick}>
+            <View style={styles.container}>
+                <View style={styles.header}>
+                    <View style={styles.cont}>
+                        <TouchableOpacity onPress={this._rightButtonClick.bind(this)}>
+                            <Image source={require("../images/list.png")} style={styles.HeaderImage}></Image>
+                        </TouchableOpacity>
+                        <Text style={styles.HeaderList}>{this.state.head}</Text>
+                        <TouchableOpacity onPress={this.Code.bind(this)} style={styles.onclick}>
                             <Image source={require("../images/sm.png")} style={styles.HeaderImage1}></Image>
-                          </TouchableOpacity>
-                          <TouchableOpacity onPress={this.pressPush.bind(this)} style={styles.onclick}>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={this.pressPush.bind(this)} style={styles.onclick}>
                             <Image source={require("../images/search.png")} style={styles.HeaderImage}></Image>
-                          </TouchableOpacity>
-                      </View>
-                  </View>
-                  <View style={styles.ContList}>
-                      <ListView
+                        </TouchableOpacity>
+                    </View>
+                </View>
+                <View style={styles.ContList}>
+                    <ListView
                         style={styles.scrollview}
                         dataSource={this.state.dataSource}
                         showsVerticalScrollIndicator={true}
                         renderRow={this._renderRow.bind(this)}
-                      />
-                      <View style={styles.RightList1}>
-                           <FlatList
-                                numColumns={3}
-                                key={item => item.Pid}
-                                style={styles.ScrollView1}
-                                renderItem={this._renderItem.bind(this)}
-                                ItemSeparatorComponent={this._separator.bind(this)}
-                                ListFooterComponent={this._createEmptyView()}
-                                data={data}
-                                keyExtractor={this.keyExtractor}
-                                onRefresh={this.refreshing}
-                                refreshing={false}
-                                onEndReachedThreshold = {0.1}
-                                onEndReached={() =>{this._onload()}}
-                                getItemLayout={(data, index) => (
-                                  // 120 是被渲染 item 的高度 ITEM_HEIGHT。
-                                  {length: 120, offset: 120 * index, index}
-                                )}
-                           />
-                      </View>
-                  </View>
-                  <Modal
+                    />
+                    <View style={styles.RightList1}>
+                        <FlatList
+                            numColumns={3}
+                            key={item => item.Pid}
+                            style={styles.ScrollView1}
+                            renderItem={this._renderItem.bind(this)}
+                            ItemSeparatorComponent={this._separator.bind(this)}
+                            ListFooterComponent={this._createEmptyView()}
+                            data={data}
+                            keyExtractor={this.keyExtractor}
+                            onRefresh={this.refreshing}
+                            refreshing={false}
+                            onEndReachedThreshold = {0.1}
+                            onEndReached={() =>{this._onload()}}
+                            getItemLayout={(data, index) => (
+                                // 120 是被渲染 item 的高度 ITEM_HEIGHT。
+                                {length: 120, offset: 120 * index, index}
+                            )}
+                        />
+                    </View>
+                </View>
+                <Modal
                     animationType='fade'
                     transparent={true}
                     visible={this.state.show}
@@ -773,349 +797,351 @@ export default class Index extends Component {
                             onPress={this._setModalVisible.bind(this)}>
                         </TouchableOpacity>
                     </View>
-                  </Modal>
-                   <Modal
-                      animationType='fade'
-                      transparent={true}
-                      visible={this.state.Show}
-                      onShow={() => {}}
-                      onRequestClose={() => {}} >
-                      <View style={styles.License}>
-                            <View style={styles.LicenseConter}>
-                                <TouchableOpacity style={styles.close} onPress={this.Close.bind(this)}>
-                                     <Text style={styles.CloseText}>×</Text>
-                                </TouchableOpacity>
-                                <Text style={styles.LicenseText}>请输入授权号</Text>
-                                <TextInput
-                                    style={styles.LicenseTextInput}
-                                    autofocus="{true}"
-                                    numberoflines="{1}"
-                                    keyboardType="numeric"
-                                    placeholder="请输入授权号"
-                                    underlineColorAndroid='transparent'
-                                    placeholderTextColor="#bcbdc1"
-                                    onChangeText={(value)=>{
-                                        this.setState({
-                                            License:value
-                                        })
-                                    }}
-                                />
-                                <TouchableOpacity style={styles.Determine} onPress={this.Determine.bind(this)}>
-                                    <Text style={styles.DetermineText}>确定</Text>
-                                </TouchableOpacity>
-                            </View>
-                      </View>
-                   </Modal>
-                  <View style={styles.footer}>
-                      <TouchableOpacity style={styles.Home} onPress={this.HISTORY.bind(this)}><Image source={require("../images/documents.png")}></Image><Text style={styles.home1}>历史单据</Text></TouchableOpacity>
-                      <TouchableOpacity style={styles.Home} onPress={this.HOME.bind(this)}><Image source={require("../images/home1.png")}></Image><Text style={styles.home2}>首页</Text></TouchableOpacity>
-                      <TouchableOpacity style={styles.Home} onPress={this.SHOP.bind(this)}>
-                         <View>
+                </Modal>
+                <Modal
+                    animationType='fade'
+                    transparent={true}
+                    visible={this.state.Show}
+                    onShow={() => {}}
+                    onRequestClose={() => {}} >
+                    <View style={styles.License}>
+                        <View style={styles.LicenseConter}>
+                            <TouchableOpacity style={styles.close} onPress={this.Close.bind(this)}>
+                                <Text style={styles.CloseText}>×</Text>
+                            </TouchableOpacity>
+                            <Text style={styles.LicenseText}>请输入授权号</Text>
+                            <TextInput
+                                style={styles.LicenseTextInput}
+                                autofocus="{true}"
+                                numberoflines="{1}"
+                                keyboardType="numeric"
+                                placeholder="请输入授权号"
+                                underlineColorAndroid='transparent'
+                                placeholderTextColor="#bcbdc1"
+                                onChangeText={(value)=>{
+                                    this.setState({
+                                        License:value
+                                    })
+                                }}
+                            />
+                            <TouchableOpacity style={styles.Determine} onPress={this.Determine.bind(this)}>
+                                <Text style={styles.DetermineText}>确定</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Modal>
+                <View style={styles.footer}>
+                    <TouchableOpacity style={styles.Home} onPress={this.HISTORY.bind(this)}><Image source={require("../images/documents.png")}></Image><Text style={styles.home1}>历史单据</Text></TouchableOpacity>
+                    <TouchableOpacity style={styles.Home} onPress={this.HOME.bind(this)}><Image source={require("../images/home1.png")}></Image><Text style={styles.home2}>首页</Text></TouchableOpacity>
+                    <TouchableOpacity style={styles.Home} onPress={this.SHOP.bind(this)}>
+                        <View>
                             <Image source={require("../images/shop.png")}>
                                 {
-                                   (this.state.shopcar==0)?
-                                    null:
-                                    <Text style={styles.ShopCar}>{this.state.shopcar}</Text>
+                                    (this.state.shopcar==0)?
+                                        null:
+                                        <Text style={styles.ShopCar}>{this.state.shopcar}</Text>
                                 }
                             </Image>
-                         </View>
-                         <Text style={styles.home1}>清单</Text>
-                      </TouchableOpacity>
-                  </View>
-              </View>
+                        </View>
+                        <Text style={styles.home1}>清单</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
 
         );
     }
 }
 const styles = StyleSheet.create({
-  footer:{
-      flex:3,
-      flexDirection:"row",
-      borderTopWidth:1,
-      borderTopColor:"#cacccb"
-  },
-  source:{
-    flexDirection:"row",
-    flex:1,
-  },
-  Home:{
-      flex:1,
-      alignItems: 'center',
-      paddingTop:15,
-      backgroundColor:"#ffffff",
-  },
-  home1:{
-      color:'black',
-      fontSize:14,
-      marginTop:5,
-      flex:1,
-  },
-  home2:{
-      color:'#f47882',
-      fontSize:14,
-      marginTop:5,
-      flex:1,
-  },
-  ShopCar:{
-    color:"red",
-    position:"absolute",
-    right:-42,
-  },
-  container:{
-      flex:1,
-      backgroundColor:"#f1f5f6",
-  },
-  login:{
-      marginLeft:60,
-      marginRight:60,
-      marginTop:40,
-      paddingTop:12,
-      paddingBottom:12,
-      backgroundColor:"#f47882",
-      color:"#ffffff",
-      borderRadius:3,
-      textAlign:"center",
-      fontSize:18,
-  },
-  header:{
-    height:50,
-    backgroundColor:"#ffffff",
-    paddingTop:10,
-    borderBottomWidth:1,
-    borderBottomColor:"#cacccb"
-  },
-  cont:{
-    flexDirection:"row",
-    marginLeft:25,
-  },
-  onclick:{
-    width:50,
-  },
-  HeaderImage1:{
-    marginRight:25,
-    marginTop:5,
-  },
-  HeaderImage:{
-    marginTop:5,
-  },
-  HeaderList:{
-    flex:6,
-    textAlign:"center",
-    color:"#323232",
-    fontSize:16,
-    marginTop:3,
-  },
-  scrollview:{
-    width:130,
-    backgroundColor:"#ffffff",
-    flex:2,
-  },
-  Active:{
-      borderTopWidth:1,
-      borderTopColor:"#e5e5e5",
-  },
-  Active1:{
-    height:50,
-    color:"#323232",
-    textAlign:"center",
-    lineHeight:38,
-    fontSize:14,
-    overflow:"hidden"
-  },
-  RightList:{
-    paddingLeft:15,
-    paddingRight:15,
-    flex:4,
-    backgroundColor:"#ffffff",
-  },
-  RightList1:{
-    flex:4,
-  },
-  ScrollView1:{
-    flex:1,
-    backgroundColor:"#ffffff",
-    marginLeft:10,
-    marginRight:10,
-  },
-  ContList:{
-    flex:17,
-    flexDirection:"row",
-  },
-  Image:{
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop:20,
-  },
-  Text:{
-    textAlign:"center",
-    marginTop:10,
-    height:20,
-    fontSize:14,
-  },
-  AddNumber:{
-    height:25,
-  },
-  addnumber:{
-    height:20,
-    position:'absolute',
-    right:5,
-    top:3,
-  },
-  Reduction1:{
-    color:"red",
-    position:'absolute',
-    right:4,
-    top:4,
-    fontSize:14,
-  },
-  subtraction:{
-    marginRight:10,
-    marginTop:2
-  },
-  Subtraction:{
-    position:'absolute',
-    right:0,
-    top:4,
-    flexDirection:"row",
-  },
-  Reduction:{
-    borderRadius:50,
-    backgroundColor:"red",
-    color:"#ffffff",
-    textAlign:"center",
-    lineHeight:11,
-    width:15,
-    height:15,
-    lineHeight:12,
-    fontSize:16
-  },
-  Number:{
-    color:"red",
-    marginRight:6,
-  },
-  Border:{
-    borderRightWidth:1,
-    borderRightColor:"#f5f5f5",
-    flex:3,
-    paddingBottom:25,
-  },
-  modalStyle: {
-     flex:1,
-     flexDirection:"row",
-  },
-  ModalLeft:{
-    backgroundColor:"#000000",
-    flex:2,
-    opacity:0.6,
-    marginTop:50,
-  },
-  buttonText1:{
-    opacity:0.1
-  },
-  ModalView:{
-    flex:6,
-    backgroundColor:'#f1f5f6',
-    marginTop:50,
-  },
-  subView:{
-    flex:2,
-    height:100,
-    borderRightWidth:1,
-    borderRightColor:"#e5e5e5",
-  },
-  ModalViewList:{
-    height:100,
-    flexDirection:"row",
-    borderBottomWidth:1,
-    borderBottomColor:"#cccccc",
-  },
-  ModalViewList1:{
-    flexDirection:"row",
-    marginTop:15,
-  },
-  subView1:{
-    flex:1,
-    marginLeft:35,
-    marginRight:35,
-    backgroundColor:"#f47882",
-    paddingTop:6,
-    paddingBottom:6,
-    borderRadius:3,
-  },
-  titleText:{
-    flex:1,
-    textAlign:"center",
-    paddingTop:40,
-    fontSize:16,
-  },
-  titleText1:{
-    color:"#ffffff",
-    textAlign:"center"
-  },
-  fontColorGray:{
-   textAlign:"center"
-  },
-  nomore:{
-    textAlign:"center",
-    marginTop:20,
-    marginBottom:10,
-  },
-  License:{
-    flex:1,
-    backgroundColor:"#333333",
-    opacity:0.8,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  LicenseConter:{
-    width:280,
-    backgroundColor:"#ffffff",
-    borderRadius:5,
-    paddingHorizontal:50,
-    paddingVertical:20,
-  },
-  LicenseText:{
-    fontSize:14,
-    color:"#323232",
-    marginLeft:44,
-  },
-  LicenseTextInput:{
-    width:178,
-    paddingTop:5,
-    paddingBottom:5,
-    marginTop:16,
-    marginBottom:16,
-    borderTopWidth:1,
-    borderBottomWidth:1,
-    borderRightWidth:1,
-    borderLeftWidth:1,
-    borderTopColor:"#cccccc",
-    borderBottomColor:"#cccccc",
-    borderLeftColor:"#cccccc",
-    borderRightColor:"#cccccc",
-  },
-  Determine:{
-    width:80,
-    paddingTop:5,
-    paddingBottom:5,
-    backgroundColor:"#f47882",
-    borderRadius:3,
-    marginLeft:48
-  },
-  DetermineText:{
-    color:"#ffffff",
-    fontSize:14,
-    textAlign:"center"
-  },
-  close:{
-    width:40,
-    height:40,
-    position:"absolute",
-    right:0,
-    top:5
-  },
-  CloseText:{
-    color:"#323232",
-    fontSize:20
-  }
+    footer:{
+        flex:3,
+        flexDirection:"row",
+        borderTopWidth:1,
+        borderTopColor:"#cacccb"
+    },
+    source:{
+        flexDirection:"row",
+        flex:1,
+    },
+    Home:{
+        flex:1,
+        alignItems: 'center',
+        paddingTop:15,
+        backgroundColor:"#ffffff",
+    },
+    home1:{
+        color:'black',
+        fontSize:18,
+        marginTop:5,
+        flex:1,
+    },
+    home2:{
+        color:'#f47882',
+        fontSize:18,
+        marginTop:5,
+        flex:1,
+    },
+    ShopCar:{
+        color:"red",
+        position:"absolute",
+        right:-42,
+    },
+    container:{
+        flex:1,
+        backgroundColor:"#f1f5f6",
+    },
+    login:{
+        marginLeft:60,
+        marginRight:60,
+        marginTop:40,
+        paddingTop:12,
+        paddingBottom:12,
+        backgroundColor:"#f47882",
+        color:"#ffffff",
+        borderRadius:3,
+        textAlign:"center",
+        fontSize:20,
+    },
+    header:{
+        height:50,
+        backgroundColor:"#ffffff",
+        paddingTop:10,
+        borderBottomWidth:1,
+        borderBottomColor:"#cacccb"
+    },
+    cont:{
+        flexDirection:"row",
+        marginLeft:25,
+    },
+    onclick:{
+        width:50,
+    },
+    HeaderImage1:{
+        marginRight:25,
+        marginTop:5,
+    },
+    HeaderImage:{
+        marginTop:5,
+    },
+    HeaderList:{
+        flex:6,
+        textAlign:"center",
+        color:"#323232",
+        fontSize:18,
+        marginTop:3,
+    },
+    scrollview:{
+        width:130,
+        backgroundColor:"#ffffff",
+        flex:2,
+    },
+    Active:{
+        borderTopWidth:1,
+        borderTopColor:"#e5e5e5",
+    },
+    Active1:{
+        paddingTop:20,
+        paddingBottom:20,
+        height:62,
+        color:"#323232",
+        textAlign:"center",
+        fontSize:16,
+        overflow:"hidden"
+    },
+    RightList:{
+        paddingLeft:15,
+        paddingRight:15,
+        flex:4,
+        backgroundColor:"#ffffff",
+    },
+    RightList1:{
+        flex:4,
+    },
+    ScrollView1:{
+        flex:1,
+        backgroundColor:"#ffffff",
+        marginLeft:10,
+        marginRight:10,
+    },
+    ContList:{
+        flex:17,
+        flexDirection:"row",
+    },
+    Image:{
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop:20,
+    },
+    Text:{
+        textAlign:"center",
+        marginTop:10,
+        height:23,
+        fontSize:16,
+    },
+    AddNumber:{
+        height:35,
+    },
+    addnumber:{
+        height:20,
+        position:'absolute',
+        right:5,
+        top:3,
+    },
+    Reduction1:{
+        color:"red",
+        position:'absolute',
+        right:4,
+        top:4,
+        fontSize:14,
+    },
+    subtraction:{
+        marginRight:10,
+        marginTop:2
+    },
+    Subtraction:{
+        position:'absolute',
+        right:5,
+        top:12,
+        flexDirection:"row",
+    },
+    Reduction:{
+        borderRadius:50,
+        backgroundColor:"red",
+        color:"#ffffff",
+        textAlign:"center",
+        lineHeight:11,
+        width:15,
+        height:15,
+        lineHeight:12,
+        fontSize:18
+    },
+    Number:{
+        color:"red",
+        marginRight:6,
+    },
+    Border:{
+        borderRightWidth:1,
+        borderRightColor:"#f5f5f5",
+        flex:3,
+        paddingBottom:35,
+    },
+    modalStyle: {
+        flex:1,
+        flexDirection:"row",
+    },
+    ModalLeft:{
+        backgroundColor:"#000000",
+        flex:2,
+        opacity:0.6,
+        marginTop:50,
+    },
+    buttonText1:{
+        opacity:0.1
+    },
+    ModalView:{
+        flex:6,
+        backgroundColor:'#f1f5f6',
+        marginTop:50,
+    },
+    subView:{
+        flex:2,
+        height:100,
+        borderRightWidth:1,
+        borderRightColor:"#e5e5e5",
+    },
+    ModalViewList:{
+        height:100,
+        flexDirection:"row",
+        borderBottomWidth:1,
+        borderBottomColor:"#cccccc",
+    },
+    ModalViewList1:{
+        flexDirection:"row",
+        marginTop:20,
+    },
+    subView1:{
+        flex:1,
+        marginLeft:35,
+        marginRight:35,
+        backgroundColor:"#f47882",
+        paddingTop:8,
+        paddingBottom:8,
+        borderRadius:3,
+    },
+    titleText:{
+        flex:1,
+        textAlign:"center",
+        paddingTop:40,
+        fontSize:18,
+    },
+    titleText1:{
+        color:"#ffffff",
+        textAlign:"center",
+        fontSize:16,
+    },
+    fontColorGray:{
+        textAlign:"center"
+    },
+    nomore:{
+        textAlign:"center",
+        marginTop:20,
+        marginBottom:10,
+    },
+    License:{
+        flex:1,
+        backgroundColor:"#333333",
+        opacity:0.8,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    LicenseConter:{
+        width:280,
+        backgroundColor:"#ffffff",
+        borderRadius:5,
+        paddingHorizontal:50,
+        paddingVertical:20,
+    },
+    LicenseText:{
+        fontSize:16,
+        color:"#323232",
+        marginLeft:44,
+    },
+    LicenseTextInput:{
+        width:178,
+        paddingTop:5,
+        paddingBottom:5,
+        marginTop:16,
+        marginBottom:16,
+        borderTopWidth:1,
+        borderBottomWidth:1,
+        borderRightWidth:1,
+        borderLeftWidth:1,
+        borderTopColor:"#cccccc",
+        borderBottomColor:"#cccccc",
+        borderLeftColor:"#cccccc",
+        borderRightColor:"#cccccc",
+    },
+    Determine:{
+        width:80,
+        paddingTop:5,
+        paddingBottom:5,
+        backgroundColor:"#f47882",
+        borderRadius:3,
+        marginLeft:48
+    },
+    DetermineText:{
+        color:"#ffffff",
+        fontSize:16,
+        textAlign:"center"
+    },
+    close:{
+        width:40,
+        height:40,
+        position:"absolute",
+        right:0,
+        top:5
+    },
+    CloseText:{
+        color:"#323232",
+        fontSize:22
+    }
 });

@@ -141,6 +141,9 @@ export default class GoodsDetails extends Component {
         var nextRoute={
            name:"主页",
            component:Index,
+            params:{
+               DepCode:this.state.DepCode,
+            }
         };
         this.props.navigator.push(nextRoute);
     }
@@ -258,7 +261,7 @@ const styles = StyleSheet.create({
     flex:6,
     textAlign:"center",
     color:"#323232",
-    fontSize:16,
+    fontSize:18,
   },
   Cont:{
     paddingTop:10,
@@ -274,7 +277,7 @@ const styles = StyleSheet.create({
     marginBottom:10,
   },
   left:{
-    fontSize:14,
+    fontSize:16,
     color:"#666666",
     position:"absolute",
     left:25,
@@ -285,7 +288,7 @@ const styles = StyleSheet.create({
     position:"absolute",
     right:25,
     top:10,
-    fontSize:14,
+    fontSize:16,
     color:"#666666",
     flexDirection:"row",
   },
@@ -293,7 +296,7 @@ const styles = StyleSheet.create({
     position:"absolute",
     left:76,
     top:10,
-    fontSize:14,
+    fontSize:16,
     color:"#666666",
     flexDirection:"row",
   },
@@ -319,39 +322,39 @@ const styles = StyleSheet.create({
     flexDirection:"row",
   },
   price:{
-    fontSize:14,
+    fontSize:16,
     color:"#666666",
   },
   Price:{
-    fontSize:14,
+    fontSize:16,
     color:"#666666",
     marginTop:10,
   },
   Price1:{
-    fontSize:14,
+    fontSize:16,
     color:"#666666",
     marginTop:10,
     marginLeft:10,
   },
   Price2:{
-    fontSize:14,
+    fontSize:16,
     color:"#666666",
     marginTop:10,
   },
   NumberName:{
-    fontSize:14,
+    fontSize:16,
     color:"#666666",
     marginTop:10,
     flex:1
   },
   Number:{
-    fontSize:14,
+    fontSize:16,
     color:"#666666",
     height:40,
     flex:3
   },
   Number1:{
-    fontSize:14,
+    fontSize:16,
     color:"#666666",
     flex:6,
   },
@@ -362,19 +365,19 @@ const styles = StyleSheet.create({
     flex:1
   },
   Delete:{
-    fontSize:18,
+    fontSize:20,
     color:"#f63e4d",
     flex:1,
     textAlign:"center"
   },
   Reduce:{
-    fontSize:18,
+    fontSize:20,
     color:"#f63e4d",
     flex:1,
     textAlign:"center"
   },
   Increase:{
-    fontSize:18,
+    fontSize:20,
     color:"#f63e4d",
     flex:1,
     textAlign:"center"
@@ -391,10 +394,10 @@ const styles = StyleSheet.create({
   ButtonText:{
     color:"#ffffff",
     backgroundColor:"#f47882",
-    height:35,
-    lineHeight:25,
+    height:40,
+    lineHeight:30,
     borderRadius:5,
     textAlign:"center",
-    fontSize:14,
+    fontSize:18,
   }
 });

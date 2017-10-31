@@ -12,8 +12,8 @@ class Storage {
   static get(key) {
     return AsyncStorage.getItem(key).then((value) => {
       //console.log("wtf",value)
-      const jsonValue = JSON.parse(value);
-      return jsonValue;
+      /*const jsonValue = JSON.parse(value);*/
+      return value;
     });
   }
   

@@ -166,30 +166,30 @@ export default class Enquiries extends Component {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#ffffff',
-  },
-  Title:{
-    height:50,
-    backgroundColor:"#f47882",
-    paddingLeft:15,
-    paddingRight:15,
-    paddingTop:10,
-    flexDirection:"row",
-    borderBottomWidth:1,
-    borderBottomColor:"#cacccb"
-  },
-  HeaderImage:{
-    width:30,
-    height:22,
-    marginTop:5,
-  },
-  Text:{
-    flex:8,
-    textAlign:"center",
-    fontSize:18,
-    color:"#ffffff"
+    container: {
+        flex: 1,
+        backgroundColor: '#ffffff',
+    },
+        Title:{
+        height:50,
+        backgroundColor:"#f47882",
+        paddingLeft:15,
+        paddingRight:15,
+        paddingTop:10,
+        flexDirection:"row",
+        borderBottomWidth:1,
+        borderBottomColor:"#cacccb"
+    },
+    HeaderImage:{
+        width:30,
+        height:26,
+        marginTop:5,
+    },
+    Text:{
+        flex:8,
+        textAlign:"center",
+        fontSize:18,
+        color:"#ffffff"
     },
     Content:{
         marginLeft:15,
@@ -207,28 +207,30 @@ const styles = StyleSheet.create({
         flex:2,
         lineHeight:35,
         color:"#636363",
-        fontSize:14,
+        fontSize:16,
     },
     ContLeft2:{
         flex:3,
         lineHeight:35,
         color:"#636363",
-        fontSize:14,
+        fontSize:16,
     },
     ContLeft1:{
         flex:8,
         lineHeight:35,
         color:"#636363",
-        fontSize:14,
+        fontSize:16,
     },
     ContLeft3:{
         flex:3,
         lineHeight:35,
         color:"#636363",
-        fontSize:14,
+        fontSize:16,
     },
     ContRight:{
-        flex:8
+        flex:8,
+        color:"#636363",
+        fontSize:16,
     },
     Emptying:{
         borderWidth:1,
@@ -241,7 +243,8 @@ const styles = StyleSheet.create({
         height:40,
         color:"#cccccc",
         lineHeight:27,
-        textAlign:"center"
+        textAlign:"center",
+        fontSize:16,
     },
     button:{
         marginTop:50,
@@ -253,6 +256,6 @@ const styles = StyleSheet.create({
         lineHeight:30,
         borderRadius:5,
         textAlign:"center",
-        fontSize:16,
+        fontSize:18,
     }
 });

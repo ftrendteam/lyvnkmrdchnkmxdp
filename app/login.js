@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
         paddingTop:5,
         paddingBottom:5,
         paddingLeft:50,
-        fontSize:14,
+        fontSize:16,
     },
     pass:{
         borderRadius:5,
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
         paddingTop:5,
         paddingBottom:5,
         paddingLeft:50,
-        fontSize:14,
+        fontSize:16,
     },
     Image:{
         marginTop:30,
@@ -165,12 +165,12 @@ const styles = StyleSheet.create({
         color:"#ffffff",
         borderRadius:3,
         textAlign:"center",
-        fontSize:16,
+        fontSize:18,
     },
     TextImage:{
         position:"absolute",
         left:12,
-        top:10,
+        top:8,
     },
     TextImage1:{
         position:"absolute",

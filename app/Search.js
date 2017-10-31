@@ -51,6 +51,7 @@ export default class Search extends Component {
       RNScannerAndroid.openScanner();
       DeviceEventEmitter.addListener("code", (reminder) => {
           dbAdapter.selectAidCode(reminder,1).then((rows)=>{
+              al
               var ShopCar = rows.item(0).ProdName;
               this.props.navigator.push({
                   component:OrderDetails2,
@@ -178,14 +179,14 @@ const styles = StyleSheet.create({
     paddingLeft:6
   },
   HeaderImage1:{
-    flex:1,
-    height:23,
+      flex:1,
+      marginLeft:20,
   },
   Text1:{
     flex:1,
   },
   Text:{
-    fontSize:14,
+    fontSize:16,
     marginTop:2
   },
   BlockList:{
@@ -203,7 +204,7 @@ const styles = StyleSheet.create({
   },
   ListText:{
     color:"#323232",
-    fontSize:14,
+    fontSize:16,
     marginTop:20,
   },
   Block:{
@@ -216,4 +217,7 @@ const styles = StyleSheet.create({
     borderBottomColor:"#e5e5e5",
     backgroundColor:"#ffffff"
   },
+    BlockText:{
+      fontSize:16,
+    }
 });

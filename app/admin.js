@@ -82,7 +82,7 @@ export default class admin extends Component {
                       dbAdapter.insertTUserSetData(detailInfo2);
                       //权限表
                       var detailInfo3 = data.DetailInfo3;
-                      console.log("userright=",detailInfo3);
+                      // console.log("userright=",detailInfo3);
                       dbAdapter.insertTUserRrightData(detailInfo3);
                       //用户管理机构表
                       var detailInfo4 = data.DetailInfo4;
@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
         paddingTop:5,
         paddingBottom:5,
         paddingLeft:50,
-        fontSize:14,
+        fontSize:16,
     },
     pass:{
         borderRadius:5,
@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
         paddingTop:5,
         paddingBottom:5,
         paddingLeft:50,
-        fontSize:14,
+        fontSize:16,
     },
     Image:{
         marginTop:30,
@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
       color:"#ffffff",
       borderRadius:3,
       textAlign:"center",
-      fontSize:16,
+      fontSize:18,
    },
   refresh:{
     marginTop:45,
@@ -339,7 +339,7 @@ const styles = StyleSheet.create({
   TextImage:{
       position:"absolute",
       left:12,
-      top:10,
+      top:8,
   },
   TextImage1:{
       position:"absolute",
@@ -372,7 +372,7 @@ const styles = StyleSheet.create({
     width:90,
     marginLeft:15,
     marginTop:6,
-    fontSize:16,
+    fontSize:18,
   },
   activity:{
     width:30,

@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
         paddingTop:8,
         paddingBottom:8,
         paddingLeft:12,
-        fontSize:14,
+        fontSize:18,
         marginLeft:30,
         marginRight:30,
         marginTop:50,
@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
     },
     textsearch1:{
         textAlign:"center",
-        fontSize:14,
+        fontSize:16,
         color:"#ffffff",
     },
     AgencyInformation:{

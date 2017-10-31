@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     },
     textsearch1:{
         textAlign:"center",
-        fontSize:14,
+        fontSize:16,
         color:"#ffffff",
     },
     determine:{
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
     },
     determine1:{
         textAlign:"center",
-        fontSize:14,
+        fontSize:16,
         color:"#ffffff",
     },
     images:{

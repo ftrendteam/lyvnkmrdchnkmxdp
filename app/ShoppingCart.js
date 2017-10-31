@@ -27,7 +27,6 @@ import Index from "./Index";
 import HistoricalDocument from "./HistoricalDocument";
 import Code from "./Code";
 import Search from "./Search";
-import Succeed from "./Succeed";
 import OrderDetails from "./OrderDetails";
 import NetUtils from "../utils/NetUtils";
 import FetchUtils from "../utils/FetchUtils";
@@ -252,18 +251,21 @@ export default class ShoppingCart extends Component {
                     Sign: NetUtils.MD5("App_PosReq" + "##" +this.state.reqDetailCode + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',
                     username: this.state.Username,
                     usercode: this.state.Userpwd,
-                    //"SuppCode":this.state.suppcode,"ChildShop":this.state.childshop:
+                    //"SuppCode":this.state.suppcode,"ChildShop":
                     DetailInfo1: {"ShopCode": tags, "OrgFormno": this.state.orgFormno, "ProMemo": this.state.Remark,},
                     DetailInfo2: this.dataRows,
                 };
                 FetchUtils.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
                     if(data.retcode == 1){
                         alert("提交成功");
-                        Storage.delete("shopInfo");
+                        dbAdapter.deleteData("shopInfo");
                         this.dataRows=[];
+                        var price="";
                         this.setState({
                             dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
-                            shopcar:""
+                            ShopNumber:price,
+                            ShopAmount:price,
+                            shopcar:"",
                         })
                     }else{
                         alert("提交失败");
@@ -346,7 +348,7 @@ export default class ShoppingCart extends Component {
                     <Text style={styles.DocumentsNote}>单据备注</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.Submit} onPress={this.submit.bind(this)}>
-                    <Text style={{fontSize:14,color:"#ffffff",}}>提交</Text>
+                    <Text style={{fontSize:16,color:"#ffffff",}}>提交</Text>
                 </TouchableOpacity>
             </View>
             <Modal
@@ -418,13 +420,13 @@ const styles = StyleSheet.create({
      },
      home1:{
        color:'black',
-       fontSize:14,
+       fontSize:18,
        marginTop:5,
        flex:1,
      },
      home2:{
        color:'#f47882',
-       fontSize:14,
+       fontSize:18,
        marginTop:5,
        flex:1,
      },
@@ -449,7 +451,7 @@ const styles = StyleSheet.create({
       marginLeft:25,
    },
    onclick:{
-      width:50,
+      width:60,
    },
    HeaderImage1:{
       marginRight:25,
@@ -462,7 +464,7 @@ const styles = StyleSheet.create({
       flex:6,
       textAlign:"center",
       color:"#323232",
-      fontSize:16,
+      fontSize:18,
    },
    Line:{
       height:10,
@@ -480,13 +482,13 @@ const styles = StyleSheet.create({
    },
    Name:{
       flex:2,
-      fontSize:16,
+      fontSize:18,
       color:"#333333",
    },
    Number:{
       flex:1,
       textAlign:"right",
-      fontSize:16,
+      fontSize:18,
       color:"#333333",
    },
    Price:{
@@ -498,7 +500,7 @@ const styles = StyleSheet.create({
    SmallScale:{
       flex:1,
       textAlign:"right",
-      fontSize:16,
+      fontSize:18,
       color:"#333333",
    },
    ShopList:{
@@ -517,21 +519,21 @@ const styles = StyleSheet.create({
    ShopLeft:{
       flex:6,
       color:"#666666",
-      fontSize:14,
+      fontSize:16,
    },
    ShopRight:{
       flex:2,
       textAlign:"right",
       color:"#666666",
-      fontSize:14,
+      fontSize:16,
    },
    Name1:{
       color:"#333333",
-      fontSize:14,
+      fontSize:16,
    },
    Name2:{
       color:"#f63e4d",
-      fontSize:14,
+      fontSize:16,
    },
    ContList1:{
       flex:12,
@@ -559,39 +561,39 @@ const styles = StyleSheet.create({
       flexDirection:"row",
    },
    CombinedText:{
-      fontSize:14,
+      fontSize:16,
       color:"#555555",
    },
    client:{
-      fontSize:14,
+      fontSize:16,
       color:"#555555",
    },
    ClientType:{
-      fontSize:14,
+      fontSize:16,
       color:"#555555",
    },
    goods:{
-      fontSize:14,
+      fontSize:16,
       color:"#555555",
       marginRight:3,
       width:45,
    },
    GoodsNumber:{
-      fontSize:14,
+      fontSize:16,
       color:"#555555",
       flex:2
    },
    Price1:{
-      fontSize:14,
+      fontSize:16,
       color:"#f47882",
       flex:2,
    },
    DocumentsNote:{
-      fontSize:14,
+      fontSize:16,
       color:"#f47882"
    },
    Submit:{
-      fontSize:14,
+      fontSize:16,
       color:"#ffffff",
       backgroundColor:"#f47882",
       paddingTop:7,
@@ -625,7 +627,7 @@ const styles = StyleSheet.create({
       color:"#f47882",
       lineHeight:30,
       textAlign:"center",
-      fontSize:14,
+      fontSize:16,
    },
    TextInput:{
       width:300,
@@ -667,7 +669,7 @@ const styles = StyleSheet.create({
         marginRight: 8
     },
     CombinedText:{
-        fontSize:16,
+        fontSize:18,
         color:"#555555",
     },
     Client:{
@@ -676,15 +678,15 @@ const styles = StyleSheet.create({
         flexDirection:'row',
     },
     client:{
-        fontSize:14,
+        fontSize:16,
         color:"#555555",
     },
     ClientType:{
-        fontSize:14,
+        fontSize:16,
         color:"#555555",
     },
     goods:{
-        fontSize:14,
+        fontSize:16,
         color:"#555555"
     },
     ClientText:{
@@ -694,17 +696,17 @@ const styles = StyleSheet.create({
         flex:2
     },
     GoodsNumber:{
-        fontSize:14,
+        fontSize:16,
         color:"#555555"
     },
     Price1:{
-        fontSize:14,
+        fontSize:16,
         color:"#f47882",
         flex:2,
         textAlign:"right"
     },
     DocumentsNote:{
-        fontSize:14,
+        fontSize:16,
         color:"#f47882",
         marginTop:15,
     },
@@ -732,7 +734,7 @@ const styles = StyleSheet.create({
         color:"#f47882",
         lineHeight:30,
         textAlign:"center",
-        fontSize:14,
+        fontSize:16,
     },
     TextInput:{
         marginLeft:25,

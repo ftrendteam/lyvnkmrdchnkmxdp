@@ -333,7 +333,7 @@ const styles = StyleSheet.create({
     flex:6,
     textAlign:"center",
     color:"#ffffff",
-    fontSize:16,
+    fontSize:18,
  },
  Cont:{
     marginLeft:25,
@@ -348,7 +348,7 @@ const styles = StyleSheet.create({
  },
  List:{
     flexDirection:"row",
-    fontSize:14,
+    fontSize:16,
  },
  ListLeft:{
     color:"#636363",
@@ -385,13 +385,13 @@ const styles = StyleSheet.create({
   },
   home1:{
     color:'black',
-    fontSize:14,
+    fontSize:18,
     marginTop:5,
     flex:1,
   },
   home2:{
      color:'#f47882',
-     fontSize:14,
+     fontSize:18,
      marginTop:5,
      flex:1,
   },
