@@ -1,159 +1,132 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
- */
+ /**
+  * Sample React Native App
+  * https://github.com/facebook/react-native
+  * @flow
+  */
 
-import React, { Component } from 'react';
-import {
-    AppRegistry,
-    StyleSheet,
-    Text,
-    View,
-    TextInput,
-    TouchableOpacity,
-    Image
-} from 'react-native';
-import Index from "./Index";
-import Home from "./Home";
-import Search from "./Search";
-import NetUtils from "../utils/NetUtils";
-import DataUtils from '../utils/DataUtils';
-import FetchUtils from "../utils/FetchUtils";
-import Storage from '../utils/Storage';
-import ModalDropdown from 'native';
-export default class ProductCG extends Component {
-    constructor(props){
-        super(props);
-        this.state = {
-            show:false,
-            Number:"",
-        };
-    }
-    Return(){
-        this.props.navigator.pop();
-    }
-    pressPush(){
-        var str=this.state.Number;
-        if(str.length != 6){
-            alert("请输入16位数的单号");
-        }else{
-            var nextRoute={
-                name:"主页",
-                component:Index
-            };
-            this.props.navigator.push(nextRoute)
-        }
-        Storage.save('OrgFormno',this.state.Number);
-        Storage.save('Name','商品采购');
-        Storage.save('valueOf','App_Client_ProCG');
-        Storage.save('history','App_Client_ProCGQ');
-        Storage.save('historyClass','App_Client_ProCGDetailQ');
+ import React, { Component } from 'react';
+ import {
+     AppRegistry,
+     StyleSheet,
+     Text,
+     View,
+     TextInput,
+     TouchableOpacity,
+     Image
+ } from 'react-native';
+ import Index from "./Index";
+ import Home from "./Home";
+ import Search from "./Search";
+ import ProductCG_list from "./ProductCG_list";
+ import NetUtils from "../utils/NetUtils";
+ import DataUtils from '../utils/DataUtils';
+ import FetchUtils from "../utils/FetchUtils";
+ import Storage from '../utils/Storage';
+ import ModalDropdown from 'native';
+ export default class ProductCG extends Component {
+     constructor(props){
+         super(props);
+         this.state = {
+             show:false,
+             Number:"",
+         };
+     }
+     Return(){
+         this.props.navigator.pop();
+     }
+     onclick(){
+         var nextRoute={
+             name:"ProductCG_list",
+             component:ProductCG_list
+         };
+         this.props.navigator.push(nextRoute)
+     }
+     render() {
+         return (
+             <View style={styles.container}>
+                 <View style={styles.Head}>
+                     <View style={styles.cont}>
+                         <TouchableOpacity style={styles.images} onPress={this.Return.bind(this)}>
+                             <Image source={require("../images/left.png")} style={styles.HeaderImage}></Image>
+                         </TouchableOpacity>
+                         <View style={styles.HeadList}>
+                             <Text style={styles.HeadText}>商品采购</Text>
+                         </View>
+                     </View>
+                 </View>
+                 <View style={styles.ContList}>
+                     <View style={styles.listleft}>
+                         <Text style={styles.listLeftText}>供应商编码:</Text>
+                     </View>
+                     <TouchableOpacity style={styles.listcont} onPress={this.onclick.bind(this)}>
+                         <Text style={styles.listContText}>111</Text>
+                     </TouchableOpacity>
+                     <View style={styles.listimages}>
+                         <Image source={require("../images/right.png")} style={styles.Image}></Image>
+                     </View>
+                 </View>
+             </View>
+         );
+     }
+ }
 
-    }
-    _dropdown_4_onSelect(idx, value) {
-        this.setState({
-            Product:value
-        })
-    }
-    render() {
-        return (
-            <View style={styles.container}>
-                <TouchableOpacity style={styles.images} onPress={this.Return.bind(this)}><Image source={require("../images/left1.png")} style={styles.HeaderImage}></Image></TouchableOpacity>
-                <View style={styles.TextInput}>
-                    <TextInput
-                        autofocus="{true}"
-                        numberoflines="{1}"
-                        keyboardType="numeric"
-                        placeholder="请输入供应商编码"
-                        textalign="center"
-                        underlineColorAndroid='transparent'
-                        placeholderTextColor="#cccccc"
-                        style={styles.admin}
-                        onChangeText={(value)=>{
-                            this.setState({
-                                Number:value
-                            })
-                        }}
-                        />
-                </View>
-                <View style={styles.AgencyInformation}>
-                    <View style={styles.InformationLeft}><Text style={styles.InformationLeftText}>供应商编码</Text></View>
-                    <ModalDropdown style={styles.PullDown} options={[1,2,3,4,5]} textStyle={styles.dropdown_2_text} onSelect={(idx, value) => this._dropdown_4_onSelect(idx, value)}/>
-                </View>
-                <View style={styles.search}>
-                    <TouchableOpacity style={styles.textsearch} onPress={this.pressPush.bind(this)}>
-                        <Text style={styles.textsearch1}>确定</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
-    );
-    }
-}
+ const styles = StyleSheet.create({
+     container: {
+         flex: 1,
+         backgroundColor: '#ffffff',
+     },
+     Head:{
+         height:50,
+         backgroundColor:"#f47882",
+         paddingTop:10,
+         borderBottomWidth:1,
+         borderBottomColor:"#cacccb",
+     },
+     cont:{
+         flexDirection:"row",
+         marginLeft:25,
+     },
+     images:{
+         width:60,
+     },
+     HeadList:{
+         flex:6,
+         marginTop:2,
+     },
+     HeadText:{
+         color:"#ffffff",
+         fontSize:18,
+         textAlign:"center",
+     },
+     ContList:{
+         height:50,
+         marginTop:20,
+         paddingTop:10,
+         paddingLeft:25,
+         flexDirection:"row",
+         borderBottomWidth:1,
+         borderBottomColor:"#cacccb",
+     },
+     listleft:{
+         flex:2,
+     },
+     listLeftText:{
+         color:"#323232",
+         fontSize:17,
+     },
+     listcont:{
+         flex:7,
+     },
+     listContText:{
+         color:"#323232",
+         fontSize:17,
+     },
+     listimages:{
+         flex:1,
+     },
+     Image:{
+     },
+ });
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#ffffff',
-    },
-    images:{
-        height:50,
-        paddingLeft:30,
-        borderBottomWidth:1,
-        borderBottomColor:"#cacccb",
-        justifyContent: 'center',
-    },
-    admin:{
-        borderRadius:3,
-        backgroundColor:"#f5f5f5",
-        color: "#333333",
-        paddingTop:8,
-        paddingBottom:8,
-        paddingLeft:12,
-        fontSize:18,
-        marginLeft:30,
-        marginRight:30,
-        marginTop:50,
-    },
-    search:{
-        flexDirection:"row",
-        marginTop:30,
-    },
-    textsearch:{
-        marginLeft:30,
-        marginRight:30,
-        backgroundColor:"#f47882",
-        borderRadius:15,
-        flex:1,
-        paddingTop:10,
-        paddingBottom:10,
-    },
-    textsearch1:{
-        textAlign:"center",
-        fontSize:16,
-        color:"#ffffff",
-    },
-    AgencyInformation:{
-        marginLeft:30,
-        marginRight:30,
-        marginTop:20,
-        flexDirection:"row",
-    },
-    InformationLeft:{
-        flex:2,
-    },
-    InformationLeftText:{
-        lineHeight:32,
-    },
-    PullDown:{
-        flex:7,
-        borderBottomWidth:1,
-        borderBottomColor:"#cacccb",
-    },
-    dropdown_2_text:{
-        paddingLeft:15,
-        lineHeight:25,
-    }
-});
 
 

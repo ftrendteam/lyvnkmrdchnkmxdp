@@ -110,16 +110,12 @@ export default class HistoricalDocument extends Component {
   }
 
   componentDidMount(){
-     console.log("componentDidMount");
      InteractionManager.runAfterInteractions(() => {
         this._setModalVisible();
         this._get();
         this._dpSearch();
         this._fetch();
      });
-  }
-  componentWillUnmount(){
-  console.log("componentWillUnmount");
   }
   _setModalVisible() {
       let isShow = this.state.show;
@@ -241,7 +237,7 @@ export default class HistoricalDocument extends Component {
                            <Text style={styles.ListLeft}>单据金额：</Text>
                            <Text style={styles.ListRight}>{rowData.prototal}</Text>
                       </Text>
-                      <Text style={styles.List} style={{marginBottom:15,}}>
+                      <Text style={styles.List}>
                             <Text style={styles.ListLeft}>单据备注：</Text>
                             <Text style={styles.ListRight}>{rowData.promemo}</Text>
                        </Text>

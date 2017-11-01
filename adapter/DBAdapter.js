@@ -811,7 +811,8 @@ export default class DBAdapter extends SQLiteOpenHelper {
   selectAllData = (dbName) => {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
-        let sql = "select * from" + dbName;
+        let sql = "select * from " + dbName;
+        console.log(sql);
         tx.executeSql(sql, [], (tx, results) => {
             resolve((results.rows));
           }, (error) => {

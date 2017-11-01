@@ -493,65 +493,159 @@ export default class Index extends Component {
     }
     //  功能分类
     Home(){
-        var invoice = "要货单";
-        this.setState({
-            head:invoice,
-        });
-        this._setModalVisible();
+        dbAdapter.selectUserRight(this.state.usercode,"K0801").then((rows)=>{
+            if(rows==true){
+                dbAdapter.selecUserRightA1012(this.state.usercode).then((rows)=>{
+                    if(rows==true){
+                        Storage.save('Name','要货单');
+                        this.Modal();
+                    }
+                })
+            }else if(rows==false){
+                alert("该店铺没有此权限");
+                this._setModalVisible();
+            }
+        })
+
         //保存需要本地存储的值  第一个参数是自己定义的  第二个参数是要传的参数
         //下面那几个地方也是这种形式，把第二个参数改一些就行，点击的时候会自己覆盖以前的值
-        Storage.save('Name','要货单');
         Storage.save('valueOf','App_Client_ProYH');
         Storage.save('history','App_Client_ProYHQ');
         Storage.save('historyClass','App_Client_ProYHDetailQ');
     }
     Home1(){
-        var invoice="损益单";
-        this.setState({
-            head:invoice,
-        });
-        this._setModalVisible();
-        Storage.save('Name','损益单');
+        dbAdapter.selectUserRight(this.state.usercode,"K0604").then((rows)=>{
+            if(rows==true){
+                dbAdapter.selecUserRightA1012(this.state.usercode).then((rows)=>{
+                    if(rows==true){
+                        Storage.save("Name","损益单");
+                        this.Modal();
+                    }
+                })
+            }else if(rows==false){
+                alert("该店铺没有此权限");
+                this._setModalVisible();
+            }
+        })
         Storage.save('valueOf','App_Client_ProSY');
         Storage.save('history','App_Client_ProSYQ');
         Storage.save('historyClass','App_Client_ProSYDetailQ');
     }
     Query(){
-        var invoice="实时盘点单";
-        this.setState({
-            head:invoice,
-        });
-        this._setModalVisible();
-        Storage.save('Name','实时盘点单');
+        dbAdapter.selectUserRight(this.state.usercode,"K0611").then((rows)=>{
+            if(rows==true){
+                dbAdapter.selecUserRightA1012(this.state.usercode).then((rows)=>{
+                    if(rows==true){
+                        Storage.save("Name","实时盘点单");
+                        this.Modal();
+                    }
+                })
+            }else if(rows==false){
+                alert("该店铺没有此权限");
+                this._setModalVisible();
+            }
+        })
         Storage.save('valueOf','App_Client_ProCurrPC');
         Storage.save('history','App_Client_ProCurrPCQ');
         Storage.save('historyClass','App_Client_ProCurrPCDetailQ');
     }
     Query1(){
-        var invoice="商品盘点单";
-        this.setState({
-            head:invoice,
-        });
-        this._setModalVisible();
+        Storage.delete("Name");
+        dbAdapter.selectUserRight(this.state.usercode,"K0607").then((rows)=>{
+            if(rows==true){
+                dbAdapter.selecUserRightA1012(this.state.usercode).then((rows)=>{
+                    if(rows==true){
+                        Storage.save("invoice","商品盘点");
+                        this.Modal();
+                    }
+                })
+            }else if(rows==false){
+                alert("该店铺没有此权限");
+                this._setModalVisible();
+            }
+        })
 
-        var nextRoute={
-            name:"主页",
-            component:Query
-        };
-        this.props.navigator.push(nextRoute);
     }
     Home2(){
-        var invoice="配送收货单";
-        this.setState({
-            head:invoice,
-        });
-        this._setModalVisible();
+        Storage.delete("Name");
+        dbAdapter.selectUserRight(this.state.usercode,"K0802").then((rows)=>{
+            if(rows==true){
+                dbAdapter.selecUserRightA1012(this.state.usercode).then((rows)=>{
+                    if(rows==true){
+                        Storage.save("invoice","配送收货");
+                        this.Modal();
+                    }
+                })
+            }else if(rows==false){
+                alert("该店铺没有此权限");
+                this._setModalVisible();
+            }
+        })
 
-        var nextRoute={
-            name:"主页",
-            component:Distrition
-        };
-        this.props.navigator.push(nextRoute);
+    }
+    Shopp(){
+        Storage.delete("Name");
+        dbAdapter.selectUserRight(this.state.usercode,"K0504").then((rows)=>{
+            if(rows==true){
+                dbAdapter.selecUserRightA1012(this.state.usercode).then((rows)=>{
+                    if(rows==true){
+                        Storage.save("invoice","商品采购");
+                        this.Modal();
+                    }
+                })
+            }else if(rows==false){
+                alert("该店铺没有此权限");
+                this._setModalVisible();
+            }
+        })
+    }
+    Shopp1(){
+        Storage.delete("Name");
+        dbAdapter.selectUserRight(this.state.usercode,"K0505").then((rows)=>{
+            if(rows==true){
+                dbAdapter.selecUserRightA1012(this.state.usercode).then((rows)=>{
+                    if(rows==true){
+                        Storage.save("invoice","商品验收");
+                        this.Modal();
+                    }
+                })
+            }else if(rows==false){
+                alert("该店铺没有此权限");
+                this._setModalVisible();
+            }
+        })
+    }
+    Shopp2(){
+        Storage.delete("Name");
+        dbAdapter.selectUserRight(this.state.usercode,"K0707").then((rows)=>{
+            if(rows==true){
+                dbAdapter.selecUserRightA1012(this.state.usercode).then((rows)=>{
+                    if(rows==true){
+                        Storage.save("invoice","协配采购");
+                        this.Modal();
+                    }
+                })
+            }else if(rows==false){
+                alert("该店铺没有此权限");
+                this._setModalVisible();
+            }
+        })
+    }
+    Shopp3(){
+        Storage.delete("Name");
+        dbAdapter.selectUserRight(this.state.usercode,"K0803").then((rows)=>{
+            if(rows==true){
+                dbAdapter.selecUserRightA1012(this.state.usercode).then((rows)=>{
+                    if(rows==true){
+                        Storage.save("invoice","协配收货");
+                        this.Modal();
+                    }
+                })
+            }else if(rows==false){
+                alert("该店铺没有此权限");
+                this._setModalVisible();
+            }
+        })
     }
     Home3(){
         this._setModalVisible();
@@ -675,6 +769,22 @@ export default class Index extends Component {
                                     <Text style={styles.titleText}>数据更新</Text>
                                 </TouchableOpacity>
                             </View>
+                            <View style={styles.ModalViewList}>
+                                <TouchableOpacity style={styles.subView} onPress={this.Shopp.bind(this)}>
+                                    <Text style={styles.titleText}>商品采购</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.subView} onPress={this.Shopp1.bind(this)}>
+                                    <Text style={styles.titleText}>商品验收</Text>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={styles.ModalViewList}>
+                                <TouchableOpacity style={styles.subView} onPress={this.Shopp2.bind(this)}>
+                                    <Text style={styles.titleText}>协配采购</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.subView} onPress={this.Shopp3.bind(this)}>
+                                    <Text style={styles.titleText}>协配收货</Text>
+                                </TouchableOpacity>
+                            </View>
                             <View style={styles.ModalViewList1}>
                                 <TouchableOpacity  style={styles.subView1} onPress={this.pullOut.bind(this)}>
                                     <Text style={styles.titleText1}>退出账号</Text>
@@ -687,7 +797,38 @@ export default class Index extends Component {
                         </TouchableOpacity>
                     </View>
                 </Modal>
-
+                <Modal
+                    animationType='fade'
+                    transparent={true}
+                    visible={this.state.Show}
+                    onShow={() => {}}
+                    onRequestClose={() => {}} >
+                    <View style={styles.License}>
+                        <View style={styles.LicenseConter}>
+                            <TouchableOpacity style={styles.close} onPress={this.Close.bind(this)}>
+                                <Text style={styles.CloseText}>×</Text>
+                            </TouchableOpacity>
+                            <Text style={styles.LicenseText}>请输入授权号</Text>
+                            <TextInput
+                                style={styles.LicenseTextInput}
+                                autofocus="{true}"
+                                numberoflines="{1}"
+                                keyboardType="numeric"
+                                placeholder="请输入授权号"
+                                underlineColorAndroid='transparent'
+                                placeholderTextColor="#bcbdc1"
+                                onChangeText={(value)=>{
+                                    this.setState({
+                                        License:value
+                                    })
+                                }}
+                            />
+                            <TouchableOpacity style={styles.Determine} onPress={this.Determine.bind(this)}>
+                                <Text style={styles.DetermineText}>确定</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Modal>
                 <View style={styles.footer}>
                     <TouchableOpacity style={styles.Home} onPress={this.HISTORY.bind(this)}><Image source={require("../images/documents.png")}></Image><Text style={styles.home1}>历史单据</Text></TouchableOpacity>
                     <TouchableOpacity style={styles.Home} onPress={this.HOME.bind(this)}><Image source={require("../images/home1.png")}></Image><Text style={styles.home2}>首页</Text></TouchableOpacity>
