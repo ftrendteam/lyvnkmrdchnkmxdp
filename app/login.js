@@ -8,7 +8,7 @@ import {
     Button,
     TextInput,
     ScrollView,
-    ToastAndroid，
+    ToastAndroid,
     TouchableOpacity,
 } from 'react-native';
 import DataUtils from "../utils/DataUtils";

@@ -14,7 +14,7 @@ import {
   Button,
   ListView,
   TextInput,
-  ToastAndroid，
+  ToastAndroid,
   TouchableOpacity,
   DeviceEventEmitter,
 } from 'react-native';
