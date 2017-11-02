@@ -24,13 +24,13 @@ import Storage from '../utils/Storage';
 let dbAdapter = new DBAdapter();
 let db;
 
-export default class ProductCG_list extends Component {
+export default class ProductXP_list extends Component {
     constructor(props){
         super(props);
         this.state = {
             search:"",
             show:false,
-            dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => true,}),
+            dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
         };
         this.dataRows = [];
     }
@@ -46,7 +46,7 @@ export default class ProductCG_list extends Component {
     }
 
     fetch(){
-        dbAdapter.selectAllData("tsuppset").then((rows)=>{
+        dbAdapter.selectAllData("tshopitem").then((rows)=>{
             for(let i =0;i<rows.length;i++){
                 var row = rows.item(i);
                 this.dataRows.push(row);
@@ -62,26 +62,12 @@ export default class ProductCG_list extends Component {
         this.props.navigator.pop();
     }
 
-    Search(value){
-        for (let i = 0; i < this.dataRows.length; i++) {
-            let temp = this.dataRows[0];
-            let dataRow = this.dataRows[i];
-            if (((dataRow.sCode + "").indexOf(value) >= 0)) {
-                this.dataRows[0] = dataRow;
-                this.dataRows[i] = temp;
-            }
-        }
-        //console.log(this.dataRows[0]);
-        //console.log(this.dataRows.length);
-        this.setState({
-            dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
-        })
-
-    }
+    Search(value){}
 
     pressPop(rowData){
-        if(this.props.reloadView){
-            this.props.reloadView(rowData.sCode)
+        var Data=rowData.shopname+rowData.shopcode;
+        if(this.props.reloadShopname){
+            this.props.reloadShopname(Data)
         }
         this.props.navigator.pop();
     }
@@ -90,10 +76,10 @@ export default class ProductCG_list extends Component {
         return(
             <TouchableOpacity style={styles.header} onPress={()=>this.pressPop(rowData)}>
                 <View style={styles.coding}>
-                    <Text style={styles.codingText1}>{rowData.sCode}</Text>
+                    <Text style={styles.codingText1}>{rowData.shopcode}</Text>
                 </View>
                 <View style={styles.name}>
-                    <Text style={styles.nameText1}>{rowData.sname}</Text>
+                    <Text style={styles.nameText1}>{rowData.shopname}</Text>
                 </View>
             </TouchableOpacity>
         )
@@ -131,7 +117,7 @@ export default class ProductCG_list extends Component {
                 <View>
                     <View style={styles.head}>
                         <View style={styles.coding}>
-                            <Text style={styles.codingText}>编码</Text>
+                            <Text style={styles.codingText}>机构号</Text>
                         </View>
                         <View style={styles.name}>
                             <Text style={styles.nameText}>名称</Text>

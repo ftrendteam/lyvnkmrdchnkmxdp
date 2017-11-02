@@ -17,97 +17,132 @@ import {
 import Index from "./Index";
 import Home from "./Home";
 import Search from "./Search";
+import ProductCG_list from "./ProductCG_list";
+import ProductXP_list from "./ProductXP_list";
 import NetUtils from "../utils/NetUtils";
 import DataUtils from '../utils/DataUtils';
 import Storage from '../utils/Storage';
 import ModalDropdown from 'native';
-export default class ProductSH extends Component {
+export default class ProductCG extends Component {
     constructor(props){
         super(props);
         this.state = {
             show:false,
             Number:"",
+            sCode1:"",
+            shopname1:""
         };
     }
+
+    componentDidMount(){
+        Storage.get('invoice').then((tags)=>{
+            this.setState({
+                invoice:tags
+            })
+        })
+    }
+
     Return(){
         this.props.navigator.pop();
     }
-    pressPush(){
-        var str=this.state.Number;
-        if(str.length != 6){
-            alert("请输入16位数的单号");
+
+    onclick(){
+        var nextRoute={
+            name:"ProductCG_list",
+            component:ProductCG_list,
+            params: {
+                reloadView:(sCode)=>this._reloadView(sCode)
+            }
+        };
+        this.props.navigator.push(nextRoute)
+    }
+
+    _reloadView(sCode) {
+        sCode = String(sCode);
+        this.setState({
+            sCode1:sCode,
+        });
+    }
+
+    Monclick(){
+        var nextRoute={
+            name:"ProductXP_list",
+            component:ProductXP_list,
+            params: {
+                reloadShopname:(shopname)=>this._reloadShopname(shopname)
+            }
+        };
+        this.props.navigator.push(nextRoute)
+    }
+
+    _reloadShopname(shopname) {
+        shopname = String(shopname);
+        this.setState({
+            shopname1:shopname,
+        });
+    }
+
+    Button(){
+        if(this.state.sCode1==""){
+            alert("请选择供应商编码")
+        }else if(this.state.shopname1==""){
+            alert("请选择机构编码")
         }else{
             var nextRoute={
-                name:"主页",
-                component:Index
+                name:"Index",
+                component:Index,
             };
-            this.props.navigator.push(nextRoute)
+            this.props.navigator.push(nextRoute);
+            Storage.save('OrgFormno',this.state.Number);
+            Storage.save('Name','协配收货');
+            Storage.save('valueOf','App_Client_ProXP');
+            Storage.save('history','App_Client_ProXPYSQ');
+            Storage.save('historyClass','App_Client_ProXPDetailYSQ');
+            Storage.save("scode",this.state.sCode1);
+            Storage.save('shildshop',this.state.shopname1)
         }
-        Storage.save('OrgFormno',this.state.Number);
-        Storage.save('Name','协配收货');
-        Storage.save('valueOf','App_Client_ProXP');
-        Storage.save('history','App_Client_ProXPYSQ');
-        Storage.save('historyClass','App_Client_ProXPDetailYSQ');
+    }
 
-    }
-    _dropdown_4_onSelect(idx, value) {
-        this.setState({
-            Product:value
-        })
-    }
     render() {
         return (
             <View style={styles.container}>
-                <TouchableOpacity style={styles.images} onPress={this.Return.bind(this)}><Image source={require("../images/left1.png")} style={styles.HeaderImage}></Image></TouchableOpacity>
-                <View style={styles.TextInput}>
-                    <TextInput
-                        autofocus="{true}"
-                        numberoflines="{1}"
-                        keyboardType="numeric"
-                        placeholder="请输入供应商编码"
-                        textalign="center"
-                        underlineColorAndroid='transparent'
-                        placeholderTextColor="#cccccc"
-                        style={styles.admin}
-                        onChangeText={(value)=>{
-                            this.setState({
-                                Number:value
-                            })
-                        }}
-                        />
+                <View style={styles.Head}>
+                    <View style={styles.cont}>
+                        <TouchableOpacity style={styles.images} onPress={this.Return.bind(this)}>
+                            <Image source={require("../images/left.png")} style={styles.HeaderImage}></Image>
+                        </TouchableOpacity>
+                        <View style={styles.HeadList}>
+                            <Text style={styles.HeadText}>{this.state.invoice}</Text>
+                        </View>
+                    </View>
                 </View>
-                <View style={styles.AgencyInformation}>
-                    <View style={styles.InformationLeft}><Text style={styles.InformationLeftText}>供应商编码</Text></View>
-                    <ModalDropdown style={styles.PullDown} options={[1,2,3,4,5]} textStyle={styles.dropdown_2_text} onSelect={(idx, value) => this._dropdown_4_onSelect(idx, value)}/>
-                </View>
-                <View style={styles.TextInput}>
-                    <TextInput
-                        autofocus="{true}"
-                        numberoflines="{1}"
-                        keyboardType="numeric"
-                        placeholder="请输入机构编码"
-                        textalign="center"
-                        underlineColorAndroid='transparent'
-                        placeholderTextColor="#cccccc"
-                        style={styles.admin}
-                        onChangeText={(value)=>{
-                            this.setState({
-                                Number:value
-                            })
-                        }}
-                        />
-                </View>
-                <View style={styles.AgencyInformation}>
-                    <View style={styles.InformationLeft}><Text style={styles.InformationLeftText}>机构编码</Text></View>
-                    <ModalDropdown style={styles.PullDown} options={[1,2,3,4,5]} textStyle={styles.dropdown_2_text} onSelect={(idx, value) => this._dropdown_4_onSelect(idx, value)}/>
-                </View>
-                <View style={styles.search}>
-                    <TouchableOpacity style={styles.textsearch} onPress={this.pressPush.bind(this)}>
-                        <Text style={styles.textsearch1}>确定</Text>
+                <View style={styles.ContList}>
+                    <View style={styles.listleft}>
+                        <Text style={styles.listLeftText}>供应商编码:</Text>
+                    </View>
+                    <TouchableOpacity style={styles.listcont} onPress={this.onclick.bind(this)}>
+                        <Text style={styles.listContText}>{this.state.sCode1}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.listimages} onPress={this.onclick.bind(this)}>
+                        <Image source={require("../images/right.png")} style={styles.Image}></Image>
                     </TouchableOpacity>
                 </View>
+                <View style={styles.ContList}>
+                    <View style={styles.listleft}>
+                        <Text style={styles.listLeftText}>机构编码:</Text>
+                    </View>
+                    <TouchableOpacity style={styles.listcont} onPress={this.Monclick.bind(this)}>
+                        <Text style={styles.listContText}>{this.state.shopname1}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.listimages} onPress={this.Monclick.bind(this)}>
+                        <Image source={require("../images/right.png")} style={styles.Image}></Image>
+                    </TouchableOpacity>
+                </View>
+                <TouchableOpacity style={styles.button} onPress={this.Button.bind(this)}>
+                    <Text style={styles.buttonText}>确定</Text>
+                </TouchableOpacity>
             </View>
-    );
+        );
     }
 }
 
@@ -116,64 +151,76 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#ffffff',
     },
-    images:{
+    Head:{
         height:50,
-        paddingLeft:30,
+        backgroundColor:"#f47882",
+        paddingTop:10,
         borderBottomWidth:1,
         borderBottomColor:"#cacccb",
-        justifyContent: 'center',
     },
-    admin:{
-        borderRadius:3,
-        backgroundColor:"#f5f5f5",
-        color: "#333333",
-        paddingTop:8,
-        paddingBottom:8,
-        paddingLeft:12,
-        fontSize:16,
-        marginLeft:30,
-        marginRight:30,
-        marginTop:50,
-    },
-    search:{
+    cont:{
         flexDirection:"row",
-        marginTop:30,
+        marginLeft:25,
     },
-    textsearch:{
-        marginLeft:30,
-        marginRight:30,
-        backgroundColor:"#f47882",
-        borderRadius:15,
-        flex:1,
-        paddingTop:10,
-        paddingBottom:10,
+    images:{
+        width:60,
     },
-    textsearch1:{
-        textAlign:"center",
-        fontSize:16,
+    HeadList:{
+        flex:6,
+        marginTop:2,
+    },
+    HeadText:{
         color:"#ffffff",
+        fontSize:18,
+        textAlign:"center",
     },
-    AgencyInformation:{
-        marginLeft:30,
-        marginRight:30,
+    ContList:{
+        height:50,
         marginTop:20,
+        marginLeft:25,
+        marginRight:25,
+        paddingTop:10,
+        paddingLeft:25,
         flexDirection:"row",
+        borderBottomWidth:1,
+        borderBottomColor:"#cacccb",
     },
-    InformationLeft:{
+    listleft:{
         flex:2,
     },
-    InformationLeftText:{
-        lineHeight:32,
+    listLeftText:{
+        color:"#323232",
+        fontSize:17,
     },
-    PullDown:{
-        flex:7,
-        borderBottomWidth:1,
-        borderBottomColor:"#cacccb",
+    listcont:{
+        flex:6,
+        paddingLeft:5,
+        paddingRight:5,
     },
-    dropdown_2_text:{
-        paddingLeft:15,
-        lineHeight:25,
+    listContText:{
+        color:"#323232",
+        fontSize:17,
+    },
+    listimages:{
+        flex:1,
+    },
+    Image:{
+    },
+    button:{
+        marginLeft:80,
+        marginRight:80,
+        paddingTop:8,
+        paddingBottom:8,
+        backgroundColor:"#f47882",
+        borderRadius:3,
+        marginTop:100,
+    },
+    buttonText:{
+        color:"#ffffff",
+        fontSize:18,
+        textAlign:"center"
     }
 });
+
 
 

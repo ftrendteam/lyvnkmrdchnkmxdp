@@ -48,6 +48,8 @@ export default class ShoppingCart extends Component {
             ShopAmount:"",
             reqDetailCode:"",
             Remark:"",
+            suppcode:"",
+            shildshop:"",
             dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
         };
         this.dataRows = [];
@@ -229,11 +231,24 @@ export default class ShoppingCart extends Component {
 
     //提交
     submit(){
+        Storage.get('shildshop').then((tags)=>{
+           this.setState({
+               shildshop:tags
+           })
+        })
+
+        Storage.get('scode').then((tags)=>{
+            this.setState({
+                suppcode:tags
+            })
+        })
+
         Storage.get('LinkUrl').then((tags) => {
             this.setState({
                 linkurl:tags
             })
         })
+
         if(this.dataRows==0){
             alert("请添加商品")
         }else{
@@ -257,7 +272,7 @@ export default class ShoppingCart extends Component {
                     username: this.state.Username,
                     usercode: this.state.Userpwd,
                     //"SuppCode":this.state.suppcode,"ChildShop":
-                    DetailInfo1: {"ShopCode": tags, "OrgFormno": this.state.orgFormno, "ProMemo": this.state.Remark,},
+                    DetailInfo1: {"ShopCode": tags, "OrgFormno": this.state.orgFormno, "ProMemo": this.state.Remark,"SuppCode":this.state.suppcode,"ChildShop":this.state.shildshop},
                     DetailInfo2: this.dataRows,
                 };
                 FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{

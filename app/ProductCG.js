@@ -29,11 +29,22 @@
              show:false,
              Number:"",
              sCode1:"",
+             invoice:""
          };
      }
+
+     componentDidMount(){
+         Storage.get('invoice').then((tags)=>{
+             this.setState({
+                 invoice:tags
+             })
+         })
+     }
+
      Return(){
          this.props.navigator.pop();
      }
+
      onclick(){
          var nextRoute={
              name:"ProductCG_list",
@@ -52,6 +63,24 @@
          });
      }
 
+     Button(){
+         if(this.state.sCode1==""){
+             alert("请选择供应商编码")
+         }else{
+             var nextRoute={
+                 name:"Index",
+                 component:Index,
+             };
+             this.props.navigator.push(nextRoute);
+             Storage.save('OrgFormno',this.state.Number);
+             Storage.save('Name','商品采购');
+             Storage.save('valueOf','App_Client_ProXP');
+             Storage.save('history','App_Client_ProXPYSQ');
+             Storage.save('historyClass','App_Client_ProXPDetailYSQ');
+             Storage.save("scode",this.state.sCode1)
+         }
+     }
+
      render() {
          return (
              <View style={styles.container}>
@@ -61,7 +90,7 @@
                              <Image source={require("../images/left.png")} style={styles.HeaderImage}></Image>
                          </TouchableOpacity>
                          <View style={styles.HeadList}>
-                             <Text style={styles.HeadText}>商品采购</Text>
+                             <Text style={styles.HeadText}>{this.state.invoice}</Text>
                          </View>
                      </View>
                  </View>
@@ -72,10 +101,13 @@
                      <TouchableOpacity style={styles.listcont} onPress={this.onclick.bind(this)}>
                          <Text style={styles.listContText}>{this.state.sCode1}</Text>
                      </TouchableOpacity>
-                     <View style={styles.listimages}>
+                     <TouchableOpacity style={styles.listimages} onPress={this.onclick.bind(this)}>
                          <Image source={require("../images/right.png")} style={styles.Image}></Image>
-                     </View>
+                     </TouchableOpacity>
                  </View>
+                 <TouchableOpacity style={styles.button} onPress={this.Button.bind(this)}>
+                     <Text style={styles.buttonText}>确定</Text>
+                 </TouchableOpacity>
              </View>
          );
      }
@@ -126,7 +158,9 @@
          fontSize:17,
      },
      listcont:{
-         flex:7,
+         flex:6,
+         paddingLeft:5,
+         paddingRight:5,
      },
      listContText:{
          color:"#323232",
@@ -137,6 +171,20 @@
      },
      Image:{
      },
+     button:{
+         marginLeft:80,
+         marginRight:80,
+         paddingTop:8,
+         paddingBottom:8,
+         backgroundColor:"#f47882",
+         borderRadius:3,
+         marginTop:100,
+     },
+     buttonText:{
+         color:"#ffffff",
+         fontSize:18,
+         textAlign:"center"
+     }
  });
 
 

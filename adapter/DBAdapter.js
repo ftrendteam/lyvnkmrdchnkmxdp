@@ -586,28 +586,6 @@ export default class DBAdapter extends SQLiteOpenHelper {
    * @param productBody
    * @param categoryBody
    */
-//   downProductAndCategory(productBody, categoryBody) {
-//       return new Promise((resolve, reject) => {
-//   //      DataUtils.get("LinkUrl", LinkUrl).then((urlData) => {
-//         Storage.get('LinkUrl').then((tags) => {
-//           FetchUtils.post(tags, productBody).then((data) => {
-//             if (data.retcode == 1) {
-//               this.insertProductData(data.TblRow).then((result) => {
-//                 FetchUtils.post(tags, categoryBody).then((data) => {
-//                   console.log("data=", data);
-//                   if (data.retcode == 1) {
-//                     this.insertTDepSetData(data.TblRow).then((result) => {
-//                       console.log("end");
-//                       resolve(true);
-//                     });
-//                   }
-//                 });
-//               });
-//             }
-//           });
-//         });
-//       });
-//     }
   downProductAndCategory(categoryBody, currShopCode) {
     return new Promise((resolve, reject) => {
       DataUtils.get("LinkUrl", '').then((urlData) => {
