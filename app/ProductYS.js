@@ -143,11 +143,13 @@ const styles = StyleSheet.create({
     ContList:{
         height:50,
         marginTop:20,
+        marginLeft:25,
+        marginRight:25,
         paddingTop:10,
         paddingLeft:25,
         flexDirection:"row",
         borderBottomWidth:1,
-        borderBottomColor:"#cacccb",
+        borderBottomColor:"#eeeeee",
     },
     listleft:{
         flex:2,

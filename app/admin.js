@@ -256,7 +256,7 @@ export default class admin extends Component {
             <View style={styles.LoadCenter}>
                 <View style={styles.loading}>
                     <ActivityIndicator key="1" color="#414240" size="large" style={styles.activity}></ActivityIndicator>
-                    <Text style={styles.TextLoading}>登录中...</Text>
+                    <Text style={styles.TextLoading}>登录中</Text>
                 </View>
             </View>
         </Modal>
@@ -366,21 +366,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loading:{
-      width:230,
-      paddingLeft:50,
-      paddingTop:10,
-      paddingBottom:10,
-      backgroundColor:"#ffffff",
+      paddingLeft:15,
+      paddingRight:15,
+      paddingTop:15,
+      paddingBottom:15,
+      backgroundColor:"#000000",
+      opacity:0.8,
       borderRadius:3,
-      flexDirection:"row",
   },
   TextLoading:{
-    width:90,
-    marginLeft:15,
-    marginTop:6,
-    fontSize:18,
+      fontSize:17,
+      color:"#ffffff"
   },
   activity:{
-    width:30,
+      marginBottom:5,
   },
 });

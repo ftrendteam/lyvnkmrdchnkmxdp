@@ -38,16 +38,24 @@ export default class Enquiries extends Component {
   }
 
   _get(){
+
     Storage.get('code').then((tags) => {
         this.setState({
             reqDetailCode: tags
         });
     });
+
     Storage.get('Name').then((tags) => {
          this.setState({
              name:tags
          })
     });
+
+    Storage.get('scode').then((tags)=>{
+         this.setState({
+             suppcode:tags
+         })
+    })
   }
 
   Return(){
@@ -97,7 +105,7 @@ export default class Enquiries extends Component {
     };
     this.props.navigator.push(nextRoute)
   }
-
+//&&this.state.name=="商品验收查询"&&this.state.name=="协配采购查询"&&this.state.name=="协配收货查询"
   render() {
     return (
       <View style={styles.container}>
@@ -123,10 +131,10 @@ export default class Enquiries extends Component {
                     <Text style={styles.ContLeft1}>{this.state.reqDetailCode}</Text>
                 </View>
                 {
-                    (this.state.name=="商品采购"&&this.state.name=="商品验收"&&this.state.name=="协配采购"&&this.state.name=="协配收货")?
+                    (this.state.name=="商品采购"||this.state.name=="商品验收"||this.state.name=="协配采购"||this.state.name=="协配收货")?
                     <View style={styles.ContList}>
                         <Text style={styles.ContLeft3}>供应商编码：</Text>
-                        <Text style={styles.ContLeft1}>001</Text>
+                        <Text style={styles.ContLeft1}>{this.state.suppcode}</Text>
                     </View>:null
                 }
                 <View style={styles.ContList}>

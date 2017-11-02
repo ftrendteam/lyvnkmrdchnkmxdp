@@ -74,9 +74,9 @@
              this.props.navigator.push(nextRoute);
              Storage.save('OrgFormno',this.state.Number);
              Storage.save('Name','商品采购');
-             Storage.save('valueOf','App_Client_ProXP');
-             Storage.save('history','App_Client_ProXPYSQ');
-             Storage.save('historyClass','App_Client_ProXPDetailYSQ');
+             Storage.save('valueOf','App_Client_ProCG');
+             Storage.save('history','App_Client_ProCGQ');
+             Storage.save('historyClass','App_Client_ProCGDetailQ');
              Storage.save("scode",this.state.sCode1)
          }
      }
@@ -135,6 +135,7 @@
      HeadList:{
          flex:6,
          marginTop:2,
+         paddingRight:50,
      },
      HeadText:{
          color:"#ffffff",
@@ -144,11 +145,13 @@
      ContList:{
          height:50,
          marginTop:20,
+         marginLeft:25,
+         marginRight:25,
          paddingTop:10,
          paddingLeft:25,
          flexDirection:"row",
          borderBottomWidth:1,
-         borderBottomColor:"#cacccb",
+         borderBottomColor:"#eeeeee",
      },
      listleft:{
          flex:2,

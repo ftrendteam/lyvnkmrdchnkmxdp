@@ -1100,7 +1100,7 @@ const styles = StyleSheet.create({
     LicenseText:{
         fontSize:16,
         color:"#323232",
-        marginLeft:44,
+        marginLeft:40,
     },
     LicenseTextInput:{
         width:178,
