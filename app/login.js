@@ -5,11 +5,11 @@ import {
     Text,
     View,
     Image,
+    Button,
     TextInput,
     ScrollView,
+    ToastAndroid，
     TouchableOpacity,
-    Button,
-    ToastAndroid
 } from 'react-native';
 import DataUtils from "../utils/DataUtils";
 import admin from "./admin";
@@ -30,6 +30,7 @@ export default class  login extends Component{
             LinkUrl:""
         };
     }
+
     pressPush(){
         if(this.state.ClientCode == ""){
             ToastAndroid.show('请输入商户号', ToastAndroid.SHORT)
@@ -39,6 +40,7 @@ export default class  login extends Component{
             ToastAndroid.show('请输入密码', ToastAndroid.SHORT)
             return;
         }
+
         let params = {
             reqCode:"App_PosReq",
             reqDetailCode:"App_Client_Qry",
@@ -47,6 +49,7 @@ export default class  login extends Component{
             Pwd:NetUtils.MD5(this.state.Pwd)+'',//获取到密码之后md5加密
             Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_Qry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
         };
+
         FetchUtil.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
             if(data.retcode == 1){
                 DetailInfo = JSON.stringify(data.DetailInfo);// 在这里从接口取出要保存的数据，然后执行save方法

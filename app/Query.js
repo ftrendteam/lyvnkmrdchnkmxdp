@@ -10,16 +10,18 @@ import {
     StyleSheet,
     Text,
     View,
+    Image,
     TextInput,
     TouchableOpacity,
-    Image
 } from 'react-native';
 import Index from "./Index";
+
 import Home from "./Home";
 import Search from "./Search";
 import NetUtils from "../utils/NetUtils";
 import DataUtils from '../utils/DataUtils';
 import Storage from '../utils/Storage';
+
 export default class Query extends Component {
     constructor(props){
         super(props);
@@ -28,9 +30,11 @@ export default class Query extends Component {
             Number:"",
         };
     }
+
     Return(){
         this.props.navigator.pop();
     }
+
     pressPush(){
         var str=this.state.Number;
         if(str.length != 16){
@@ -40,14 +44,15 @@ export default class Query extends Component {
                 name:"主页",
                 component:Search
             };
-            this.props.navigator.push(nextRoute)
+            this.props.navigator.push(nextRoute);
+            Storage.save('OrgFormno',this.state.Number);
+            Storage.save('Name','配送收货单');
+            Storage.save('valueOf','App_Client_ProPSSH');
+            Storage.save('history','App_Client_ProPSSHQ');
+            Storage.save('historyClass','App_Client_ProPSSHDetailQ');
         }
-        Storage.save('OrgFormno',this.state.Number);
-        Storage.save('Name','配送收货单');
-        Storage.save('valueOf','App_Client_ProPSSH');
-        Storage.save('history','App_Client_ProPSSHQ');
-        Storage.save('historyClass','App_Client_ProPSSHDetailQ');
     }
+
     Home(){
         var str=this.state.Number;
         if(str.length != 16){
@@ -57,13 +62,13 @@ export default class Query extends Component {
                 name:"主页",
                 component:Index
             };
-            this.props.navigator.push(nextRoute)
+            this.props.navigator.push(nextRoute);
+            Storage.save('OrgFormno',this.state.Number);
+            Storage.save('Name','商品盘点单');
+            Storage.save('valueOf','App_Client_ProPC');
+            Storage.save('history','App_Client_ProCurrPCQ');
+            Storage.save('historyClass','App_Client_ProPCDetailQ');
         }
-        Storage.save('OrgFormno',this.state.Number);
-        Storage.save('Name','商品盘点单');
-        Storage.save('valueOf','App_Client_ProPC');
-        Storage.save('history','App_Client_ProCurrPCQ');
-        Storage.save('historyClass','App_Client_ProPCDetailQ');
     }
     render() {
         return (
@@ -83,7 +88,7 @@ export default class Query extends Component {
                                 Number:value
                             })
                         }}
-                        />
+                    />
                 </View>
                 <View style={styles.search}>
                     <TouchableOpacity style={styles.textsearch} onPress={this.pressPush.bind(this)}>

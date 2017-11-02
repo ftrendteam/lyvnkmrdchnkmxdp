@@ -10,17 +10,20 @@ import {
   StyleSheet,
   Text,
   View,
-  TextInput,
   Image,
+  Button,
+  TextInput,
   TouchableOpacity,
-  Button
 } from 'react-native';
+
 import HistoricalDocument from "./HistoricalDocument";
 import DateUtil from "../utils/DateUtil";
 import Storage from "../utils/Storage";
 import DateTimePicker from "react-native-datetime";
+
 let dateutil = new DateUtil();
 let db;
+
 export default class Enquiries extends Component {
   constructor(props){
       super(props);
@@ -34,28 +37,28 @@ export default class Enquiries extends Component {
   }
 
   componentDidMount(){
-    this._get();
+     this._get();
   }
 
   _get(){
 
-    Storage.get('code').then((tags) => {
+     Storage.get('code').then((tags) => {
         this.setState({
             reqDetailCode: tags
         });
-    });
+     });
 
-    Storage.get('Name').then((tags) => {
+     Storage.get('Name').then((tags) => {
          this.setState({
              name:tags
          })
-    });
+     });
 
-    Storage.get('scode').then((tags)=>{
+     Storage.get('scode').then((tags)=>{
          this.setState({
              suppcode:tags
          })
-    })
+     })
   }
 
   Return(){
@@ -69,6 +72,7 @@ export default class Enquiries extends Component {
     }
     this.props.navigator.pop();
   }
+
   //日期时间，以下是三种不同方式
   showDatePicker() {
         var date = new Date();
@@ -105,7 +109,7 @@ export default class Enquiries extends Component {
     };
     this.props.navigator.push(nextRoute)
   }
-//&&this.state.name=="商品验收查询"&&this.state.name=="协配采购查询"&&this.state.name=="协配收货查询"
+
   render() {
     return (
       <View style={styles.container}>

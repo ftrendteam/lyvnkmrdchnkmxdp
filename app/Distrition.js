@@ -10,15 +10,17 @@ import {
     StyleSheet,
     Text,
     View,
+    Image,
     TextInput,
     TouchableOpacity,
-    Image
 } from 'react-native';
+
 import Home from "./Home";
 import Search from "./Search";
 import NetUtils from "../utils/NetUtils";
 import DataUtils from '../utils/DataUtils';
 import Storage from '../utils/Storage';
+
 export default class Distrition extends Component {
     constructor(props){
         super(props);
@@ -27,6 +29,7 @@ export default class Distrition extends Component {
             Number:"",
         };
     }
+
     //返回前一页面
     Return(){
         this.props.navigator.pop();
@@ -67,7 +70,9 @@ export default class Distrition extends Component {
     render() {
         return (
             <View style={styles.container}>
-                <TouchableOpacity style={styles.images} onPress={this.Return.bind(this)}><Image source={require("../images/left1.png")} style={styles.HeaderImage}></Image></TouchableOpacity>
+                <TouchableOpacity style={styles.images} onPress={this.Return.bind(this)}>
+                    <Image source={require("../images/left1.png")} style={styles.HeaderImage}></Image>
+                </TouchableOpacity>
                 <View style={styles.TextInput}>
                     <TextInput
                         autofocus="{true}"
@@ -82,7 +87,7 @@ export default class Distrition extends Component {
                                 Number:value
                             })
                         }}
-                        />
+                    />
                 </View>
                 <View style={styles.search}>
                     <TouchableOpacity style={styles.textsearch} onPress={this.pressPush.bind(this)}>
@@ -93,65 +98,65 @@ export default class Distrition extends Component {
                     </TouchableOpacity>
                 </View>
             </View>
-    );
+        );
     }
 }
 
 const styles = StyleSheet.create({
     container: {
-            flex: 1,
-            backgroundColor: '#ffffff',
-        },
-        admin:{
-            borderRadius:3,
-            backgroundColor:"#f5f5f5",
-            color: "#333333",
-            paddingTop:8,
-            paddingBottom:8,
-            paddingLeft:12,
-            fontSize:18,
-            marginLeft:30,
-            marginRight:30,
-            marginTop:50,
-        },
-        search:{
-            flexDirection:"row",
-            marginTop:20,
-        },
-        textsearch:{
-            marginLeft:30,
-            marginRight:20,
-            backgroundColor:"#f47882",
-            borderRadius:15,
-            flex:5,
-            paddingTop:10,
-            paddingBottom:10,
-        },
-        textsearch1:{
-            textAlign:"center",
-            fontSize:16,
-            color:"#ffffff",
-        },
-        determine:{
-            flex:2,
-            backgroundColor:"#f47882",
-            borderRadius:3,
-            paddingTop:10,
-            paddingBottom:10,
-            marginRight:30,
-        },
-        determine1:{
-            textAlign:"center",
-            fontSize:16,
-            color:"#ffffff",
-        },
-        images:{
-            height:50,
-            paddingLeft:30,
-            borderBottomWidth:1,
-            borderBottomColor:"#cacccb",
-            justifyContent: 'center',
-        }
+        flex: 1,
+        backgroundColor: '#ffffff',
+    },
+    admin:{
+        borderRadius:3,
+        backgroundColor:"#f5f5f5",
+        color: "#333333",
+        paddingTop:8,
+        paddingBottom:8,
+        paddingLeft:12,
+        fontSize:18,
+        marginLeft:30,
+        marginRight:30,
+        marginTop:50,
+    },
+    search:{
+        flexDirection:"row",
+        marginTop:20,
+    },
+    textsearch:{
+        marginLeft:30,
+        marginRight:20,
+        backgroundColor:"#f47882",
+        borderRadius:15,
+        flex:5,
+        paddingTop:10,
+        paddingBottom:10,
+    },
+    textsearch1:{
+        textAlign:"center",
+        fontSize:16,
+        color:"#ffffff",
+    },
+    determine:{
+        flex:2,
+        backgroundColor:"#f47882",
+        borderRadius:3,
+        paddingTop:10,
+        paddingBottom:10,
+        marginRight:30,
+    },
+    determine1:{
+        textAlign:"center",
+        fontSize:16,
+        color:"#ffffff",
+    },
+    images:{
+        height:50,
+        paddingLeft:30,
+        borderBottomWidth:1,
+        borderBottomColor:"#cacccb",
+        justifyContent: 'center',
+    }
 });
 
 

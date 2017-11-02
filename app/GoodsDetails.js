@@ -9,18 +9,20 @@ import {
   StyleSheet,
   Text,
   View,
-  TouchableOpacity,
   Image,
-  ScrollView,
   ListView,
-  ToastAndroid
+  ScrollView,
+  ToastAndroid,
+  TouchableOpacity,
 } from 'react-native';
+
 import HistoricalDocument from "./HistoricalDocument";
 import FetchUtils from "../utils/FetchUtils";
 import NetUtils from "../utils/NetUtils";
 import DBAdapter from "../adapter/DBAdapter";
 import DataUtils from '../utils/DataUtils';
 import Storage from "../utils/Storage";
+
 export default class GoodsDetails extends Component {
     constructor(props){
           super(props);
@@ -37,26 +39,28 @@ export default class GoodsDetails extends Component {
     }
 
     componentDidMount(){
-         //url获取
+         //获取本地数据库url
          Storage.get('LinkUrl').then((tags) => {
             this.setState({
                 linkurl:tags
             })
          })
 
-         //reqDetailCode获取
+         //reqDetailCode
           Storage.get('historyClass').then((tags) => {
               this.setState({
                   reqDetailCode: tags
               });
           });
-         //username获取
+
+         //username
          Storage.get('username').then((tags) => {
            this.setState({
                Username: tags
            });
          });
-         //usercode获取
+
+         //usercode
          Storage.get('userpwd').then((tags) => {
            this.setState({
                Userpwd: tags

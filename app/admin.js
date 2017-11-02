@@ -29,18 +29,11 @@ import DBAdapter from "../adapter/DBAdapter";
 import Storage from "../utils/Storage";
 import Picker from 'react-native-picker';
 import ModalDropdown from 'react-native-modal-dropdown';
-//第二页面
+
 let dbAdapter = new DBAdapter();
 let db
+
 export default class admin extends Component {
-  componentWillMount() {
-    //开启数据库
-    if (!db) {
-      db = dbAdapter.open();
-    }
-    //建表
-    dbAdapter.createTable();
-  }
     constructor(props){
         super(props);
         this.state = {
@@ -58,17 +51,29 @@ export default class admin extends Component {
             Product:"",
             detailInfo1:"",
             linkurl:"",
-//            ClientCode:this.props.ClientCode ? this.props.ClientCode : "",
         };
         this.pickerData=[]
     }
-    //进入页面执行事件
+
+    //初始化render之前执行
+    componentWillMount() {
+        //开启数据库
+        if (!db) {
+            db = dbAdapter.open();
+        }
+        //建表
+        dbAdapter.createTable();
+    }
+
+    //初始化render之后只执行一次
     componentDidMount(){
+        //获取数据库url地址
         Storage.get('LinkUrl').then((tags) => {
             this.setState({
                 linkurl:tags
             })
         })
+
         Storage.get('ClientCode').then((tags) => {
             let params = {
                  reqCode:"App_PosReq",
@@ -77,7 +82,7 @@ export default class admin extends Component {
                  sDateTime:Date.parse(new Date()),//获取当前时间转换成时间戳
                  Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_UseQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
             };
-              FetchUtil.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
+            FetchUtil.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
                  if(data.retcode == 1){
                       //用户信息
                       var detailInfo1 = data.DetailInfo1;
@@ -97,11 +102,11 @@ export default class admin extends Component {
                  }else{
                      ToastAndroid.show('网络请求失败', ToastAndroid.SHORT);
                  }
-              })
-         });
+            })
+        });
     }
 
-    //失去焦点时 跑数据、存储、获取数据
+    //输入用户编码之后执行
     autoFocuss(){
         Storage.get('ClientCode').then((tags) => {
              let params = {
@@ -126,19 +131,21 @@ export default class admin extends Component {
                 }else{
                 }
              })
-         })
+        })
     }
 
     // 失焦时触发事件
     inputOnBlur(){
         this.autoFocuss();
     }
+
     _setModalVisible() {
         let isShow = this.state.show;
         this.setState({
             show:!isShow,
         });
     }
+
     //登录
     pressPush(){
         //等待对话框 显示隐藏
@@ -184,7 +191,7 @@ export default class admin extends Component {
         });
     }
 
-    //下拉列表赋值
+    //机构信息下拉列表赋值
     _dropdown_4_onSelect(idx, value) {
         this.setState({
             Product:value

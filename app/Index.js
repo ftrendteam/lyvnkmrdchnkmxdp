@@ -52,6 +52,7 @@ let page =1;
 let total = 0;
 let totalPage = 0;
 const lastDepCode = "";
+
 export default class Index extends Component {
     constructor(props){
         super(props);
@@ -183,7 +184,6 @@ export default class Index extends Component {
             });
             this._fetch();
             this.function();
-            // alert(lastDepCode)
             if(lastDepCode ==1){
                 page= 1;
             }
@@ -208,7 +208,7 @@ export default class Index extends Component {
                 dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
                 isloading:true
             })
-            //触发点击第一个列表
+            //触发第一个左侧品类
             let priductData=[];
             dbAdapter.selectProduct(this.state.depcode,page,1).then((rows)=>{
                 // alert(lastDepCode);
@@ -240,6 +240,7 @@ export default class Index extends Component {
         });
         this._fetch1();
     }
+
     _fetch1(){
         dbAdapter.selectShopInfo("1").then((rows)=>{
             for(let i =0;i<rows.length;i++){
@@ -253,6 +254,7 @@ export default class Index extends Component {
             });
         });
     }
+
     _renderRow(rowData, sectionID, rowID){
         return (
             <TouchableOpacity style={styles.Active} onPress={()=>this._pressRow(rowData)}>
@@ -413,6 +415,7 @@ export default class Index extends Component {
     Close(){
         this.Modal();
     }
+
     //授权号查询判断
     Determine(){
         dbAdapter.selectUserRight(this.state.License,"K0801").then((rows)=>{
@@ -489,6 +492,7 @@ export default class Index extends Component {
             }
         });
     }
+
     //  功能分类
     Home(){
         dbAdapter.selectUserRight(this.state.usercode,"K0801").then((rows)=>{
@@ -505,12 +509,12 @@ export default class Index extends Component {
             }
         })
 
-        //保存需要本地存储的值  第一个参数是自己定义的  第二个参数是要传的参数
-        //下面那几个地方也是这种形式，把第二个参数改一些就行，点击的时候会自己覆盖以前的值
+        //将内容保存到本地数据库
         Storage.save('valueOf','App_Client_ProYH');
         Storage.save('history','App_Client_ProYHQ');
         Storage.save('historyClass','App_Client_ProYHDetailQ');
     }
+
     Home1(){
         dbAdapter.selectUserRight(this.state.usercode,"K0604").then((rows)=>{
             if(rows==true){
@@ -529,6 +533,7 @@ export default class Index extends Component {
         Storage.save('history','App_Client_ProSYQ');
         Storage.save('historyClass','App_Client_ProSYDetailQ');
     }
+
     Query(){
         dbAdapter.selectUserRight(this.state.usercode,"K0611").then((rows)=>{
             if(rows==true){
@@ -547,6 +552,7 @@ export default class Index extends Component {
         Storage.save('history','App_Client_ProCurrPCQ');
         Storage.save('historyClass','App_Client_ProCurrPCDetailQ');
     }
+
     Query1(){
         Storage.delete("Name");
         dbAdapter.selectUserRight(this.state.usercode,"K0607").then((rows)=>{
@@ -564,6 +570,7 @@ export default class Index extends Component {
         })
 
     }
+
     Home2(){
         Storage.delete("Name");
         dbAdapter.selectUserRight(this.state.usercode,"K0802").then((rows)=>{
@@ -581,6 +588,7 @@ export default class Index extends Component {
         })
 
     }
+
     Shopp(){
         Storage.delete("Name");
         dbAdapter.selectUserRight(this.state.usercode,"K0504").then((rows)=>{
@@ -597,6 +605,7 @@ export default class Index extends Component {
             }
         })
     }
+
     Shopp1(){
         Storage.delete("Name");
         dbAdapter.selectUserRight(this.state.usercode,"K0505").then((rows)=>{
@@ -613,6 +622,7 @@ export default class Index extends Component {
             }
         })
     }
+
     Shopp2(){
         Storage.delete("Name");
         dbAdapter.selectUserRight(this.state.usercode,"K0707").then((rows)=>{
@@ -629,6 +639,7 @@ export default class Index extends Component {
             }
         })
     }
+
     Shopp3(){
         Storage.delete("Name");
         dbAdapter.selectUserRight(this.state.usercode,"K0803").then((rows)=>{
@@ -645,12 +656,15 @@ export default class Index extends Component {
             }
         })
     }
+
     Home3(){
         this._setModalVisible();
     }
+
     keyExtractor(item: Object, index: number) {
         return item.ProdName//FlatList使用json中的ProdName动态绑定key
     }
+
     //翻页列表
     _onload(){
         if(this.state.isloading){

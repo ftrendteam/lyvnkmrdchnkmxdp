@@ -10,10 +10,11 @@
      StyleSheet,
      Text,
      View,
+     Image,
      TextInput,
      TouchableOpacity,
-     Image
  } from 'react-native';
+
  import Index from "./Index";
  import Home from "./Home";
  import Search from "./Search";
@@ -22,6 +23,7 @@
  import DataUtils from '../utils/DataUtils';
  import Storage from '../utils/Storage';
  import ModalDropdown from 'native';
+
  export default class ProductCG extends Component {
      constructor(props){
          super(props);

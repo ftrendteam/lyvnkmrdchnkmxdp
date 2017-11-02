@@ -10,12 +10,13 @@ import {
   StyleSheet,
   Text,
   View,
-  TextInput,
   Image,
   ListView,
+  TextInput,
   TouchableOpacity,
   DeviceEventEmitter
 } from 'react-native';
+
 import Index from "./Index";
 import ShoppingCart from "./ShoppingCart";
 import Code from "./Code";
@@ -29,6 +30,7 @@ var {NativeModules} = require('react-native');
 var RNScannerAndroid = NativeModules.RNScannerAndroid;
 let dbAdapter = new DBAdapter();
 let db;
+
 export default class Search extends Component {
   constructor(props){
       super(props);
@@ -38,6 +40,7 @@ export default class Search extends Component {
       };
       this.dataRows = [];
   }
+
   pressPop(){
       var nextRoute={
          name:"主页",

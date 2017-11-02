@@ -10,25 +10,27 @@ import {
   StyleSheet,
   Text,
   View,
-  TouchableOpacity,
   Image,
+  Button,
   ListView,
   TextInput,
-  Button,
+  ToastAndroid，
+  TouchableOpacity,
   DeviceEventEmitter,
-  ToastAndroid
 } from 'react-native';
 import Code from "./Code";
 import home from "./Home";
 import Index from "./Index";
-import OrderDetails from "./OrderDetails1";
 import Search from "./Search";
 import Storage from "../utils/Storage";
-import DBAdapter from "../adapter/DBAdapter";
 import DataUtils from '../utils/DataUtils';
+import OrderDetails from "./OrderDetails1";
+import DBAdapter from "../adapter/DBAdapter";
+
 let dbAdapter = new DBAdapter();
 var {NativeModules} = require('react-native');
 var RNScannerAndroid = NativeModules.RNScannerAndroid;
+
 export default class GoodsDetails extends Component {
     constructor(props){
         super(props);
@@ -46,9 +48,11 @@ export default class GoodsDetails extends Component {
             name:""
         }
     }
+
     GoodsDetails(){
         this.props.navigator.pop();
     }
+
     pressPush(){
         var nextRoute={
             name:"主页",
@@ -56,6 +60,7 @@ export default class GoodsDetails extends Component {
         };
        this.props.navigator.push(nextRoute)
     }
+
     Code(){
         RNScannerAndroid.openScanner();
         DeviceEventEmitter.addListener("code", (reminder) => {
@@ -89,6 +94,7 @@ export default class GoodsDetails extends Component {
        //};
        //this.props.navigator.push(nextRoute)
     }
+
     componentDidMount(){
         Storage.get('Name').then((tags) => {
             this.setState({
@@ -96,7 +102,8 @@ export default class GoodsDetails extends Component {
             });
         });
     }
-// 失焦时触发事件
+
+    //失焦时触发事件
     inputOnBlur(){
        var Number=this.state.Number;
        var ShopPrice=this.state.ShopPrice;
@@ -105,12 +112,14 @@ export default class GoodsDetails extends Component {
            totalPrice: this.state.totalPrice
        });
     }
+
     add(){
         var Number1=this.state.Number;
         this.setState({
            Number:parseInt(Number1)+1
        });
     }
+
     subtraction(){
         var Number1=this.state.Number;
         this.setState({
@@ -123,12 +132,14 @@ export default class GoodsDetails extends Component {
             });
         }
     }
+
     clear(){
         var Number1=this.state.Number;
         this.setState({
            Number:0
         });
     }
+
     pressPop(){
         var shopInfoData = [];
         var shopInfo = {};
