@@ -153,6 +153,12 @@ export default class HistoricalDocument extends Component {
      });
   }
   _dpSearch(){
+      //url获取
+      Storage.get('LinkUrl').then((tags) => {
+          this.setState({
+              linkurl:tags
+          })
+      })
      Storage.get('code').then((tags) => {
          DataUtils.get("usercode","").then((usercode)=>{
               DataUtils.get("username","").then((username)=>{
@@ -177,7 +183,7 @@ export default class HistoricalDocument extends Component {
              prodcode:this.state.codesw1,
              Sign:NetUtils.MD5("App_PosReq" + "##" +this.state.reqDetailCode + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',
          };
-         FetchUtils.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
+         FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
             var DetailInfo1 = JSON.stringify(data.DetailInfo1)
             if(Detailnfo1 = null){
                 this._setModalVisible();

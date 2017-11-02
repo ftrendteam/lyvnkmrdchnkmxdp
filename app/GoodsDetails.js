@@ -37,6 +37,13 @@ export default class GoodsDetails extends Component {
     }
 
     componentDidMount(){
+         //url获取
+         Storage.get('LinkUrl').then((tags) => {
+            this.setState({
+                linkurl:tags
+            })
+         })
+
          //reqDetailCode获取
           Storage.get('historyClass').then((tags) => {
               this.setState({
@@ -80,7 +87,7 @@ export default class GoodsDetails extends Component {
                  formno:this.state.Formno,
                  prodcode:"",
              };
-             FetchUtils.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
+             FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
                  if(data.retcode == 1){
                     var DetailInfo2 = data.DetailInfo2;
                       var shopnumber = 0;

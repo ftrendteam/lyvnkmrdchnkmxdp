@@ -28,7 +28,6 @@ export default class DataUtils {
         });
       } catch (error) {
         reject(defaultValue);
-        console.log("wtf=", error);
       }
     });
     

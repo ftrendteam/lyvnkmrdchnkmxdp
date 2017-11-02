@@ -39,7 +39,6 @@ import ProductYS from "./ProductYS";
 import ProductXP from "./ProductXP";
 import ProductSH from "./ProductSH";
 import NetUtils from "../utils/NetUtils";
-import FetchUtils from "../utils/FetchUtils";
 import DBAdapter from "../adapter/DBAdapter";
 import DataUtils from '../utils/DataUtils';
 import Storage from '../utils/Storage';
@@ -157,7 +156,6 @@ export default class Index extends Component {
     }
 
     _rightButtonClick() {
-        console.log('右侧按钮点击了');
         this._setModalVisible();
     }
 

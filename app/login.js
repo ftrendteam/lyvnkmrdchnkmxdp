@@ -57,10 +57,10 @@ export default class  login extends Component{
                    var items=str.replace('?wsdl',"")
                    var data='/FMJsonInterfaceByDownToPos';
                    var date=items+'/FMJsonInterfaceByDownToPos';
-                   DataUtils.save('LinkUrl',date);
+                   Storage.save('LinkUrl',date);
                 }
-                DataUtils.save('FirstTime','1');
-                DataUtils.save('ClientCode',this.state.ClientCode);
+                Storage.save('FirstTime','1');
+                Storage.save('ClientCode',this.state.ClientCode);
                 this.props.navigator.push({
                     component:admin,
                 });

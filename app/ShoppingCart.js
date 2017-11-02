@@ -229,6 +229,11 @@ export default class ShoppingCart extends Component {
 
     //提交
     submit(){
+        Storage.get('LinkUrl').then((tags) => {
+            this.setState({
+                linkurl:tags
+            })
+        })
         if(this.dataRows==0){
             alert("请添加商品")
         }else{
@@ -255,7 +260,7 @@ export default class ShoppingCart extends Component {
                     DetailInfo1: {"ShopCode": tags, "OrgFormno": this.state.orgFormno, "ProMemo": this.state.Remark,},
                     DetailInfo2: this.dataRows,
                 };
-                FetchUtils.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
+                FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
                     if(data.retcode == 1){
                         alert("提交成功");
                         dbAdapter.deleteData("shopInfo");

@@ -18,7 +18,6 @@ import Home from "./Home";
 import Search from "./Search";
 import NetUtils from "../utils/NetUtils";
 import DataUtils from '../utils/DataUtils';
-import FetchUtils from "../utils/FetchUtils";
 import Storage from '../utils/Storage';
 export default class Distrition extends Component {
     constructor(props){

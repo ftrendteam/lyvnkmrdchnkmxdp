@@ -20,7 +20,6 @@
  import ProductCG_list from "./ProductCG_list";
  import NetUtils from "../utils/NetUtils";
  import DataUtils from '../utils/DataUtils';
- import FetchUtils from "../utils/FetchUtils";
  import Storage from '../utils/Storage';
  import ModalDropdown from 'native';
  export default class ProductCG extends Component {
@@ -29,6 +28,7 @@
          this.state = {
              show:false,
              Number:"",
+             sCode1:"",
          };
      }
      Return(){
@@ -37,10 +37,21 @@
      onclick(){
          var nextRoute={
              name:"ProductCG_list",
-             component:ProductCG_list
+             component:ProductCG_list,
+             params: {
+                 reloadView:(sCode)=>this._reloadView(sCode)
+             }
          };
          this.props.navigator.push(nextRoute)
      }
+
+     _reloadView(sCode) {
+         sCode = String(sCode);
+         this.setState({
+             sCode1:sCode,
+         });
+     }
+
      render() {
          return (
              <View style={styles.container}>
@@ -59,7 +70,7 @@
                          <Text style={styles.listLeftText}>供应商编码:</Text>
                      </View>
                      <TouchableOpacity style={styles.listcont} onPress={this.onclick.bind(this)}>
-                         <Text style={styles.listContText}>111</Text>
+                         <Text style={styles.listContText}>{this.state.sCode1}</Text>
                      </TouchableOpacity>
                      <View style={styles.listimages}>
                          <Image source={require("../images/right.png")} style={styles.Image}></Image>

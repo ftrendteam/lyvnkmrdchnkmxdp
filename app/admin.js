@@ -46,6 +46,7 @@ export default class admin extends Component {
         this.state = {
             language:null,
             show:false,
+            animating:false,
             reqCode:"",
             reqDetailCode:"",
             ClientCode:"",
@@ -56,13 +57,18 @@ export default class admin extends Component {
             UserPwd:"",
             Product:"",
             detailInfo1:"",
-            animating:false,
+            linkurl:"",
 //            ClientCode:this.props.ClientCode ? this.props.ClientCode : "",
         };
         this.pickerData=[]
     }
     //进入页面执行事件
     componentDidMount(){
+        Storage.get('LinkUrl').then((tags) => {
+            this.setState({
+                linkurl:tags
+            })
+        })
         Storage.get('ClientCode').then((tags) => {
             let params = {
                  reqCode:"App_PosReq",
@@ -71,7 +77,7 @@ export default class admin extends Component {
                  sDateTime:Date.parse(new Date()),//获取当前时间转换成时间戳
                  Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_UseQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
             };
-              FetchUtil.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
+              FetchUtil.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
                  if(data.retcode == 1){
                       //用户信息
                       var detailInfo1 = data.DetailInfo1;
@@ -105,7 +111,7 @@ export default class admin extends Component {
                     sDateTime:Date.parse(new Date()),//获取当前时间转换成时间戳
                     Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_UseQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
              };
-             FetchUtil.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
+             FetchUtil.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
                 if(data.retcode == 1){
                     DetailInfo1 = JSON.stringify(data.DetailInfo1);// 在这里从接口取出要保存的数据，然后执行save方法
                        var  DetailInfo1 = JSON.stringify(data.DetailInfo1);
