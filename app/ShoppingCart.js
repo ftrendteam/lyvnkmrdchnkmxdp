@@ -277,9 +277,10 @@ export default class ShoppingCart extends Component {
                     username: this.state.Username,
                     usercode: this.state.Userpwd,
                     //"SuppCode":this.state.suppcode,"ChildShop":
-                    DetailInfo1: {"ShopCode": tags, "OrgFormno": this.state.orgFormno, "ProMemo": this.state.Remark,"SuppCode":this.state.suppcode,"ChildShop":this.state.shildshop},
+                    DetailInfo1: {"ShopCode": tags, "OrgFormno": this.state.orgFormno, "ProMemo": this.state.Remark,"SuppCode":this.state.suppcode,"childshop":this.state.shildshop},
                     DetailInfo2: this.dataRows,
                 };
+                // alert(JSON.stringify(params));
                 FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
                     if(data.retcode == 1){
                         alert("提交成功");
@@ -403,7 +404,7 @@ export default class ShoppingCart extends Component {
             <TouchableOpacity style={styles.Home} onPress={this.HOME.bind(this)}><Image source={require("../images/home.png")}></Image><Text style={styles.home1}>首页</Text></TouchableOpacity>
             <TouchableOpacity style={styles.Home} onPress={this.SHOP.bind(this)}>
                 <View>
-                   <Image source={require("../images/shop.png")}>
+                   <Image source={require("../images/shop1.png")}>
                        {
                           (this.state.shopcar==0)?
                            null:

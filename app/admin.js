@@ -19,7 +19,7 @@ import {
   AsyncStorages,
   ToastAndroid,
   ScrollView,
-  ActivityIndicator
+  ActivityIndicator,
 } from 'react-native';
 import Index from "./Index";
 import DataUtils from "../utils/DataUtils";
@@ -379,7 +379,7 @@ const styles = StyleSheet.create({
       paddingBottom:15,
       backgroundColor:"#000000",
       opacity:0.8,
-      borderRadius:3,
+      borderRadius:5,
   },
   TextLoading:{
       fontSize:17,

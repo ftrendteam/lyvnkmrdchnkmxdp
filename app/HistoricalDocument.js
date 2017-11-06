@@ -48,6 +48,7 @@ export default class HistoricalDocument extends Component {
             danzi1:"",
             codesw1:"",
             shopcar:"",
+            scode:"",
             show:false,
             animating:true,
             nomore:false,
@@ -208,7 +209,6 @@ export default class HistoricalDocument extends Component {
                 }
             }
          })
-
      });
   }
 
@@ -231,7 +231,6 @@ export default class HistoricalDocument extends Component {
           }
       })
   }
-
   _renderRow(rowData, sectionID, rowID){
       return(
           <View style={styles.Cont}>
@@ -241,6 +240,20 @@ export default class HistoricalDocument extends Component {
                           <Text style={styles.ListLeft}>要货单号：</Text>
                           <Text style={styles.ListRight}>{rowData.Formno}</Text>
                       </Text>
+                      {
+                          (this.state.name == "商品采购"||this.state.name == "商品验收"||this.state.name == "协配采购"||this.state.name == "协配收货") ?
+                              <Text style={styles.List}>
+                                  <Text style={styles.ListLeft}>供应商码：</Text>
+                                  <Text style={styles.ListRight}>{rowData.storecode}</Text>
+                              </Text> : null
+                      }
+                      {
+                          (this.state.name == "协配采购"||this.state.name == "协配收货") ?
+                              <Text style={styles.List}>
+                                  <Text style={styles.ListLeft}>机构信息：</Text>
+                                  <Text style={styles.ListRight}>{rowData.childshop}</Text>
+                              </Text> : null
+                      }
                       <Text style={styles.List}>
                           <Text style={styles.ListLeft}>制单日期：</Text>
                           <Text style={styles.ListRight}>{rowData.FormDate}</Text>
@@ -356,7 +369,8 @@ const styles = StyleSheet.create({
     borderBottomColor:"#e5e5e5"
  },
  ContList:{
-    paddingTop:15,
+    paddingTop:10,
+    paddingBottom:10,
  },
  List:{
     flexDirection:"row",

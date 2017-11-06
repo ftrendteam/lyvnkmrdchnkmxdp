@@ -171,6 +171,7 @@ const styles = StyleSheet.create({
     HeadList:{
         flex:6,
         marginTop:2,
+        paddingRight:70,
     },
     HeadText:{
         color:"#ffffff",

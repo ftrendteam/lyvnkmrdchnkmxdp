@@ -99,7 +99,7 @@ export default class Search extends Component {
 
   OrderDetails(rowData){
      this.props.navigator.push({
-        component:OrderDetails2,
+        component:OrderDetails,
         params:{
             ProdName:rowData.ProdName,
             ShopPrice:rowData.StdPrice,

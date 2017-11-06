@@ -13,6 +13,7 @@ import {
   Image,
   Button,
   TextInput,
+  ScrollView,
   TouchableOpacity,
 } from 'react-native';
 
@@ -113,6 +114,7 @@ export default class Enquiries extends Component {
   render() {
     return (
       <View style={styles.container}>
+          <ScrollView style={styles.ScrollView} scrollEnabled={false}>
             <View style={styles.Title}>
                 <TouchableOpacity onPress={this.Return.bind(this)} style={styles.HeaderImage}>
                      <Image source={require("../images/left.png")}></Image>
@@ -172,6 +174,7 @@ export default class Enquiries extends Component {
                     <Text style={styles.EmptyingTxt}>清空历史查询</Text>
                 </TouchableOpacity>
             </View>
+          </ScrollView>
       </View>
     );
   }
@@ -216,13 +219,13 @@ const styles = StyleSheet.create({
         paddingLeft:25,
     },
     ContLeft:{
-        flex:2,
+        width:100,
         lineHeight:35,
         color:"#636363",
         fontSize:16,
     },
     ContLeft2:{
-        flex:3,
+        width:100,
         lineHeight:35,
         color:"#636363",
         fontSize:16,
@@ -234,7 +237,7 @@ const styles = StyleSheet.create({
         fontSize:16,
     },
     ContLeft3:{
-        flex:3,
+        width:100,
         lineHeight:35,
         color:"#636363",
         fontSize:16,

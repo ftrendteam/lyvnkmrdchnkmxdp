@@ -14,6 +14,7 @@ import {
   Image,
   ListView,
   TextInput,
+  ScrollView,
   Button,
   DeviceEventEmitter,
   ToastAndroid
@@ -157,72 +158,74 @@ export default class GoodsDetails extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <View style={styles.header}>
-              <View style={styles.cont}>
-                    <TouchableOpacity onPress={this.GoodsDetails.bind(this)} style={styles.Headeronclick}>
-                          <Image source={require("../images/left1.png")} style={styles.HeaderImage}></Image>
-                    </TouchableOpacity>
-                    <Text style={styles.HeaderList}>{this.state.name}</Text>
+          <ScrollView style={styles.ScrollView} scrollEnabled={false}>
+            <View style={styles.header}>
+                  <View style={styles.cont}>
+                        <TouchableOpacity onPress={this.GoodsDetails.bind(this)} style={styles.Headeronclick}>
+                              <Image source={require("../images/left1.png")} style={styles.HeaderImage}></Image>
+                        </TouchableOpacity>
+                        <Text style={styles.HeaderList}>{this.state.name}</Text>
 
-              </View>
-        </View>
-        <View style={styles.Cont}>
-            <View style={styles.List}>
-                <Text style={styles.left}>名称</Text>
-                <Text style={styles.right}>{this.state.ProdName}</Text>
+                  </View>
             </View>
-            <View style={styles.List}>
-                <View style={styles.left1}>
-                    <Text style={styles.NumberName}>数量</Text>
-                    <TextInput style={styles.Number}
-                        underlineColorAndroid='transparent'
-                        keyboardType="numeric"
-                        value={this.state.Number.toString()}
-                        onBlur={this.inputOnBlur.bind(this)}
-                        onChangeText={(value)=>{this.setState({Number:value})}}/>
-                    <Text style={styles.NumberText}>件</Text>
+            <View style={styles.Cont}>
+                <View style={styles.List}>
+                    <Text style={styles.left}>名称</Text>
+                    <Text style={styles.right}>{this.state.ProdName}</Text>
                 </View>
-                <View style={styles.right1}>
-                    <TouchableOpacity style={styles.sublime} onPress={this.clear.bind(this)}><Text style={styles.Delete}>×</Text></TouchableOpacity>
-                    <TouchableOpacity style={styles.sublime} onPress={this.subtraction.bind(this)}><Text style={styles.Reduce}>-</Text></TouchableOpacity>
-                    <TouchableOpacity style={styles.sublime} onPress={this.add.bind(this)}><Text style={styles.Increase}>+</Text></TouchableOpacity>
+                <View style={styles.List}>
+                    <View style={styles.left1}>
+                        <Text style={styles.NumberName}>数量</Text>
+                        <TextInput style={styles.Number}
+                            underlineColorAndroid='transparent'
+                            keyboardType="numeric"
+                            value={this.state.Number.toString()}
+                            onBlur={this.inputOnBlur.bind(this)}
+                            onChangeText={(value)=>{this.setState({Number:value})}}/>
+                        <Text style={styles.NumberText}>件</Text>
+                    </View>
+                    <View style={styles.right1}>
+                        <TouchableOpacity style={styles.sublime} onPress={this.clear.bind(this)}><Text style={styles.Delete}>×</Text></TouchableOpacity>
+                        <TouchableOpacity style={styles.sublime} onPress={this.subtraction.bind(this)}><Text style={styles.Reduce}>-</Text></TouchableOpacity>
+                        <TouchableOpacity style={styles.sublime} onPress={this.add.bind(this)}><Text style={styles.Increase}>+</Text></TouchableOpacity>
+                    </View>
+                </View>
+                <View style={styles.List}>
+                    <View style={styles.left2}>
+                        <Text style={styles.Price}>单价</Text>
+                        <Text style={styles.Price1}>{this.state.ShopPrice}</Text>
+                    </View>
+                    <View style={styles.right2}>
+                        <Text style={styles.price}>元/件</Text>
+                    </View>
+                </View>
+                <View style={styles.List}>
+                    <View style={styles.left2}>
+                        <Text style={styles.Price}>金额</Text>
+                        <Text style={styles.Price1}>
+                        {(this.state.Number)*(this.state.ShopPrice)}
+                        </Text>
+                    </View>
+                    <View style={styles.right2}>
+                        <Text style={styles.price}>元</Text>
+                    </View>
+                </View>
+                <View style={styles.List}>
+                    <View style={styles.left2}>
+                        <Text style={styles.Price2}>备注</Text>
+                        <TextInput
+                         style={styles.Number1}
+                         placeholder="暂无备注"
+                         value={this.state.Remark.toString()}
+                         underlineColorAndroid='transparent'
+                         onChangeText={(value)=>{this.setState({Remark:value})}}/>
+                    </View>
+                </View>
+                <View style={styles.button}>
+                    <Text style={styles.ButtonText} onPress={this.pressPop.bind(this)}>确定</Text>
                 </View>
             </View>
-            <View style={styles.List}>
-                <View style={styles.left2}>
-                    <Text style={styles.Price}>单价</Text>
-                    <Text style={styles.Price1}>{this.state.ShopPrice}</Text>
-                </View>
-                <View style={styles.right2}>
-                    <Text style={styles.price}>元/件</Text>
-                </View>
-            </View>
-            <View style={styles.List}>
-                <View style={styles.left2}>
-                    <Text style={styles.Price}>金额</Text>
-                    <Text style={styles.Price1}>
-                    {(this.state.Number)*(this.state.ShopPrice)}
-                    </Text>
-                </View>
-                <View style={styles.right2}>
-                    <Text style={styles.price}>元</Text>
-                </View>
-            </View>
-            <View style={styles.List}>
-                <View style={styles.left2}>
-                    <Text style={styles.Price2}>备注</Text>
-                    <TextInput
-                     style={styles.Number1}
-                     placeholder="暂无备注"
-                     value={this.state.Remark.toString()}
-                     underlineColorAndroid='transparent'
-                     onChangeText={(value)=>{this.setState({Remark:value})}}/>
-                </View>
-            </View>
-            <View style={styles.button}>
-                <Text style={styles.ButtonText} onPress={this.pressPop.bind(this)}>确定</Text>
-            </View>
-        </View>
+          </ScrollView>
       </View>
     );
   }

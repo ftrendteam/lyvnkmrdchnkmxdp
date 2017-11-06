@@ -13,6 +13,7 @@ import {
   Image,
   Button,
   ListView,
+  ScrollView,
   TextInput,
   ToastAndroid,
   TouchableOpacity,
@@ -168,6 +169,7 @@ export default class GoodsDetails extends Component {
   render() {
     return (
       <View style={styles.container}>
+        <ScrollView style={styles.ScrollView} scrollEnabled={false}>
         <View style={styles.header}>
               <View style={styles.cont}>
                     <TouchableOpacity onPress={this.GoodsDetails.bind(this)} style={styles.Headeronclick}>
@@ -234,6 +236,7 @@ export default class GoodsDetails extends Component {
                 <Text style={styles.ButtonText} onPress={this.pressPop.bind(this)}>确定</Text>
             </View>
         </View>
+        </ScrollView>
       </View>
     );
   }

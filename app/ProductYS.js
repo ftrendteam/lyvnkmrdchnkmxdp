@@ -134,6 +134,7 @@ const styles = StyleSheet.create({
     HeadList:{
         flex:6,
         marginTop:2,
+        paddingRight:70,
     },
     HeadText:{
         color:"#ffffff",
@@ -144,22 +145,21 @@ const styles = StyleSheet.create({
         height:50,
         marginTop:20,
         marginLeft:25,
-        marginRight:25,
+        marginRight:15,
         paddingTop:10,
-        paddingLeft:25,
         flexDirection:"row",
         borderBottomWidth:1,
         borderBottomColor:"#eeeeee",
     },
     listleft:{
-        flex:2,
+        width:100,
     },
     listLeftText:{
         color:"#323232",
         fontSize:17,
     },
     listcont:{
-        flex:6,
+        flex:7,
         paddingLeft:5,
         paddingRight:5,
     },
