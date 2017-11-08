@@ -20,7 +20,6 @@ import Search from "./Search";
 import ProductCG_list from "./ProductCG_list";
 import ProductXP_list from "./ProductXP_list";
 import NetUtils from "../utils/NetUtils";
-import DataUtils from '../utils/DataUtils';
 import Storage from '../utils/Storage';
 import ModalDropdown from 'native';
 export default class ProductCG extends Component {
@@ -118,7 +117,7 @@ export default class ProductCG extends Component {
                 </View>
                 <View style={styles.ContList}>
                     <View style={styles.listleft}>
-                        <Text style={styles.listLeftText}>供应商编码:</Text>
+                        <Text style={styles.listLeftText}>供应商:</Text>
                     </View>
                     <TouchableOpacity style={styles.listcont} onPress={this.onclick.bind(this)}>
                         <Text style={styles.listContText}>{this.state.sCode1}</Text>
@@ -129,7 +128,7 @@ export default class ProductCG extends Component {
                 </View>
                 <View style={styles.ContList}>
                     <View style={styles.listleft}>
-                        <Text style={styles.listLeftText}>机构编码:</Text>
+                        <Text style={styles.listLeftText}>机构:</Text>
                     </View>
                     <TouchableOpacity style={styles.listcont} onPress={this.Monclick.bind(this)}>
                         <Text style={styles.listContText}>{this.state.shopname1}</Text>

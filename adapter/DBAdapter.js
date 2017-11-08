@@ -654,7 +654,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
           ",ifNull(b.promemo,'') as ShopRemark,'" + DepCode + "' as DepCode1 " +
           " from product a left join shopInfo b on a.Pid=b.Pid where IsDel='0' and prodtype<>'1' ";
         ssql = ssql + " and a.DepCode in (select depcode from tdepset where IsDel='0' and depcode" + DepLevel + "='" + DepCode + "')";
-        ssql = ssql + " limit 20 offset " + (currpage-1)*20;
+        ssql = ssql + " limit 9 offset " + (currpage-1)*9;
         tx.executeSql(ssql, [], (tx, results) => {
           resolve(results.rows);
         });
@@ -712,10 +712,10 @@ export default class DBAdapter extends SQLiteOpenHelper {
    * @param funcCode 需要查询的权限号
    * @return true 表示含有某个权限 false 没有权限
    */
-  selectUserRight(userCode, funcCode) {
+  selectUserRight(userCode,funcCode) {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
-        let sql = "select * from tuserright where usercode='" + userCode + "' and Funccode='" + funcCode+"'";
+        let sql = "select * from tuserright where usercode = '"+userCode+"' and Funccode='" + funcCode+"'";
         tx.executeSql(sql, [], (tx, results) => {
           resolve(results.rows.length != 0);
         })

@@ -19,7 +19,6 @@ import HistoricalDocument from "./HistoricalDocument";
 import FetchUtils from "../utils/FetchUtils";
 import NetUtils from "../utils/NetUtils";
 import DBAdapter from "../adapter/DBAdapter";
-import DataUtils from '../utils/DataUtils';
 import Storage from "../utils/Storage";
 
 export default class GoodsDetails extends Component {
@@ -71,8 +70,8 @@ export default class GoodsDetails extends Component {
          });
 
          Storage.get('code').then((tags) => {
-             DataUtils.get("usercode","").then((usercode)=>{
-                  DataUtils.get("username","").then((username)=>{
+             Storage.get("usercode","").then((usercode)=>{
+                 Storage.get("username","").then((username)=>{
                       let params = {
                           ClientCode: this.state.ClientCode,
                           username: this.state.Username,
@@ -319,6 +318,6 @@ const styles = StyleSheet.create({
    paddingBottom:50,
    },
    listViewStyle:{
-    marginBottom:260,
+    marginBottom:300,
    }
 });

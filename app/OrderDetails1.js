@@ -24,7 +24,6 @@ import home from "./Home";
 import Index from "./Index";
 import Search from "./Search";
 import Storage from "../utils/Storage";
-import DataUtils from '../utils/DataUtils';
 import OrderDetails from "./OrderDetails1";
 import DBAdapter from "../adapter/DBAdapter";
 

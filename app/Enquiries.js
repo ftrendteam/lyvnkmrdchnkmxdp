@@ -38,6 +38,7 @@ export default class Enquiries extends Component {
   }
 
   componentDidMount(){
+
      this._get();
   }
 

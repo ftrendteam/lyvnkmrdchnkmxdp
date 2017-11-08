@@ -16,9 +16,10 @@ import {
 } from 'react-native';
 
 import Home from "./Home";
+import Index from "./Index";
 import Search from "./Search";
+import Distrition_list from "./Distrition_list";
 import NetUtils from "../utils/NetUtils";
-import DataUtils from '../utils/DataUtils';
 import Storage from '../utils/Storage';
 
 export default class Distrition extends Component {
@@ -27,7 +28,17 @@ export default class Distrition extends Component {
         this.state = {
             show:false,
             Number:"",
+            invoice:"",
+            sCode1:""
         };
+    }
+
+    componentDidMount(){
+        Storage.get('invoice').then((tags)=>{
+            this.setState({
+                invoice:tags
+            })
+        })
     }
 
     //返回前一页面
@@ -38,15 +49,11 @@ export default class Distrition extends Component {
     //判断当前输入是否为正确的单号 并保存
     pressPush(){
         var str=this.state.Number;
-        if(str.length != 16){
-            alert("请输入16位数的单号");
-        }else{
-            var nextRoute={
-                name:"主页",
-                component:Search
-            };
-            this.props.navigator.push(nextRoute)
-        }
+        var nextRoute={
+            name:"主页",
+            component:Search
+        };
+        this.props.navigator.push(nextRoute)
         Storage.save('OrgFormno',this.state.Number);
         Storage.save('Name','配送收货单');
         Storage.save('valueOf','App_Client_ProPSSH');
@@ -56,27 +63,55 @@ export default class Distrition extends Component {
 
     Home(){
         var str=this.state.Number;
-        if(str.length != 16){
-            alert("请输入16位数的单号");
-        }else{
-            this.props.navigator.pop();
-        }
+        var nextRoute={
+            name:"主页",
+            component:Index
+        };
+        this.props.navigator.push(nextRoute);
         Storage.save('OrgFormno',this.state.Number);
+        Storage.save("scode",this.state.sCode1);
         Storage.save('Name','配送收货单');
         Storage.save('valueOf','App_Client_ProPSSH');
         Storage.save('history','App_Client_ProPSSHQ');
         Storage.save('historyClass','App_Client_ProPSSHDetailQ');
     }
+
+    Search(){
+        var nextRoute={
+            name:"Distrition_list",
+            component:Distrition_list,
+            params: {
+                reloadView:(sCode)=>this._reloadView(sCode)
+            }
+        };
+        this.props.navigator.push(nextRoute)
+    }
+
+    _reloadView(sCode) {
+        sCode = String(sCode);
+        this.setState({
+            sCode1:sCode,
+        });
+    }
+
     render() {
         return (
             <View style={styles.container}>
-                <TouchableOpacity style={styles.images} onPress={this.Return.bind(this)}>
-                    <Image source={require("../images/left1.png")} style={styles.HeaderImage}></Image>
-                </TouchableOpacity>
+                <View style={styles.Head}>
+                    <View style={styles.cont}>
+                        <TouchableOpacity style={styles.Images} onPress={this.Return.bind(this)}>
+                            <Image source={require("../images/left.png")} style={styles.HeaderImage}></Image>
+                        </TouchableOpacity>
+                        <View style={styles.HeadList}>
+                            <Text style={styles.HeadText}>{this.state.invoice}</Text>
+                        </View>
+                    </View>
+                </View>
                 <View style={styles.TextInput}>
                     <TextInput
-                        autofocus="{true}"
-                        numberoflines="{1}"
+                        autofocus={true}
+                        numberoflines={1}
+                        defaultValue ={this.state.sCode1}
                         placeholder="请输入原始单号"
                         textalign="center"
                         underlineColorAndroid='transparent'
@@ -88,6 +123,9 @@ export default class Distrition extends Component {
                             })
                         }}
                     />
+                    <TouchableOpacity style={styles.Search} onPress={this.Search.bind(this)}>
+                        <Image source={require("../images/search.png")}></Image>
+                    </TouchableOpacity>
                 </View>
                 <View style={styles.search}>
                     <TouchableOpacity style={styles.textsearch} onPress={this.pressPush.bind(this)}>
@@ -107,6 +145,30 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#ffffff',
     },
+    Head:{
+        height:50,
+        backgroundColor:"#f47882",
+        paddingTop:10,
+        borderBottomWidth:1,
+        borderBottomColor:"#cacccb",
+    },
+    cont:{
+        flexDirection:"row",
+        marginLeft:25,
+    },
+    Images:{
+        width:60,
+    },
+    HeadList:{
+        flex:6,
+        marginTop:2,
+        paddingRight:70,
+    },
+    HeadText:{
+        color:"#ffffff",
+        fontSize:18,
+        textAlign:"center",
+    },
     admin:{
         borderRadius:3,
         backgroundColor:"#f5f5f5",
@@ -114,9 +176,14 @@ const styles = StyleSheet.create({
         paddingTop:8,
         paddingBottom:8,
         paddingLeft:12,
-        fontSize:18,
-        marginLeft:30,
-        marginRight:30,
+        paddingRight:60,
+        fontSize:16,
+        flex:5,
+    },
+    TextInput:{
+        flexDirection:"row",
+        paddingLeft:30,
+        paddingRight:30,
         marginTop:50,
     },
     search:{
@@ -156,6 +223,12 @@ const styles = StyleSheet.create({
         borderBottomWidth:1,
         borderBottomColor:"#cacccb",
         justifyContent: 'center',
+    },
+    Search:{
+        width:60,
+        paddingTop:8,
+        paddingLeft:15,
+        backgroundColor:"#f5f5f5",
     }
 });
 

@@ -22,6 +22,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import Index from "./Index";
+import PickedDate_list from "./PickedDate_list";
 import DataUtils from "../utils/DataUtils";
 import NetUtils from "../utils/NetUtils";
 import FetchUtil from "../utils/FetchUtils";
@@ -39,6 +40,7 @@ export default class admin extends Component {
         this.state = {
             language:null,
             show:false,
+            ErrorShow:false,
             animating:false,
             reqCode:"",
             reqDetailCode:"",
@@ -51,6 +53,7 @@ export default class admin extends Component {
             Product:"",
             detailInfo1:"",
             linkurl:"",
+            sCode1:""
         };
         this.pickerData=[]
     }
@@ -106,45 +109,20 @@ export default class admin extends Component {
         });
     }
 
-    //输入用户编码之后执行
-    autoFocuss(){
-        Storage.get('ClientCode').then((tags) => {
-             let params = {
-                    reqCode:"App_PosReq",
-                    reqDetailCode:"App_Client_UseQry",
-                    ClientCode:tags,
-                    sDateTime:Date.parse(new Date()),//获取当前时间转换成时间戳
-                    Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_UseQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
-             };
-             FetchUtil.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
-                if(data.retcode == 1){
-                    DetailInfo1 = JSON.stringify(data.DetailInfo1);// 在这里从接口取出要保存的数据，然后执行save方法
-                       var  DetailInfo1 = JSON.stringify(data.DetailInfo1);
-                       for(var value of data.DetailInfo1){
-                            var shopcode = value.shopcode;
-                            var shopname = value.shopname;
-                            this.pickerData .push(shopname+"_"+shopcode);
-                       }
-                       this.setState({
-                            pickedDate:this.pickerData
-                       })
-                }else{
-                }
-             })
-        })
-    }
-
-    // 失焦时触发事件
-    inputOnBlur(){
-        this.autoFocuss();
-    }
-
     _setModalVisible() {
         let isShow = this.state.show;
         this.setState({
             show:!isShow,
         });
     }
+
+    _ErrorModalVisible(){
+        let isshow = this.state.ErrorShow;
+        this.setState({
+            ErrorShow:!isshow,
+        });
+    }
+
 
     //登录
     pressPush(){
@@ -155,24 +133,23 @@ export default class admin extends Component {
         }
         if(this.state.UserPwd == ""){
             ToastAndroid.show('请输入密码', ToastAndroid.SHORT)
-            return;
+            // return;
         }
-        if(this.state.Product == ""){
+        if(this.state.sCode1 == ""){
             ToastAndroid.show('请选择机构信息', ToastAndroid.SHORT)
             return;
         }else{
             <ActivityIndicator key="1"></ActivityIndicator>
         }
-        var code = ""+this.state.Product;//获取到之后前面加""+
+        var code = ""+this.state.sCode1;//获取到之后前面加""+
         var Usercode=this.state.Usercode;
         var UserPwd=this.state.UserPwd;
-        //DataUtils.save("shopCode",this.state.pickedDate);//调用保存封装接口
         str1 = code.split('_');
         str2 = str1[1];
         this._setModalVisible();
         dbAdapter.isLogin(Usercode, this.state.UserPwd, str2).then((isLogin)=>{
             if(isLogin){
-               var strin = this.state.Product;
+               var strin = this.state.sCode1;
                strjj = ""+strin;
                code = strjj.substring(strjj.indexOf('_') + 1,strjj.length);
                Storage.save('code',code);
@@ -186,16 +163,33 @@ export default class admin extends Component {
                this._setModalVisible();
             }else{
                this._setModalVisible();
-               ToastAndroid.show('用户编码或密码错误', ToastAndroid.SHORT);
+               this._ErrorModalVisible();
+               // ToastAndroid.show('用户编码或密码错误', ToastAndroid.SHORT);
             }
         });
     }
 
-    //机构信息下拉列表赋值
-    _dropdown_4_onSelect(idx, value) {
+    PickedDate(){
+        Storage.save('invoice','机构信息')
+        var nextRoute={
+            name:"PickedDate_list",
+            component:PickedDate_list,
+            params: {
+                reloadView:(sCode)=>this._reloadView(sCode)
+            }
+        };
+        this.props.navigator.push(nextRoute)
+    }
+
+    _reloadView(sCode) {
+        sCode = String(sCode);
         this.setState({
-            Product:value
-        })
+            sCode1:sCode,
+        });
+    }
+
+    LoginError(){
+        this._ErrorModalVisible();
     }
 
   render() {
@@ -215,7 +209,6 @@ export default class admin extends Component {
                     underlineColorAndroid='transparent'
                     placeholderTextColor="#bcbdc1"
                     style={styles.admin}
-                    onBlur={this.inputOnBlur.bind(this)}
                     onChangeText={(value)=>{
                         this.setState({
                             Usercode:value
@@ -245,7 +238,19 @@ export default class admin extends Component {
             </View>
             <View style={styles.AgencyInformation}>
                 <View style={styles.InformationLeft}><Text style={styles.InformationLeftText}>机构信息</Text></View>
-                <ModalDropdown style={styles.PullDown} options={this.state.pickedDate} textStyle={styles.dropdown_2_text} onSelect={(idx, value) => this._dropdown_4_onSelect(idx, value)}/>
+                <TouchableOpacity style={styles.listcont} onPress={this.PickedDate.bind(this)}>
+                    <TextInput
+                        autofocus={true}
+                        editable={false}
+                        numberoflines="{1}"
+                        defaultValue ={this.state.sCode1}
+                        placeholder="请选择机构信息"
+                        textalign="center"
+                        underlineColorAndroid='transparent'
+                        placeholderTextColor="#bcbdc1"
+                        style={styles.listContText}
+                    />
+                </TouchableOpacity>
             </View>
             <TouchableOpacity onPress={this.pressPush.bind(this)}>
                <Text style={styles.login}>登录</Text>
@@ -264,6 +269,27 @@ export default class admin extends Component {
                 <View style={styles.loading}>
                     <ActivityIndicator key="1" color="#414240" size="large" style={styles.activity}></ActivityIndicator>
                     <Text style={styles.TextLoading}>登录中</Text>
+                </View>
+            </View>
+        </Modal>
+        <Modal
+            animationType='fade'
+            transparent={true}
+            visible={this.state.ErrorShow}
+            onShow={() => {}}
+            onRequestClose={() => {}} >
+            <View style={styles.Error}>
+                <View style={styles.ErrorCont}>
+                    <View style={styles.LoginError}>
+                        <Text style={styles.ErrorText}>
+                            登录失败：账号或密码错误
+                        </Text>
+                    </View>
+                    <TouchableOpacity style={styles.LoginOk} onPress={this.LoginError.bind(this)}>
+                        <Text style={styles.ErrorText}>
+                            好的
+                        </Text>
+                    </TouchableOpacity>
                 </View>
             </View>
         </Modal>
@@ -313,7 +339,7 @@ const styles = StyleSheet.create({
       flexDirection:"row",
    },
    InformationLeft:{
-    flex:2,
+    width:80,
    },
    InformationLeftText:{
     color:"#bcbdc1",
@@ -388,4 +414,43 @@ const styles = StyleSheet.create({
   activity:{
       marginBottom:5,
   },
+    listcont:{
+        flex:7,
+        paddingLeft:5,
+        paddingRight:5,
+        borderBottomWidth:1,
+        borderBottomColor:"#474955",
+    },
+    listContText:{
+        color:"#bcbdc1",
+        fontSize:14,
+    },
+    Error:{
+        flex:1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    ErrorCont:{
+        width:320,
+        backgroundColor:"#ffffff",
+        borderRadius:3,
+        paddingTop:15,
+        paddingBottom:15,
+        paddingLeft:8,
+        paddingRight:8,
+    },
+    LoginError:{
+        marginTop:18,
+        paddingBottom:15,
+        borderBottomColor:"#cccccc",
+        borderBottomWidth:1,
+    },
+    ErrorText:{
+        color:"#323232",
+        fontSize:16,
+        textAlign:"center"
+    },
+    LoginOk:{
+        marginTop:22,
+    },
 });

@@ -31,7 +31,6 @@ import Search from "./Search1";
 import OrderDetails from "./OrderDetails3";
 import NetUtils from "../utils/NetUtils";
 import FetchUtils from "../utils/FetchUtils";
-import DataUtils from '../utils/DataUtils';
 import DBAdapter from "../adapter/DBAdapter";
 import Storage from "../utils/Storage";
 import SideMenu from 'react-native-side-menu';
@@ -258,8 +257,8 @@ export default class ShoppingCart extends Component {
             alert("请添加商品")
         }else{
             Storage.get('code').then((tags) => {
-                DataUtils.get("usercode","").then((usercode)=>{
-                    DataUtils.get("username","").then((username)=>{
+                Storage.get("usercode","").then((usercode)=>{
+                    Storage.get("username","").then((username)=>{
                         let params = {
                             ClientCode: this.state.ClientCode,
                             username: this.state.Username,

@@ -19,7 +19,6 @@ import Index from "./Index";
 import Home from "./Home";
 import Search from "./Search";
 import NetUtils from "../utils/NetUtils";
-import DataUtils from '../utils/DataUtils';
 import Storage from '../utils/Storage';
 
 export default class Query extends Component {
@@ -29,6 +28,14 @@ export default class Query extends Component {
             show:false,
             Number:"",
         };
+    }
+
+    componentDidMount(){
+        Storage.get('invoice').then((tags)=>{
+            this.setState({
+                invoice:tags
+            })
+        })
     }
 
     Return(){
@@ -73,7 +80,16 @@ export default class Query extends Component {
     render() {
         return (
             <View style={styles.container}>
-                <TouchableOpacity style={styles.images} onPress={this.Return.bind(this)}><Image source={require("../images/left1.png")} style={styles.HeaderImage}></Image></TouchableOpacity>
+                <View style={styles.Head}>
+                    <View style={styles.cont}>
+                        <TouchableOpacity style={styles.Images} onPress={this.Return.bind(this)}>
+                            <Image source={require("../images/left.png")} style={styles.HeaderImage}></Image>
+                        </TouchableOpacity>
+                        <View style={styles.HeadList}>
+                            <Text style={styles.HeadText}>{this.state.invoice}</Text>
+                        </View>
+                    </View>
+                </View>
                 <View style={styles.TextInput}>
                     <TextInput
                         autofocus="{true}"
@@ -107,6 +123,30 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#ffffff',
+    },
+    Head:{
+        height:50,
+        backgroundColor:"#f47882",
+        paddingTop:10,
+        borderBottomWidth:1,
+        borderBottomColor:"#cacccb",
+    },
+    cont:{
+        flexDirection:"row",
+        marginLeft:25,
+    },
+    Images:{
+        width:60,
+    },
+    HeadList:{
+        flex:6,
+        marginTop:2,
+        paddingRight:70,
+    },
+    HeadText:{
+        color:"#ffffff",
+        fontSize:18,
+        textAlign:"center",
     },
     admin:{
         borderRadius:3,

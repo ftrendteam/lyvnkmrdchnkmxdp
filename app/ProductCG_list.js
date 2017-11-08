@@ -18,7 +18,6 @@ import {
     InteractionManager,
 } from 'react-native';
 import DBAdapter from "../adapter/DBAdapter";
-import DataUtils from '../utils/DataUtils';
 import Storage from '../utils/Storage';
 
 let dbAdapter = new DBAdapter();

@@ -28,7 +28,6 @@ import Enquiries from "./Enquiries";
 import NetUtils from "../utils/NetUtils";
 import FetchUtils from "../utils/FetchUtils";
 import DBAdapter from "../adapter/DBAdapter";
-import DataUtils from '../utils/DataUtils';
 import Storage from "../utils/Storage";
 let dbAdapter = new DBAdapter();
 let db;
@@ -164,8 +163,8 @@ export default class HistoricalDocument extends Component {
 
      Storage.get('code').then((tags) => {
 
-         DataUtils.get("usercode","").then((usercode)=>{
-              DataUtils.get("username","").then((username)=>{
+         Storage.get("usercode","").then((usercode)=>{
+             Storage.get("username","").then((username)=>{
                   let params = {
                       ClientCode: this.state.ClientCode,
                       username: this.state.Username,

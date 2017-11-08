@@ -26,7 +26,6 @@ import Index from "./Index";
 import Search from "./Search";
 import Storage from "../utils/Storage";
 import OrderDetails from "./OrderDetails";
-import DataUtils from '../utils/DataUtils';
 import DBAdapter from "../adapter/DBAdapter";
 
 let dbAdapter = new DBAdapter();

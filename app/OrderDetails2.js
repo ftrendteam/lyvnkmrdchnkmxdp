@@ -26,7 +26,6 @@ import OrderDetails from "./OrderDetails2";
 import Search from "./Search";
 import Storage from "../utils/Storage";
 import DBAdapter from "../adapter/DBAdapter";
-import DataUtils from '../utils/DataUtils';
 let dbAdapter = new DBAdapter();
 var {NativeModules} = require('react-native');
 var RNScannerAndroid = NativeModules.RNScannerAndroid;
