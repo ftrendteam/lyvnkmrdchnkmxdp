@@ -30,7 +30,7 @@ export default class ProductXP_list extends Component {
         this.state = {
             search:"",
             show:false,
-            dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
+            dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => true}),
         };
         this.dataRows = [];
     }
@@ -62,7 +62,21 @@ export default class ProductXP_list extends Component {
         this.props.navigator.pop();
     }
 
-    Search(value){}
+    Search(value){
+        for (let i = 0; i < this.dataRows.length; i++) {
+            let temp = this.dataRows[0];
+            let dataRow = this.dataRows[i];
+            if (((dataRow.shopcode + "").indexOf(value) >= 0)) {
+                this.dataRows[0] = dataRow;
+                this.dataRows[i] = temp;
+                break;
+            }
+        }
+        this.setState({
+            dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
+        })
+
+    }
 
     pressPop(rowData){
         var Data=rowData.shopname+rowData.shopcode;
@@ -155,6 +169,7 @@ const styles = StyleSheet.create({
     HeadList:{
         flex:6,
         marginTop:2,
+        paddingRight:70,
     },
     HeadText:{
         color:"#ffffff",

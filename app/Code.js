@@ -16,40 +16,40 @@ import {
 import { QRScannerView } from 'ac-qrcode';
 export default class Code extends Component {
     constructor(props){
-          super(props);
-      }
+        super(props);
+    }
     pressPop(){
         this.props.navigator.pop();
     }
-  render() {
-    return (
-      <QRScannerView
-           onScanResultReceived={this.barcodeReceived.bind(this)}
-           renderTopBarView={() => this._renderTitleBar()}
-           renderBottomMenuView={() => this._renderMenu()}
-       />
-    );
-  }
-  _renderTitleBar(){
-      return(
-          <View style={styles.Title}>
-            <TouchableOpacity onPress={this.pressPop.bind(this)} style={styles.HeaderImage}>
-                <Image source={require("../images/left.png")}></Image>
-             </TouchableOpacity>
-            <Text style={styles.Text1}>扫描商品</Text>
-          </View>
+    render() {
+        return (
+            <QRScannerView
+               onScanResultReceived={this.barcodeReceived.bind(this)}
+               renderTopBarView={() => this._renderTitleBar()}
+               renderBottomMenuView={() => this._renderMenu()}
+            />
+        );
+    }
+    _renderTitleBar(){
+        return(
+            <View style={styles.Title}>
+                <TouchableOpacity onPress={this.pressPop.bind(this)} style={styles.HeaderImage}>
+                    <Image source={require("../images/left.png")}></Image>
+                </TouchableOpacity>
+                <Text style={styles.Text1}>扫描商品</Text>
+            </View>
+        );
+    }
 
-      );
-  }
-  _renderMenu() {
-      return (
-          <Text style={{color:'white',textAlignVertical:'center', textAlign:'center',font:20,padding:12}}>Here is bottom menu</Text>
-      )
-  }
-  barcodeReceived(e) {
-      Toast.show('Type: ' + e.type + '\nData: ' + e.data);
-      //console.log(e)
-  }
+    _renderMenu() {
+        return (
+            <Text style={{color:'white',textAlignVertical:'center', textAlign:'center',font:20,padding:12}}>Here is bottom menu</Text>
+        )
+    }
+
+    barcodeReceived(e) {
+        Toast.show('Type: ' + e.type + '\nData: ' + e.data);
+    }
 }
 
 const styles = StyleSheet.create({

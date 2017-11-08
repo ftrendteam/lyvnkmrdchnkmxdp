@@ -10,10 +10,11 @@
      StyleSheet,
      Text,
      View,
+     Image,
      TextInput,
      TouchableOpacity,
-     Image
  } from 'react-native';
+
  import Index from "./Index";
  import Home from "./Home";
  import Search from "./Search";
@@ -22,6 +23,7 @@
  import DataUtils from '../utils/DataUtils';
  import Storage from '../utils/Storage';
  import ModalDropdown from 'native';
+
  export default class ProductCG extends Component {
      constructor(props){
          super(props);
@@ -74,9 +76,9 @@
              this.props.navigator.push(nextRoute);
              Storage.save('OrgFormno',this.state.Number);
              Storage.save('Name','商品采购');
-             Storage.save('valueOf','App_Client_ProXP');
-             Storage.save('history','App_Client_ProXPYSQ');
-             Storage.save('historyClass','App_Client_ProXPDetailYSQ');
+             Storage.save('valueOf','App_Client_ProCG');
+             Storage.save('history','App_Client_ProCGQ');
+             Storage.save('historyClass','App_Client_ProCGDetailQ');
              Storage.save("scode",this.state.sCode1)
          }
      }
@@ -135,6 +137,7 @@
      HeadList:{
          flex:6,
          marginTop:2,
+         paddingRight:70,
      },
      HeadText:{
          color:"#ffffff",
@@ -144,21 +147,22 @@
      ContList:{
          height:50,
          marginTop:20,
+         marginLeft:25,
+         marginRight:15,
          paddingTop:10,
-         paddingLeft:25,
          flexDirection:"row",
          borderBottomWidth:1,
-         borderBottomColor:"#cacccb",
+         borderBottomColor:"#eeeeee",
      },
      listleft:{
-         flex:2,
+         width:100,
      },
      listLeftText:{
          color:"#323232",
          fontSize:17,
      },
      listcont:{
-         flex:6,
+         flex:7,
          paddingLeft:5,
          paddingRight:5,
      },

@@ -63,20 +63,22 @@ export default class ProductCG_list extends Component {
     }
 
     Search(value){
-        for (let i = 0; i < this.dataRows.length; i++) {
-            let temp = this.dataRows[0];
-            let dataRow = this.dataRows[i];
-            if (((dataRow.sCode + "").indexOf(value) >= 0)) {
-                this.dataRows[0] = dataRow;
-                this.dataRows[i] = temp;
+        //if(value>=3){
+            for (let i = 0; i < this.dataRows.length; i++) {
+                // let temp = this.dataRows[0];
+                let dataRow = this.dataRows[i];
+                if (((dataRow.sCode + "").indexOf(value) >= 0)) {
+                    // this.dataRows[0] = dataRow;
+                    // this.dataRows[i] = temp;
+                    var str = this.dataRows.splice(i,1);
+                    this.dataRows.unshift(str[0])
+                    break;
+                }
             }
-        }
-        //console.log(this.dataRows[0]);
-        //console.log(this.dataRows.length);
-        this.setState({
-            dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
-        })
-
+            this.setState({
+                dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
+            })
+        //}
     }
 
     pressPop(rowData){
@@ -169,6 +171,7 @@ const styles = StyleSheet.create({
     HeadList:{
         flex:6,
         marginTop:2,
+        paddingRight:70,
     },
     HeadText:{
         color:"#ffffff",

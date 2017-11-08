@@ -10,12 +10,13 @@ import {
   StyleSheet,
   Text,
   View,
-  TextInput,
   Image,
   ListView,
+  TextInput,
   TouchableOpacity,
   DeviceEventEmitter
 } from 'react-native';
+
 import Index from "./Index";
 import Code from "./Code";
 import OrderDetails from "./OrderDetails2";
@@ -28,6 +29,7 @@ var {NativeModules} = require('react-native');
 var RNScannerAndroid = NativeModules.RNScannerAndroid;
 let dbAdapter = new DBAdapter();
 let db;
+
 export default class Search extends Component {
   constructor(props){
       super(props);
@@ -37,6 +39,7 @@ export default class Search extends Component {
       };
       this.dataRows = [];
   }
+
   pressPop(){
       var nextRoute={
          name:"主页",
@@ -96,7 +99,7 @@ export default class Search extends Component {
 
   OrderDetails(rowData){
      this.props.navigator.push({
-        component:OrderDetails2,
+        component:OrderDetails,
         params:{
             ProdName:rowData.ProdName,
             ShopPrice:rowData.StdPrice,

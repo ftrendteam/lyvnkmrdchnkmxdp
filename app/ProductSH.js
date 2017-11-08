@@ -95,7 +95,7 @@ export default class ProductCG extends Component {
             this.props.navigator.push(nextRoute);
             Storage.save('OrgFormno',this.state.Number);
             Storage.save('Name','协配收货');
-            Storage.save('valueOf','App_Client_ProXP');
+            Storage.save('valueOf','App_Client_ProXPYS');
             Storage.save('history','App_Client_ProXPYSQ');
             Storage.save('historyClass','App_Client_ProXPDetailYSQ');
             Storage.save("scode",this.state.sCode1);
@@ -168,6 +168,7 @@ const styles = StyleSheet.create({
     HeadList:{
         flex:6,
         marginTop:2,
+        paddingRight:70,
     },
     HeadText:{
         color:"#ffffff",
@@ -178,22 +179,21 @@ const styles = StyleSheet.create({
         height:50,
         marginTop:20,
         marginLeft:25,
-        marginRight:25,
+        marginRight:15,
         paddingTop:10,
-        paddingLeft:25,
         flexDirection:"row",
         borderBottomWidth:1,
-        borderBottomColor:"#cacccb",
+        borderBottomColor:"#eeeeee",
     },
     listleft:{
-        flex:2,
+        width:100,
     },
     listLeftText:{
         color:"#323232",
         fontSize:17,
     },
     listcont:{
-        flex:6,
+        flex:7,
         paddingLeft:5,
         paddingRight:5,
     },

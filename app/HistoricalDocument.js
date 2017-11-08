@@ -48,6 +48,7 @@ export default class HistoricalDocument extends Component {
             danzi1:"",
             codesw1:"",
             shopcar:"",
+            scode:"",
             show:false,
             animating:true,
             nomore:false,
@@ -130,14 +131,6 @@ export default class HistoricalDocument extends Component {
              })
         });
 
-     //reqDetailCode获取
-     Storage.get('history').then((tags) => {
-        //alert(tags)
-         this.setState({
-             reqDetailCode: tags
-         });
-     });
-
      //username获取
      Storage.get('username').then((tags) => {
           this.setState({
@@ -153,13 +146,24 @@ export default class HistoricalDocument extends Component {
      });
   }
   _dpSearch(){
+
       //url获取
       Storage.get('LinkUrl').then((tags) => {
           this.setState({
               linkurl:tags
           })
       })
+
+      //reqDetailCode获取
+      Storage.get('history').then((tags) => {
+          //alert(tags)
+          this.setState({
+              reqDetailCode: tags
+          });
+      });
+
      Storage.get('code').then((tags) => {
+
          DataUtils.get("usercode","").then((usercode)=>{
               DataUtils.get("username","").then((username)=>{
                   let params = {
@@ -169,20 +173,23 @@ export default class HistoricalDocument extends Component {
                   };
               });
          });
+
          let params = {
              reqCode:"App_PosReq",
              reqDetailCode:this.state.reqDetailCode,
              ClientCode:this.state.ClientCode,
-             sDateTime:"2017-08-09 12:12:12",
+             sDateTime:Date.parse(new Date()),
              username:this.state.Username,
              usercode:this.state.Userpwd,
              BeginDate:this.state.kaishi1,
              EndDate:this.state.jieshu1,
              shopcode:tags,
+             childshopcode:"0",
              formno:this.state.danzi1,
              prodcode:this.state.codesw1,
-             Sign:NetUtils.MD5("App_PosReq" + "##" +this.state.reqDetailCode + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',
+             Sign:NetUtils.MD5("App_PosReq" + "##" +this.state.reqDetailCode + "##" + Date.parse(new Date()) + "##" + "PosControlCs")+'',
          };
+
          FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
             var DetailInfo1 = JSON.stringify(data.DetailInfo1)
             if(Detailnfo1 = null){
@@ -204,6 +211,7 @@ export default class HistoricalDocument extends Component {
          })
      });
   }
+
   _fetch(){
       dbAdapter.selectShopInfoAllCountm().then((rows)=>{
           var ShopCar = rows.item(0).countm;
@@ -212,6 +220,7 @@ export default class HistoricalDocument extends Component {
           });
       });
   }
+
   GoodsDetails(rowData){
       this.props.navigator.push({
           component:GoodsDetails,
@@ -221,7 +230,7 @@ export default class HistoricalDocument extends Component {
               promemo:rowData.promemo,
           }
       })
-   }
+  }
   _renderRow(rowData, sectionID, rowID){
       return(
           <View style={styles.Cont}>
@@ -231,6 +240,20 @@ export default class HistoricalDocument extends Component {
                           <Text style={styles.ListLeft}>要货单号：</Text>
                           <Text style={styles.ListRight}>{rowData.Formno}</Text>
                       </Text>
+                      {
+                          (this.state.name == "商品采购"||this.state.name == "商品验收"||this.state.name == "协配采购"||this.state.name == "协配收货") ?
+                              <Text style={styles.List}>
+                                  <Text style={styles.ListLeft}>供应商码：</Text>
+                                  <Text style={styles.ListRight}>{rowData.storecode}</Text>
+                              </Text> : null
+                      }
+                      {
+                          (this.state.name == "协配采购"||this.state.name == "协配收货") ?
+                              <Text style={styles.List}>
+                                  <Text style={styles.ListLeft}>机构信息：</Text>
+                                  <Text style={styles.ListRight}>{rowData.childshop}</Text>
+                              </Text> : null
+                      }
                       <Text style={styles.List}>
                           <Text style={styles.ListLeft}>制单日期：</Text>
                           <Text style={styles.ListRight}>{rowData.FormDate}</Text>
@@ -346,7 +369,8 @@ const styles = StyleSheet.create({
     borderBottomColor:"#e5e5e5"
  },
  ContList:{
-    paddingTop:15,
+    paddingTop:10,
+    paddingBottom:10,
  },
  List:{
     flexDirection:"row",

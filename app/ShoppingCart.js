@@ -11,18 +11,19 @@ import {
   Text,
   View,
   Image,
+  Modal,
+  ListView,
   TextInput,
   Navigator,
-  TouchableOpacity,
-  ScrollView,
-  Modal,
-  ActivityIndicator,
   Dimensions,
+  ScrollView,
+  TouchableOpacity,
+  ActivityIndicator,
   TouchableHighlight,
-  ListView,
   DeviceEventEmitter,
   InteractionManager
 } from 'react-native';
+
 import Index from "./Index";
 import HistoricalDocument from "./HistoricalDocument";
 import Code from "./Code";
@@ -39,6 +40,7 @@ var {NativeModules} = require('react-native');
 var RNScannerAndroid = NativeModules.RNScannerAndroid;
 let dbAdapter = new DBAdapter();
 let db;
+
 export default class ShoppingCart extends Component {
     constructor(props){
         super(props);
@@ -197,6 +199,7 @@ export default class ShoppingCart extends Component {
        });
 
     }
+
     _fetch(){
         //查询shopInfo表中所有商品的数量总和
        dbAdapter.selectShopInfoAllCountm().then((rows)=>{
@@ -206,6 +209,7 @@ export default class ShoppingCart extends Component {
            });
        });
      }
+
     _renderRow(rowData, sectionID, rowID){
          return (
             <View style={styles.ShopList}>
@@ -224,7 +228,8 @@ export default class ShoppingCart extends Component {
             </View>
          );
      }
-    pressPop(){
+
+     pressPop(){
        this._setModalVisible();
        this.props.navigator.pop();
     }
@@ -272,9 +277,10 @@ export default class ShoppingCart extends Component {
                     username: this.state.Username,
                     usercode: this.state.Userpwd,
                     //"SuppCode":this.state.suppcode,"ChildShop":
-                    DetailInfo1: {"ShopCode": tags, "OrgFormno": this.state.orgFormno, "ProMemo": this.state.Remark,"SuppCode":this.state.suppcode,"ChildShop":this.state.shildshop},
+                    DetailInfo1: {"ShopCode": tags, "OrgFormno": this.state.orgFormno, "ProMemo": this.state.Remark,"SuppCode":this.state.suppcode,"childshop":this.state.shildshop},
                     DetailInfo2: this.dataRows,
                 };
+                // alert(JSON.stringify(params));
                 FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
                     if(data.retcode == 1){
                         alert("提交成功");
@@ -310,13 +316,6 @@ export default class ShoppingCart extends Component {
             show:!isShow,
         });
     }
-    //执行 等待状态
-//    _ModalVisible() {
-//      let isShow = this.state.Show;
-//      this.setState({
-//          Show:!isShow,
-//      });
-//    }
 
   render() {
     return (
@@ -405,7 +404,7 @@ export default class ShoppingCart extends Component {
             <TouchableOpacity style={styles.Home} onPress={this.HOME.bind(this)}><Image source={require("../images/home.png")}></Image><Text style={styles.home1}>首页</Text></TouchableOpacity>
             <TouchableOpacity style={styles.Home} onPress={this.SHOP.bind(this)}>
                 <View>
-                   <Image source={require("../images/shop.png")}>
+                   <Image source={require("../images/shop1.png")}>
                        {
                           (this.state.shopcar==0)?
                            null:

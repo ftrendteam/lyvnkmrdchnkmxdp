@@ -9,18 +9,19 @@ import {
   StyleSheet,
   Text,
   View,
-  TouchableOpacity,
   Image,
-  ScrollView,
   ListView,
-  ToastAndroid
+  ToastAndroid,
+  TouchableOpacity,
 } from 'react-native';
+
 import HistoricalDocument from "./HistoricalDocument";
 import FetchUtils from "../utils/FetchUtils";
 import NetUtils from "../utils/NetUtils";
 import DBAdapter from "../adapter/DBAdapter";
 import DataUtils from '../utils/DataUtils';
 import Storage from "../utils/Storage";
+
 export default class GoodsDetails extends Component {
     constructor(props){
           super(props);
@@ -28,6 +29,8 @@ export default class GoodsDetails extends Component {
              reqDetailCode:"",
              ShopCountm:"",
              Number:"",
+             storecode:"",
+             numbershop:"",
              dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
              Formno:this.props.Formno ? this.props.Formno : "",
              FormDate:this.props.FormDate ? this.props.FormDate : "",
@@ -37,26 +40,30 @@ export default class GoodsDetails extends Component {
     }
 
     componentDidMount(){
-         //url获取
+
+        // alert(this.state.reqDetailCode)
+         //获取本地数据库url
          Storage.get('LinkUrl').then((tags) => {
             this.setState({
                 linkurl:tags
             })
-         })
+         });
 
-         //reqDetailCode获取
+         //reqDetailCode
           Storage.get('historyClass').then((tags) => {
               this.setState({
                   reqDetailCode: tags
               });
           });
-         //username获取
+
+         //username
          Storage.get('username').then((tags) => {
            this.setState({
                Username: tags
            });
          });
-         //usercode获取
+
+         //usercode
          Storage.get('userpwd').then((tags) => {
            this.setState({
                Userpwd: tags
@@ -89,8 +96,11 @@ export default class GoodsDetails extends Component {
              };
              FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
                  if(data.retcode == 1){
+                    var numbercode = data.DetailInfo1.storecode;
+                    var numbershop = data.DetailInfo1.childshop;
+
                     var DetailInfo2 = data.DetailInfo2;
-                      var shopnumber = 0;
+                    var shopnumber = 0;
                     for(let i =0;i<DetailInfo2.length;i++){
                        var row = DetailInfo2[i];
                        var number = row.countm;
@@ -99,8 +109,10 @@ export default class GoodsDetails extends Component {
                     this.dataRows = this.dataRows.concat(DetailInfo2);
                     this.setState({
                        dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
-                       Number:shopnumber
-                   })
+                       Number:shopnumber,
+                       storecode:numbercode,
+                       numbershop:numbershop
+                    })
                  }else{
                    ToastAndroid.show('网络请求失败', ToastAndroid.SHORT);
                  }
@@ -133,7 +145,7 @@ export default class GoodsDetails extends Component {
         <View style={styles.Cont}>
             <View style={styles.List}>
                 <View style={styles.ListLeft}>
-                    <Text style={styles.ListText}>盘点仓库</Text>
+                    <Text style={styles.ListText}>盘点仓库：</Text>
                     <Text style={styles.write}></Text>
                     <Text style={styles.ListText}>系统默认仓库</Text>
                 </View>
@@ -145,18 +157,38 @@ export default class GoodsDetails extends Component {
             </View>
             <View style={styles.List}>
                 <View style={styles.ListLeft}>
-                    <Text style={styles.ListText}>单据备注</Text>
+                    <Text style={styles.ListText}>单据备注：</Text>
                     <Text style={styles.write}></Text>
                     <Text style={styles.ListText}>{this.state.promemo}</Text>
                 </View>
             </View>
             <View style={styles.List}>
                 <View style={styles.ListLeft}>
-                    <Text style={styles.ListText}>制单日期</Text>
+                    <Text style={styles.ListText}>制单日期：</Text>
                     <Text style={styles.write}></Text>
                     <Text style={styles.ListText}>{this.state.FormDate}</Text>
                 </View>
             </View>
+            {
+                (this.state.reqDetailCode=="App_Client_ProCGDetailQ"||this.state.reqDetailCode=="App_Client_ProYSDetailQ"||this.state.reqDetailCode=="App_Client_ProXPDetailCGQ"||this.state.reqDetailCode=="App_Client_ProXPDetailYSQ")?
+                    <View style={styles.List}>
+                        <View style={styles.ListLeft}>
+                            <Text style={styles.ListText}>供应商编码：</Text>
+                            <Text style={styles.write}></Text>
+                            <Text style={styles.ListText}>{this.state.storecode}</Text>
+                        </View>
+                    </View>:null
+            }
+            {
+                (this.state.reqDetailCode == "App_Client_ProXPDetailCGQ" || this.state.reqDetailCode == "App_Client_ProXPDetailYSQ") ?
+                    <View style={styles.List}>
+                        <View style={styles.ListLeft}>
+                            <Text style={styles.ListText}>机构号：</Text>
+                            <Text style={styles.write}></Text>
+                            <Text style={styles.ListText}>{this.state.numbershop}</Text>
+                        </View>
+                    </View>:null
+            }
         </View>
         <View style={styles.ShopCont}>
             <View style={styles.ShopList}>

@@ -10,17 +10,21 @@ import {
   StyleSheet,
   Text,
   View,
-  TextInput,
   Image,
+  Button,
+  TextInput,
+  ScrollView,
   TouchableOpacity,
-  Button
 } from 'react-native';
+
 import HistoricalDocument from "./HistoricalDocument";
 import DateUtil from "../utils/DateUtil";
 import Storage from "../utils/Storage";
 import DateTimePicker from "react-native-datetime";
+
 let dateutil = new DateUtil();
 let db;
+
 export default class Enquiries extends Component {
   constructor(props){
       super(props);
@@ -34,20 +38,28 @@ export default class Enquiries extends Component {
   }
 
   componentDidMount(){
-    this._get();
+     this._get();
   }
 
   _get(){
-    Storage.get('code').then((tags) => {
+
+     Storage.get('code').then((tags) => {
         this.setState({
             reqDetailCode: tags
         });
-    });
-    Storage.get('Name').then((tags) => {
+     });
+
+     Storage.get('Name').then((tags) => {
          this.setState({
              name:tags
          })
-    });
+     });
+
+     Storage.get('scode').then((tags)=>{
+         this.setState({
+             suppcode:tags
+         })
+     })
   }
 
   Return(){
@@ -61,6 +73,7 @@ export default class Enquiries extends Component {
     }
     this.props.navigator.pop();
   }
+
   //日期时间，以下是三种不同方式
   showDatePicker() {
         var date = new Date();
@@ -101,6 +114,7 @@ export default class Enquiries extends Component {
   render() {
     return (
       <View style={styles.container}>
+          <ScrollView style={styles.ScrollView} scrollEnabled={false}>
             <View style={styles.Title}>
                 <TouchableOpacity onPress={this.Return.bind(this)} style={styles.HeaderImage}>
                      <Image source={require("../images/left.png")}></Image>
@@ -123,10 +137,10 @@ export default class Enquiries extends Component {
                     <Text style={styles.ContLeft1}>{this.state.reqDetailCode}</Text>
                 </View>
                 {
-                    (this.state.name=="商品采购"&&this.state.name=="商品验收"&&this.state.name=="协配采购"&&this.state.name=="协配收货")?
+                    (this.state.name=="商品采购"||this.state.name=="商品验收"||this.state.name=="协配采购"||this.state.name=="协配收货")?
                     <View style={styles.ContList}>
                         <Text style={styles.ContLeft3}>供应商编码：</Text>
-                        <Text style={styles.ContLeft1}>001</Text>
+                        <Text style={styles.ContLeft1}>{this.state.suppcode}</Text>
                     </View>:null
                 }
                 <View style={styles.ContList}>
@@ -160,6 +174,7 @@ export default class Enquiries extends Component {
                     <Text style={styles.EmptyingTxt}>清空历史查询</Text>
                 </TouchableOpacity>
             </View>
+          </ScrollView>
       </View>
     );
   }
@@ -204,13 +219,13 @@ const styles = StyleSheet.create({
         paddingLeft:25,
     },
     ContLeft:{
-        flex:2,
+        width:100,
         lineHeight:35,
         color:"#636363",
         fontSize:16,
     },
     ContLeft2:{
-        flex:3,
+        width:100,
         lineHeight:35,
         color:"#636363",
         fontSize:16,
@@ -222,7 +237,7 @@ const styles = StyleSheet.create({
         fontSize:16,
     },
     ContLeft3:{
-        flex:3,
+        width:100,
         lineHeight:35,
         color:"#636363",
         fontSize:16,
