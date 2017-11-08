@@ -271,7 +271,6 @@ export  default class RequestBodyUtils {
   }
   
   
- 
   /***
    * 品级请求体
    */
@@ -303,6 +302,23 @@ export  default class RequestBodyUtils {
       'OrderFld': 'pid',
       'NeedYWDate': '0',
       'LastYWDate': currDate,
+    });
+  }
+  /**
+   * 相关单据查询接口请求体
+   */
+  static createNOYSCGQ = (reqDetailCode) => {
+    let date = DateUtils.getCurrentDate(new Date());
+    let sign = MD5Utils.encryptMD5('App_PosReq' + "##" + reqDetailCode + "##" + date + "##" + 'PosControlCs');
+    return JSON.stringify({
+      'reqCode': 'App_PosReq'  //固定内容
+      , 'reqDetailCode': reqDetailCode
+      , 'ClientCode': '810001' //商户号编码
+      , 'sDateTime': date //时间戳
+      , 'Sign': sign + ''
+      , 'username': '收银员1' //用户名称
+      , 'usercode': '001' //用户编码
+      , 'shopcode': '0' //机构号
     });
   }
   
