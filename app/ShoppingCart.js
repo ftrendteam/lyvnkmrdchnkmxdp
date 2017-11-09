@@ -45,6 +45,7 @@ export default class ShoppingCart extends Component {
         super(props);
         this.state = {
             show:false,
+            Show:false,
             ShopNumber:"",
             ShopAmount:"",
             reqDetailCode:"",
@@ -169,7 +170,7 @@ export default class ShoppingCart extends Component {
                 Userpwd: tags
             });
        });
-
+       this.modal();
        //查询shopInfo表中某品类的数量
        dbAdapter.selectShopInfo('1').then((rows)=>{
            //this._ModalVisible();
@@ -186,14 +187,16 @@ export default class ShoppingCart extends Component {
                }
            }
            if(this.dataRows==0){
+               this.modal();
                 return;
            }else{
-           this.setState({
-               number1:number,
-               ShopNumber:shopnumber,//数量
-               ShopAmount:shopAmount,//总金额
-               dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
-           })
+               this.setState({
+                   number1:number,
+                   ShopNumber:shopnumber,//数量
+                   ShopAmount:shopAmount,//总金额
+                   dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
+               })
+               this.modal();
            }
        });
 
@@ -315,6 +318,13 @@ export default class ShoppingCart extends Component {
         });
     }
 
+    modal() {
+        let isShow = this.state.Show;
+        this.setState({
+            Show:!isShow,
+        });
+    }
+
   render() {
     return (
       <View style={styles.container}>
@@ -398,7 +408,7 @@ export default class ShoppingCart extends Component {
             </Modal>
         </View>
         <View style={styles.footer}>
-            <TouchableOpacity style={styles.Home} onPress={this.HISTORY.bind(this)}><Image source={require("../images/documents.png")}></Image><Text style={styles.home1}>历史单据</Text></TouchableOpacity>
+            <TouchableOpacity style={styles.Home} onPress={this.HISTORY.bind(this)}><Image source={require("../images/documents.png")}></Image><Text style={styles.home3}>历史单据</Text></TouchableOpacity>
             <TouchableOpacity style={styles.Home} onPress={this.HOME.bind(this)}><Image source={require("../images/home.png")}></Image><Text style={styles.home1}>首页</Text></TouchableOpacity>
             <TouchableOpacity style={styles.Home} onPress={this.SHOP.bind(this)}>
                 <View>
@@ -413,6 +423,19 @@ export default class ShoppingCart extends Component {
                 <Text style={styles.home2}>清单</Text>
             </TouchableOpacity>
         </View>
+        <Modal
+          animationType='fade'
+          transparent={true}
+          visible={this.state.Show}
+          onShow={() => {}}
+          onRequestClose={() => {}} >
+          <View style={styles.LoadCenter}>
+              <View style={styles.loading}>
+                  <ActivityIndicator key="1" color="#414240" size="large" style={styles.activity}></ActivityIndicator>
+                  <Text style={styles.TextLoading}>加载中</Text>
+              </View>
+          </View>
+        </Modal>
       </View>
     );
   }
@@ -441,6 +464,12 @@ const styles = StyleSheet.create({
        marginTop:5,
        flex:1,
      },
+    home3:{
+        color:'black',
+        fontSize:17,
+        marginTop:5,
+        flex:1,
+    },
      home2:{
        color:'#f47882',
        fontSize:18,
@@ -762,11 +791,25 @@ const styles = StyleSheet.create({
         borderColor:"#fbced2",
         textAlignVertical: 'top'
     },
-    loading:{
+    LoadCenter:{
         flex:1,
-        backgroundColor:"#000000",
-        opacity:0.5,
         justifyContent: 'center',
         alignItems: 'center',
-     }
+    },
+    loading:{
+        paddingLeft:15,
+        paddingRight:15,
+        paddingTop:15,
+        paddingBottom:15,
+        backgroundColor:"#000000",
+        opacity:0.8,
+        borderRadius:5,
+    },
+    TextLoading:{
+        fontSize:17,
+        color:"#ffffff"
+    },
+    activity:{
+        marginBottom:5,
+    },
 });

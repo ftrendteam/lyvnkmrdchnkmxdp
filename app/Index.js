@@ -148,11 +148,18 @@ export default class Index extends Component {
     pullOut(){
         Storage.delete('username')
         this._setModalVisible();
-        var nextRoute={
-            name:"主页",
-            component:admin
-        };
-        this.props.navigator.push(nextRoute)
+        if(this.state.ShopCar1>0){
+            alert("商品未提交")
+        }else{
+
+            Storage.delete('Name');
+
+            var nextRoute={
+                name:"主页",
+                component:admin
+            };
+            this.props.navigator.push(nextRoute)
+        }
     }
 
     pressPop(){
@@ -806,7 +813,7 @@ export default class Index extends Component {
                     </View>
                 </Modal>
                 <View style={styles.footer}>
-                    <TouchableOpacity style={styles.Home} onPress={this.HISTORY.bind(this)}><Image source={require("../images/documents.png")}></Image><Text style={styles.home1}>历史单据</Text></TouchableOpacity>
+                    <TouchableOpacity style={styles.Home} onPress={this.HISTORY.bind(this)}><Image source={require("../images/documents.png")}></Image><Text style={styles.home3}>历史单据</Text></TouchableOpacity>
                     <TouchableOpacity style={styles.Home} onPress={this.HOME.bind(this)}><Image source={require("../images/home1.png")}></Image><Text style={styles.home2}>首页</Text></TouchableOpacity>
                     <TouchableOpacity style={styles.Home} onPress={this.SHOP.bind(this)}>
                         <View>
@@ -824,7 +831,7 @@ export default class Index extends Component {
             </View>
 
         );
-    }
+    };
 }
 const styles = StyleSheet.create({
     footer:{
@@ -846,6 +853,12 @@ const styles = StyleSheet.create({
     home1:{
         color:'black',
         fontSize:18,
+        marginTop:5,
+        flex:1,
+    },
+    home3:{
+        color:'black',
+        fontSize:17,
         marginTop:5,
         flex:1,
     },

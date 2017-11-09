@@ -9,7 +9,9 @@ import {
   AppRegistry,
   StyleSheet,
   Text,
-  View
+  View,
+  Modal,
+  ActivityIndicator
 } from 'react-native';
 import admin from "./admin";
 import login from "./login";
@@ -21,16 +23,25 @@ export default class file extends Component {
       super(props);
       this.state = {
           first:"",
+          show:true
       };
   }
+  _setModalVisible() {
+    let isShow = this.state.show;
+    this.setState({
+        show:!isShow,
+    });
+  }
+
   componentWillMount(){
        Storage.get('FirstTime').then((tags) => {
             if(tags == 1 ){
+                this._setModalVisible();
                 var nextRoute={
                     name:"主页",
                     component:Index
                 };
-                this.props.navigator.push(nextRoute)
+                this.props.navigator.push(nextRoute);
             }else {
                 var nextRoute={
                     name:"主页",
@@ -52,7 +63,21 @@ export default class file extends Component {
   }
   render() {
     return (
-      <View style={styles.container}></View>
+      <View style={styles.container}>
+          <Modal
+              animationType='fade'
+              transparent={true}
+              visible={this.state.show}
+              onShow={() => {}}
+              onRequestClose={() => {}} >
+              <View style={styles.LoadCenter}>
+                  <View style={styles.loading}>
+                      <ActivityIndicator key="1" color="#ffffff" size="large" style={styles.activity}></ActivityIndicator>
+                      <Text style={styles.TextLoading}>登录中</Text>
+                  </View>
+              </View>
+          </Modal>
+      </View>
     );
   }
 }
@@ -62,6 +87,28 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#ffffff',
+    backgroundColor: '#000000',
+    opacity:0.5
   },
+    LoadCenter:{
+        flex:1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    loading:{
+        paddingLeft:15,
+        paddingRight:15,
+        paddingTop:15,
+        paddingBottom:15,
+        backgroundColor:"#000000",
+        opacity:0.8,
+        borderRadius:5,
+    },
+    TextLoading:{
+        fontSize:17,
+        color:"#ffffff"
+    },
+    activity:{
+        marginBottom:5,
+    },
 });
