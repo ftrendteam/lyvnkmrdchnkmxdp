@@ -17,6 +17,7 @@ import {
 import Index from "./Index";
 import Home from "./Home";
 import Search from "./Search";
+import Distrition_list from "./Distrition_list";
 import ProductCG_list from "./ProductCG_list";
 import NetUtils from "../utils/NetUtils";
 import Storage from '../utils/Storage';
@@ -28,6 +29,7 @@ export default class ProductCG extends Component {
             show:false,
             Number:"",
             sCode1:"",
+            suppcode1:"",
         };
     }
 
@@ -63,7 +65,7 @@ export default class ProductCG extends Component {
 
     Button(){
         if(this.state.sCode1==""){
-            alert("请选择供应商编码")
+            alert("请选择供应商")
         }else{
             var nextRoute={
                 name:"Index",
@@ -73,10 +75,30 @@ export default class ProductCG extends Component {
             Storage.save('OrgFormno',this.state.Number);
             Storage.save('Name','商品验收');
             Storage.save('valueOf','App_Client_ProYS');
-            Storage.save('history','App_Client_ProYSQ');
+            Storage.save('histoasry','App_Client_ProYSQ');
             Storage.save('historyClass','App_Client_ProYSDetailQ');
             Storage.save("scode",this.state.sCode1)
         }
+    }
+
+    Search(){
+        Storage.save('shopPandian','App_Client_NOYSCGQ');
+        var nextRoute={
+            name:"Distrition_list",
+            component:Distrition_list,
+            params: {
+                SearchShopname:(Suppcode)=>this.SearchShopname(Suppcode)
+            }
+        };
+        this.props.navigator.push(nextRoute)
+    }
+
+    SearchShopname(Suppcode) {
+        Suppcode = String(Suppcode);
+        this.setState({
+            suppcode1:Suppcode,
+        });
+
     }
 
     render() {
@@ -97,7 +119,17 @@ export default class ProductCG extends Component {
                         <Text style={styles.listLeftText}>供应商:</Text>
                     </View>
                     <TouchableOpacity style={styles.listcont} onPress={this.onclick.bind(this)}>
-                        <Text style={styles.listContText}>{this.state.sCode1}</Text>
+                        <TextInput
+                            style={styles.TextInput1}
+                            autofocus={true}
+                            editable={false}
+                            defaultValue ={this.state.sCode1}
+                            numberoflines={1}
+                            placeholder="请选择供应商"
+                            textalign="center"
+                            underlineColorAndroid='transparent'
+                            placeholderTextColor="#cccccc"
+                        />
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.listimages} onPress={this.onclick.bind(this)}>
                         <Image source={require("../images/right.png")} style={styles.Image}></Image>
@@ -107,15 +139,22 @@ export default class ProductCG extends Component {
                     <View style={styles.listleft}>
                         <Text style={styles.listLeftText}>采购单:</Text>
                     </View>
-                    <TextInput
-                        style={styles.TextInput}
-                        autofocus="{true}"
-                        numberoflines="{1}"
-                        placeholder="请输入采购号"
-                        textalign="center"
-                        underlineColorAndroid='transparent'
-                        placeholderTextColor="#cccccc"
-                    />
+                    <TouchableOpacity onPress={this.Search.bind(this)} style={styles.listcont}>
+                        <TextInput
+                            style={styles.TextInput1}
+                            autofocus={true}
+                            editable={false}
+                            defaultValue ={this.state.suppcode1}
+                            numberoflines={1}
+                            placeholder="请选择采购单"
+                            textalign="center"
+                            underlineColorAndroid='transparent'
+                            placeholderTextColor="#cccccc"
+                        />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.listimages} onPress={this.Search.bind(this)}>
+                        <Image source={require("../images/right.png")} style={styles.Image}></Image>
+                    </TouchableOpacity>
                 </View>
                 <TouchableOpacity style={styles.button} onPress={this.Button.bind(this)}>
                     <Text style={styles.buttonText}>确定</Text>
@@ -156,16 +195,17 @@ const styles = StyleSheet.create({
     },
     ContList:{
         height:50,
-        marginTop:20,
+        marginTop:15,
         marginLeft:25,
         marginRight:15,
-        paddingTop:10,
+        paddingTop:13,
+        paddingBottom:5,
         flexDirection:"row",
         borderBottomWidth:1,
         borderBottomColor:"#eeeeee",
     },
     listleft:{
-        width:100,
+        width:70,
     },
     listLeftText:{
         color:"#323232",
@@ -183,13 +223,16 @@ const styles = StyleSheet.create({
     listimages:{
         flex:1,
     },
-    Image:{
-    },
     TextInput:{
         flex:7,
+    },
+    TextInput1:{
         paddingLeft:5,
         paddingRight:5,
+        paddingTop:5,
+        paddingBottom:5,
         fontSize:16,
+        color:"#323232"
     },
     button:{
         marginLeft:80,

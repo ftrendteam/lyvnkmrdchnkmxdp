@@ -45,7 +45,7 @@ export default class PickedDate_list extends Component {
                     linkurl:tags
                 })
             })
-            Storage.get('invoice').then((tags)=>{
+            Storage.get('PickedDate').then((tags)=>{
                 this.setState({
                     invoice:tags
                 })
@@ -101,7 +101,7 @@ export default class PickedDate_list extends Component {
 
     pressPop(rowData){
         if(this.props.reloadView){
-            this.props.reloadView(rowData.shopname+'_'+rowData.FNeedPS)
+            this.props.reloadView(rowData.shopname+'_'+rowData.shopcode)
         }
         this.props.navigator.pop();
     }
@@ -110,7 +110,7 @@ export default class PickedDate_list extends Component {
         return(
             <TouchableOpacity style={styles.header} onPress={()=>this.pressPop(rowData)}>
                 <View style={styles.coding}>
-                    <Text style={styles.codingText1}>{rowData.FNeedPS}</Text>
+                    <Text style={styles.codingText1}>{rowData.shopcode}</Text>
                 </View>
                 <View style={styles.name}>
                     <Text style={styles.nameText1}>{rowData.shopname}</Text>
@@ -136,8 +136,8 @@ export default class PickedDate_list extends Component {
                     <TextInput
                         autofocus="{true}"
                         returnKeyType="search"
-                        placeholder="请输入供应商编码"
-                        placeholderColor="#323232"
+                        placeholder="搜索机构信息"
+                        placeholderTextColor="#bcbdc1"
                         underlineColorAndroid='transparent'
                         style={styles.searchContect}
                         onChangeText={(value)=>{
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
         paddingRight:70,
     },
     HeadText:{
-        color:"#ffffff",
+        color:"#bcbdc1",
         fontSize:18,
         textAlign:"center",
     },
@@ -203,8 +203,8 @@ const styles = StyleSheet.create({
     },
     searchContect:{
         borderRadius:5,
-        backgroundColor:"#f5f5f5",
-        color: "#323232",
+        backgroundColor:"#474955",
+        color:"#bcbdc1",
         paddingTop:8,
         paddingBottom:8,
         paddingLeft:25,

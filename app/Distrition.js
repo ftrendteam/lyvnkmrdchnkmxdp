@@ -68,15 +68,16 @@ export default class Distrition extends Component {
             component:Index
         };
         this.props.navigator.push(nextRoute);
-        Storage.save('OrgFormno',this.state.Number);
+        Storage.save('OrgFormno',this.state.sCode1);
         Storage.save("scode",this.state.sCode1);
-        Storage.save('Name','配送收货单');
+        Storage.save('Name','配送收货');
         Storage.save('valueOf','App_Client_ProPSSH');
         Storage.save('history','App_Client_ProPSSHQ');
         Storage.save('historyClass','App_Client_ProPSSHDetailQ');
     }
 
     Search(){
+        Storage.save('shopPandian','App_Client_NOYSPSQ');
         var nextRoute={
             name:"Distrition_list",
             component:Distrition_list,
@@ -107,24 +108,25 @@ export default class Distrition extends Component {
                         </View>
                     </View>
                 </View>
-                <View style={styles.TextInput}>
-                    <TextInput
-                        autofocus={true}
-                        numberoflines={1}
-                        defaultValue ={this.state.sCode1}
-                        placeholder="请输入原始单号"
-                        textalign="center"
-                        underlineColorAndroid='transparent'
-                        placeholderTextColor="#cccccc"
-                        style={styles.admin}
-                        onChangeText={(value)=>{
-                            this.setState({
-                                Number:value
-                            })
-                        }}
-                    />
-                    <TouchableOpacity style={styles.Search} onPress={this.Search.bind(this)}>
-                        <Image source={require("../images/search.png")}></Image>
+                <View style={styles.ContList}>
+                    <View style={styles.listleft}>
+                        <Text style={styles.listLeftText}>单号:</Text>
+                    </View>
+                    <TouchableOpacity style={styles.listcont} onPress={this.Search.bind(this)}>
+                        <TextInput
+                            style={styles.TextInput1}
+                            autofocus={true}
+                            editable={false}
+                            defaultValue ={this.state.sCode1}
+                            numberoflines={1}
+                            placeholder="请选择单号"
+                            textalign="center"
+                            underlineColorAndroid='transparent'
+                            placeholderTextColor="#cccccc"
+                        />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.listimages} onPress={this.Search.bind(this)}>
+                        <Image source={require("../images/right.png")} style={styles.Image}></Image>
                     </TouchableOpacity>
                 </View>
                 <View style={styles.search}>
@@ -179,16 +181,48 @@ const styles = StyleSheet.create({
         paddingRight:60,
         fontSize:16,
         flex:5,
+    },ContList:{
+        height:50,
+        marginTop:20,
+        marginLeft:25,
+        marginRight:15,
+        paddingTop:10,
+        flexDirection:"row",
+        borderBottomWidth:1,
+        borderBottomColor:"#eeeeee",
+    },
+    listleft:{
+        width:60,
+    },
+    listLeftText:{
+        color:"#323232",
+        fontSize:17,
+    },
+    listcont:{
+        flex:7,
+        paddingLeft:5,
+        paddingRight:5,
+    },
+    listContText:{
+        color:"#323232",
+        fontSize:17,
+    },
+    listimages:{
+        flex:1,
     },
     TextInput:{
-        flexDirection:"row",
-        paddingLeft:30,
-        paddingRight:30,
-        marginTop:50,
+        flex:7,
+
+    },
+    TextInput1:{
+        paddingLeft:5,
+        paddingRight:5,
+        fontSize:16,
+        color:"#323232"
     },
     search:{
         flexDirection:"row",
-        marginTop:20,
+        marginTop:40,
     },
     textsearch:{
         marginLeft:30,

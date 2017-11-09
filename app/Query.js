@@ -18,6 +18,7 @@ import Index from "./Index";
 
 import Home from "./Home";
 import Search from "./Search";
+import Distrition_list from "./Distrition_list";
 import NetUtils from "../utils/NetUtils";
 import Storage from '../utils/Storage';
 
@@ -27,10 +28,12 @@ export default class Query extends Component {
         this.state = {
             show:false,
             Number:"",
+            sCode1:""
         };
     }
 
     componentDidMount(){
+        // Storage.delete("PickedDate");
         Storage.get('invoice').then((tags)=>{
             this.setState({
                 invoice:tags
@@ -44,8 +47,8 @@ export default class Query extends Component {
 
     pressPush(){
         var str=this.state.Number;
-        if(str.length != 16){
-            alert("请输入16位数的单号");
+        if(this.state.sCode1==""){
+            alert("请选择原始单号");
         }else{
             var nextRoute={
                 name:"主页",
@@ -53,7 +56,7 @@ export default class Query extends Component {
             };
             this.props.navigator.push(nextRoute);
             Storage.save('OrgFormno',this.state.Number);
-            Storage.save('Name','配送收货单');
+            Storage.save('Name','商品盘点');
             Storage.save('valueOf','App_Client_ProPSSH');
             Storage.save('history','App_Client_ProPSSHQ');
             Storage.save('historyClass','App_Client_ProPSSHDetailQ');
@@ -62,21 +65,41 @@ export default class Query extends Component {
 
     Home(){
         var str=this.state.Number;
-        if(str.length != 16){
-            alert("请输入16位数的单号");
+        if(this.state.sCode1==""){
+            alert("请选择原始单号");
         }else{
             var nextRoute={
                 name:"主页",
                 component:Index
             };
             this.props.navigator.push(nextRoute);
-            Storage.save('OrgFormno',this.state.Number);
-            Storage.save('Name','商品盘点单');
+            Storage.save('OrgFormno',this.state.sCode1);
+            Storage.save('Name','商品盘点');
             Storage.save('valueOf','App_Client_ProPC');
             Storage.save('history','App_Client_ProCurrPCQ');
             Storage.save('historyClass','App_Client_ProPCDetailQ');
         }
     }
+
+    Search(){
+        Storage.save('shopPandian','App_Client_NoEndPCQ');
+        var nextRoute={
+            name:"Distrition_list",
+            component:Distrition_list,
+            params: {
+                reloadView:(sCode)=>this._reloadView(sCode)
+            }
+        };
+        this.props.navigator.push(nextRoute)
+    }
+
+    _reloadView(sCode) {
+        sCode = String(sCode);
+        this.setState({
+            sCode1:sCode,
+        });
+    }
+
     render() {
         return (
             <View style={styles.container}>
@@ -90,21 +113,26 @@ export default class Query extends Component {
                         </View>
                     </View>
                 </View>
-                <View style={styles.TextInput}>
-                    <TextInput
-                        autofocus="{true}"
-                        numberoflines="{1}"
-                        placeholder="请输入原始单号"
-                        textalign="center"
-                        underlineColorAndroid='transparent'
-                        placeholderTextColor="#cccccc"
-                        style={styles.admin}
-                        onChangeText={(value)=>{
-                            this.setState({
-                                Number:value
-                            })
-                        }}
-                    />
+                <View style={styles.ContList}>
+                    <View style={styles.listleft}>
+                        <Text style={styles.listLeftText}>单号:</Text>
+                    </View>
+                    <TouchableOpacity style={styles.listcont} onPress={this.Search.bind(this)}>
+                        <TextInput
+                            style={styles.TextInput1}
+                            autofocus={true}
+                            editable={false}
+                            defaultValue ={this.state.sCode1}
+                            numberoflines={1}
+                            placeholder="请选择单号"
+                            textalign="center"
+                            underlineColorAndroid='transparent'
+                            placeholderTextColor="#cccccc"
+                        />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.listimages} onPress={this.Search.bind(this)}>
+                        <Image source={require("../images/right.png")} style={styles.Image}></Image>
+                    </TouchableOpacity>
                 </View>
                 <View style={styles.search}>
                     <TouchableOpacity style={styles.textsearch} onPress={this.pressPush.bind(this)}>
@@ -155,14 +183,52 @@ const styles = StyleSheet.create({
         paddingTop:8,
         paddingBottom:8,
         paddingLeft:12,
+        paddingRight:60,
         fontSize:16,
-        marginLeft:30,
-        marginRight:30,
-        marginTop:50,
+        flex:5,
+    },
+    ContList:{
+        height:50,
+        marginTop:20,
+        marginLeft:25,
+        marginRight:15,
+        paddingTop:10,
+        flexDirection:"row",
+        borderBottomWidth:1,
+        borderBottomColor:"#eeeeee",
+    },
+    listleft:{
+        width:60,
+    },
+    listLeftText:{
+        color:"#323232",
+        fontSize:17,
+    },
+    listcont:{
+        flex:7,
+        paddingLeft:5,
+        paddingRight:5,
+    },
+    listContText:{
+        color:"#323232",
+        fontSize:17,
+    },
+    listimages:{
+        flex:1,
+    },
+    TextInput:{
+        flex:7,
+
+    },
+    TextInput1:{
+        paddingLeft:5,
+        paddingRight:5,
+        fontSize:16,
+        color:"#323232"
     },
     search:{
         flexDirection:"row",
-        marginTop:20,
+        marginTop:40,
     },
     textsearch:{
         marginLeft:30,
@@ -198,6 +264,12 @@ const styles = StyleSheet.create({
         borderBottomColor:"#cacccb",
         justifyContent: 'center',
     },
+    Search:{
+        width:60,
+        paddingTop:8,
+        paddingLeft:15,
+        backgroundColor:"#f5f5f5",
+    }
 });
 
 

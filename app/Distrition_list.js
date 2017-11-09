@@ -19,6 +19,8 @@ import {
 } from 'react-native';
 import DBAdapter from "../adapter/DBAdapter";
 import Storage from '../utils/Storage';
+import NetUtils from "../utils/NetUtils";
+import FetchUtil from "../utils/FetchUtils";
 
 let dbAdapter = new DBAdapter();
 let db;
@@ -28,6 +30,12 @@ export default class Distrition_list extends Component {
         super(props);
         this.state = {
             search:"",
+            LinkUrl:"",
+            shopPandian:"",
+            userName:"",
+            Usercode:"",
+            str2:"",
+            DetailInfo:"",
             show:false,
             dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => true,}),
         };
@@ -35,6 +43,36 @@ export default class Distrition_list extends Component {
     }
     componentDidMount(){
         InteractionManager.runAfterInteractions(() => {
+            Storage.get('shopPandian').then((tags)=>{
+                this.setState({
+                    shopPandian:tags
+                })
+            })
+
+            Storage.get('userName').then((tags)=>{
+                this.setState({
+                    userName:tags
+                })
+            })
+
+            Storage.get('Usercode').then((tags)=>{
+                this.setState({
+                    Usercode:tags
+                })
+            })
+
+            Storage.get('str2').then((tags)=>{
+                this.setState({
+                    str2:tags
+                })
+            })
+
+            Storage.get('LinkUrl').then((tags)=>{
+                this.setState({
+                    LinkUrl:tags
+                })
+            })
+
             Storage.get('invoice').then((tags)=>{
                 this.setState({
                     invoice:tags
@@ -45,14 +83,34 @@ export default class Distrition_list extends Component {
     }
 
     fetch(){
-        dbAdapter.selectAllData("tsuppset").then((rows)=>{
-            for(let i =0;i<rows.length;i++){
-                var row = rows.item(i);
-                this.dataRows.push(row);
-            }
+        Storage.get('ClientCode').then((tags) => {
+            let params = {
+                reqCode:"App_PosReq",
+                reqDetailCode:this.state.shopPandian,
+                ClientCode:tags,
+                sDateTime:Date.parse(new Date()),//获取当前时间转换成时间戳
+                Sign:NetUtils.MD5("App_PosReq" + "##" +this.state.shopPandian + "##" + Date.parse(new Date()) + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
+                username:this.state.userName,
+                usercode:this.state.Usercode,
+                shopcode:this.state.str2,
+            };
 
-            this.setState({
-                dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
+            FetchUtil.post(this.state.LinkUrl,JSON.stringify(params)).then((data)=>{
+                if(data.retcode == 1){
+                    var DetailInfo = data.DetailInfo;
+                    console.log(DetailInfo);
+                    this.dataRows = this.dataRows.concat(DetailInfo);
+                    this.setState({
+                        DetailInfo:DetailInfo
+                    })
+                    if(DetailInfo==null){
+                        return;
+                    }else{
+                        this.setState({
+                            dataSource:this.state.dataSource.cloneWithRows(this.dataRows)
+                        })
+                    }
+                }else{}
             })
         })
     }
@@ -62,40 +120,64 @@ export default class Distrition_list extends Component {
     }
 
     Search(value){
-        //if(value>=3){
-            for (let i = 0; i < this.dataRows.length; i++) {
-                // let temp = this.dataRows[0];
-                let dataRow = this.dataRows[i];
-                if (((dataRow.sCode + "").indexOf(value) >= 0)) {
-                    // this.dataRows[0] = dataRow;
-                    // this.dataRows[i] = temp;
-                    var str = this.dataRows.splice(i,1);
-                    this.dataRows.unshift(str[0])
-                    break;
-                }
+        for (let i = 0; i < this.dataRows.length; i++) {
+            // let temp = this.dataRows[0];
+            let dataRow = this.dataRows[i];
+            if (((dataRow.Formno + "").indexOf(value) >= 0)) {
+                // this.dataRows[0] = dataRow;
+                // this.dataRows[i] = temp;
+                var str = this.dataRows.splice(i,1);
+                this.dataRows.unshift(str[0])
+                break;
             }
-            this.setState({
-                dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
-            })
-        //}
-    }
+        }
+        this.setState({
+            dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
+        })
+    }l
 
     pressPop(rowData){
         if(this.props.reloadView){
-            this.props.reloadView(rowData.sCode)
+            if(this.state.shopPandian=='App_Client_NoEndPCQ'||this.state.shopPandian=='App_Client_NOYSPSQ'){
+                this.props.reloadView(rowData.Formno)
+            }
+        }
+        this.props.navigator.pop();
+    }
+
+    pressPop1(rowData){
+        if(this.props.SearchShopname){
+            if(this.state.shopPandian=='App_Client_NOYSCGQ'||this.state.shopPandian=='App_Client_NOYSXPCGQ'){
+                this.props.SearchShopname(rowData.suppcode)
+            }
         }
         this.props.navigator.pop();
     }
 
     _renderRow(rowData, sectionID, rowID){
         return(
-            <TouchableOpacity style={styles.header} onPress={()=>this.pressPop(rowData)}>
-                <View style={styles.coding}>
-                    <Text style={styles.codingText1}>{rowData.sCode}</Text>
-                </View>
-                <View style={styles.name}>
-                    <Text style={styles.nameText1}>{rowData.sname}</Text>
-                </View>
+            <TouchableOpacity style={styles.header}>
+                {
+                    (this.state.shopPandian=='App_Client_NoEndPCQ'||this.state.shopPandian=='App_Client_NOYSPSQ')?
+                        <TouchableOpacity onPress={()=>this.pressPop(rowData)}>
+                            <View style={styles.coding}>
+                                <Text style={styles.codingText1}>{rowData.Formno}</Text>
+                            </View>
+                        </TouchableOpacity>:null
+                }
+                {
+                    (this.state.shopPandian=='App_Client_NOYSCGQ'||this.state.shopPandian=='App_Client_NOYSXPCGQ')?
+                        <TouchableOpacity onPress={()=>this.pressPop1(rowData)} style={styles.coding}>
+                            <Text style={styles.codingText1}>{rowData.Formno}</Text>
+                        </TouchableOpacity>:null
+                }
+                {
+                    (this.state.shopPandian=='App_Client_NOYSCGQ'||this.state.shopPandian=='App_Client_NOYSXPCGQ')?
+                        <TouchableOpacity onPress={()=>this.pressPop1(rowData)}style={styles.name}>
+                            <Text style={styles.nameText1}>{rowData.suppcode}</Text>
+                        </TouchableOpacity>:null
+                }
+
             </TouchableOpacity>
         )
 
@@ -117,7 +199,7 @@ export default class Distrition_list extends Component {
                     <TextInput
                         autofocus="{true}"
                         returnKeyType="search"
-                        placeholder="请输入供应商编码"
+                        placeholder="搜索相关单号"
                         placeholderColor="#323232"
                         underlineColorAndroid='transparent'
                         style={styles.searchContect}
@@ -132,18 +214,30 @@ export default class Distrition_list extends Component {
                 <View>
                     <View style={styles.head}>
                         <View style={styles.coding}>
-                            <Text style={styles.codingText}>编码</Text>
+                            <Text style={styles.codingText}>单据号</Text>
                         </View>
-                        <View style={styles.name}>
-                            <Text style={styles.nameText}>名称</Text>
-                        </View>
+                        {
+                            (this.state.invoice=="商品验收"||this.state.invoice=="协配收货")?
+                            <View style={styles.name}>
+                                <Text style={styles.nameText}>供应商</Text>
+                            </View>:null
+                        }
                     </View>
-                    <ListView
-                        style={styles.scrollview}
-                        dataSource={this.state.dataSource}
-                        showsVerticalScrollIndicator={true}
-                        renderRow={this._renderRow.bind(this)}
-                    />
+
+                    {
+                        (this.state.DetailInfo==null)?
+                            <View style={styles.Null}>
+                                <Text style={styles.NullText}>
+                                    暂无数据~~~
+                                </Text>
+                            </View>:
+                        <ListView
+                            style={styles.scrollview}
+                            dataSource={this.state.dataSource}
+                            showsVerticalScrollIndicator={true}
+                            renderRow={this._renderRow.bind(this)}
+                        />
+                    }
                 </View>
             </View>
         );
@@ -249,5 +343,16 @@ const styles = StyleSheet.create({
     },
     scrollview:{
         marginBottom:200,
+    },
+    Null:{
+        marginLeft:25,
+        marginRight:25,
+        marginTop:120,
+    },
+    NullText:{
+        color:"#cccccc",
+        fontSize:20,
+        textAlign:"center"
     }
+
 });

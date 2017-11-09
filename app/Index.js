@@ -80,6 +80,9 @@ export default class Index extends Component {
         this.productData = [];
         this.moreTime = 0;
         var timer1 = null;
+        if (!db) {
+            db = dbAdapter.open();
+        }
     }
 
     HISTORY(){
@@ -143,7 +146,8 @@ export default class Index extends Component {
     }
 
     pullOut(){
-        this._setModalVisible()
+        Storage.delete('username')
+        this._setModalVisible();
         var nextRoute={
             name:"主页",
             component:admin
@@ -414,8 +418,8 @@ export default class Index extends Component {
                 if(rows==true){
                     dbAdapter.selecUserRightA1012(this.state.usercode).then((rows)=>{
                         if(rows==true){
-                            Storage.save('Name','要货单');
-                            var invoice = "要货单";
+                            Storage.save('Name','要货');
+                            var invoice = "要货";
                             this.setState({
                                 head:invoice,
                             });
@@ -443,8 +447,8 @@ export default class Index extends Component {
                 if (rows == true) {
                     dbAdapter.selecUserRightA1012(this.state.usercode).then((rows) => {
                         if (rows == true) {
-                            Storage.save('Name','损益单');
-                            var invoice = "损益单";
+                            Storage.save('Name','损益');
+                            var invoice = "损益";
                             this.setState({
                                 head: invoice,
                             });
@@ -470,8 +474,8 @@ export default class Index extends Component {
                 if (rows == true) {
                     dbAdapter.selecUserRightA1012(this.state.usercode).then((rows) => {
                         if (rows == true) {
-                            Storage.save('Name','实时盘点单');
-                            var invoice = "实时盘点单";
+                            Storage.save('Name','实时盘点');
+                            var invoice = "实时盘点";
                             this.setState({
                                 head: invoice,
                             });
@@ -498,6 +502,7 @@ export default class Index extends Component {
                 if (rows == true) {
                     dbAdapter.selecUserRightA1012(this.state.usercode).then((rows) => {
                         if (rows == true) {
+                            Storage.save('invoice','商品盘点');
                             var nextRoute = {
                                 name: "主页",
                                 component: Query
@@ -524,7 +529,7 @@ export default class Index extends Component {
                 if (rows == true) {
                     dbAdapter.selecUserRightA1012(this.state.usercode).then((rows) => {
                         if (rows == true) {
-                            Storage.save("invoice", "配送收货");
+                            Storage.save("invoice", "配送收货单");
                             var nextRoute = {
                                 name: "主页",
                                 component: Distrition

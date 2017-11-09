@@ -4,6 +4,7 @@
 import SQLiteOpenHelper from '../sqLiteOpenHelper/SQLiteOpenHelper';
 import MD5Utils from '../utils/MD5Utils';
 import DataUtils from '../utils/DataUtils';
+import Storage from '../utils/Storage';
 import FetchUtils from '../utils/FetchUtils';
 import RequestBodyUtils from '../utils/RequestBodyUtils';
 let db;
@@ -530,8 +531,8 @@ export default class DBAdapter extends SQLiteOpenHelper {
             let item = results.rows.item(0);
             if ((md5Pwd + '') == item.UserPwd) {//密码正确
               let userName = item.UserName;
-              DataUtils.save("userName", userName);
-              DataUtils.save("userCode", Usercode);
+                Storage.save("userName", userName);
+              // DataUtils.save("userCode", Usercode);
               let shopCode;
               DataUtils.get('code', '').then((data) => {
                 shopCode = data;

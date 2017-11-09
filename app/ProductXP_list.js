@@ -115,7 +115,7 @@ export default class ProductXP_list extends Component {
                     <TextInput
                         autofocus="{true}"
                         returnKeyType="search"
-                        placeholder="请输入供应商编码"
+                        placeholder="搜索相关单号"
                         placeholderColor="#323232"
                         underlineColorAndroid='transparent'
                         style={styles.searchContect}

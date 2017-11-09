@@ -154,7 +154,9 @@ export default class admin extends Component {
                code = strjj.substring(strjj.indexOf('_') + 1,strjj.length);
                Storage.save('code',code);
                Storage.save('username',Usercode);
+               Storage.save('Usercode',Usercode);
                Storage.save('userpwd',UserPwd);
+               Storage.save('str2',str2);
                var nextRoute={
                    name:"主页",
                    component:Index,
@@ -170,7 +172,7 @@ export default class admin extends Component {
     }
 
     PickedDate(){
-        Storage.save('invoice','机构信息')
+        Storage.save('PickedDate','机构信息')
         var nextRoute={
             name:"PickedDate_list",
             component:PickedDate_list,

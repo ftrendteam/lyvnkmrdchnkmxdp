@@ -13,13 +13,14 @@ import {
 } from 'react-native';
 import admin from "./admin";
 import login from "./login";
+import Index from "./Index";
 import Storage from "../utils/Storage";
 import Navigator from "react-native-deprecated-custom-components";
 export default class file extends Component {
   constructor(props){
       super(props);
       this.state = {
-          first:""
+          first:"",
       };
   }
   componentWillMount(){
@@ -27,7 +28,7 @@ export default class file extends Component {
             if(tags == 1 ){
                 var nextRoute={
                     name:"主页",
-                    component:admin
+                    component:Index
                 };
                 this.props.navigator.push(nextRoute)
             }else {
@@ -38,6 +39,16 @@ export default class file extends Component {
                 this.props.navigator.push(nextRoute)
             }
        });
+
+       Storage.get('username').then((tags) => {
+          if(tags==null){
+              var nextRoute={
+                  name:"主页",
+                  component:admin
+              };
+              this.props.navigator.push(nextRoute)
+          }
+       })
   }
   render() {
     return (

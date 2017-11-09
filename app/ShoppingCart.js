@@ -279,7 +279,6 @@ export default class ShoppingCart extends Component {
                     DetailInfo1: {"ShopCode": tags, "OrgFormno": this.state.orgFormno, "ProMemo": this.state.Remark,"SuppCode":this.state.suppcode,"childshop":this.state.shildshop},
                     DetailInfo2: this.dataRows,
                 };
-                // alert(JSON.stringify(params));
                 FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
                     if(data.retcode == 1){
                         alert("提交成功");

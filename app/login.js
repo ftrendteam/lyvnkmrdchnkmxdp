@@ -86,6 +86,7 @@ export default class  login extends Component{
                 });
                 this._setModalVisible();
             }else{
+               this._setModalVisible();
                this._ErrorModalVisible()
             }
         })

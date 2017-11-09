@@ -70,7 +70,8 @@ export default class ProductCG_list extends Component {
                     // this.dataRows[0] = dataRow;
                     // this.dataRows[i] = temp;
                     var str = this.dataRows.splice(i,1);
-                    this.dataRows.unshift(str[0])
+                    this.dataRows.unshift(str[0]);
+                    alert(JSON.stringify(str))
                     break;
                 }
             }
@@ -117,7 +118,7 @@ export default class ProductCG_list extends Component {
                     <TextInput
                         autofocus="{true}"
                         returnKeyType="search"
-                        placeholder="请输入供应商编码"
+                        placeholder="搜索相关单号"
                         placeholderColor="#323232"
                         underlineColorAndroid='transparent'
                         style={styles.searchContect}

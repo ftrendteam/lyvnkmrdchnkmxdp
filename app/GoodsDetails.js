@@ -318,6 +318,6 @@ const styles = StyleSheet.create({
    paddingBottom:50,
    },
    listViewStyle:{
-    marginBottom:300,
+    marginBottom:280,
    }
 });

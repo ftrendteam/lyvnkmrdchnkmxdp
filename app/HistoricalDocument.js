@@ -145,7 +145,6 @@ export default class HistoricalDocument extends Component {
      });
   }
   _dpSearch(){
-
       //url获取
       Storage.get('LinkUrl').then((tags) => {
           this.setState({
@@ -162,7 +161,6 @@ export default class HistoricalDocument extends Component {
       });
 
      Storage.get('code').then((tags) => {
-
          Storage.get("usercode","").then((usercode)=>{
              Storage.get("username","").then((username)=>{
                   let params = {
@@ -194,7 +192,8 @@ export default class HistoricalDocument extends Component {
             if(Detailnfo1 = null){
                 this._setModalVisible();
             }
-            this._setModalVisible();
+
+                this._setModalVisible();
 
             if(data.retcode == 1){
                 var DetailInfo1 = data.DetailInfo1;
@@ -315,9 +314,10 @@ export default class HistoricalDocument extends Component {
         visible={this.state.show}
         onShow={() => {}}
         onRequestClose={() => {}} >
-            <View style={styles.loading}>
-                <View style={styles.LoadCenter}>
-                    <ActivityIndicator key="1" color="#ffffff" size="large" style={styles.activity}></ActivityIndicator>
+            <View style={styles.LoadCenter}>
+                <View style={styles.loading}>
+                    <ActivityIndicator key="1" color="#414240" size="large" style={styles.activity}></ActivityIndicator>
+                    <Text style={styles.TextLoading}>加载中</Text>
                 </View>
             </View>
         </Modal>
@@ -425,11 +425,25 @@ const styles = StyleSheet.create({
    position:"absolute",
    right:-42,
   },
- loading:{
-    flex:1,
-    backgroundColor:"#000000",
-    opacity:0.5,
-    justifyContent: 'center',
-    alignItems: 'center',
- },
+    LoadCenter:{
+        flex:1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    loading:{
+        paddingLeft:15,
+        paddingRight:15,
+        paddingTop:15,
+        paddingBottom:15,
+        backgroundColor:"#000000",
+        opacity:0.8,
+        borderRadius:5,
+    },
+    TextLoading:{
+        fontSize:17,
+        color:"#ffffff"
+    },
+    activity:{
+        marginBottom:5,
+    },
 });
