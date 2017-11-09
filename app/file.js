@@ -40,15 +40,15 @@ export default class file extends Component {
             }
        });
 
-       Storage.get('username').then((tags) => {
-          if(tags==null){
-              var nextRoute={
-                  name:"主页",
-                  component:admin
-              };
-              this.props.navigator.push(nextRoute)
-          }
-       })
+       // Storage.get('username').then((tags) => {
+       //    if(tags==null){
+       //        var nextRoute={
+       //            name:"主页",
+       //            component:admin
+       //        };
+       //        this.props.navigator.push(nextRoute)
+       //    }
+       // })
   }
   render() {
     return (
