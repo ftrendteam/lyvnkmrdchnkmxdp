@@ -198,6 +198,7 @@ export default class HistoricalDocument extends Component {
             if(data.retcode == 1){
                 var DetailInfo1 = data.DetailInfo1;
                 this.dataRows = this.dataRows.concat(DetailInfo1);
+                alert(JSON.stringify(DetailInfo1))
                 if(this.dataRows==0){
                     return;
                 }else{
@@ -416,7 +417,7 @@ const styles = StyleSheet.create({
   },
   home2:{
      color:'#f47882',
-     fontSize:18,
+     fontSize:17,
      marginTop:5,
      flex:1,
   },

@@ -55,7 +55,7 @@ export default class Distrition extends Component {
         };
         this.props.navigator.push(nextRoute)
         Storage.save('OrgFormno',this.state.Number);
-        Storage.save('Name','配送收货单');
+        Storage.save('Name','配送收货');
         Storage.save('valueOf','App_Client_ProPSSH');
         Storage.save('history','App_Client_ProPSSHQ');
         Storage.save('historyClass','App_Client_ProPSSHDetailQ');
