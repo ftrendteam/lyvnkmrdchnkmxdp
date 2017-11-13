@@ -29,6 +29,7 @@ public class ReactNativeHost extends com.facebook.react.ReactNativeHost {
                 new PickerViewPackage(),
                 new SQLitePluginPackage(),
                 new JsScannerReactPackage(),
+                new JSAndroidIMEIReactPackage(),
                 new MainReactPackage()
         );
     }
