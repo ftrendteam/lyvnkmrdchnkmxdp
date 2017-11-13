@@ -383,7 +383,7 @@ export default class ShoppingCart extends Component {
             visible={this.state.show}
             onShow={() => {}}
             onRequestClose={() => {}} >
-                 <View style={styles.modalStyle}>
+                 <TouchableOpacity style={styles.modalStyle}  onPress={this._setModalVisible.bind(this)}>
                     <View style={styles.ModalView}>
                         <View style={styles.DanJu}>
                             <View style={styles.danju}><Text style={styles.DanText}>单据备注</Text></View>
@@ -404,13 +404,13 @@ export default class ShoppingCart extends Component {
                             })
                         }}/>
                     </View>
-                 </View>
+                 </TouchableOpacity>
             </Modal>
         </View>
         <View style={styles.footer}>
             <TouchableOpacity style={styles.Home} onPress={this.HISTORY.bind(this)}><Image source={require("../images/documents.png")}></Image><Text style={styles.home3}>历史单据</Text></TouchableOpacity>
             <TouchableOpacity style={styles.Home} onPress={this.HOME.bind(this)}><Image source={require("../images/home.png")}></Image><Text style={styles.home1}>首页</Text></TouchableOpacity>
-            <TouchableOpacity style={styles.Home} onPress={this.SHOP.bind(this)}>
+            <TouchableOpacity style={styles.Home}>
                 <View>
                    <Image source={require("../images/shop1.png")}>
                        {
@@ -431,7 +431,7 @@ export default class ShoppingCart extends Component {
           onRequestClose={() => {}} >
           <View style={styles.LoadCenter}>
               <View style={styles.loading}>
-                  <ActivityIndicator key="1" color="#414240" size="large" style={styles.activity}></ActivityIndicator>
+                  <ActivityIndicator key="1" color="#ffffff" size="large" style={styles.activity}></ActivityIndicator>
                   <Text style={styles.TextLoading}>加载中</Text>
               </View>
           </View>
@@ -665,13 +665,13 @@ const styles = StyleSheet.create({
       marginTop:200,
    },
    DanJu:{
-      height:45,
+      paddingTop:15,
+      paddingBottom:15,
       backgroundColor:"#fbced2",
       borderRadius:5,
    },
    DanText:{
       color:"#f47882",
-      lineHeight:30,
       textAlign:"center",
       fontSize:16,
    },

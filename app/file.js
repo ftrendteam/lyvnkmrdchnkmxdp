@@ -23,7 +23,7 @@ export default class file extends Component {
       super(props);
       this.state = {
           first:"",
-          show:true
+          show:false
       };
   }
   _setModalVisible() {
@@ -42,12 +42,13 @@ export default class file extends Component {
                     component:Index
                 };
                 this.props.navigator.push(nextRoute);
-            }else {
+                this._setModalVisible();
+            }else{
                 var nextRoute={
                     name:"主页",
                     component:login
                 };
-                this.props.navigator.push(nextRoute)
+                this.props.navigator.push(nextRoute);
             }
        });
 

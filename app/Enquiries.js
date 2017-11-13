@@ -254,11 +254,11 @@ const styles = StyleSheet.create({
         borderRadius:5,
         marginLeft:15,
         marginRight:15,
+        paddingTop:10,
+        paddingBottom:10,
     },
     EmptyingTxt:{
-        height:40,
         color:"#cccccc",
-        lineHeight:27,
         textAlign:"center",
         fontSize:16,
     },

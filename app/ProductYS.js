@@ -66,6 +66,8 @@ export default class ProductCG extends Component {
     Button(){
         if(this.state.sCode1==""){
             alert("请选择供应商")
+        }else if(this.state.suppcode1==""){
+            alert("请选择采购单")
         }else{
             var nextRoute={
                 name:"Index",
@@ -235,8 +237,8 @@ const styles = StyleSheet.create({
         color:"#323232"
     },
     button:{
-        marginLeft:80,
-        marginRight:80,
+        marginLeft:60,
+        marginRight:60,
         paddingTop:8,
         paddingBottom:8,
         backgroundColor:"#f47882",

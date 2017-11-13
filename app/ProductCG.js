@@ -192,8 +192,8 @@
          color:"#323232"
      },
      button:{
-         marginLeft:80,
-         marginRight:80,
+         marginLeft:60,
+         marginRight:60,
          paddingTop:8,
          paddingBottom:8,
          backgroundColor:"#f47882",

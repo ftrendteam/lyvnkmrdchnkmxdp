@@ -269,7 +269,7 @@ export default class admin extends Component {
         onRequestClose={() => {}} >
             <View style={styles.LoadCenter}>
                 <View style={styles.loading}>
-                    <ActivityIndicator key="1" color="#414240" size="large" style={styles.activity}></ActivityIndicator>
+                    <ActivityIndicator key="1" color="#ffffff" size="large" style={styles.activity}></ActivityIndicator>
                     <Text style={styles.TextLoading}>登录中</Text>
                 </View>
             </View>

@@ -131,30 +131,34 @@ export default class GoodsDetails extends Component {
         });
     }
     pressPop(){
-        var shopInfoData = [];
-        var shopInfo = {};
-        shopInfo.Pid = this.state.Pid;
-        shopInfo.ProdCode=this.state.ProdCode;
-        shopInfo.prodname = this.state.ProdName;
-        shopInfo.countm = this.state.Number;
-        shopInfo.ShopPrice = this.state.ShopPrice;
-        shopInfo.prototal =(this.state.Number)*(this.state.ShopPrice);
-        shopInfo.promemo = this.state.Remark;
-        shopInfo.DepCode = this.state.DepCode;
-        shopInfoData.push(shopInfo);
-        //调用插入表方法
-        dbAdapter.insertShopInfo(shopInfoData);
-        var nextRoute={
-           name:"主页",
-           component:ShoppingCart,
-            params:{
-               DepCode:this.state.DepCode,
-            }
-        };
-        this.props.navigator.push(nextRoute);
+        if(this.state.name==null) {
+            alert("请选择单据")
+        }else {
+            var shopInfoData = [];
+            var shopInfo = {};
+            shopInfo.Pid = this.state.Pid;
+            shopInfo.ProdCode = this.state.ProdCode;
+            shopInfo.prodname = this.state.ProdName;
+            shopInfo.countm = this.state.Number;
+            shopInfo.ShopPrice = this.state.ShopPrice;
+            shopInfo.prototal = (this.state.Number) * (this.state.ShopPrice);
+            shopInfo.promemo = this.state.Remark;
+            shopInfo.DepCode = this.state.DepCode;
+            shopInfoData.push(shopInfo);
+            //调用插入表方法
+            dbAdapter.insertShopInfo(shopInfoData);
+            var nextRoute = {
+                name: "主页",
+                component: ShoppingCart,
+                params: {
+                    DepCode: this.state.DepCode,
+                }
+            };
+            this.props.navigator.push(nextRoute);
+        }
     }
 
-  render() {
+  render(){
     return (
       <View style={styles.container}>
           <ScrollView style={styles.ScrollView} scrollEnabled={false}>

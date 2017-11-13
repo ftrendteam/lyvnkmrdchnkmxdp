@@ -69,10 +69,12 @@ export default class Index extends Component {
             ShopCar1:"",
             usercode:"",
             License:"",
+            username:"",
             nomore: true,
             isloading:true,
             show:false,
             Show:false,
+            ErrorShow:false,
             depcode:this.props.DepCode ? this.props.DepCode : "",
             dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
         };
@@ -146,7 +148,8 @@ export default class Index extends Component {
     }
 
     pullOut(){
-        Storage.delete('username')
+        Storage.delete('username');
+        Storage.delete('history');
         this._setModalVisible();
         if(this.state.ShopCar1>0){
             alert("商品未提交")
@@ -178,12 +181,37 @@ export default class Index extends Component {
         });
     }
 
+    _ErrorModalVisible(){
+        let isshow = this.state.ErrorShow;
+        this.setState({
+            ErrorShow:!isshow,
+        });
+    }
+
+    LoginError(){
+        var nextRoute={
+            name:"主页",
+            component:admin
+        };
+        this.props.navigator.push(nextRoute)
+        this._ErrorModalVisible();
+    }
+
+    Close(){
+        this._ErrorModalVisible();
+    }
+
     //进入页面执行方法
     componentDidMount(){
         InteractionManager.runAfterInteractions(() => {
             Storage.get('Name').then((tags) => {
                 this.setState({
                     head:tags
+                })
+            });
+            Storage.get('username').then((tags) => {
+                this.setState({
+                    username:tags
                 })
             });
             this._fetch();
@@ -203,7 +231,7 @@ export default class Index extends Component {
                 var ShopCar = rows.item(0).DepCode;
                 var ShopCar1 = rows.item(0).ShopNumber;
             }
-            if (this.state.depcode == "") {
+            if(this.state.depcode == "") {
                 this.setState({
                     depcode :ShopCar,
                 })
@@ -225,7 +253,7 @@ export default class Index extends Component {
                     priductData.push(row);
                 }
                 total = this.state.Page;
-                totalPage = total % 9 == 0 ? total / 9 : Math.floor(total / 9) + 1;
+                totalPage = total % 15 == 0 ? total / 15 : Math.floor(total / 15) + 1;
                 this.productData=priductData;
                 this.setState({
                     data:priductData,
@@ -280,6 +308,9 @@ export default class Index extends Component {
         if(lastDepCode ==""){
             lastDepCode = rowData.DepCode;
         }
+        if(lastDepCode!==''){
+            page= 1;
+        }
         dbAdapter.selectProduct1(rowData.DepCode,1).then((rows)=>{
             for(let i =0;i<rows.length;i++){
                 var row = rows.item(i);
@@ -300,11 +331,8 @@ export default class Index extends Component {
                 var row = rows.item(i);
                 priductData.push(row);
             };
-            if(lastDepCode ==1){
-                page= 1;
-            }
             total = this.state.Page;
-            totalPage = total % 9 == 0 ? total / 9 : Math.floor(total / 9) + 1;
+            totalPage = total % 15 == 0 ? total / 15 : Math.floor(total / 15) + 1;
             this.productData=priductData;
             this.setState({
                 data:priductData,
@@ -419,7 +447,11 @@ export default class Index extends Component {
     //功能分类
     Home(){
         if(this.state.ShopCar1>0){
+            this._setModalVisible();
             alert("商品未提交")
+        }else if(this.state.username==null){
+            this._setModalVisible();
+            this._ErrorModalVisible();
         }else{
             dbAdapter.selectUserRight(this.state.usercode,"K0801").then((rows)=>{
                 if(rows==true){
@@ -448,7 +480,11 @@ export default class Index extends Component {
 
     Home1(){
         if(this.state.ShopCar1>0){
+            this._setModalVisible();
             alert("商品未提交")
+        }else if(this.state.username==null){
+            this._setModalVisible();
+            this._ErrorModalVisible();
         }else {
             dbAdapter.selectUserRight(this.state.usercode,"K0604").then((rows) => {
                 if (rows == true) {
@@ -475,7 +511,11 @@ export default class Index extends Component {
 
     Query(){
         if(this.state.ShopCar1>0){
+            this._setModalVisible();
             alert("商品未提交")
+        }else if(this.state.username==null){
+            this._setModalVisible();
+            this._ErrorModalVisible();
         }else {
             dbAdapter.selectUserRight(this.state.usercode,"K0611").then((rows) => {
                 if (rows == true) {
@@ -502,7 +542,11 @@ export default class Index extends Component {
 
     Query1(){
         if(this.state.ShopCar1>0){
+            this._setModalVisible();
             alert("商品未提交")
+        }else if(this.state.username==null){
+            this._setModalVisible();
+            this._ErrorModalVisible();
         }else {
             // Storage.delete("Name");
             dbAdapter.selectUserRight(this.state.usercode,"K0607").then((rows) => {
@@ -529,7 +573,11 @@ export default class Index extends Component {
 
     Home2(){
         if(this.state.ShopCar1>0){
+            this._setModalVisible();
             alert("商品未提交")
+        }else if(this.state.username==null){
+            this._setModalVisible();
+            this._ErrorModalVisible();
         }else {
             // Storage.delete("Name");
             dbAdapter.selectUserRight(this.state.usercode,"K0802").then((rows) => {
@@ -556,7 +604,11 @@ export default class Index extends Component {
 
     Shopp(){
         if(this.state.ShopCar1>0){
+            this._setModalVisible();
             alert("商品未提交")
+        }else if(this.state.username==null){
+            this._setModalVisible();
+            this._ErrorModalVisible();
         }else {
             // Storage.delete("Name");
             dbAdapter.selectUserRight(this.state.usercode,"K0504").then((rows) => {
@@ -582,7 +634,11 @@ export default class Index extends Component {
 
     Shopp1(){
         if(this.state.ShopCar1>0){
+            this._setModalVisible();
             alert("商品未提交")
+        }else if(this.state.username==null){
+            this._setModalVisible();
+            this._ErrorModalVisible();
         }else {
             // Storage.delete("Name");
             dbAdapter.selectUserRight(this.state.usercode,"K0505").then((rows) => {
@@ -608,7 +664,11 @@ export default class Index extends Component {
 
     Shopp2(){
         if(this.state.ShopCar1>0){
+            this._setModalVisible();
             alert("商品未提交")
+        }else if(this.state.username==null){
+            this._setModalVisible();
+            this._ErrorModalVisible();
         }else {
             // Storage.delete("Name");
             dbAdapter.selectUserRight(this.state.usercode,"K0707").then((rows) => {
@@ -634,7 +694,11 @@ export default class Index extends Component {
 
     Shopp3(){
         if(this.state.ShopCar1>0){
+            this._setModalVisible();
             alert("商品未提交")
+        }else if(this.state.username==null){
+            this._setModalVisible();
+            this._ErrorModalVisible();
         }else {
             // Storage.delete("Name");
             dbAdapter.selectUserRight(this.state.usercode,"K0803").then((rows) => {
@@ -801,7 +865,7 @@ export default class Index extends Component {
                                 </View>
                                 <View style={styles.ModalViewList1}>
                                     <TouchableOpacity  style={styles.subView1} onPress={this.pullOut.bind(this)}>
-                                        <Text style={styles.titleText1}>退出账号</Text>
+                                        <Text style={styles.titleText1}>退出</Text>
                                     </TouchableOpacity>
                                 </View>
                             </ScrollView>
@@ -814,7 +878,7 @@ export default class Index extends Component {
                 </Modal>
                 <View style={styles.footer}>
                     <TouchableOpacity style={styles.Home} onPress={this.HISTORY.bind(this)}><Image source={require("../images/documents.png")}></Image><Text style={styles.home3}>历史单据</Text></TouchableOpacity>
-                    <TouchableOpacity style={styles.Home} onPress={this.HOME.bind(this)}><Image source={require("../images/home1.png")}></Image><Text style={styles.home2}>首页</Text></TouchableOpacity>
+                    <TouchableOpacity style={styles.Home}><Image source={require("../images/home1.png")}></Image><Text style={styles.home2}>首页</Text></TouchableOpacity>
                     <TouchableOpacity style={styles.Home} onPress={this.SHOP.bind(this)}>
                         <View>
                             <Image source={require("../images/shop.png")}>
@@ -828,6 +892,27 @@ export default class Index extends Component {
                         <Text style={styles.home1}>清单</Text>
                     </TouchableOpacity>
                 </View>
+                <Modal
+                    animationType='fade'
+                    transparent={true}
+                    visible={this.state.ErrorShow}
+                    onShow={() => {}}
+                    onRequestClose={() => {}} >
+                    <TouchableOpacity style={styles.Error} onPress={this.Close.bind(this)}>
+                        <View style={styles.ErrorCont}>
+                            <View style={styles.LoginError}>
+                                <Text style={styles.ErrorText}>
+                                    账号已过期，请重新登录
+                                </Text>
+                            </View>
+                            <TouchableOpacity style={styles.LoginOk} onPress={this.LoginError.bind(this)}>
+                                <Text style={styles.ErrorText}>
+                                    点击登录
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+                    </TouchableOpacity>
+                </Modal>
             </View>
 
         );
@@ -1132,5 +1217,35 @@ const styles = StyleSheet.create({
     CloseText:{
         color:"#323232",
         fontSize:22
-    }
+    },
+    Error:{
+        flex:1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor:"#000000",
+        opacity:0.8
+    },
+    ErrorCont:{
+        width:320,
+        backgroundColor:"#ffffff",
+        borderRadius:3,
+        paddingTop:15,
+        paddingBottom:15,
+        paddingLeft:8,
+        paddingRight:8,
+    },
+    LoginError:{
+        marginTop:18,
+        paddingBottom:15,
+        borderBottomColor:"#cccccc",
+        borderBottomWidth:1,
+    },
+    ErrorText:{
+        color:"#323232",
+        fontSize:16,
+        textAlign:"center"
+    },
+    LoginOk:{
+        marginTop:22,
+    },
 });

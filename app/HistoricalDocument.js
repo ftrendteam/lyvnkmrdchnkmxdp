@@ -15,7 +15,6 @@ import {
   Modal,
   ScrollView,
   TouchableOpacity,
-  TouchableHighlight,
   ToastAndroid,
   ListView,
   InteractionManager,
@@ -192,13 +191,10 @@ export default class HistoricalDocument extends Component {
             if(Detailnfo1 = null){
                 this._setModalVisible();
             }
-
                 this._setModalVisible();
-
             if(data.retcode == 1){
                 var DetailInfo1 = data.DetailInfo1;
                 this.dataRows = this.dataRows.concat(DetailInfo1);
-                alert(JSON.stringify(DetailInfo1))
                 if(this.dataRows==0){
                     return;
                 }else{
@@ -233,7 +229,7 @@ export default class HistoricalDocument extends Component {
   _renderRow(rowData, sectionID, rowID){
       return(
           <View style={styles.Cont}>
-              <TouchableHighlight  onPress={()=>this.GoodsDetails(rowData)}>
+              <TouchableOpacity  onPress={()=>this.GoodsDetails(rowData)}>
                   <View style={styles.ContList}>
                       <Text style={styles.List}>
                           <Text style={styles.ListLeft}>要货单号：</Text>
@@ -270,7 +266,7 @@ export default class HistoricalDocument extends Component {
                             <Text style={styles.ListRight}>{rowData.promemo}</Text>
                        </Text>
                   </View>
-              </TouchableHighlight>
+              </TouchableOpacity>
           </View>
       )
   }
@@ -294,7 +290,7 @@ export default class HistoricalDocument extends Component {
             />
         </View>
         <View style={styles.footer}>
-            <TouchableOpacity style={styles.Home} onPress={this.HISTORY.bind(this)}><Image source={require("../images/documents1.png")}></Image><Text style={styles.home2}>历史单据</Text></TouchableOpacity>
+            <TouchableOpacity style={styles.Home}><Image source={require("../images/documents1.png")}></Image><Text style={styles.home2}>历史单据</Text></TouchableOpacity>
             <TouchableOpacity style={styles.Home} onPress={this.HOME.bind(this)}><Image source={require("../images/home.png")}></Image><Text style={styles.home1}>首页</Text></TouchableOpacity>
             <TouchableOpacity style={styles.Home} onPress={this.SHOP.bind(this)}>
                  <View>
@@ -317,7 +313,7 @@ export default class HistoricalDocument extends Component {
         onRequestClose={() => {}} >
             <View style={styles.LoadCenter}>
                 <View style={styles.loading}>
-                    <ActivityIndicator key="1" color="#414240" size="large" style={styles.activity}></ActivityIndicator>
+                    <ActivityIndicator key="1" color="#ffffff" size="large" style={styles.activity}></ActivityIndicator>
                     <Text style={styles.TextLoading}>加载中</Text>
                 </View>
             </View>
