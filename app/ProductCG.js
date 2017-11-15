@@ -30,7 +30,8 @@
              show:false,
              Number:"",
              sCode1:"",
-             invoice:""
+             invoice:"",
+             active:"",
          };
      }
 
@@ -65,20 +66,24 @@
      }
 
      Button(){
+         var str=this.state.sCode1;
          if(this.state.sCode1==""){
              alert("请选择供应商")
          }else{
+             var date = new Date();
+             var data=JSON.stringify(date.getTime());
              var nextRoute={
                  name:"Index",
                  component:Index,
              };
              this.props.navigator.push(nextRoute);
-             Storage.save('OrgFormno',this.state.Number);
-             Storage.save('Name','商品采购');
+             Storage.save('Name','商品采购单');
              Storage.save('valueOf','App_Client_ProCG');
              Storage.save('history','App_Client_ProCGQ');
              Storage.save('historyClass','App_Client_ProCGDetailQ');
-             Storage.save("scode",this.state.sCode1)
+             Storage.save('ProYH','ProCG');
+             Storage.save('Date',data);
+             Storage.save("scode",str)
          }
      }
 

@@ -40,7 +40,6 @@ export default class GoodsDetails extends Component {
 
     componentDidMount(){
 
-        // alert(this.state.reqDetailCode)
          //获取本地数据库url
          Storage.get('LinkUrl').then((tags) => {
             this.setState({

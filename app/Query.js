@@ -28,7 +28,8 @@ export default class Query extends Component {
         this.state = {
             show:false,
             Number:"",
-            sCode1:""
+            sCode1:"",
+            active:"",
         };
     }
 
@@ -45,8 +46,15 @@ export default class Query extends Component {
         this.props.navigator.pop();
     }
 
+    _reloadView(sCode) {
+        sCode = String(sCode);
+        this.setState({
+            sCode1:sCode,
+        });
+    }
+
     pressPush(){
-        var str=this.state.Number;
+        var str=this.state.sCode1;
         if(this.state.sCode1==""){
             alert("请选择原始单号");
         }else{
@@ -55,16 +63,23 @@ export default class Query extends Component {
                 component:Search
             };
             this.props.navigator.push(nextRoute);
-            Storage.save('OrgFormno',this.state.Number);
-            Storage.save('Name','商品盘点');
+
+            var date = new Date();
+            var data=JSON.stringify(date.getTime());
+            Storage.save('OrgFormno',str);
+            Storage.save('Date',data);
+            Storage.save('Name','商品盘点单');
             Storage.save('valueOf','App_Client_ProPSSH');
             Storage.save('history','App_Client_ProPSSHQ');
             Storage.save('historyClass','App_Client_ProPSSHDetailQ');
+            Storage.save('ProYH','ProPC');
         }
     }
 
     Home(){
-        var str=this.state.Number;
+        var str=this.state.sCode1;
+        var date = new Date();
+        var data=JSON.stringify(date.getTime());
         if(this.state.sCode1==""){
             alert("请选择原始单号");
         }else{
@@ -73,11 +88,14 @@ export default class Query extends Component {
                 component:Index
             };
             this.props.navigator.push(nextRoute);
-            Storage.save('OrgFormno',this.state.sCode1);
-            Storage.save('Name','商品盘点');
+
+            Storage.save('OrgFormno',str);
+            Storage.save('Date',data);
+            Storage.save('Name','商品盘点单');
             Storage.save('valueOf','App_Client_ProPC');
             Storage.save('history','App_Client_ProCurrPCQ');
             Storage.save('historyClass','App_Client_ProPCDetailQ');
+            Storage.save('ProYH','ProPC');
         }
     }
 
@@ -91,13 +109,6 @@ export default class Query extends Component {
             }
         };
         this.props.navigator.push(nextRoute)
-    }
-
-    _reloadView(sCode) {
-        sCode = String(sCode);
-        this.setState({
-            sCode1:sCode,
-        });
     }
 
     render() {

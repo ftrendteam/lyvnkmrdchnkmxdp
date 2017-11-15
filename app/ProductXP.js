@@ -29,7 +29,8 @@ export default class ProductCG extends Component {
             show:false,
             Number:"",
             sCode1:"",
-            shopname1:""
+            shopname1:"",
+            active:"",
         };
     }
 
@@ -82,6 +83,10 @@ export default class ProductCG extends Component {
     }
 
     Button(){
+        var date = new Date();
+        var data=JSON.stringify(date.getTime());
+        var str=this.state.sCode1;
+        var str1=this.state.shopname1;
         if(this.state.sCode1==""){
             alert("请选择供应商")
         }else if(this.state.shopname1==""){
@@ -92,13 +97,14 @@ export default class ProductCG extends Component {
                 component:Index,
             };
             this.props.navigator.push(nextRoute);
-            Storage.save('OrgFormno',this.state.Number);
-            Storage.save('Name','协配采购');
+            Storage.save('Name','协配采购单');
             Storage.save('valueOf','App_Client_ProXPCG');
             Storage.save('history','App_Client_ProXPCGQ');
             Storage.save('historyClass','App_Client_ProXPDetailCGQ');
-            Storage.save("scode",this.state.sCode1)
-            Storage.save('shildshop',this.state.shopname1)
+            Storage.save('ProYH','ProXPCG');
+            Storage.save('Date',data);
+            Storage.save("scode",str);
+            Storage.save('shildshop',str1)
         }
     }
 

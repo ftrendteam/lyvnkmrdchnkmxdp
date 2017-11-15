@@ -29,7 +29,8 @@ export default class Distrition extends Component {
             show:false,
             Number:"",
             invoice:"",
-            sCode1:""
+            sCode1:"",
+            active:"",
         };
     }
 
@@ -46,34 +47,52 @@ export default class Distrition extends Component {
         this.props.navigator.pop();
     }
 
+    _reloadView(sCode) {
+        sCode = String(sCode);
+        this.setState({
+            sCode1:sCode,
+        });
+    }
+
     //判断当前输入是否为正确的单号 并保存
     pressPush(){
-        var str=this.state.Number;
+        var date = new Date();
+        var data=JSON.stringify(date.getTime());
+        var str=this.state.sCode1;
         var nextRoute={
             name:"主页",
             component:Search
         };
         this.props.navigator.push(nextRoute)
-        Storage.save('OrgFormno',this.state.Number);
-        Storage.save('Name','配送收货');
+        Storage.save('OrgFormno',str);
+        Storage.save('Date',data);
+        Storage.save('Name','配送收货单');
         Storage.save('valueOf','App_Client_ProPSSH');
         Storage.save('history','App_Client_ProPSSHQ');
         Storage.save('historyClass','App_Client_ProPSSHDetailQ');
+        Storage.save('ProYH','ProPSSH');
     }
 
     Home(){
-        var str=this.state.Number;
+        var date = new Date();
+        var data=JSON.stringify(date.getTime());
+        this.setState({
+            active:data,
+        });
+        var str=this.state.sCode1;
         var nextRoute={
             name:"主页",
             component:Index
         };
         this.props.navigator.push(nextRoute);
-        Storage.save('OrgFormno',this.state.sCode1);
-        Storage.save("scode",this.state.sCode1);
-        Storage.save('Name','配送收货');
+        Storage.save('OrgFormno',str);
+        Storage.save("scode",str);
+        Storage.save('Date',this.state.active);
+        Storage.save('Name','配送收货单');
         Storage.save('valueOf','App_Client_ProPSSH');
         Storage.save('history','App_Client_ProPSSHQ');
         Storage.save('historyClass','App_Client_ProPSSHDetailQ');
+        Storage.save('ProYH','ProPSSH');
     }
 
     Search(){
@@ -86,13 +105,6 @@ export default class Distrition extends Component {
             }
         };
         this.props.navigator.push(nextRoute)
-    }
-
-    _reloadView(sCode) {
-        sCode = String(sCode);
-        this.setState({
-            sCode1:sCode,
-        });
     }
 
     render() {
