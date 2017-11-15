@@ -277,10 +277,11 @@ export default class DBAdapter extends SQLiteOpenHelper {
           let Pid = shopInfo.Pid;
           let ProdCode = shopInfo.ProdCode;
           let DepCode = shopInfo.DepCode;
+          let ydcountm = shopInfo.ydcountm;
           //   "prodname":"海鲜菇","countm":1.0000,"kccount":0.0,"prototal":1.0000,"unit":"kg  ","promemo":""
-          let sql = " replace INTO shopInfo(pid,ProdCode,prodname,countm,ShopPrice,prototal,promemo,DepCode)" +
-            "values(?,?,?,?,?,?,?,?)";
-          tx.executeSql(sql, [Pid, ProdCode, shopName, ShopNumber, ShopPrice, ShopAmount, ShopRemark, DepCode], () => {
+          let sql = " replace INTO shopInfo(pid,ProdCode,prodname,countm,ShopPrice,prototal,promemo,DepCode,ydcountm)" +
+            "values(?,?,?,?,?,?,?,?,?)";
+          tx.executeSql(sql, [Pid, ProdCode, shopName, ShopNumber, ShopPrice, ShopAmount, ShopRemark, DepCode,ydcountm], () => {
               resolve(true);
             }, (err) => {
               reject(false);
@@ -539,6 +540,13 @@ export default class DBAdapter extends SQLiteOpenHelper {
                 console.log("shopCode", shopCode);
                 if (shopCode == currShopCode) {//当前登录的机构号 和本地保存的相同
                   // console.log("当前登录的机构号 和本地保存的相同");
+                  let categoryBody = RequestBodyUtils.createCategory(currShopCode);
+                  this.downProductAndCategory(categoryBody, currShopCode).then((result) => {
+                    //if (result) {
+                    console.log("本地没有保存机构号,根据当前的机构号下载商品和品类");
+                    resolve(true);
+                    //}
+                  });
                   resolve(true);
                 } else if (shopCode == '') {//本地没有保存机构号,根据当前的机构号下载商品和品类
                   let categoryBody = RequestBodyUtils.createCategory(currShopCode);
@@ -555,6 +563,8 @@ export default class DBAdapter extends SQLiteOpenHelper {
                    * prductBody 商品信息下载请求体
                    * categoryBody 品类信息下载请求体
                    */
+                  //this.deleteData("product");
+                  //this.deleteData("tdepset");
                   let categoryBody = RequestBodyUtils.createCategory(currShopCode);
                   this.downProductAndCategory(categoryBody, currShopCode).then((result) => {
                     //if (result) {
@@ -611,14 +621,11 @@ export default class DBAdapter extends SQLiteOpenHelper {
    * 登录后，商品属性页面口 查询某级品类名称
    * @param DepLevel 当前阶段穿默认值 1
    * DepLevel 默认取1
-   *
    */
   selectTDepSet(DepLevel) {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
-        
         tx.executeSql('select a.*,ifNull(b.countm,0) as ShopNumber from tdepset a left join (select depcode,sum(countm)  as countm from shopInfo group by depcode) b on a.depcode=b.depcode where IsDel=0 and DepLevel=' + DepLevel + '', [], (tx, results) => {
-          
           resolve(results.rows);
         });
       }, (error) => {
@@ -791,7 +798,6 @@ export default class DBAdapter extends SQLiteOpenHelper {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
         let sql = "select * from " + dbName;
-        console.log(sql);
         tx.executeSql(sql, [], (tx, results) => {
             resolve((results.rows));
           }, (error) => {
