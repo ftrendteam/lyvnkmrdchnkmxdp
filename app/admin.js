@@ -123,7 +123,6 @@ export default class admin extends Component {
         });
     }
 
-
     //登录
     pressPush(){
         //等待对话框 显示隐藏

@@ -71,6 +71,9 @@ export default class Index extends Component {
             License:"",
             username:"",
             active:"",
+            ClientCode:"",
+            Usercode:"",
+            userName:"",
             nomore: true,
             isloading:true,
             show:false,
@@ -185,22 +188,40 @@ export default class Index extends Component {
     //进入页面执行方法
     componentDidMount(){
         InteractionManager.runAfterInteractions(() => {
-            Storage.get('Name').then((tags) => {
-                this.setState({
-                    head:tags
-                })
-            });
-            Storage.get('username').then((tags) => {
-                this.setState({
-                    username:tags
-                })
-            });
+            this.Storage();
             this._fetch();
             this.function();
             if(lastDepCode ==1){
                 page= 1;
             }
         });
+    }
+
+    Storage(){
+        Storage.get('Name').then((tags) => {
+            this.setState({
+                head:tags
+            })
+        });
+
+        Storage.get('username').then((tags) => {
+            this.setState({
+                username:tags
+            })
+        });
+
+        Storage.get('ClientCode').then((tags)=>{
+            this.setState({
+                ClientCode:tags
+            })
+        })
+
+        Storage.get('Usercode').then((tags)=>{
+            this.setState({
+                Usercode:tags
+            })
+        })
+
     }
 
     //获取左侧商品品类信息、商品总数、触发第一个列表
@@ -399,6 +420,21 @@ export default class Index extends Component {
         if(title ==null){
             alert("请选择单据");
         }else{
+            Storage.get('userName').then((tags)=>{
+                let params = {
+                    reqCode:"App_PosReq",
+                    reqDetailCode:"App_Client_CurrProdQry",
+                    ClientCode:this.state.ClientCode,
+                    sDateTime:Date.parse(new Date()),//获取当前时间转换成时间戳
+                    Pwd:NetUtils.MD5(this.state.Pwd)+'',//获取到密码之后md5加密
+                    Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
+                    username:tags,
+                    usercode:this.state.Usercode,
+
+                };
+            })
+
+
             this.props.navigator.push({
                 component:OrderDetails,
                 params:{
