@@ -18,7 +18,7 @@ export default class CreatePDGFromNo {
    *        ProXPYS协配收货单
    */
   static createFromNO = (fromFlag) => {
-    let fromNO = fromFlag + '当前时间的毫秒值'
+    let fromNO = fromFlag + '当前时间的毫秒值';
     return fromNO;
   }
 }

@@ -12,11 +12,15 @@ import {
     ToastAndroid,
     TouchableOpacity,
     ActivityIndicator,
+    DeviceEventEmitter
 } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import admin from "./admin";
 import NetUtils from "../utils/NetUtils";
 import FetchUtil from "../utils/FetchUtils";
 import Storage from "../utils/Storage";
+var {NativeModules} = require('react-native');
+var RNAndroidIMEI = NativeModules.RNAndroidIMEI;
 
 export default class  login extends Component{
     constructor(props){
@@ -81,10 +85,15 @@ export default class  login extends Component{
                 }
                 Storage.save('FirstTime','1');
                 Storage.save('ClientCode',this.state.ClientCode);
+                RNAndroidIMEI.getAndroidIMEI();
+                DeviceEventEmitter.addListener("AndroidIMEI", (IMEI) => {
+                    Storage.save('IMEI',IMEI)
+                });
                 this.props.navigator.push({
                     component:admin,
                 });
                 this._setModalVisible();
+                ToastAndroid.show('登录成功', ToastAndroid.SHORT);
             }else{
                this._setModalVisible();
                this._ErrorModalVisible()
@@ -98,7 +107,7 @@ export default class  login extends Component{
 
     render(){
         return (
-            <View style={styles.container}>
+            <Image source={require("../images/bj.png")} style={styles.container}>
                 <ScrollView style={styles.ScrollView} scrollEnabled={false}>
                     <View style={styles.Image}>
                         <Image source={require("../images/logo.png")}></Image>
@@ -108,7 +117,7 @@ export default class  login extends Component{
                             autofocus="{true}"
                             numberoflines="{1}"
                             keyboardType="numeric"
-                            placeholder="商户号"
+                            placeholder="请输入商户号"
                             textalign="center"
                             underlineColorAndroid='transparent'
                             placeholderTextColor="#bcbdc1"
@@ -126,7 +135,7 @@ export default class  login extends Component{
                             secureTextEntry={true}
                             numberoflines="{1}"
                             keyboardType="numeric"
-                            placeholder="密码"
+                            placeholder="请输入商户密码"
                             maxLength={6}
                             textalign="center"
                             underlineColorAndroid='transparent'
@@ -178,35 +187,37 @@ export default class  login extends Component{
                         </View>
                     </Modal>
                 </ScrollView>
-            </View>
+        </Image>
         );
     }
 }
 const styles = StyleSheet.create({
     container:{
         flex:1,
-        backgroundColor:"#323642",
+        paddingTop:20,
+        paddingLeft:30,
+        paddingRight:30,
+        width:null,
+        height:null,
     },
     TextInput:{
-        marginLeft:30,
-        marginRight:30,
         marginTop:25,
     },
     admin:{
         borderRadius:5,
-        backgroundColor:"#474955",
-        color: "#ffffff",
-        paddingTop:5,
-        paddingBottom:5,
+        backgroundColor:"#ffffff",
+        color: "#333333",
+        paddingTop:10,
+        paddingBottom:10,
         paddingLeft:50,
         fontSize:16,
     },
     pass:{
         borderRadius:5,
-        backgroundColor:"#474955",
-        color: "#ffffff",
-        paddingTop:5,
-        paddingBottom:5,
+        backgroundColor:"#ffffff",
+        color: "#333333",
+        paddingTop:10,
+        paddingBottom:10,
         paddingLeft:50,
         fontSize:16,
     },
@@ -215,14 +226,13 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom:10,
+
     },
     login:{
-        marginLeft:30,
-        marginRight:30,
         marginTop:40,
         paddingTop:12,
         paddingBottom:12,
-        backgroundColor:"#f47882",
+        backgroundColor:"#ff8081",
         color:"#ffffff",
         borderRadius:3,
         textAlign:"center",

@@ -12,6 +12,7 @@
     "react-native": "0.47.1",
     "react-native-datetime": "^0.1.2",
     "react-native-deprecated-custom-components": "^0.1.1",
+    "react-native-linear-gradient": "^2.3.0",
     "react-native-md5": "^1.0.0",
     "react-native-modal-dropdown": "^0.4.4",
     "react-native-picker": "^4.1.2",

@@ -23,6 +23,7 @@ import {
     AnimatedFlatList,
     DeviceEventEmitter,
     FlatList,
+    ToastAndroid,
     ActivityIndicator,
     InteractionManager
 } from 'react-native';
@@ -56,7 +57,6 @@ export default class Index extends Component {
     constructor(props){
         super(props);
         this.state = {
-            Number:"",
             pickedDate:"",
             pid:"",
             DepCode:"",
@@ -69,6 +69,8 @@ export default class Index extends Component {
             ShopCar1:"",
             usercode:"",
             License:"",
+            username:"",
+            active:"",
             nomore: true,
             isloading:true,
             show:false,
@@ -146,7 +148,9 @@ export default class Index extends Component {
     }
 
     pullOut(){
-        Storage.delete('username')
+        Storage.delete('username');
+        Storage.delete('history');
+        Storage.delete('FirstTime1');
         this._setModalVisible();
         if(this.state.ShopCar1>0){
             alert("商品未提交")
@@ -186,6 +190,11 @@ export default class Index extends Component {
                     head:tags
                 })
             });
+            Storage.get('username').then((tags) => {
+                this.setState({
+                    username:tags
+                })
+            });
             this._fetch();
             this.function();
             if(lastDepCode ==1){
@@ -203,7 +212,7 @@ export default class Index extends Component {
                 var ShopCar = rows.item(0).DepCode;
                 var ShopCar1 = rows.item(0).ShopNumber;
             }
-            if (this.state.depcode == "") {
+            if(this.state.depcode == "") {
                 this.setState({
                     depcode :ShopCar,
                 })
@@ -225,7 +234,7 @@ export default class Index extends Component {
                     priductData.push(row);
                 }
                 total = this.state.Page;
-                totalPage = total % 9 == 0 ? total / 9 : Math.floor(total / 9) + 1;
+                totalPage = total % 15 == 0 ? total / 15 : Math.floor(total / 15) + 1;
                 this.productData=priductData;
                 this.setState({
                     data:priductData,
@@ -262,7 +271,7 @@ export default class Index extends Component {
 
     _renderRow(rowData, sectionID, rowID){
         return (
-            <TouchableOpacity style={styles.Active} onPress={()=>this._pressRow(rowData)}>
+            <TouchableOpacity style={[styles.Active,{backgroundColor:this.state.bjcolor}]} onPress={()=>this._pressRow(rowData)}>
                 {
                     (rowData.ShopNumber==0)?
                         null:
@@ -279,6 +288,9 @@ export default class Index extends Component {
     _pressRow(rowData){
         if(lastDepCode ==""){
             lastDepCode = rowData.DepCode;
+        }
+        if(lastDepCode!==''){
+            page= 1;
         }
         dbAdapter.selectProduct1(rowData.DepCode,1).then((rows)=>{
             for(let i =0;i<rows.length;i++){
@@ -300,11 +312,8 @@ export default class Index extends Component {
                 var row = rows.item(i);
                 priductData.push(row);
             };
-            if(lastDepCode ==1){
-                page= 1;
-            }
             total = this.state.Page;
-            totalPage = total % 9 == 0 ? total / 9 : Math.floor(total / 9) + 1;
+            totalPage = total % 15 == 0 ? total / 15 : Math.floor(total / 15) + 1;
             this.productData=priductData;
             this.setState({
                 data:priductData,
@@ -418,18 +427,29 @@ export default class Index extends Component {
 
     //功能分类
     Home(){
+        Storage.delete('OrgFormno');
+        Storage.delete('scode');
+        Storage.delete('shildshop');
         if(this.state.ShopCar1>0){
+            this._setModalVisible();
             alert("商品未提交")
+        }else if(this.state.username==null){
+            this._setModalVisible();
         }else{
             dbAdapter.selectUserRight(this.state.usercode,"K0801").then((rows)=>{
                 if(rows==true){
                     dbAdapter.selecUserRightA1012(this.state.usercode).then((rows)=>{
                         if(rows==true){
-                            Storage.save('Name','要货');
-                            var invoice = "要货";
+                            var date = new Date();
+                            var data=JSON.stringify(date.getTime());
+                            Storage.save('Name','要货单');
+                            Storage.save('ProYH','ProYH');
+                            var invoice = "要货单";
                             this.setState({
                                 head:invoice,
+                                active:data,
                             });
+                            Storage.save('Date',this.state.active);
                             this._setModalVisible();
                         }
                     })
@@ -447,18 +467,29 @@ export default class Index extends Component {
     }
 
     Home1(){
+        Storage.delete('OrgFormno');
+        Storage.delete('scode');
+        Storage.delete('shildshop');
         if(this.state.ShopCar1>0){
+            this._setModalVisible();
             alert("商品未提交")
+        }else if(this.state.username==null){
+            this._setModalVisible();
         }else {
             dbAdapter.selectUserRight(this.state.usercode,"K0604").then((rows) => {
                 if (rows == true) {
                     dbAdapter.selecUserRightA1012(this.state.usercode).then((rows) => {
                         if (rows == true) {
-                            Storage.save('Name','损益');
-                            var invoice = "损益";
+                            var date = new Date();
+                            var data=JSON.stringify(date.getTime());
+                            Storage.save('Name','损益单');
+                            Storage.save('ProYH','ProSY');
+                            var invoice = "损益单";
                             this.setState({
                                 head: invoice,
+                                active:data,
                             });
+                            Storage.save('Date',this.state.active);
                             this._setModalVisible();
                         }
                     })
@@ -474,18 +505,29 @@ export default class Index extends Component {
     }
 
     Query(){
+        Storage.delete('OrgFormno');
+        Storage.delete('scode');
+        Storage.delete('shildshop');
         if(this.state.ShopCar1>0){
+            this._setModalVisible();
             alert("商品未提交")
+        }else if(this.state.username==null){
+            this._setModalVisible();
         }else {
             dbAdapter.selectUserRight(this.state.usercode,"K0611").then((rows) => {
                 if (rows == true) {
                     dbAdapter.selecUserRightA1012(this.state.usercode).then((rows) => {
                         if (rows == true) {
-                            Storage.save('Name','实时盘点');
-                            var invoice = "实时盘点";
+                            var date = new Date();
+                            var data=JSON.stringify(date.getTime());
+                            Storage.save('Name','实时盘点单');
+                            Storage.save('ProYH','ProCurrPC');
+                            var invoice = "实时盘点单";
                             this.setState({
                                 head: invoice,
+                                active:data,
                             });
+                            Storage.save('Date',this.state.active);
                             this._setModalVisible();
                         }
                     })
@@ -501,15 +543,21 @@ export default class Index extends Component {
     }
 
     Query1(){
+        Storage.delete('OrgFormno');
+        Storage.delete('scode');
+        Storage.delete('shildshop');
         if(this.state.ShopCar1>0){
+            this._setModalVisible();
             alert("商品未提交")
+        }else if(this.state.username==null){
+            this._setModalVisible();
         }else {
             // Storage.delete("Name");
             dbAdapter.selectUserRight(this.state.usercode,"K0607").then((rows) => {
                 if (rows == true) {
                     dbAdapter.selecUserRightA1012(this.state.usercode).then((rows) => {
                         if (rows == true) {
-                            Storage.save('invoice','商品盘点');
+                            Storage.save('invoice','商品盘点单');
                             var nextRoute = {
                                 name: "主页",
                                 component: Query
@@ -528,8 +576,14 @@ export default class Index extends Component {
     }
 
     Home2(){
+        Storage.delete('OrgFormno');
+        Storage.delete('scode');
+        Storage.delete('shildshop');
         if(this.state.ShopCar1>0){
+            this._setModalVisible();
             alert("商品未提交")
+        }else if(this.state.username==null){
+            this._setModalVisible();
         }else {
             // Storage.delete("Name");
             dbAdapter.selectUserRight(this.state.usercode,"K0802").then((rows) => {
@@ -555,15 +609,21 @@ export default class Index extends Component {
     }
 
     Shopp(){
+        Storage.delete('OrgFormno');
+        Storage.delete('scode');
+        Storage.delete('shildshop');
         if(this.state.ShopCar1>0){
+            this._setModalVisible();
             alert("商品未提交")
+        }else if(this.state.username==null){
+            this._setModalVisible();
         }else {
             // Storage.delete("Name");
             dbAdapter.selectUserRight(this.state.usercode,"K0504").then((rows) => {
                 if (rows == true) {
                     dbAdapter.selecUserRightA1012(this.state.usercode).then((rows) => {
                         if (rows == true) {
-                            Storage.save("invoice", "商品采购");
+                            Storage.save("invoice", "商品采购单");
                             var nextRoute = {
                                 name: "主页",
                                 component: ProductCG
@@ -581,15 +641,21 @@ export default class Index extends Component {
     }
 
     Shopp1(){
+        Storage.delete('OrgFormno');
+        Storage.delete('scode');
+        Storage.delete('shildshop');
         if(this.state.ShopCar1>0){
+            this._setModalVisible();
             alert("商品未提交")
+        }else if(this.state.username==null){
+            this._setModalVisible();
         }else {
             // Storage.delete("Name");
             dbAdapter.selectUserRight(this.state.usercode,"K0505").then((rows) => {
                 if (rows == true) {
                     dbAdapter.selecUserRightA1012(this.state.usercode).then((rows) => {
                         if (rows == true) {
-                            Storage.save("invoice", "商品验收");
+                            Storage.save("invoice", "商品验收单");
                             var nextRoute = {
                                 name: "主页",
                                 component: ProductYS
@@ -607,15 +673,21 @@ export default class Index extends Component {
     }
 
     Shopp2(){
+        Storage.delete('OrgFormno');
+        Storage.delete('scode');
+        Storage.delete('shildshop');
         if(this.state.ShopCar1>0){
+            this._setModalVisible();
             alert("商品未提交")
+        }else if(this.state.username==null){
+            this._setModalVisible();
         }else {
             // Storage.delete("Name");
             dbAdapter.selectUserRight(this.state.usercode,"K0707").then((rows) => {
                 if (rows == true) {
                     dbAdapter.selecUserRightA1012(this.state.usercode).then((rows) => {
                         if (rows == true) {
-                            Storage.save("invoice", "协配采购");
+                            Storage.save("invoice", "协配采购单");
                             var nextRoute = {
                                 name: "主页",
                                 component: ProductXP
@@ -633,15 +705,21 @@ export default class Index extends Component {
     }
 
     Shopp3(){
+        Storage.delete('OrgFormno');
+        Storage.delete('scode');
+        Storage.delete('shildshop');
         if(this.state.ShopCar1>0){
+            this._setModalVisible();
             alert("商品未提交")
+        }else if(this.state.username==null){
+            this._setModalVisible();
         }else {
             // Storage.delete("Name");
             dbAdapter.selectUserRight(this.state.usercode,"K0803").then((rows) => {
                 if (rows == true) {
                     dbAdapter.selecUserRightA1012(this.state.usercode).then((rows) => {
                         if (rows == true) {
-                            Storage.save("invoice", "协配收货");
+                            Storage.save("invoice", "协配收货单");
                             var nextRoute = {
                                 name: "主页",
                                 component: ProductSH
@@ -761,23 +839,23 @@ export default class Index extends Component {
                             <ScrollView>
                                 <View style={styles.ModalViewList}>
                                     <TouchableOpacity style={styles.subView} onPress={this.Home.bind(this)}>
-                                        <Text style={styles.titleText}>要货</Text>
+                                        <Text style={styles.titleText}>要货单</Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity style={styles.subView} onPress={this.Home1.bind(this)}>
-                                        <Text style={styles.titleText}>损益</Text>
+                                        <Text style={styles.titleText}>损益单</Text>
                                     </TouchableOpacity>
                                 </View>
                                 <View style={styles.ModalViewList}>
                                     <TouchableOpacity style={styles.subView} onPress={this.Query.bind(this)}>
-                                        <Text style={styles.titleText}>实时盘点</Text>
+                                        <Text style={styles.titleText}>实时盘点单</Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity style={styles.subView} onPress={this.Query1.bind(this)}>
-                                        <Text style={styles.titleText}>商品盘点</Text>
+                                        <Text style={styles.titleText}>商品盘点单</Text>
                                     </TouchableOpacity>
                                 </View>
                                 <View style={styles.ModalViewList}>
                                     <TouchableOpacity style={styles.subView} onPress={this.Home2.bind(this)}>
-                                        <Text style={styles.titleText}>配送收货</Text>
+                                        <Text style={styles.titleText}>配送收货单</Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity style={styles.subView} onPress={this.Home3.bind(this)}>
                                         <Text style={styles.titleText}>数据更新</Text>
@@ -785,23 +863,23 @@ export default class Index extends Component {
                                 </View>
                                 <View style={styles.ModalViewList}>
                                     <TouchableOpacity style={styles.subView} onPress={this.Shopp.bind(this)}>
-                                        <Text style={styles.titleText}>商品采购</Text>
+                                        <Text style={styles.titleText}>商品采购单</Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity style={styles.subView} onPress={this.Shopp1.bind(this)}>
-                                        <Text style={styles.titleText}>商品验收</Text>
+                                        <Text style={styles.titleText}>商品验收单</Text>
                                     </TouchableOpacity>
                                 </View>
                                 <View style={styles.ModalViewList}>
                                     <TouchableOpacity style={styles.subView} onPress={this.Shopp2.bind(this)}>
-                                        <Text style={styles.titleText}>协配采购</Text>
+                                        <Text style={styles.titleText}>协配采购单</Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity style={styles.subView} onPress={this.Shopp3.bind(this)}>
-                                        <Text style={styles.titleText}>协配收货</Text>
+                                        <Text style={styles.titleText}>协配收货单</Text>
                                     </TouchableOpacity>
                                 </View>
                                 <View style={styles.ModalViewList1}>
                                     <TouchableOpacity  style={styles.subView1} onPress={this.pullOut.bind(this)}>
-                                        <Text style={styles.titleText1}>退出账号</Text>
+                                        <Text style={styles.titleText1}>退出</Text>
                                     </TouchableOpacity>
                                 </View>
                             </ScrollView>
@@ -814,7 +892,7 @@ export default class Index extends Component {
                 </Modal>
                 <View style={styles.footer}>
                     <TouchableOpacity style={styles.Home} onPress={this.HISTORY.bind(this)}><Image source={require("../images/documents.png")}></Image><Text style={styles.home3}>历史单据</Text></TouchableOpacity>
-                    <TouchableOpacity style={styles.Home} onPress={this.HOME.bind(this)}><Image source={require("../images/home1.png")}></Image><Text style={styles.home2}>首页</Text></TouchableOpacity>
+                    <TouchableOpacity style={styles.Home}><Image source={require("../images/home1.png")}></Image><Text style={styles.home2}>首页</Text></TouchableOpacity>
                     <TouchableOpacity style={styles.Home} onPress={this.SHOP.bind(this)}>
                         <View>
                             <Image source={require("../images/shop.png")}>
@@ -829,7 +907,6 @@ export default class Index extends Component {
                     </TouchableOpacity>
                 </View>
             </View>
-
         );
     };
 }
@@ -1132,5 +1209,5 @@ const styles = StyleSheet.create({
     CloseText:{
         color:"#323232",
         fontSize:22
-    }
+    },
 });

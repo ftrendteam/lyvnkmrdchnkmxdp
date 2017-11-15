@@ -85,7 +85,7 @@ export default class PickedDate_list extends Component {
             for (let i = 0; i < this.dataRows.length; i++) {
                 // let temp = this.dataRows[0];
                 let dataRow = this.dataRows[i];
-                if (((dataRow.sCode + "").indexOf(value) >= 0)) {
+                if (((dataRow.shopcode + "").indexOf(value) >= 0)) {
                     // this.dataRows[0] = dataRow;
                     // this.dataRows[i] = temp;
                     var str = this.dataRows.splice(i,1);
@@ -136,7 +136,7 @@ export default class PickedDate_list extends Component {
                     <TextInput
                         autofocus="{true}"
                         returnKeyType="search"
-                        placeholder="搜索机构信息"
+                        placeholder="搜索机构编码"
                         placeholderTextColor="#bcbdc1"
                         underlineColorAndroid='transparent'
                         style={styles.searchContect}

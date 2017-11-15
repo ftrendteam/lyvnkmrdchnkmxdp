@@ -30,6 +30,7 @@ export default class ProductCG extends Component {
             Number:"",
             sCode1:"",
             suppcode1:"",
+            active:"",
         };
     }
 
@@ -63,21 +64,37 @@ export default class ProductCG extends Component {
         });
     }
 
+    SearchShopname(Suppcode) {
+        Suppcode = String(Suppcode);
+        this.setState({
+            suppcode1:Suppcode,
+        });
+
+    }
+
     Button(){
+        var date = new Date();
+        var data=JSON.stringify(date.getTime());
+        var str=this.state.sCode1;
+        var str1=this.state.suppcode1;
         if(this.state.sCode1==""){
             alert("请选择供应商")
+        }else if(this.state.suppcode1==""){
+            alert("请选择采购单")
         }else{
             var nextRoute={
                 name:"Index",
                 component:Index,
             };
             this.props.navigator.push(nextRoute);
-            Storage.save('OrgFormno',this.state.Number);
-            Storage.save('Name','商品验收');
+            Storage.save('OrgFormno',str1);
+            Storage.save('Name','商品验收单');
             Storage.save('valueOf','App_Client_ProYS');
             Storage.save('histoasry','App_Client_ProYSQ');
             Storage.save('historyClass','App_Client_ProYSDetailQ');
-            Storage.save("scode",this.state.sCode1)
+            Storage.save('ProYH','ProYS');
+            Storage.save('Date',data);
+            Storage.save("scode",str)
         }
     }
 
@@ -91,14 +108,6 @@ export default class ProductCG extends Component {
             }
         };
         this.props.navigator.push(nextRoute)
-    }
-
-    SearchShopname(Suppcode) {
-        Suppcode = String(Suppcode);
-        this.setState({
-            suppcode1:Suppcode,
-        });
-
     }
 
     render() {
@@ -235,8 +244,8 @@ const styles = StyleSheet.create({
         color:"#323232"
     },
     button:{
-        marginLeft:80,
-        marginRight:80,
+        marginLeft:60,
+        marginRight:60,
         paddingTop:8,
         paddingBottom:8,
         backgroundColor:"#f47882",

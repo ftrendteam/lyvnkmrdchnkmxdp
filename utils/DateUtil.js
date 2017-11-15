@@ -27,4 +27,5 @@ export default class DateUtil{
         date.setMinutes(parseInt(timeArray[1]));
         return date;
     }
+
 }

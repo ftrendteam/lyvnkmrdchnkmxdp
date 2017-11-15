@@ -34,6 +34,7 @@ export default class Search extends Component {
       super(props);
       this.state = {
           Search:"",
+          dataRows:"1",
           dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
       };
       this.dataRows = [];
@@ -81,7 +82,8 @@ export default class Search extends Component {
               this.dataRows.push(row);
           }
           this.setState({
-              dataSource:this.state.dataSource.cloneWithRows(this.dataRows)
+              dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
+              dataRows:this.dataRows
           })
       });
   }
@@ -141,12 +143,20 @@ export default class Search extends Component {
             <Text style={styles.ListText}>搜索“{this.state.Search}”相关内容</Text>
         </View>
         <View style={styles.BlockList}>
-             <ListView
-                dataSource={this.state.dataSource}
-                showsVerticalScrollIndicator={true}
-                renderRow={this._renderRow.bind(this)}
-                ref="myInput"
-              />
+            {
+                (this.state.dataRows=="")?
+                <View style={styles.Null}>
+                    <Text style={styles.NullText}>
+                        没有搜索到相关商品~~~
+                    </Text>
+                </View>:
+                <ListView
+                    dataSource={this.state.dataSource}
+                    showsVerticalScrollIndicator={true}
+                    renderRow={this._renderRow.bind(this)}
+                    ref="myInput"
+                />
+            }
         </View>
       </View>
     );
@@ -222,5 +232,15 @@ const styles = StyleSheet.create({
   },
     BlockText:{
       fontSize:16,
+    },
+    Null:{
+        marginLeft:25,
+        marginRight:25,
+        marginTop:120,
+    },
+    NullText:{
+        color:"#cccccc",
+        fontSize:20,
+        textAlign:"center"
     }
 });

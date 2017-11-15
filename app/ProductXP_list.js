@@ -78,7 +78,7 @@ export default class ProductXP_list extends Component {
     }
 
     pressPop(rowData){
-        var Data=rowData.shopname+rowData.shopcode;
+        var Data=rowData.shopcode;
         if(this.props.reloadShopname){
             this.props.reloadShopname(Data)
         }

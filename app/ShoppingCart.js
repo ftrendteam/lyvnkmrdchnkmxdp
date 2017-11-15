@@ -46,12 +46,17 @@ export default class ShoppingCart extends Component {
         this.state = {
             show:false,
             Show:false,
+            orgFormno:"",
             ShopNumber:"",
             ShopAmount:"",
             reqDetailCode:"",
             Remark:"",
             suppcode:"",
             shildshop:"",
+            IMEI:"",
+            ProYH:"",
+            Date:"",
+            active:"",
             dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
         };
         this.dataRows = [];
@@ -170,6 +175,25 @@ export default class ShoppingCart extends Component {
                 Userpwd: tags
             });
        });
+
+        Storage.get('IMEI').then((tags) => {
+            this.setState({
+                IMEI:tags
+            })
+        })
+
+        Storage.get('ProYH').then((tags) => {
+            this.setState({
+                ProYH:tags
+            })
+        })
+
+        Storage.get('Date').then((tags) => {
+            this.setState({
+                Date:tags
+            })
+        })
+
        this.modal();
        //查询shopInfo表中某品类的数量
        dbAdapter.selectShopInfo('1').then((rows)=>{
@@ -278,24 +302,37 @@ export default class ShoppingCart extends Component {
                     Sign: NetUtils.MD5("App_PosReq" + "##" +this.state.reqDetailCode + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',
                     username: this.state.Username,
                     usercode: this.state.Userpwd,
-                    //"SuppCode":this.state.suppcode,"ChildShop":
-                    DetailInfo1: {"ShopCode": tags, "OrgFormno": this.state.orgFormno, "ProMemo": this.state.Remark,"SuppCode":this.state.suppcode,"childshop":this.state.shildshop},
+                    DetailInfo1: {
+                        "ShopCode": tags,
+                        "OrgFormno": this.state.orgFormno,
+                        "ProMemo": this.state.Remark,
+                        "SuppCode":this.state.suppcode,
+                        "childshop":this.state.shildshop,
+                        "pdaGuid":this.state.IMEI,
+                        "pdgFormno":this.state.ProYH+this.state.Date
+                    },
                     DetailInfo2: this.dataRows,
                 };
+                alert(JSON.stringify(params));
                 FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
                     if(data.retcode == 1){
-                        alert("提交成功");
+                        // alert("提交成功");
                         dbAdapter.deleteData("shopInfo");
                         this.dataRows=[];
                         var price="";
+                        var date = new Date();
+                        var data=JSON.stringify(date.getTime());
                         this.setState({
                             dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
                             ShopNumber:price,
                             ShopAmount:price,
                             shopcar:"",
+                            active:data,
                         })
+                        Storage.save('Date',this.state.active);
                     }else{
-                        alert("提交失败");
+                        // alert("提交失败");
+                        // alert(JSON.stringify(data))
                     }
                 })
             })
@@ -383,7 +420,7 @@ export default class ShoppingCart extends Component {
             visible={this.state.show}
             onShow={() => {}}
             onRequestClose={() => {}} >
-                 <View style={styles.modalStyle}>
+                 <TouchableOpacity style={styles.modalStyle}  onPress={this._setModalVisible.bind(this)}>
                     <View style={styles.ModalView}>
                         <View style={styles.DanJu}>
                             <View style={styles.danju}><Text style={styles.DanText}>单据备注</Text></View>
@@ -404,13 +441,13 @@ export default class ShoppingCart extends Component {
                             })
                         }}/>
                     </View>
-                 </View>
+                 </TouchableOpacity>
             </Modal>
         </View>
         <View style={styles.footer}>
             <TouchableOpacity style={styles.Home} onPress={this.HISTORY.bind(this)}><Image source={require("../images/documents.png")}></Image><Text style={styles.home3}>历史单据</Text></TouchableOpacity>
             <TouchableOpacity style={styles.Home} onPress={this.HOME.bind(this)}><Image source={require("../images/home.png")}></Image><Text style={styles.home1}>首页</Text></TouchableOpacity>
-            <TouchableOpacity style={styles.Home} onPress={this.SHOP.bind(this)}>
+            <TouchableOpacity style={styles.Home}>
                 <View>
                    <Image source={require("../images/shop1.png")}>
                        {
@@ -431,7 +468,7 @@ export default class ShoppingCart extends Component {
           onRequestClose={() => {}} >
           <View style={styles.LoadCenter}>
               <View style={styles.loading}>
-                  <ActivityIndicator key="1" color="#414240" size="large" style={styles.activity}></ActivityIndicator>
+                  <ActivityIndicator key="1" color="#ffffff" size="large" style={styles.activity}></ActivityIndicator>
                   <Text style={styles.TextLoading}>加载中</Text>
               </View>
           </View>
@@ -665,13 +702,13 @@ const styles = StyleSheet.create({
       marginTop:200,
    },
    DanJu:{
-      height:45,
+      paddingTop:15,
+      paddingBottom:15,
       backgroundColor:"#fbced2",
       borderRadius:5,
    },
    DanText:{
       color:"#f47882",
-      lineHeight:30,
       textAlign:"center",
       fontSize:16,
    },

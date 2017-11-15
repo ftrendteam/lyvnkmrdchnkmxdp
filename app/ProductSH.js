@@ -32,6 +32,7 @@ export default class ProductCG extends Component {
             sCode1:"",
             shopname1:"",
             suppcode1:"",
+            active:"",
         };
     }
 
@@ -83,7 +84,19 @@ export default class ProductCG extends Component {
         });
     }
 
+    SearchShopname(Suppcode) {
+        Suppcode = String(Suppcode);
+        this.setState({
+            suppcode1:Suppcode,
+        });
+    }
+
     Button(){
+        var date = new Date();
+        var data=JSON.stringify(date.getTime());
+        var str=this.state.sCode1;
+        var str1=this.state.shopname1;
+        var str2=this.state.suppcode1;
         if(this.state.sCode1==""){
             alert("请选择供应商")
         }else if(this.state.shopname1==""){
@@ -94,14 +107,17 @@ export default class ProductCG extends Component {
                 component:Index,
             };
             this.props.navigator.push(nextRoute);
-            Storage.save('OrgFormno',this.state.Number);
-            Storage.save('Name','协配收货');
+            Storage.save('OrgFormno',str2);
+            Storage.save('Name','协配收货单');
             Storage.save('valueOf','App_Client_ProXPYS');
             Storage.save('history','App_Client_ProXPYSQ');
             Storage.save('historyClass','App_Client_ProXPDetailYSQ');
-            Storage.save("scode",this.state.sCode1);
-            Storage.save('shildshop',this.state.shopname1);
+            Storage.save('ProYH','ProXPYS');
             Storage.save('shopPandian','App_Client_NOYSXPCGQ');
+            Storage.save('Date',data);
+            Storage.save("scode",str);
+            Storage.save('shildshop',str1);
+
         }
     }
 
@@ -117,13 +133,6 @@ export default class ProductCG extends Component {
         this.props.navigator.push(nextRoute)
     }
 
-    SearchShopname(Suppcode) {
-        Suppcode = String(Suppcode);
-        this.setState({
-            suppcode1:Suppcode,
-        });
-
-    }
 
     render() {
         return (
@@ -280,8 +289,8 @@ const styles = StyleSheet.create({
         color:"#323232"
     },
     button:{
-        marginLeft:80,
-        marginRight:80,
+        marginLeft:60,
+        marginRight:60,
         paddingTop:8,
         paddingBottom:8,
         backgroundColor:"#f47882",

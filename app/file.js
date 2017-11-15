@@ -11,6 +11,7 @@ import {
   Text,
   View,
   Modal,
+  ToastAndroid,
   ActivityIndicator
 } from 'react-native';
 import admin from "./admin";
@@ -23,7 +24,7 @@ export default class file extends Component {
       super(props);
       this.state = {
           first:"",
-          show:true
+          show:false
       };
   }
   _setModalVisible() {
@@ -35,31 +36,31 @@ export default class file extends Component {
 
   componentWillMount(){
        Storage.get('FirstTime').then((tags) => {
-            if(tags == 1 ){
-                this._setModalVisible();
-                var nextRoute={
-                    name:"主页",
-                    component:Index
-                };
-                this.props.navigator.push(nextRoute);
-            }else {
-                var nextRoute={
-                    name:"主页",
-                    component:login
-                };
-                this.props.navigator.push(nextRoute)
-            }
+           Storage.get('FirstTime1').then((FirstTime1) => {
+                if(tags == 1&&FirstTime1==2){
+                    this._setModalVisible();
+                    var nextRoute={
+                        name:"主页",
+                        component:Index
+                    };
+                    this.props.navigator.push(nextRoute);
+                    this._setModalVisible();
+                    ToastAndroid.show('登录成功', ToastAndroid.SHORT);
+                }else if(tags == 1){
+                    var nextRoute={
+                        name:"主页",
+                        component:admin
+                    };
+                    this.props.navigator.push(nextRoute);
+                }else{
+                    var nextRoute={
+                        name:"主页",
+                        component:login
+                    };
+                    this.props.navigator.push(nextRoute);
+                }
+           })
        });
-
-       // Storage.get('username').then((tags) => {
-       //    if(tags==null){
-       //        var nextRoute={
-       //            name:"主页",
-       //            component:admin
-       //        };
-       //        this.props.navigator.push(nextRoute)
-       //    }
-       // })
   }
   render() {
     return (
@@ -87,8 +88,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#000000',
-    opacity:0.5
+    backgroundColor:'rgba(0,0,0,0)',
   },
     LoadCenter:{
         flex:1,
