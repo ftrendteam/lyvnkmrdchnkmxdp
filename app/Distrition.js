@@ -63,10 +63,13 @@ export default class Distrition extends Component {
             name:"主页",
             component:Search
         };
-        this.props.navigator.push(nextRoute)
+        this.props.navigator.push(nextRoute);
+        Storage.delete('YuanDan');
+        Storage.delete('Screen');
         Storage.save('OrgFormno',str);
         Storage.save('Date',data);
         Storage.save('Name','配送收货单');
+        Storage.save('FormType','PSSHYW');
         Storage.save('valueOf','App_Client_ProPSSH');
         Storage.save('history','App_Client_ProPSSHQ');
         Storage.save('historyClass','App_Client_ProPSSHDetailQ');
@@ -85,6 +88,7 @@ export default class Distrition extends Component {
             component:Index
         };
         this.props.navigator.push(nextRoute);
+        Storage.delete('YuanDan');
         Storage.save('OrgFormno',str);
         Storage.save("scode",str);
         Storage.save('Date',this.state.active);

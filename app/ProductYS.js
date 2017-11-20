@@ -82,6 +82,8 @@ export default class ProductCG extends Component {
         }else if(this.state.suppcode1==""){
             alert("请选择采购单")
         }else{
+            Storage.delete('YuanDan');
+            Storage.delete('Screen');
             var nextRoute={
                 name:"Index",
                 component:Index,
@@ -89,10 +91,13 @@ export default class ProductCG extends Component {
             this.props.navigator.push(nextRoute);
             Storage.save('OrgFormno',str1);
             Storage.save('Name','商品验收单');
+            Storage.save('FormType','YSYW');
             Storage.save('valueOf','App_Client_ProYS');
             Storage.save('histoasry','App_Client_ProYSQ');
             Storage.save('historyClass','App_Client_ProYSDetailQ');
             Storage.save('ProYH','ProYS');
+            Storage.save('YuanDan','1');
+            Storage.save('Screen','1');
             Storage.save('Date',data);
             Storage.save("scode",str)
         }

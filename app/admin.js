@@ -217,7 +217,7 @@ export default class admin extends Component {
                                 Usercode:value
                             })
                         }}/>
-                    <Image source={require("../images/admin.png")} style={styles.TextImage}></Image>
+                    <Image source={require("../images/1_07.png")} style={styles.TextImage1}></Image>
                 </View>
                 <View style={[styles.TextInput,{marginTop:15}]}>
                     <TextInput
@@ -237,7 +237,7 @@ export default class admin extends Component {
                             })
                         }}
                         />
-                    <Image source={require("../images/admin1.png")} style={styles.TextImage1}></Image>
+                    <Image source={require("../images/1_11.png")} style={styles.TextImage1}></Image>
                 </View>
                 <View style={[styles.TextInput,{marginTop:15}]}>
                     <TouchableOpacity onPress={this.PickedDate.bind(this)}>
@@ -256,7 +256,7 @@ export default class admin extends Component {
                                 })
                             }}
                         />
-                        <Image source={require("../images/admin1.png")} style={styles.TextImage1}></Image>
+                        <Image source={require("../images/1_14.png")} style={styles.TextImage1}></Image>
                     </TouchableOpacity>
                 </View>
                 <TouchableOpacity onPress={this.pressPush.bind(this)}>
@@ -298,7 +298,7 @@ export default class admin extends Component {
                 </Modal>
             </ScrollView>
             <TouchableOpacity style={styles.refresh}>
-                <Image source={require("../images/refresh.png")}></Image>
+                <Image source={require("../images/1_21.png")}></Image>
                 <Text style={styles.DataText}>数据更新</Text>
             </TouchableOpacity>
       </Image>
@@ -363,7 +363,6 @@ const styles = StyleSheet.create({
     marginLeft:10,
     color:"#ffffff",
     fontSize:16,
-    marginTop:3,
   },
   TextImage:{
       position:"absolute",
@@ -373,7 +372,7 @@ const styles = StyleSheet.create({
   TextImage1:{
       position:"absolute",
       left:14,
-      top:10,
+      top:15,
   },
   modalStyle:{
     backgroundColor:"#ffffff",

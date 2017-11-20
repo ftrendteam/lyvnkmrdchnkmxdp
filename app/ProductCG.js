@@ -77,7 +77,10 @@
                  component:Index,
              };
              this.props.navigator.push(nextRoute);
+             Storage.delete('YuanDan');
+             Storage.delete('Screen');
              Storage.save('Name','商品采购单');
+             Storage.save('FormType','CGYW');
              Storage.save('valueOf','App_Client_ProCG');
              Storage.save('history','App_Client_ProCGQ');
              Storage.save('historyClass','App_Client_ProCGDetailQ');

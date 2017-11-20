@@ -278,7 +278,7 @@ export default class HistoricalDocument extends Component {
             <View style={styles.cont}>
                 <Text style={styles.HeaderList}>{this.state.name}</Text>
                 <TouchableOpacity onPress={this.pressPush.bind(this)} style={styles.onclick}>
-                    <Image source={require("../images/search1.png")} style={styles.HeaderImage}></Image>
+                    <Image source={require("../images/1_08.png")} style={styles.HeaderImage}></Image>
                 </TouchableOpacity>
             </View>
         </View>
@@ -290,11 +290,11 @@ export default class HistoricalDocument extends Component {
             />
         </View>
         <View style={styles.footer}>
-            <TouchableOpacity style={styles.Home}><Image source={require("../images/documents1.png")}></Image><Text style={styles.home2}>历史单据</Text></TouchableOpacity>
-            <TouchableOpacity style={styles.Home} onPress={this.HOME.bind(this)}><Image source={require("../images/home.png")}></Image><Text style={styles.home1}>首页</Text></TouchableOpacity>
+            <TouchableOpacity style={styles.Home}><Image source={require("../images/1_30.png")}></Image><Text style={styles.home2}>历史单据查询</Text></TouchableOpacity>
+            <TouchableOpacity style={styles.Home} onPress={this.HOME.bind(this)}><Image source={require("../images/1_311.png")}></Image><Text style={styles.home1}>商品</Text></TouchableOpacity>
             <TouchableOpacity style={styles.Home} onPress={this.SHOP.bind(this)}>
                  <View>
-                    <Image source={require("../images/shop.png")}>
+                    <Image source={require("../images/1_322.png")}>
                         {
                            (this.state.shopcar==0)?
                             null:
@@ -325,62 +325,55 @@ export default class HistoricalDocument extends Component {
 const styles = StyleSheet.create({
  container:{
     flex:1,
-    backgroundColor:"#ffffff",
+    backgroundColor:"#f2f2f2",
  },
  header:{
-    height:50,
-    backgroundColor:"#f47882",
-    paddingTop:10,
-    borderBottomWidth:1,
-    borderBottomColor:"#cacccb"
+     height:60,
+     backgroundColor:"#ff4f4d",
+     paddingTop:10,
  },
  cont:{
     flexDirection:"row",
-    marginLeft:25,
-    marginRight:25,
+    paddingLeft:16,
+    paddingRight:16,
  },
  HeaderImage1:{
     marginRight:25,
     marginTop:5
  },
- onclick:{
-    width:30,
- },
- HeaderImage:{
-    marginTop:5,
- },
  HeaderList:{
-    marginTop:4,
     flex:6,
     textAlign:"center",
     color:"#ffffff",
-    fontSize:18,
+    fontSize:22,
  },
  Cont:{
-    marginLeft:25,
-    marginRight:25,
-    paddingLeft:35,
-    paddingRight:35,
-    borderBottomWidth:1,
-    borderBottomColor:"#e5e5e5"
+     marginBottom:10,
+     marginLeft:10,
+     marginRight:10,
+     backgroundColor:"#ffffff",
+     paddingLeft:20,
+     paddingRight:20,
+     paddingTop:12,
+     paddingBottom:12,
+     borderRadius:5,
  },
  ContList:{
-    paddingTop:10,
-    paddingBottom:10,
  },
  List:{
     flexDirection:"row",
-    fontSize:16,
+    fontSize:14,
  },
  ListLeft:{
-    color:"#636363",
+    color:"#666666",
  },
  ListRight:{
-    color:"#323232",
+    color:"#333333",
     lineHeight:28,
  },
  Rolling:{
-    flex:12,
+    flex:15,
+    paddingTop:10,
  },
  centering:{
     position:"absolute",
@@ -402,18 +395,18 @@ const styles = StyleSheet.create({
   Home:{
      flex:1,
      alignItems: 'center',
-     paddingTop:15,
+     paddingTop:7,
      backgroundColor:"#ffffff",
   },
   home1:{
-    color:'black',
-    fontSize:18,
+    color:'#999999',
+    fontSize:12,
     marginTop:5,
     flex:1,
   },
   home2:{
-     color:'#f47882',
-     fontSize:17,
+     color:'#ff4e4e',
+     fontSize:12,
      marginTop:5,
      flex:1,
   },

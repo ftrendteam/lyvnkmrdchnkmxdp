@@ -14,13 +14,15 @@ import {
   ListView,
   TextInput,
   TouchableOpacity,
-  DeviceEventEmitter
+  DeviceEventEmitter,
+  InteractionManager
 } from 'react-native';
 
 import Index from "./Index";
 import Code from "./Code";
 import OrderDetails from "./OrderDetails2";
 import NetUtils from "../utils/NetUtils";
+import FetchUtil from "../utils/FetchUtils";
 import DBAdapter from "../adapter/DBAdapter";
 import Storage from '../utils/Storage';
 
@@ -40,38 +42,64 @@ export default class Search extends Component {
       this.dataRows = [];
   }
 
+  componentDidMount(){
+    InteractionManager.runAfterInteractions(() => {
+        this.Storage();
+    });
+  }
+
+  Storage(){
+    Storage.get('Name').then((tags) => {
+        this.setState({
+            head:tags
+        })
+    });
+
+    Storage.get('username').then((tags) => {
+        this.setState({
+            username:tags
+        })
+    });
+
+    Storage.get('ClientCode').then((tags)=>{
+        this.setState({
+            ClientCode:tags
+        })
+    })
+
+    Storage.get('Usercode').then((tags)=>{
+        this.setState({
+            Usercode:tags
+        })
+    })
+
+    Storage.get('code').then((tags)=>{
+        this.setState({
+            ShopCode:tags
+        })
+    })
+
+    Storage.get('shildshop').then((tags)=>{
+        this.setState({
+            ChildShopCode:tags
+        })
+    })
+
+    Storage.get('OrgFormno').then((tags)=>{
+        this.setState({
+            OrgFormno:tags
+        })
+    })
+
+  }
+
+
   pressPop(){
       var nextRoute={
          name:"主页",
          component:Index,
       };
       this.props.navigator.push(nextRoute);
-  }
-
-  Code(){
-      RNScannerAndroid.openScanner();
-      DeviceEventEmitter.addListener("code", (reminder) => {
-          dbAdapter.selectAidCode(reminder,1).then((rows)=>{
-              if(rows.length==0){
-                  alert("该商品不存在")
-              }else{
-                  var ShopCar = rows.item(0).ProdName;
-                  this.props.navigator.push({
-                      component:OrderDetails,
-                      params:{
-                          ProdName:rows.item(0).ProdName,
-                          ShopPrice:rows.item(0).ShopPrice,
-                          Pid:rows.item(0).Pid,
-                          countm:rows.item(0).ShopNumber,
-                          promemo:rows.item(0).promemo,
-                          prototal:rows.item(0).prototal,
-                          ProdCode:rows.item(0).ProdCode,
-                          DepCode:rows.item(0).DepCode1,
-                      }
-                  })
-              }
-          })
-      })
   }
 
   inputOnBlur(value){
@@ -91,7 +119,7 @@ export default class Search extends Component {
   _renderRow(rowData, sectionID, rowID){
       return (
           <View style={styles.Block}>
-              <TouchableOpacity onPress={()=>this.OrderDetails(rowData)}>
+              <TouchableOpacity onPress={()=>this.OrderDetails(rowData)} underlayColor={'red'} >
                  <Text style={styles.BlockText}>{rowData.ProdName}</Text>
               </TouchableOpacity>
           </View>
@@ -99,19 +127,59 @@ export default class Search extends Component {
   }
 
   OrderDetails(rowData){
-     this.props.navigator.push({
-        component:OrderDetails,
-        params:{
-            ProdName:rowData.ProdName,
-            ShopPrice:rowData.StdPrice,
-            Pid:rowData.Pid,
-            countm:rowData.ShopNumber,
-            promemo:rowData.promemo,
-            prototal:rowData.prototal,
-            ProdCode:rowData.ProdCode,
-            DepCode:rowData.DepCode1,
-        }
-     })
+      Storage.get('FormType').then((tags)=>{
+          this.setState({
+              FormType:tags
+          })
+      })
+
+      Storage.get('LinkUrl').then((tags) => {
+          this.setState({
+              LinkUrl:tags
+          })
+      })
+      //商品查询
+      Storage.get('userName').then((tags)=>{
+          let params = {
+              reqCode:"App_PosReq",
+              reqDetailCode:"App_Client_CurrProdQry",
+              ClientCode:this.state.ClientCode,
+              sDateTime:Date.parse(new Date()),
+              Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
+              username:tags,
+              usercode:this.state.Usercode,
+              SuppCode:rowData.SuppCode,
+              ShopCode:this.state.ShopCode,
+              ChildShopCode:this.state.ChildShopCode,
+              ProdCode:rowData.ProdCode,
+              OrgFormno:this.state.OrgFormno,
+              FormType:this.state.FormType,
+          };
+          FetchUtil.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
+              var countm=JSON.stringify(data.countm);
+              var ShopPrice=JSON.stringify(data.ShopPrice);
+              if(data.retcode == 1){
+                  // if(data.isFond==1){
+                  this.props.navigator.push({
+                      component:OrderDetails,
+                      params:{
+                          ProdName:rowData.ProdName,
+                          ShopPrice:rowData.StdPrice,
+                          Pid:rowData.Pid,
+                          countm:rowData.ShopNumber,
+                          promemo:rowData.promemo,
+                          prototal:rowData.prototal,
+                          ProdCode:rowData.ProdCode,
+                          DepCode:rowData.DepCode1,
+                          ydcountm:countm,
+                      }
+                  })
+                  // }else{
+                  //     // alert('该商品暂时无法购买')
+                  // }
+              }else{}
+          })
+      })
   }
 
   render() {
@@ -122,8 +190,8 @@ export default class Search extends Component {
              style={styles.Search}
              value={this.state.Number}
              returnKeyType="search"
-             placeholder="搜索商品名称"
-             placeholderColor="#afafaf"
+             placeholder="请输入搜索商品名称"
+             placeholderColor="#999999"
              underlineColorAndroid='transparent'
              onChangeText={(value)=>{
                  this.setState({
@@ -132,15 +200,10 @@ export default class Search extends Component {
                  this.inputOnBlur(value)
              }}
              />
+            <Image source={require("../images/2.png")} style={styles.SearchImage} />
             <View style={styles.Right}>
-                <TouchableOpacity onPress={this.Code.bind(this)} style={styles.HeaderImage1}>
-                    <Image source={require("../images/sm.png")}></Image>
-                </TouchableOpacity>
                 <TouchableOpacity style={styles.Text1}><Text style={styles.Text} onPress={this.pressPop.bind(this)}>取消</Text></TouchableOpacity>
             </View>
-        </View>
-        <View style={styles.list}>
-            <Text style={styles.ListText}>搜索“{this.state.Search}”相关内容</Text>
         </View>
         <View style={styles.BlockList}>
             {
@@ -166,27 +229,36 @@ export default class Search extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f1f5f6',
+    backgroundColor: '#f2f2f2',
   },
   Title:{
-    height:60,
-    backgroundColor:"#ffffff",
-    paddingLeft:15,
-    paddingRight:15,
-    paddingTop:13,
+    backgroundColor:"#ff4e4e",
+    paddingLeft:16,
+    paddingRight:16,
+    paddingTop:15,
+    paddingBottom:15,
     flexDirection:"row",
     borderBottomWidth:1,
     borderBottomColor:"#cacccb"
   },
+    SearchImage:{
+      position:"absolute",
+        top:22,
+        left:24,
+    },
   Search:{
-    borderRadius:5,
-    backgroundColor:"#f2f5f6",
-    color: "#323232",
-    height:35,
-    flex:5,
+    borderRadius:30,
+    backgroundColor:"#ffffff",
+    color: "#333333",
+    paddingLeft:46,
+    paddingBottom:15,
+    paddingTop:6,
+    paddingBottom:6,
+    fontSize:14,
+    flex:1,
   },
   Right:{
-    flex:2,
+    width:60,
     flexDirection:"row",
     paddingTop:3,
     paddingLeft:6
@@ -196,11 +268,13 @@ const styles = StyleSheet.create({
       marginLeft:20,
   },
   Text1:{
-    flex:1,
+    flex:1
   },
   Text:{
     fontSize:16,
-    marginTop:2
+    color:"#ffffff",
+      paddingTop:5,
+      paddingLeft:10,
   },
   BlockList:{
     flex:1,
@@ -210,28 +284,18 @@ const styles = StyleSheet.create({
   Row:{
     flexDirection:"row",
   },
-  list:{
-    height:60,
+  Block:{
+    paddingTop:15,
+    paddingBottom:15,
     paddingLeft:25,
     paddingRight:25,
-  },
-  ListText:{
-    color:"#323232",
-    fontSize:16,
-    marginTop:20,
-  },
-  Block:{
-    flex:3,
-    paddingTop:20,
-    paddingBottom:20,
-    marginLeft:25,
-    marginRight:25,
     borderBottomWidth:1,
-    borderBottomColor:"#e5e5e5",
+    borderBottomColor:"#f2f2f2",
     backgroundColor:"#ffffff"
   },
     BlockText:{
-      fontSize:16,
+      fontSize:14,
+      color:"#333333"
     },
     Null:{
         marginLeft:25,

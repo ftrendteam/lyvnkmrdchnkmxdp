@@ -66,9 +66,12 @@ export default class Query extends Component {
 
             var date = new Date();
             var data=JSON.stringify(date.getTime());
+            Storage.delete('YuanDan');
+            Storage.delete('Screen');
             Storage.save('OrgFormno',str);
             Storage.save('Date',data);
             Storage.save('Name','商品盘点单');
+            Storage.save('FormType','PCYW');
             Storage.save('valueOf','App_Client_ProPSSH');
             Storage.save('history','App_Client_ProPSSHQ');
             Storage.save('historyClass','App_Client_ProPSSHDetailQ');
@@ -88,7 +91,7 @@ export default class Query extends Component {
                 component:Index
             };
             this.props.navigator.push(nextRoute);
-
+            Storage.delete('YuanDan');
             Storage.save('OrgFormno',str);
             Storage.save('Date',data);
             Storage.save('Name','商品盘点单');

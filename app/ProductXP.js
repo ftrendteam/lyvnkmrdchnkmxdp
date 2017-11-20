@@ -92,16 +92,21 @@ export default class ProductCG extends Component {
         }else if(this.state.shopname1==""){
             alert("请选择机构")
         }else{
+            Storage.delete('YuanDan');
+            Storage.delete('Screen');
             var nextRoute={
                 name:"Index",
                 component:Index,
             };
             this.props.navigator.push(nextRoute);
             Storage.save('Name','协配采购单');
+            Storage.save('FormType','XPCGYW');
             Storage.save('valueOf','App_Client_ProXPCG');
             Storage.save('history','App_Client_ProXPCGQ');
             Storage.save('historyClass','App_Client_ProXPDetailCGQ');
             Storage.save('ProYH','ProXPCG');
+            Storage.save('YuanDan','1');
+            Storage.save('Screen','1');
             Storage.save('Date',data);
             Storage.save("scode",str);
             Storage.save('shildshop',str1)

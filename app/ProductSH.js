@@ -102,6 +102,8 @@ export default class ProductCG extends Component {
         }else if(this.state.shopname1==""){
             alert("请选择机构")
         }else{
+            Storage.delete('YuanDan');
+            Storage.delete('Screen');
             var nextRoute={
                 name:"Index",
                 component:Index,
@@ -109,10 +111,13 @@ export default class ProductCG extends Component {
             this.props.navigator.push(nextRoute);
             Storage.save('OrgFormno',str2);
             Storage.save('Name','协配收货单');
+            Storage.save('FormType','XPYSYW');
             Storage.save('valueOf','App_Client_ProXPYS');
             Storage.save('history','App_Client_ProXPYSQ');
             Storage.save('historyClass','App_Client_ProXPDetailYSQ');
             Storage.save('ProYH','ProXPYS');
+            Storage.save('YuanDan','1');
+            Storage.save('Screen','1');
             Storage.save('shopPandian','App_Client_NOYSXPCGQ');
             Storage.save('Date',data);
             Storage.save("scode",str);

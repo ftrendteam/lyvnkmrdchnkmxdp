@@ -116,38 +116,42 @@ export default class Enquiries extends Component {
     return (
       <View style={styles.container}>
           <ScrollView style={styles.ScrollView} scrollEnabled={false}>
-            <View style={styles.Title}>
-                <TouchableOpacity onPress={this.Return.bind(this)} style={styles.HeaderImage}>
-                     <Image source={require("../images/left.png")}></Image>
-                </TouchableOpacity>
-                <Text style={styles.Text}>{this.state.name}查询</Text>
-            </View>
+              <View style={styles.header}>
+                  <View style={styles.cont}>
+                      <TouchableOpacity onPress={this.Return.bind(this)}>
+                          <Image source={require("../images/2_01.png")} style={styles.HeaderImage}></Image>
+                      </TouchableOpacity>
+                      <Text style={styles.HeaderList}>{this.state.name}查询</Text>
+                  </View>
+              </View>
             <View style={styles.Content}>
                 <View style={styles.ContList}>
-                    <Text style={styles.ContLeft}>开始日期：</Text>
-                    <Text style={styles.ContLeft} onPress={(data)=>{this.showDateTimePicker(true)}}>{this.state.startDate.toString()}</Text>
+                    <Text style={styles.ContLeft}>开始日期</Text>
+                    <Text style={styles.Contright} onPress={(data)=>{this.showDateTimePicker(true)}}>{this.state.startDate.toString()}</Text>
                     <DateTimePicker ref={(picker)=>{this.picker=picker}}/>
                 </View>
                 <View style={styles.ContList}>
-                    <Text style={styles.ContLeft}>结束日期：</Text>
-                    <Text style={styles.ContLeft} onPress={(data)=>{this.showDateTimePicker(false)}}>{this.state.endDate.toString()}</Text>
+                    <Text style={styles.ContLeft}>结束日期</Text>
+                    <Text style={styles.Contright} onPress={(data)=>{this.showDateTimePicker(false)}}>{this.state.endDate.toString()}</Text>
                     <DateTimePicker ref={(picker)=>{this.picker=picker}}/>
                 </View>
                 <View style={styles.ContList}>
-                    <Text style={styles.ContLeft3}>门店：</Text>
+                    <Text style={styles.ContLeft}>门店</Text>
                     <Text style={styles.ContLeft1}>{this.state.reqDetailCode}</Text>
                 </View>
                 {
-                    (this.state.name=="商品采购"||this.state.name=="商品验收"||this.state.name=="协配采购"||this.state.name=="协配收货")?
+                    (this.state.name=="商品采购单"||this.state.name=="商品验收单"||this.state.name=="协配采购单"||this.state.name=="协配收货单")?
                     <View style={styles.ContList}>
-                        <Text style={styles.ContLeft3}>供应商编码：</Text>
+                        <Text style={styles.ContLeft}>供应商编码</Text>
                         <Text style={styles.ContLeft1}>{this.state.suppcode}</Text>
                     </View>:null
                 }
                 <View style={styles.ContList}>
-                    <Text style={styles.ContLeft2}>单据号：</Text>
+                    <Text style={styles.ContLeft}>单据号</Text>
                     <TextInput
                     underlineColorAndroid='transparent'
+                    placeholder="请输入单据号"
+                    placeholderTextColor="#999999"
                     style={styles.ContRight}
                     onChangeText={(value)=>{
                         this.setState({
@@ -156,9 +160,11 @@ export default class Enquiries extends Component {
                     }}/>
                 </View>
                 <View style={styles.ContList}>
-                    <Text style={styles.ContLeft2}>商品编码：</Text>
+                    <Text style={styles.ContLeft}>商品编码</Text>
                     <TextInput
                     underlineColorAndroid='transparent'
+                    placeholder="请输入商品编码"
+                    placeholderTextColor="#999999"
                     style={styles.ContRight}
                     onChangeText={(value)=>{
                         this.setState({
@@ -184,32 +190,26 @@ export default class Enquiries extends Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#ffffff',
+        backgroundColor: '#f2f2f2',
     },
-        Title:{
-        height:50,
-        backgroundColor:"#f47882",
-        paddingLeft:15,
-        paddingRight:15,
+    header:{
+        height:60,
+        backgroundColor:"#ff4f4d",
         paddingTop:10,
+    },
+    cont:{
         flexDirection:"row",
-        borderBottomWidth:1,
-        borderBottomColor:"#cacccb"
+        paddingLeft:16,
+        paddingRight:16,
     },
-    HeaderImage:{
-        width:30,
-        height:26,
-        marginTop:5,
-    },
-    Text:{
-        flex:8,
+    HeaderList:{
+        flex:6,
         textAlign:"center",
-        fontSize:18,
-        color:"#ffffff"
+        color:"#ffffff",
+        fontSize:22,
+        marginTop:2,
     },
     Content:{
-        marginLeft:15,
-        marginRight:15,
         marginBottom:30,
     },
     ContList:{
@@ -217,60 +217,59 @@ const styles = StyleSheet.create({
         borderBottomColor:"#f5f5f5",
         flexDirection:"row",
         height:55,
+        paddingTop:15,
         paddingLeft:25,
+        backgroundColor:"#ffffff",
+        borderBottomColor:"#f2f2f2",
+        borderBottomWidth:1,
     },
     ContLeft:{
-        width:100,
-        lineHeight:35,
-        color:"#636363",
+        color:"#666666",
         fontSize:16,
+        width:115,
+        textAlign:"right"
     },
-    ContLeft2:{
-        width:100,
-        lineHeight:35,
-        color:"#636363",
-        fontSize:16,
+    Contright:{
+        color:"#333333",
+        marginLeft:15,
     },
     ContLeft1:{
         flex:8,
-        lineHeight:35,
-        color:"#636363",
+        color:"#333333",
         fontSize:16,
-    },
-    ContLeft3:{
-        width:100,
-        lineHeight:35,
-        color:"#636363",
-        fontSize:16,
+        marginLeft:15,
     },
     ContRight:{
         flex:8,
-        color:"#636363",
+        color:"#333333",
         fontSize:16,
     },
     Emptying:{
         borderWidth:1,
-        borderColor:"#cccccc",
+        borderColor:"#ff4e4e",
         borderRadius:5,
-        marginLeft:15,
-        marginRight:15,
-        paddingTop:10,
-        paddingBottom:10,
+        marginLeft:25,
+        marginRight:25,
+        paddingTop:13,
+        paddingBottom:13,
+        backgroundColor:"#ffffff"
     },
     EmptyingTxt:{
-        color:"#cccccc",
+        color:"#ff4e4e",
         textAlign:"center",
-        fontSize:16,
+        fontSize:18,
     },
     button:{
-        marginTop:50,
+        marginTop:30,
+        marginLeft:25,
+        marginRight:25,
+        backgroundColor:"#ff4e4e",
+        borderRadius:5,
+        paddingTop:13,
+        paddingBottom:13,
     },
     ButtonText:{
         color:"#ffffff",
-        backgroundColor:"#f47882",
-        height:40,
-        lineHeight:30,
-        borderRadius:5,
         textAlign:"center",
         fontSize:18,
     }

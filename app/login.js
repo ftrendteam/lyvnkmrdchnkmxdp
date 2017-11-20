@@ -127,7 +127,7 @@ export default class  login extends Component{
                                     ClientCode:value
                                 })
                             }}/>
-                        <Image source={require("../images/admin.png")} style={styles.TextImage}></Image>
+                        <Image source={require("../images/1_11.png")} style={styles.TextImage1}></Image>
                     </View>
                     <View style={styles.TextInput}>
                         <TextInput
@@ -147,7 +147,7 @@ export default class  login extends Component{
                                 })
                             }}
                         />
-                        <Image source={require("../images/look.png")} style={styles.TextImage1}></Image>
+                        <Image source={require("../images/1_04.png")} style={styles.TextImage1}></Image>
                     </View>
                     <TouchableOpacity onPress={this.pressPush.bind(this)}>
                         <Text style={styles.login}>确定</Text>
@@ -238,15 +238,10 @@ const styles = StyleSheet.create({
         textAlign:"center",
         fontSize:18,
     },
-    TextImage:{
-        position:"absolute",
-        left:12,
-        top:8,
-    },
     TextImage1:{
         position:"absolute",
         left:14,
-        top:10,
+        top:15,
     },
     LoadCenter:{
         flex:1,

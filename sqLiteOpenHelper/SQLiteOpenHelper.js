@@ -139,7 +139,7 @@ export default class SQLiteOpenHelper {
         });
       //Pid,ProdCode,prodname,countm,ShopPrice,prototal,promemo,kccount
       tx.executeSql("CREATE TABLE IF NOT EXISTS shopInfo(pid int not null Primary Key,ProdCode varchar(20) null,prodname varchar(255) null,countm float(8) null," +
-        "ShopPrice float(8) null,prototal float(8) null,promemo varchar(50) null,DepCode varchar(20) null,ydcountm int(255) null)", [],
+        "ShopPrice float(8) null,prototal float(8) null,promemo varchar(50) null,DepCode varchar(20) null,ydcountm int(255) null,SuppCode varchar(50) null)", [],
         () => {
         
         }, (err) => {

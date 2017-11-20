@@ -33,7 +33,7 @@ export default class GoodsDetails extends Component {
              dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
              Formno:this.props.Formno ? this.props.Formno : "",
              FormDate:this.props.FormDate ? this.props.FormDate : "",
-             promemo:this.props.promemo ? this.props.promemo : "",
+             promemo:this.props.promemo ? this.props.promemo : "无",
           };
           this.dataRows = [];
     }
@@ -126,19 +126,21 @@ export default class GoodsDetails extends Component {
         return (
             <View style={styles.ShopList1}>
                 <Text style={styles.Name1}>{rowData.prodname}</Text>
-                <Text style={styles.ShopPrice1}>{rowData.prototal}</Text>
-                <Text style={styles.ShopNumber1}>{rowData.countm}件</Text>
+                <Text style={styles.Name1}>{rowData.prototal}</Text>
+                <Text style={styles.Name1}>{rowData.countm}</Text>
             </View>
         );
    }
   render() {
     return (
       <View style={styles.container}>
-        <View style={styles.Title}>
-            <TouchableOpacity onPress={this.GoodsDetails.bind(this)} style={styles.HeaderImage}>
-                 <Image source={require("../images/left.png")}></Image>
-            </TouchableOpacity>
-            <Text style={styles.Text}>{this.state.Formno}</Text>
+        <View style={styles.header}>
+            <View style={styles.cont}>
+                <TouchableOpacity onPress={this.GoodsDetails.bind(this)}>
+                    <Image source={require("../images/2_01.png")} style={styles.HeaderImage}></Image>
+                </TouchableOpacity>
+                <Text style={styles.HeaderList}>{this.state.Formno}</Text>
+            </View>
         </View>
         <View style={styles.Cont}>
             <View style={styles.List}>
@@ -156,7 +158,6 @@ export default class GoodsDetails extends Component {
             <View style={styles.List}>
                 <View style={styles.ListLeft}>
                     <Text style={styles.ListText}>单据备注：</Text>
-                    <Text style={styles.write}></Text>
                     <Text style={styles.ListText}>{this.state.promemo}</Text>
                 </View>
             </View>
@@ -191,8 +192,8 @@ export default class GoodsDetails extends Component {
         <View style={styles.ShopCont}>
             <View style={styles.ShopList}>
                 <Text style={styles.Name}>名称</Text>
-                <Text style={styles.ShopPrice}>金额</Text>
-                <Text style={styles.ShopNumber}>数量</Text>
+                <Text style={styles.Name}>金额</Text>
+                <Text style={styles.Name}>数量</Text>
             </View>
             <ListView
             style={styles.listViewStyle}
@@ -207,111 +208,83 @@ export default class GoodsDetails extends Component {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#ffffff',
-  },
-   Title:{
-      height:60,
-      backgroundColor:"#f47882",
-      paddingLeft:25,
-      paddingRight:25,
-      paddingTop:13,
-      flexDirection:"row",
-      borderBottomWidth:2,
-      borderBottomColor:"#e36871",
-   },
-   HeaderImage:{
-      width:30,
-      height:26,
-      marginTop:5,
-   },
-   Text:{
-      flex:8,
-      textAlign:"center",
-      fontSize:18,
-      color:"#ffffff"
-   },
-   Cont:{
-    paddingLeft:25,
-    paddingRight:25,
-    paddingTop:15,
-    backgroundColor:"#f47882"
+    container: {
+        flex: 1,
+        backgroundColor: '#f2f2f2',
+    },
+    header:{
+        height:60,
+        backgroundColor:"#ff4f4d",
+        paddingTop:10,
+    },
+    cont:{
+        flexDirection:"row",
+        paddingLeft:16,
+        paddingRight:16,
+    },
+    HeaderList:{
+        flex:6,
+        textAlign:"center",
+        color:"#ffffff",
+        fontSize:22,
+        marginTop:2,
+    },
+    Cont:{
+        paddingLeft:25,
+        paddingRight:25,
+        paddingTop:15,
+        backgroundColor:"#fffbe7"
    },
    List:{
-    marginBottom:15,
-    flexDirection:"row",
+        marginBottom:15,
+        flexDirection:"row",
    },
    ListText:{
-    fontSize:16,
-    color:"#ffffff"
+        fontSize:14,
+        color:"#333333"
    },
    ListLeft:{
-    flexDirection:"row",
+        flexDirection:"row",
    },
    write:{
-    width:10,
+        width:10,
    },
    ListRight:{
-    position:"absolute",
-    right:0,
-    flexDirection:"row",
+        position:"absolute",
+        right:0,
+        flexDirection:"row",
    },
    ShopList:{
-    paddingLeft:25,
-    paddingRight:25,
-    height:60,
-    backgroundColor:"#fafafa",
-    flexDirection:"row",
+        paddingLeft:25,
+        paddingRight:25,
+        paddingTop:20,
+        paddingBottom:20,
+        alignItems:"center",
+        flexDirection:"row",
    },
    Name:{
-    flex:1,
-    color:"#333333",
-    fontSize:18,
-    lineHeight:36,
-   },
-   ShopPrice:{
-    flex:1,
-    color:"#333333",
-    fontSize:18,
-    lineHeight:36,
-    textAlign:"center"
-   },
-   ShopNumber:{
-    flex:1,
-    color:"#333333",
-    fontSize:18,
-    lineHeight:36,
-    textAlign:"right"
+       flex:1,
+       color:"#666666",
+       fontSize:16,
+       textAlign:"center"
    },
    ShopList1:{
     paddingLeft:25,
     paddingRight:25,
-    paddingTop:10,
-    paddingBottom:10,
+    paddingTop:20,
+    paddingBottom:20,
     backgroundColor:"#ffffff",
     flexDirection:"row",
     borderBottomWidth:1,
-    borderBottomColor:"#fafafa",
+    borderBottomColor:"#f2f2f2",
     overflow:"hidden"
    },
    Name1:{
     flex:1,
     color:"#333333",
     fontSize:16,
+    textAlign:"center",
     overflow:"hidden"
-   },
-   ShopPrice1:{
-    flex:1,
-    color:"#333333",
-    fontSize:16,
-    textAlign:"center"
-   },
-   ShopNumber1:{
-    flex:1,
-    color:"#333333",
-    fontSize:16,
-    textAlign:"right"
    },
    ContList:{
    paddingBottom:50,
