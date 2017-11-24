@@ -356,7 +356,7 @@ const styles = StyleSheet.create({
   refresh:{
     position:"absolute",
     bottom:10,
-    left:250,
+    right:30,
     flexDirection:'row'
   },
   DataText:{

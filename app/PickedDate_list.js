@@ -83,11 +83,8 @@ export default class PickedDate_list extends Component {
     Search(value){
         //if(value>=3){
             for (let i = 0; i < this.dataRows.length; i++) {
-                // let temp = this.dataRows[0];
                 let dataRow = this.dataRows[i];
                 if (((dataRow.shopcode + "").indexOf(value) >= 0)) {
-                    // this.dataRows[0] = dataRow;
-                    // this.dataRows[i] = temp;
                     var str = this.dataRows.splice(i,1);
                     this.dataRows.unshift(str[0])
                     break;
@@ -108,12 +105,12 @@ export default class PickedDate_list extends Component {
 
     _renderRow(rowData, sectionID, rowID){
         return(
-            <TouchableOpacity style={styles.header} onPress={()=>this.pressPop(rowData)}>
+            <TouchableOpacity style={styles.DataList} onPress={()=>this.pressPop(rowData)}>
                 <View style={styles.coding}>
-                    <Text style={styles.codingText1}>{rowData.shopcode}</Text>
+                    <Text style={styles.codingText}>{rowData.shopcode}</Text>
                 </View>
                 <View style={styles.name}>
-                    <Text style={styles.nameText1}>{rowData.shopname}</Text>
+                    <Text style={styles.codingText}>{rowData.shopname}</Text>
                 </View>
             </TouchableOpacity>
         )
@@ -122,24 +119,14 @@ export default class PickedDate_list extends Component {
     render() {
         return (
             <View style={styles.container}>
-                <View style={styles.Head}>
-                    <View style={styles.cont}>
-                        <TouchableOpacity style={styles.images} onPress={this.Return.bind(this)}>
-                            <Image source={require("../images/left.png")} style={styles.HeaderImage}></Image>
-                        </TouchableOpacity>
-                        <View style={styles.HeadList}>
-                            <Text style={styles.HeadText}>{this.state.invoice}</Text>
-                        </View>
-                    </View>
-                </View>
-                <View style={styles.Search}>
+                <View style={styles.Title}>
                     <TextInput
+                        style={styles.Search}
                         autofocus="{true}"
                         returnKeyType="search"
                         placeholder="搜索机构编码"
                         placeholderTextColor="#bcbdc1"
                         underlineColorAndroid='transparent'
-                        style={styles.searchContect}
                         onChangeText={(value)=>{
                             this.setState({
                                 search:value
@@ -147,6 +134,10 @@ export default class PickedDate_list extends Component {
                             this.Search(value)
                         }}
                     />
+                    <Image source={require("../images/2.png")} style={styles.SearchImage} />
+                    <View style={styles.Right}>
+                        <TouchableOpacity style={styles.Text1}><Text style={styles.Text} onPress={this.Return.bind(this)}>取消</Text></TouchableOpacity>
+                    </View>
                 </View>
                 <View>
                     <View style={styles.head}>
@@ -154,7 +145,7 @@ export default class PickedDate_list extends Component {
                             <Text style={styles.codingText}>编码</Text>
                         </View>
                         <View style={styles.name}>
-                            <Text style={styles.nameText}>机构名称</Text>
+                            <Text style={styles.codingText}>机构名称</Text>
                         </View>
                     </View>
                     <ListView
@@ -172,101 +163,93 @@ export default class PickedDate_list extends Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#323642',
+        backgroundColor: '#f2f2f2',
     },
-    Head:{
-        height:50,
-        backgroundColor:"#474955",
-        paddingTop:10,
-    },
-    cont:{
+    Title:{
+        backgroundColor:"#ff4e4e",
+        paddingLeft:16,
+        paddingRight:16,
+        paddingTop:15,
+        paddingBottom:15,
         flexDirection:"row",
-        marginLeft:25,
+        borderBottomWidth:1,
+        borderBottomColor:"#cacccb"
     },
-    images:{
-        width:60,
-    },
-    HeadList:{
-        flex:6,
-        marginTop:2,
-        paddingRight:70,
-    },
-    HeadText:{
-        color:"#bcbdc1",
-        fontSize:18,
-        textAlign:"center",
+    SearchImage:{
+        position:"absolute",
+        top:22,
+        left:24,
     },
     Search:{
-        marginLeft:25,
-        marginRight:25,
-        marginTop:15,
+        borderRadius:30,
+        backgroundColor:"#ffffff",
+        color: "#333333",
+        paddingLeft:46,
+        paddingBottom:15,
+        paddingTop:6,
+        paddingBottom:6,
+        fontSize:14,
+        flex:1,
     },
-    searchContect:{
-        borderRadius:5,
-        backgroundColor:"#474955",
-        color:"#bcbdc1",
-        paddingTop:8,
-        paddingBottom:8,
-        paddingLeft:25,
-        fontSize:16,
-        borderTopWidth:1,
-        borderTopColor:"#cacccb",
-        borderBottomWidth:1,
-        borderBottomColor:"#cacccb",
-        borderLeftWidth:1,
-        borderLeftColor:"#cacccb",
-        borderRightWidth:1,
-        borderRightColor:"#cacccb",
-    },
-    head:{
-        height:45,
+    Right:{
+        width:60,
         flexDirection:"row",
-        marginLeft:25,
-        marginRight:25,
-        marginTop:15,
-        borderBottomWidth:1,
-        borderBottomColor:"#474955",
+        paddingTop:3,
+        paddingLeft:6
+    },
+    HeaderImage1:{
+        flex:1,
+        marginLeft:20,
+    },
+    Text1:{
+        flex:1
+    },
+    Text:{
+        fontSize:16,
+        color:"#ffffff",
+        paddingTop:5,
+        paddingLeft:10,
+    },
+
+    head:{
+        flexDirection:"row",
+        paddingTop:13,
+        paddingBottom:13,
+        paddingLeft:25,
+        paddingRight:25,
     },
     coding:{
         flex:1,
         paddingLeft:12
     },
     codingText:{
-        color:"#bcbdc1",
-        fontSize:17,
+        color:"#333333",
+        fontSize:16,
+        height:22,
+        overflow:"hidden"
     },
     name:{
         flex:1,
     },
-    nameText:{
-        color:"#bcbdc1",
-        fontSize:17,
-    },
-    header:{
-        height:35,
+    DataList:{
         flexDirection:"row",
-        marginLeft:25,
-        marginRight:25,
-        marginTop:15,
+        paddingTop:13,
+        paddingBottom:13,
+        paddingLeft:25,
+        paddingRight:25,
+        backgroundColor:"#ffffff",
         borderBottomWidth:1,
-        borderBottomColor:"#474955",
+        borderBottomColor:"#f2f2f2",
+        overflow:"hidden"
     },
     coding:{
         flex:1,
         paddingLeft:12
     },
-    codingText1:{
-        color:"#bcbdc1",
-        fontSize:16,
-    },
     name:{
         flex:1,
     },
-    nameText1:{
-        color:"#bcbdc1",
-        fontSize:16,
-    },
     scrollview:{
-        marginBottom:200,
+        marginBottom:180
     }
 });

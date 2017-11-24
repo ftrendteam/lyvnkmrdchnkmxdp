@@ -32,6 +32,7 @@ import ShoppingCart from "./ShoppingCart";
 import Code from "./Code";
 import admin from "./admin";
 import OrderDetails from "./OrderDetails";
+import SunYi from "./SunYi";
 import Search from "./Search";
 import Query from "./Query";
 import Distrition from "./Distrition";
@@ -59,6 +60,7 @@ export default class Index extends Component {
         super(props);
         this.state = {
             currentindex:0,
+            isPress:true,
             pickedDate:"",
             pid:"",
             DepCode:"",
@@ -97,13 +99,7 @@ export default class Index extends Component {
         }
     }
 
-    _refreshMsssage= (id) =>{
-        this.setState({
-            currentindex:id
-        });
-    }
-
-    HISTORY(){
+    History(){
         var nextRoute={
             name:"主页",
             component:HistoricalDocument
@@ -111,15 +107,7 @@ export default class Index extends Component {
         this.props.navigator.push(nextRoute)
     }
 
-    HOME(){
-        var nextRoute={
-            name:"主页",
-            component:Index
-        };
-        this.props.navigator.push(nextRoute)
-    }
-
-    SHOP(){
+    ShopList(){
         var nextRoute={
             name:"主页",
             component:ShoppingCart
@@ -170,7 +158,6 @@ export default class Index extends Component {
                             OrgFormno:this.state.OrgFormno,
                             FormType:this.state.FormType,
                         };
-                        alert(JSON.stringify(params))
                         FetchUtil.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
                             var countm=JSON.stringify(data.countm);
                             var ShopPrice=JSON.stringify(data.ShopPrice);
@@ -203,30 +190,12 @@ export default class Index extends Component {
         })
     }
 
-    pullOut(){
-        Storage.delete('username');
-        Storage.delete('history');
-        Storage.delete('FirstTime1');
-        this._setModalVisible();
-        if(this.state.ShopCar1>0){
-            alert("商品未提交")
-        }else{
-
-            Storage.delete('Name');
-
-            var nextRoute={
-                name:"主页",
-                component:admin
-            };
-            this.props.navigator.push(nextRoute)
-        }
-    }
-
     pressPop(){
         this._setModalVisible()
         this.props.navigator.pop();
     }
 
+    //单据弹层
     _rightButtonClick() {
         this._setModalVisible();
     }
@@ -237,16 +206,22 @@ export default class Index extends Component {
             show:!isShow,
         });
     }
+    //单据弹层结束
 
     //进入页面执行方法
     componentDidMount(){
         InteractionManager.runAfterInteractions(() => {
             this.Storage();
             this._fetch();
-            this.function();
             if(lastDepCode ==1){
                 page= 1;
             }
+
+
+            var data={
+                src:require('../images/1_42.png'),
+                type: "1"
+            };
         });
     }
 
@@ -293,6 +268,13 @@ export default class Index extends Component {
             })
         })
 
+        Storage.get('username').then((tags) => {
+            this.setState({
+                usercode:tags
+            })
+
+        });
+
     }
 
     //获取左侧商品品类信息、商品总数、触发第一个列表
@@ -330,8 +312,8 @@ export default class Index extends Component {
                 this.productData=priductData;
                 this.setState({
                     data:priductData,
-                    isloading:false
-                })
+                    isloading:false,
+                });
             });
         });
         //获取商品总数
@@ -362,32 +344,23 @@ export default class Index extends Component {
     }
 
     _renderRow(rowData, sectionID, rowID){
-        // alert(sectionID);
         return (
-            // this.dataRows.map((item,index) => {
-            //
-            // })
-
-            // let sclick= this.state.currentindex?styles.click:styles.clickes;
-
-        <TouchableOpacity onPress={() => this._pressRow(rowData)} style={styles.Active}>
-            {
-                (rowData.ShopNumber == 0) ?
-                    null :
+            <TouchableOpacity onPress={() => this._pressRow(rowData)} key={rowData.DepCode} style={this.state.currentindex==rowData.DepCode ? styles.clickes : styles.click}>
+                {
+                    (rowData.ShopNumber == 0) ?
+                        null :
                     <View style={styles.addnumber}>
                         <Text style={styles.Reduction1}>{rowData.ShopNumber}</Text>
                     </View>
-            }
+                }
 
-            <Text onPress={() =>this._refreshMsssage(this,rowID)} key={rowID} style={this.state.currentindex?styles.click:styles.clickes}>{rowData.DepName}></Text>
+                <Text style={styles.Active}>{rowData.DepName}</Text>
 
-        </TouchableOpacity>
+            </TouchableOpacity>
         );
-
-
     }
 
-    //点击商品品类获取商品信息
+    //商品品类获取品类下商品
     _pressRow(rowData){
         if(lastDepCode ==""){
             lastDepCode = rowData.DepCode;
@@ -420,7 +393,8 @@ export default class Index extends Component {
             this.productData=priductData;
             this.setState({
                 data:priductData,
-                isloading:false
+                isloading:false,
+                currentindex:rowData.DepCode
             })
             if(totalPage==0){
                 this.setState({
@@ -462,7 +436,7 @@ export default class Index extends Component {
         )
     }
 
-    //商品减少查询
+    //修改商品数量增减查询
     Countm(item){
         //调取数量
         dbAdapter.upDataShopInfoCountmSub(item.item.ProdCode).then((rows)=>{});
@@ -561,18 +535,19 @@ export default class Index extends Component {
         }
     }
 
-    //功能授权
-    function(){
-        Storage.get('username').then((tags) => {
-            this.setState({
-                usercode:tags
-            })
-
-        });
+    //功能分类
+    ChuMo(){
+        Storage.save("Disting","1");
+        <Image
+            source={data.src}
+        />
     }
 
-    //功能分类
-    Home(){
+    SaoMa(){
+        Storage.save("Disting","0")
+    }
+
+    YaoHuo(){
         Storage.delete('OrgFormno');
         Storage.delete('scode');
         Storage.delete('shildshop');
@@ -616,7 +591,7 @@ export default class Index extends Component {
         }
     }
 
-    Home1(){
+    SunYi(){
         Storage.delete('OrgFormno');
         Storage.delete('scode');
         Storage.delete('shildshop');
@@ -632,19 +607,14 @@ export default class Index extends Component {
                 if (rows == true) {
                     dbAdapter.selecUserRightA1012(this.state.usercode).then((rows) => {
                         if (rows == true) {
-                            var date = new Date();
-                            var data=JSON.stringify(date.getTime());
-                            Storage.save('Name','损益单');
-                            Storage.save('FormType','SYYW');
-                            Storage.save('ProYH','ProSY');
-                            Storage.save('YdCountm','3');
-                            var invoice = "损益单";
-                            this.setState({
-                                head: invoice,
-                                active:data,
-                            });
-                            Storage.save('Date',this.state.active);
+                            Storage.save("invoice", "损益单");
+                            var nextRoute = {
+                                name: "损益",
+                                component: SunYi
+                            };
+                            this.props.navigator.push(nextRoute);
                             this._setModalVisible();
+
                         }
                     })
                 } else if (rows == false) {
@@ -652,13 +622,10 @@ export default class Index extends Component {
                     this._setModalVisible();
                 }
             })
-            Storage.save('valueOf', 'App_Client_ProSY');
-            Storage.save('history', 'App_Client_ProSYQ');
-            Storage.save('historyClass', 'App_Client_ProSYDetailQ');
         }
     }
 
-    Query(){
+    SSPanDian(){
         Storage.delete('OrgFormno');
         Storage.delete('scode');
         Storage.delete('shildshop');
@@ -700,7 +667,7 @@ export default class Index extends Component {
         }
     }
 
-    Query1(){
+    SPPanDian(){
         Storage.delete('OrgFormno');
         Storage.delete('scode');
         Storage.delete('shildshop');
@@ -734,7 +701,7 @@ export default class Index extends Component {
 
     }
 
-    Home2(){
+    PSShouHuo(){
         Storage.delete('OrgFormno');
         Storage.delete('scode');
         Storage.delete('shildshop');
@@ -768,7 +735,7 @@ export default class Index extends Component {
 
     }
 
-    Shopp(){
+    SPCaiGou(){
         Storage.delete('OrgFormno');
         Storage.delete('scode');
         Storage.delete('shildshop');
@@ -800,7 +767,7 @@ export default class Index extends Component {
         }
     }
 
-    Shopp1(){
+    SPYanShou(){
         Storage.delete('OrgFormno');
         Storage.delete('scode');
         Storage.delete('shildshop');
@@ -833,7 +800,7 @@ export default class Index extends Component {
         }
     }
 
-    Shopp2(){
+    XPCaiGou(){
         Storage.delete('OrgFormno');
         Storage.delete('scode');
         Storage.delete('shildshop');
@@ -866,7 +833,7 @@ export default class Index extends Component {
         }
     }
 
-    Shopp3(){
+    XPShouHuo(){
         Storage.delete('OrgFormno');
         Storage.delete('scode');
         Storage.delete('shildshop');
@@ -899,9 +866,25 @@ export default class Index extends Component {
         }
     }
 
-    Home3(){
+    pullOut(){
+        Storage.delete('username');
+        Storage.delete('history');
+        Storage.delete('FirstTime1');
         this._setModalVisible();
+        if(this.state.ShopCar1>0){
+            alert("商品未提交")
+        }else{
+
+            Storage.delete('Name');
+
+            var nextRoute={
+                name:"主页",
+                component:admin
+            };
+            this.props.navigator.push(nextRoute)
+        }
     }
+    //功能分类结束
 
     keyExtractor(item: Object, index: number) {
         return item.ProdName//FlatList使用json中的ProdName动态绑定key
@@ -999,39 +982,39 @@ export default class Index extends Component {
                     onRequestClose={() => {}} >
                     <View style={styles.modalStyle}>
                         <View style={styles.ModalTitle}>
-                            <View style={styles.ModalLeft}>
+                            <TouchableOpacity style={styles.ModalLeft} onPress={this.ChuMo}>
                                 <View>
-                                    <Image source={require("../images/1_42.png")} />
+                                    <Image source={require("../images/1_43.png")} />
                                 </View>
-                                <TouchableOpacity>
+                                <View>
                                     <Text style={styles.ModalImage}>
                                         <Image source={require("../images/1_39.png")} />
                                     </Text>
                                     <Text style={styles.ModalText}>
                                         触摸
                                     </Text>
-                                </TouchableOpacity>
-                            </View>
+                                </View>
+                            </TouchableOpacity>
                             <View style={styles.ModalLeft1}>
                                 <Image source={require("../images/1_47.png")} />
                             </View>
-                            <View style={styles.ModalLeft}>
+                            <TouchableOpacity style={styles.ModalLeft} onPress={this.SaoMa}>
                                 <View style={[{marginLeft:14}]}>
                                     <Image source={require("../images/1_43.png")} />
                                 </View>
-                                <TouchableOpacity>
+                                <View>
                                     <Text style={styles.ModalImage}>
                                         <Image source={require("../images/1_41.png")} />
                                     </Text>
                                     <Text style={styles.ModalText}>
                                         扫码
                                     </Text>
-                                </TouchableOpacity>
-                            </View>
+                                </View>
+                            </TouchableOpacity>
                         </View>
                         <View style={styles.ModalCont}>
                             <View style={styles.ModalHead}>
-                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.Home.bind(this)}>
+                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.YaoHuo.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_25.png")} />
                                     </Text>
@@ -1039,7 +1022,7 @@ export default class Index extends Component {
                                         要货
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.Home2.bind(this)}>
+                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.PSShouHuo.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_28.png")} />
                                     </Text>
@@ -1047,7 +1030,7 @@ export default class Index extends Component {
                                         配送收货
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.ModalHeadImage} onPress={this.Query.bind(this)}>
+                                <TouchableOpacity style={styles.ModalHeadImage} onPress={this.SSPanDian.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_29.png")} />
                                     </Text>
@@ -1060,7 +1043,7 @@ export default class Index extends Component {
                                 <Image source={require("../images/1_48.png")} style={styles.ModalImageLine} />
                             </View>
                             <View style={styles.ModalHead}>
-                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.Query1.bind(this)}>
+                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.SPPanDian.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_36.png")} />
                                     </Text>
@@ -1068,7 +1051,7 @@ export default class Index extends Component {
                                         商品盘点
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.Home1.bind(this)}>
+                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.SunYi.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_38.png")} />
                                     </Text>
@@ -1076,7 +1059,7 @@ export default class Index extends Component {
                                         损益
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.ModalHeadImage} onPress={this.Shopp.bind(this)}>
+                                <TouchableOpacity style={styles.ModalHeadImage} onPress={this.SPCaiGou.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_40.png")} />
                                     </Text>
@@ -1089,7 +1072,7 @@ export default class Index extends Component {
                                 <Image source={require("../images/1_48.png")} style={styles.ModalImageLine} />
                             </View>
                             <View style={styles.ModalHead}>
-                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.Shopp1.bind(this)}>
+                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.SPYanShou.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_44.png")} />
                                     </Text>
@@ -1097,7 +1080,7 @@ export default class Index extends Component {
                                         商品验收
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.Shopp2.bind(this)}>
+                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.XPCaiGou.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_45.png")} />
                                     </Text>
@@ -1105,7 +1088,7 @@ export default class Index extends Component {
                                         协配采购
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.ModalHeadImage} onPress={this.Shopp3.bind(this)}>
+                                <TouchableOpacity style={styles.ModalHeadImage} onPress={this.XPShouHuo.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_46.png")} />
                                     </Text>
@@ -1126,7 +1109,7 @@ export default class Index extends Component {
                                         退出账号
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.ModalHeadImage}>
+                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_59.png")} />
                                     </Text>
@@ -1141,15 +1124,29 @@ export default class Index extends Component {
                     </View>
                 </Modal>
                 <View style={styles.footer}>
-                    <TouchableOpacity style={styles.Home} onPress={this.HISTORY.bind(this)}><Image source={require("../images/1_300.png")}></Image><Text style={styles.home1}>历史单据查询</Text></TouchableOpacity>
+                    <TouchableOpacity style={styles.Home} onPress={this.History.bind(this)}><Image source={require("../images/1_300.png")}></Image><Text style={styles.home1}>历史单据查询</Text></TouchableOpacity>
                     <TouchableOpacity style={styles.Home}><Image source={require("../images/1_31.png")}></Image><Text style={styles.home2}>商品</Text></TouchableOpacity>
-                    <TouchableOpacity style={styles.Home} onPress={this.SHOP.bind(this)}>
+                    <TouchableOpacity style={styles.Home} onPress={this.ShopList.bind(this)}>
                         <View>
                             <Image source={require("../images/1_322.png")}>
                                 {
                                     (this.state.shopcar==0)?
                                         null:
-                                        <Text style={styles.ShopCar}>{this.state.shopcar}</Text>
+                                        <Text style={[{position:"absolute", right:-200,}]}>{this.state.shopcar}</Text>
+                                }
+                                {
+                                    (this.state.shopcar>0)?
+                                        <Text style={[styles.ShopCar,{paddingTop:3,}]}>{this.state.shopcar}</Text>:null
+                                }
+                                {
+                                    (this.state.shopcar<100)?
+                                        null:
+                                        <Text style={[styles.ShopCar,{width:35,height:35,paddingTop:6,}]}>{this.state.shopcar}</Text>
+                                }
+                                {
+                                    (this.state.shopcar<1000)?
+                                        null:
+                                        <Text style={[styles.ShopCar,{width:40,height:40,paddingTop:8,right:-49,}]}>{this.state.shopcar}</Text>
                                 }
                             </Image>
                         </View>
@@ -1179,7 +1176,7 @@ const styles = StyleSheet.create({
     },
     header:{
         height:60,
-        backgroundColor:"#ff4f4d",
+        backgroundColor:"#ff4e4e",
         paddingTop:10,
     },
     cont:{
@@ -1199,7 +1196,7 @@ const styles = StyleSheet.create({
         textAlign:"center",
         color:"#ffffff",
         fontSize:22,
-        marginTop:2,
+        marginTop:3,
     },
     scrollview:{
         width:130,
@@ -1207,26 +1204,27 @@ const styles = StyleSheet.create({
         flex:2,
     },
     Active:{
+        color:"#333333",
+        textAlign:"center",
+        fontSize:16,
+        height:22,
+        overflow:"hidden",
+    },
+    click:{
         borderTopWidth:1,
         borderTopColor:"#f2f2f2",
         borderRightColor:"#f2f2f2",
         borderRightWidth:1,
-    },
-    click:{
         paddingTop:20,
         paddingBottom:20,
-        overflow:"hidden",
-        color:"#333333",
-        textAlign:"center",
-        fontSize:16,
     },
     clickes:{
+        borderTopWidth:1,
+        borderTopColor:"#f2f2f2",
+        borderRightColor:"#f2f2f2",
+        borderRightWidth:1,
         paddingTop:20,
         paddingBottom:20,
-        overflow:"hidden",
-        color:"#333333",
-        textAlign:"center",
-        fontSize:16,
         backgroundColor:"#f2f2f2"
     },
     RightList:{
@@ -1250,7 +1248,6 @@ const styles = StyleSheet.create({
     Image:{
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop:20,
     },
     Text:{
         textAlign:"center",
@@ -1260,7 +1257,7 @@ const styles = StyleSheet.create({
         color:"#333333"
     },
     AddNumber:{
-        height:35,
+        height:30,
     },
     addnumber:{
         height:20,
@@ -1304,7 +1301,7 @@ const styles = StyleSheet.create({
         borderRightWidth:1,
         borderRightColor:"#f2f2f2",
         flex:3,
-        paddingBottom:35,
+        paddingBottom:30,
     },
     fontColorGray:{
         textAlign:"center"
@@ -1390,18 +1387,23 @@ const styles = StyleSheet.create({
     },
     home1:{
         color:'#999999',
-        fontSize:12,
+        fontSize:16,
         marginTop:5,
         flex:1,
     },
     home2:{
         color:'#ff4e4e',
-        fontSize:12,
+        fontSize:16,
         marginTop:5,
         flex:1,
     },
     ShopCar:{
-        color:"red",
+        width:25,
+        height:25,
+        backgroundColor:"#ffba00",
+        color:"#ffffff",
+        textAlign:"center",
+        borderRadius:50,
         position:"absolute",
         right:-42,
     },

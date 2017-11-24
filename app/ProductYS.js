@@ -83,7 +83,6 @@ export default class ProductCG extends Component {
             alert("请选择采购单")
         }else{
             Storage.delete('YuanDan');
-            Storage.delete('Screen');
             var nextRoute={
                 name:"Index",
                 component:Index,
@@ -118,14 +117,13 @@ export default class ProductCG extends Component {
     render() {
         return (
             <View style={styles.container}>
-                <View style={styles.Head}>
+                <View style={styles.header}>
                     <View style={styles.cont}>
-                        <TouchableOpacity style={styles.images} onPress={this.Return.bind(this)}>
-                            <Image source={require("../images/left.png")} style={styles.HeaderImage}></Image>
+                        <TouchableOpacity onPress={this.Return.bind(this)}>
+                            <Image source={require("../images/2_01.png")} style={styles.HeaderImage}></Image>
                         </TouchableOpacity>
-                        <View style={styles.HeadList}>
-                            <Text style={styles.HeadText}>{this.state.invoice}</Text>
-                        </View>
+                        <Text style={styles.HeaderList}>{this.state.invoice}</Text>
+
                     </View>
                 </View>
                 <View style={styles.ContList}>
@@ -146,7 +144,7 @@ export default class ProductCG extends Component {
                         />
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.listimages} onPress={this.onclick.bind(this)}>
-                        <Image source={require("../images/right.png")} style={styles.Image}></Image>
+                        <Image source={require("../images/2_03.png")} style={styles.Image}></Image>
                     </TouchableOpacity>
                 </View>
                 <View style={styles.ContList}>
@@ -167,7 +165,7 @@ export default class ProductCG extends Component {
                         />
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.listimages} onPress={this.Search.bind(this)}>
-                        <Image source={require("../images/right.png")} style={styles.Image}></Image>
+                        <Image source={require("../images/2_03.png")} style={styles.Image}></Image>
                     </TouchableOpacity>
                 </View>
                 <TouchableOpacity style={styles.button} onPress={this.Button.bind(this)}>
@@ -181,49 +179,43 @@ export default class ProductCG extends Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#ffffff',
+        backgroundColor: '#f2f2f2',
     },
-    Head:{
-        height:50,
-        backgroundColor:"#f47882",
+    header:{
+        height:60,
+        backgroundColor:"#ff4e4e",
         paddingTop:10,
-        borderBottomWidth:1,
-        borderBottomColor:"#cacccb",
     },
     cont:{
         flexDirection:"row",
-        marginLeft:25,
+        paddingLeft:16,
+        paddingRight:16,
     },
-    images:{
-        width:60,
-    },
-    HeadList:{
+    HeaderList:{
         flex:6,
-        marginTop:2,
-        paddingRight:70,
-    },
-    HeadText:{
-        color:"#ffffff",
-        fontSize:18,
         textAlign:"center",
+        color:"#ffffff",
+        fontSize:22,
+        marginTop:3,
     },
     ContList:{
-        height:50,
-        marginTop:15,
-        marginLeft:25,
-        marginRight:15,
-        paddingTop:13,
-        paddingBottom:5,
+        height:55,
+        paddingLeft:25,
+        paddingRight:15,
+        paddingTop:15,
+        backgroundColor:"#ffffff",
         flexDirection:"row",
         borderBottomWidth:1,
-        borderBottomColor:"#eeeeee",
+        borderBottomColor:"#f2f2f2",
     },
     listleft:{
         width:70,
+        marginTop:4,
     },
     listLeftText:{
-        color:"#323232",
-        fontSize:17,
+        color:"#333333",
+        fontSize:16,
+        textAlign:"right"
     },
     listcont:{
         flex:7,
@@ -231,35 +223,28 @@ const styles = StyleSheet.create({
         paddingRight:5,
     },
     listContText:{
-        color:"#323232",
-        fontSize:17,
-    },
-    listimages:{
-        flex:1,
-    },
-    TextInput:{
-        flex:7,
+        color:"#333333",
+        fontSize:16,
     },
     TextInput1:{
         paddingLeft:5,
         paddingRight:5,
-        paddingTop:5,
-        paddingBottom:5,
+        marginBottom:2,
         fontSize:16,
-        color:"#323232"
+        color:"#333333"
     },
     button:{
-        marginLeft:60,
-        marginRight:60,
-        paddingTop:8,
-        paddingBottom:8,
-        backgroundColor:"#f47882",
+        marginLeft:25,
+        marginRight:25,
+        paddingTop:13,
+        paddingBottom:13,
+        backgroundColor:"#ff4e4e",
         borderRadius:3,
-        marginTop:100,
+        marginTop:30,
     },
     buttonText:{
         color:"#ffffff",
-        fontSize:18,
+        fontSize:16,
         textAlign:"center"
     }
 });

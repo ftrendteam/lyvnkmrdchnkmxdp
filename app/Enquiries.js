@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
         textAlign:"center",
         color:"#ffffff",
         fontSize:22,
-        marginTop:2,
+        marginTop:3,
     },
     Content:{
         marginBottom:30,
@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
         flexDirection:"row",
         height:55,
         paddingTop:15,
-        paddingLeft:25,
+        paddingLeft:10,
         backgroundColor:"#ffffff",
         borderBottomColor:"#f2f2f2",
         borderBottomWidth:1,
@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
     ContLeft:{
         color:"#666666",
         fontSize:16,
-        width:115,
+        width:100,
         textAlign:"right"
     },
     Contright:{

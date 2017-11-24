@@ -278,10 +278,11 @@ export default class DBAdapter extends SQLiteOpenHelper {
           let ProdCode = shopInfo.ProdCode;
           let DepCode = shopInfo.DepCode;
           let ydcountm = shopInfo.ydcountm;
+          let SuppCode = shopInfo.SuppCode;
           //   "prodname":"海鲜菇","countm":1.0000,"kccount":0.0,"prototal":1.0000,"unit":"kg  ","promemo":""
-          let sql = " replace INTO shopInfo(pid,ProdCode,prodname,countm,ShopPrice,prototal,promemo,DepCode,ydcountm)" +
-            "values(?,?,?,?,?,?,?,?,?)";
-          tx.executeSql(sql, [Pid, ProdCode, shopName, ShopNumber, ShopPrice, ShopAmount, ShopRemark, DepCode,ydcountm], () => {
+          let sql = " replace INTO shopInfo(pid,ProdCode,prodname,countm,ShopPrice,prototal,promemo,DepCode,ydcountm,SuppCode)" +
+            "values(?,?,?,?,?,?,?,?,?,?)";
+          tx.executeSql(sql, [Pid, ProdCode, shopName, ShopNumber, ShopPrice, ShopAmount, ShopRemark, DepCode,ydcountm,SuppCode], () => {
               resolve(true);
             }, (err) => {
               reject(false);
@@ -662,7 +663,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
           ",ifNull(b.promemo,'') as ShopRemark,'" + DepCode + "' as DepCode1 " +
           " from product a left join shopInfo b on a.Pid=b.Pid where IsDel='0' and prodtype<>'1' ";
         ssql = ssql + " and a.DepCode in (select depcode from tdepset where IsDel='0' and depcode" + DepLevel + "='" + DepCode + "')";
-        ssql = ssql + " limit 9 offset " + (currpage-1)*9;
+        ssql = ssql + " limit 15 offset " + (currpage-1)*15;
         tx.executeSql(ssql, [], (tx, results) => {
           resolve(results.rows);
         });

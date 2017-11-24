@@ -46,8 +46,7 @@ export default class ShoppingCart extends Component {
         this.state = {
             show:false,
             Show:false,
-            Screen:false,
-            orgFormno:"",
+            ScreenBod:false,
             ShopNumber:"",
             ShopAmount:"",
             reqDetailCode:"",
@@ -89,12 +88,6 @@ export default class ShoppingCart extends Component {
             this.setState({
                 reqDetailCode: tags
             })
-        });
-
-        Storage.get('OrgFormno').then((tags) => {
-            this.setState({
-                orgFormno: tags
-            });
         });
 
         Storage.get('procode').then((tags) => {
@@ -234,7 +227,7 @@ export default class ShoppingCart extends Component {
         );
     }
 
-    HISTORY(){
+    History(){
         var nextRoute={
             name:"主页",
             component:HistoricalDocument
@@ -242,19 +235,10 @@ export default class ShoppingCart extends Component {
         this.props.navigator.push(nextRoute)
     }
 
-    HOME(){
+    Shop(){
         var nextRoute={
             name:"主页",
             component:Index
-        };
-        this.props.navigator.push(nextRoute)
-    }
-
-    SHOP(){
-        var nextRoute={
-            name:"主页",
-
-            component:ShoppingCart
         };
         this.props.navigator.push(nextRoute)
     }
@@ -396,10 +380,10 @@ export default class ShoppingCart extends Component {
         this.props.navigator.pop();
     }
 
-    Screen(){
-        let isScreen = this.state.Screen;
+    ScreenBod(){
+        let isScreen = this.state.ScreenBod;
         this.setState({
-            Screen:!isScreen,
+            ScreenBod:!isScreen,
         });
     }
 
@@ -454,7 +438,7 @@ export default class ShoppingCart extends Component {
                     usercode: this.state.Userpwd,
                     DetailInfo1: {
                         "ShopCode": tags,
-                        "OrgFormno": this.state.orgFormno,
+                        "OrgFormno": this.state.OrgFormno,
                         "ProMemo": this.state.Remark,
                         "SuppCode":this.state.suppcode,
                         "childshop":this.state.shildshop,
@@ -465,7 +449,7 @@ export default class ShoppingCart extends Component {
                 };
                 FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
                     if(data.retcode == 1){
-                        if(this.state.Screen==1){
+                        if(this.state.Screen=="1"){
                             var DetailInfo2=params.DetailInfo2;
                             for(let i =0;i<DetailInfo2.length;i++){
                                 let detail = DetailInfo2[i];
@@ -494,7 +478,7 @@ export default class ShoppingCart extends Component {
                                 })
                                 Storage.save('Date',this.state.active);
                             }else{
-                                this.Screen();
+                                this.ScreenBod();
                             }
                         }else{
                             alert("提交成功");
@@ -514,8 +498,7 @@ export default class ShoppingCart extends Component {
                             Storage.save('Date',this.state.active);
                         }
                     }else{
-                        // alert("提交失败");
-                        // alert(JSON.stringify(data))
+                        alert(JSON.stringify(data))
                     }
                 })
             })
@@ -565,7 +548,7 @@ export default class ShoppingCart extends Component {
                     usercode: this.state.Userpwd,
                     DetailInfo1: {
                         "ShopCode": tags,
-                        "OrgFormno": this.state.orgFormno,
+                        "OrgFormno": this.state.OrgFormno,
                         "ProMemo": this.state.Remark,
                         "SuppCode": this.state.suppcode,
                         "childshop": this.state.shildshop,
@@ -576,7 +559,7 @@ export default class ShoppingCart extends Component {
                 };
                 FetchUtils.post(this.state.linkurl, JSON.stringify(params)).then((data) => {
                     if (data.retcode == 1) {
-                        this.Screen();
+                        this.ScreenBod();
                         alert("提交成功");
                         dbAdapter.deleteData("shopInfo");
                         this.dataRows = [];
@@ -685,10 +668,6 @@ export default class ShoppingCart extends Component {
                             <Text style={styles.ClientType}>{this.state.ShopNumber}</Text>
                         </Text>
                         <Text style={styles.ClientText}>
-                            <Text style={[styles.ClientText,styles.ClientType]}>客户：</Text>
-                            <Text style={styles.ClientType}>散户</Text>
-                        </Text>
-                        <Text style={styles.ClientText}>
                             <Text style={[styles.ClientText,styles.ClientType]}>总价：</Text>
                             <Text style={styles.Price1}>{this.state.ShopAmount}</Text>
                         </Text>
@@ -714,50 +693,31 @@ export default class ShoppingCart extends Component {
                             <Text style={{fontSize:18,color:"#ffffff",textAlign:"center"}}>提交</Text>
                         </TouchableOpacity>
                     </View>
-                    <Modal
-                        transparent={true}
-                        visible={this.state.show}
-                        onShow={() => {}}
-                        onRequestClose={() => {}} >
-                        <TouchableOpacity style={styles.modalStyle}>
-                            <View style={styles.ModalView}>
-                                <View style={styles.DanJu}>
-                                    <View style={styles.danju}><Text style={styles.DanText}>单据备注</Text></View>
-                                    <TouchableOpacity style={styles.ModalLeft} onPress={this._setModalVisible.bind(this)}>
-                                        <Image source={require("../images/2_02.png")} />
-                                    </TouchableOpacity>
-                                </View>
-                                <TextInput
-                                    multiline={true}
-                                    placeholder="请填写单据备注信息"
-                                    underlineColorAndroid='transparent'
-                                    placeholderTextColor="#888888"
-                                    value={this.state.Remark}
-                                    style={styles.TextInput}
-                                    onChangeText={(value)=>{
-                                        this.setState({
-                                            Remark:value
-                                        })
-                                    }}/>
-                                <TouchableOpacity style={styles.Button} onPress={this._setModalVisible.bind(this)}>
-                                    <Text style={styles.ButtonText}>
-                                        确定
-                                    </Text>
-                                </TouchableOpacity>
-                            </View>
-                        </TouchableOpacity>
-                    </Modal>
                 </View>
                 <View style={styles.footer}>
-                    <TouchableOpacity style={styles.Home} onPress={this.HISTORY.bind(this)}><Image source={require("../images/1_300.png")}></Image><Text style={styles.home3}>历史单据查询</Text></TouchableOpacity>
-                    <TouchableOpacity style={styles.Home} onPress={this.HOME.bind(this)}><Image source={require("../images/1_311.png")}></Image><Text style={styles.home1}>商品</Text></TouchableOpacity>
+                    <TouchableOpacity style={styles.Home} onPress={this.History.bind(this)}><Image source={require("../images/1_300.png")}></Image><Text style={styles.home3}>历史单据查询</Text></TouchableOpacity>
+                    <TouchableOpacity style={styles.Home} onPress={this.Shop.bind(this)}><Image source={require("../images/1_311.png")}></Image><Text style={styles.home1}>商品</Text></TouchableOpacity>
                     <TouchableOpacity style={styles.Home}>
                         <View>
                             <Image source={require("../images/1_32.png")}>
                                 {
                                     (this.state.shopcar==0)?
                                         null:
-                                        <Text style={styles.ShopCar}>{this.state.shopcar}</Text>
+                                        <Text style={[{position:"absolute", right:-200,}]}>{this.state.shopcar}</Text>
+                                }
+                                {
+                                    (this.state.shopcar>0)?
+                                        <Text style={[styles.ShopCar,{paddingTop:3,}]}>{this.state.shopcar}</Text>:null
+                                }
+                                {
+                                    (this.state.shopcar<100)?
+                                        null:
+                                        <Text style={[styles.ShopCar,{width:35,height:35,paddingTop:6,}]}>{this.state.shopcar}</Text>
+                                }
+                                {
+                                    (this.state.shopcar<1000)?
+                                        null:
+                                        <Text style={[styles.ShopCar,{width:40,height:40,paddingTop:8,right:-49,}]}>{this.state.shopcar}</Text>
                                 }
                             </Image>
                         </View>
@@ -778,15 +738,51 @@ export default class ShoppingCart extends Component {
                     </View>
                 </Modal>
                 <Modal
-                    animationType='fade'
                     transparent={true}
-                    visible={this.state.Screen}
+                    visible={this.state.show}
                     onShow={() => {}}
                     onRequestClose={() => {}} >
-                    <TouchableOpacity style={styles.Screen}>
-                        <View style={styles.ScreenCont}>
-                            <View>
-                                <Text>以下商品数量与原始数量不匹配，是否继续？</Text>
+                    <TouchableOpacity style={styles.modalStyle}>
+                        <View style={styles.ModalView}>
+                            <View style={styles.DanJu}>
+                                <View style={styles.danju}><Text style={styles.DanText}>单据备注</Text></View>
+                                <TouchableOpacity style={styles.ModalLeft} onPress={this._setModalVisible.bind(this)}>
+                                    <Image source={require("../images/2_02.png")} />
+                                </TouchableOpacity>
+                            </View>
+                            <TextInput
+                                multiline={true}
+                                placeholder="请填写单据备注信息"
+                                underlineColorAndroid='transparent'
+                                placeholderTextColor="#888888"
+                                value={this.state.Remark}
+                                style={styles.TextInput}
+                                onChangeText={(value)=>{
+                                    this.setState({
+                                        Remark:value
+                                    })
+                                }}/>
+                            <TouchableOpacity style={styles.Button} onPress={this._setModalVisible.bind(this)}>
+                                <Text style={styles.ButtonText}>
+                                    确定
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+                    </TouchableOpacity>
+                </Modal>
+                <Modal
+                    animationType='fade'
+                    transparent={true}
+                    visible={this.state.ScreenBod}
+                    onShow={() => {}}
+                    onRequestClose={() => {}} >
+                    <TouchableOpacity style={styles.modalStyle}>
+                        <View style={styles.ModalView}>
+                            <View style={styles.DanJu}>
+                                <View style={styles.danju}><Text style={styles.DanText}>以下商品数量与原始数量不匹配，是否继续？</Text></View>
+                                <TouchableOpacity style={styles.ModalLeft} onPress={this.ScreenBod.bind(this)}>
+                                    <Image source={require("../images/2_02.png")} />
+                                </TouchableOpacity>
                             </View>
                             <View style={styles.ScreenTitle}>
                                 <View style={styles.coulumnScreen}>
@@ -805,18 +801,20 @@ export default class ShoppingCart extends Component {
                                     </Text>
                                 </View>
                             </View>
-                            <ListView
-                                dataSource={this.state.dataSource}
-                                showsVerticalScrollIndicator={true}
-                                renderRow={this._Screen.bind(this)}
-                            />
+                            <View style={[{maxHeight:300,}]}>
+                                <ListView
+                                    dataSource={this.state.dataSource}
+                                    showsVerticalScrollIndicator={true}
+                                    renderRow={this._Screen.bind(this)}
+                                />
+                            </View>
                             <View style={styles.Determine}>
-                                <TouchableOpacity style={styles.Cancel} onPress={this.Screen.bind(this)}>
+                                <TouchableOpacity style={styles.Cancel} onPress={this.ScreenBod.bind(this)}>
                                     <Text style={styles.CancelText}>
                                         取消
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.Cancel} onPress={this.submit1.bind(this)}>
+                                <TouchableOpacity style={[styles.Cancel,{marginRight:25,}]} onPress={this.submit1.bind(this)}>
                                     <Text style={styles.CancelText}>
                                         确定
                                     </Text>
@@ -837,7 +835,7 @@ const styles = StyleSheet.create({
     },
     header:{
         height:60,
-        backgroundColor:"#ff4f4d",
+        backgroundColor:"#ff4e4e",
         paddingTop:10,
     },
     cont:{
@@ -853,6 +851,7 @@ const styles = StyleSheet.create({
         textAlign:"center",
         color:"#ffffff",
         fontSize:22,
+        marginTop:3,
     },
     NameList:{
         paddingLeft:25,
@@ -864,25 +863,25 @@ const styles = StyleSheet.create({
     },
     Name:{
         flex:2,
-        fontSize:16,
+        fontSize:18,
         color:"#333333",
     },
     Number:{
         flex:1,
         textAlign:"right",
-        fontSize:16,
+        fontSize:18,
         color:"#333333",
     },
     Price:{
         flex:1,
         textAlign:"right",
-        fontSize:16,
+        fontSize:18,
         color:"#333333",
     },
     SmallScale:{
         flex:1,
         textAlign:"right",
-        fontSize:16,
+        fontSize:18,
         color:"#333333",
     },
     ShopList:{
@@ -1029,7 +1028,6 @@ const styles = StyleSheet.create({
         flexDirection:'row',
         marginLeft: 8
     },
-
     rightView:{
         flexDirection:'row',
         marginRight: 8
@@ -1091,37 +1089,24 @@ const styles = StyleSheet.create({
     activity:{
         marginBottom:5,
     },
-    Screen:{
-        flex:1,
-        backgroundColor:"#000000",
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    ScreenCont:{
-        width:300,
-        maxHeight:380,
-        paddingTop:15,
-        paddingLeft:15,
-        paddingRight:15,
-        paddingBottom:15,
-        backgroundColor:"#ffffff",
-        borderRadius:5,
-    },
     ScreenList:{
-        height:38,
+        paddingTop:8,
+        paddingBottom:8,
+        height:55,
         overflow:"hidden",
         flexDirection:"row",
-        backgroundColor:"#f7f7f7",
+        backgroundColor:"#ffffff",
         marginBottom:2,
     },
     ScreenTitle:{
-        height:45,
+        paddingTop:8,
+        paddingBottom:8,
+        height:55,
         flexDirection:"row",
-        borderBottomWidth:1,
-        borderBottomColor:"#cacccb",
     },
     coulumnScreen:{
-        flex:1
+        flex:1,
+        paddingLeft:5,
     },
     coulumnText:{
         fontSize:16,
@@ -1129,17 +1114,21 @@ const styles = StyleSheet.create({
         lineHeight:30,
     },
     Determine:{
-        height:50,
-        marginTop:10,
+        marginTop:20,
         flexDirection:"row"
     },
     Cancel:{
         flex:1,
+        marginLeft:25,
+        backgroundColor:"#ff4e4e",
+        paddingTop:13,
+        paddingBottom:13,
+        borderRadius:5,
     },
     CancelText:{
         fontSize:16,
+        color:"#ffffff",
         textAlign:"center",
-        lineHeight:30,
     },
     footer:{
         flex:3,
@@ -1159,18 +1148,23 @@ const styles = StyleSheet.create({
     },
     home1:{
         color:'#999999',
-        fontSize:12,
+        fontSize:16,
         marginTop:5,
         flex:1,
     },
     home2:{
         color:'#ff4e4e',
-        fontSize:12,
+        fontSize:16,
         marginTop:5,
         flex:1,
     },
     ShopCar:{
-        color:"red",
+        width:25,
+        height:25,
+        backgroundColor:"#ffba00",
+        color:"#ffffff",
+        textAlign:"center",
+        borderRadius:50,
         position:"absolute",
         right:-42,
     },

@@ -266,6 +266,8 @@ const styles = StyleSheet.create({
     },
     Error:{
         flex:1,
+        backgroundColor:"#000000",
+        opacity:0.9,
         justifyContent: 'center',
         alignItems: 'center',
     },
