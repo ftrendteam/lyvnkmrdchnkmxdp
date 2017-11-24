@@ -8,21 +8,21 @@ let deCode;
 let dbAdapter;
 let strWeightLen;
 let strLength;
-let bigDecimal;
 export default class DeCodePrePrint18 {
   constructor() {
   }
   
-  init = (DeCode, DbAdapter) => {
-    deCode = DeCode;
+  init = (code, DbAdapter) => {
+    deCode = code;
     dbAdapter = DbAdapter;
+    // return  this.deCodePreFlag();
   }
   
   deCodePreFlag = () => {
     let flag = StringUtils.subStr(0, 2, deCode);
-    if ("27".equals(flag)) {
+    if ("27"==flag) {
       return true;
-    } else if ("13".equals(flag)) {
+    } else if ("13"==flag) {
       return true;
     } else {
       return false;
@@ -30,21 +30,23 @@ export default class DeCodePrePrint18 {
   }
   
   /***
-   * 获取商品编码
+   * 获取商品ProdCode
    */
   async deCodeProdCode() {
-    await dbAdapter.selectKgOpt("ScalePluLength").then((datas) => {
-      let dataLen = datas.length;
-      if (dataLen != 0) {
-        strLength = datas.item(0).OptValue;
-        if (strLength == "") {
-          strLength = "5";
-        }
-      } else {
-        strLength = "5";
-      }
-      return StringUtils.subStr(2, (2 + Number(strLength)), deCode);
-    });
+      return new Promise((resolve, reject) => {
+          dbAdapter.selectKgOpt("ScalePluLength").then((datas) => {
+              let dataLen = datas.length;
+              if (dataLen != 0) {
+                  strLength = datas.item(0).OptValue;
+                  if (strLength == "") {
+                      strLength = "5";
+                  }
+              } else {
+                  strLength = "5";
+              }
+              resolve(StringUtils.subStr(2, (2 + Number(strLength)), deCode));
+          });
+      });
   }
   
   /***
@@ -92,8 +94,11 @@ export default class DeCodePrePrint18 {
     });
     
   }
-  
-  
+
+    /***
+     * 解析商品重量
+     * @returns {Promise}
+     */
   deCodeWeight = () => {
     return new Promise((resolve, reject) => {
       let fixed = 2;

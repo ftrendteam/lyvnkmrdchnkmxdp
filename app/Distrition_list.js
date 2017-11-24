@@ -148,7 +148,7 @@ export default class Distrition_list extends Component {
     pressPop1(rowData){
         if(this.props.SearchShopname){
             if(this.state.shopPandian=='App_Client_NOYSCGQ'||this.state.shopPandian=='App_Client_NOYSXPCGQ'){
-                this.props.SearchShopname(rowData.suppcode)
+                this.props.SearchShopname(rowData.Formno)
             }
         }
         this.props.navigator.pop();
@@ -211,7 +211,7 @@ export default class Distrition_list extends Component {
                             <Text style={styles.codingText}>单据号</Text>
                         </View>
                         {
-                            (this.state.invoice=="商品验收"||this.state.invoice=="协配收货")?
+                            (this.state.invoice=="商品验收单"||this.state.invoice=="协配收货单")?
                                 <View style={styles.name}>
                                     <Text style={styles.codingText}>供应商</Text>
                                 </View>:null

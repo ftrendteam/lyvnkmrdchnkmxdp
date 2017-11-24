@@ -85,6 +85,7 @@ export default class ProductCG extends Component {
             Storage.save('history','App_Client_ProCGQ');
             Storage.save('historyClass','App_Client_ProCGDetailQ');
             Storage.save('ProYH','ProCG');
+            Storage.save('YdCountm','3');
             Storage.save('Date',data);
             Storage.save("scode",str)
         }
@@ -149,6 +150,7 @@ const styles = StyleSheet.create({
     HeaderList:{
         flex:6,
         textAlign:"center",
+        paddingRight:50,
         color:"#ffffff",
         fontSize:22,
         marginTop:3,

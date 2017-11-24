@@ -710,14 +710,18 @@ export default class ShoppingCart extends Component {
                                         <Text style={[styles.ShopCar,{paddingTop:3,}]}>{this.state.shopcar}</Text>:null
                                 }
                                 {
-                                    (this.state.shopcar<100)?
+                                    (this.state.shopcar<999)?
                                         null:
-                                        <Text style={[styles.ShopCar,{width:35,height:35,paddingTop:6,}]}>{this.state.shopcar}</Text>
+                                        <Text style={[styles.ShopCar,{width:30,height:30,top:11,lineHeight:21,}]}>{this.state.shopcar}</Text>
                                 }
                                 {
-                                    (this.state.shopcar<1000)?
-                                        null:
-                                        <Text style={[styles.ShopCar,{width:40,height:40,paddingTop:8,right:-49,}]}>{this.state.shopcar}</Text>
+                                    (this.state.shopcar>999)?
+                                        <View>
+                                            <Text style={[styles.ShopCar,{width:30,height:30,top:11,lineHeight:23}]}>{this.state.shopcar}</Text>
+                                            <Text style={styles.Add}>
+                                                +
+                                            </Text>
+                                        </View>:null
                                 }
                             </Image>
                         </View>
@@ -1166,6 +1170,14 @@ const styles = StyleSheet.create({
         textAlign:"center",
         borderRadius:50,
         position:"absolute",
+        top:10,
         right:-42,
+    },
+    Add:{
+        position:"absolute",
+        right:-50,
+        top:5,
+        color:"#ff4e4e",
+        fontWeight:"bold"
     },
 });

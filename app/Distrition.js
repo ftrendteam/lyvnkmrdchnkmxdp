@@ -92,6 +92,7 @@ export default class Distrition extends Component {
         Storage.save("scode",str);
         Storage.save('Date',this.state.active);
         Storage.save('Name','配送收货单');
+        Storage.save('FormType','PSSHYW');
         Storage.save('valueOf','App_Client_ProPSSH');
         Storage.save('history','App_Client_ProPSSHQ');
         Storage.save('historyClass','App_Client_ProPSSHDetailQ');
@@ -175,6 +176,7 @@ const styles = StyleSheet.create({
     HeaderList:{
         flex:6,
         textAlign:"center",
+        paddingRight:50,
         color:"#ffffff",
         fontSize:22,
         marginTop:3,

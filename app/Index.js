@@ -44,11 +44,16 @@ import NetUtils from "../utils/NetUtils";
 import FetchUtil from "../utils/FetchUtils";
 import DBAdapter from "../adapter/DBAdapter";
 import Storage from '../utils/Storage';
+import DeCodePrePrint18 from "../utils/DeCodePrePrint18";
 import SideMenu from 'react-native-side-menu';
 
 var {NativeModules} = require('react-native');
 var RNScannerAndroid = NativeModules.RNScannerAndroid;
+
 let dbAdapter = new DBAdapter();
+
+let decodepreprint = new DeCodePrePrint18();
+
 let db;
 let page =1;
 let total = 0;
@@ -83,6 +88,9 @@ export default class Index extends Component {
             OrgFormno:"",
             FormType:"",
             LinkUrl:"",
+            Disting:"",
+            pressStatus:0,
+            PressStatus:0,
             nomore: true,
             isloading:true,
             show:false,
@@ -126,67 +134,137 @@ export default class Index extends Component {
     Code(){
         RNScannerAndroid.openScanner();
         DeviceEventEmitter.addListener("code", (reminder) => {
-            dbAdapter.selectAidCode(reminder,1).then((rows)=>{
-                if(rows.length==0){
-                    alert("该商品不存在")
-                }else{
-                    Storage.get('FormType').then((tags)=>{
-                        this.setState({
-                            FormType:tags
-                        })
-                    })
 
-                    Storage.get('LinkUrl').then((tags) => {
-                        this.setState({
-                            LinkUrl:tags
+            var number = "279001501234012341";
+
+            decodepreprint.init(number,dbAdapter);
+
+            if(number.length==18&&decodepreprint.deCodePreFlag()){
+                decodepreprint.deCodeProdCode().then((datas)=>{
+                    dbAdapter.selectProdCode(datas,1).then((rows)=>{
+                        Storage.get('FormType').then((tags)=>{
+                            this.setState({
+                                FormType:tags
+                            })
+                        })
+
+                        Storage.get('LinkUrl').then((tags) => {
+                            this.setState({
+                                LinkUrl:tags
+                            })
+                        })
+                        //商品查询
+                        Storage.get('userName').then((tags)=>{
+                            let params = {
+                                reqCode:"App_PosReq",
+                                reqDetailCode:"App_Client_CurrProdQry",
+                                ClientCode:this.state.ClientCode,
+                                sDateTime:Date.parse(new Date()),
+                                Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
+                                username:tags,
+                                usercode:this.state.Usercode,
+                                SuppCode:rows.item(0).SuppCode,
+                                ShopCode:this.state.ShopCode,
+                                ChildShopCode:this.state.ChildShopCode,
+                                ProdCode:datas,
+                                OrgFormno:this.state.OrgFormno,
+                                FormType:this.state.FormType,
+                            };
+                            FetchUtil.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
+                                var countm=JSON.stringify(data.countm);
+                                var ShopPrice=JSON.stringify(data.ShopPrice);
+                                if(data.retcode == 1){
+                                    // if(data.isFond==1){
+                                    var ShopCar = rows.item(0).ProdName;
+                                    this.props.navigator.push({
+                                        component:OrderDetails,
+                                        params:{
+                                            ProdName:rows.item(0).ProdName,
+                                            ShopPrice:rows.item(0).ShopPrice,
+                                            Pid:rows.item(0).Pid,
+                                            countm:rows.item(0).ShopNumber,
+                                            promemo:rows.item(0).promemo,
+                                            prototal:rows.item(0).prototal,
+                                            ProdCode:rows.item(0).ProdCode,
+                                            DepCode:rows.item(0).DepCode1,
+                                            SuppCode:rows.item(0).SuppCode,
+                                            ydcountm:countm,
+                                        }
+                                    })
+                                    // }else{
+                                    //     // alert('该商品暂时无法购买')
+                                    // }
+                                }else{}
+                            })
                         })
                     })
-                    //商品查询
-                    Storage.get('userName').then((tags)=>{
-                        let params = {
-                            reqCode:"App_PosReq",
-                            reqDetailCode:"App_Client_CurrProdQry",
-                            ClientCode:this.state.ClientCode,
-                            sDateTime:Date.parse(new Date()),
-                            Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
-                            username:tags,
-                            usercode:this.state.Usercode,
-                            SuppCode:rows.item(0).SuppCode,
-                            ShopCode:this.state.ShopCode,
-                            ChildShopCode:this.state.ChildShopCode,
-                            ProdCode:rows.item(0).ProdCode,
-                            OrgFormno:this.state.OrgFormno,
-                            FormType:this.state.FormType,
-                        };
-                        FetchUtil.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
-                            var countm=JSON.stringify(data.countm);
-                            var ShopPrice=JSON.stringify(data.ShopPrice);
-                            if(data.retcode == 1){
-                                // if(data.isFond==1){
-                                var ShopCar = rows.item(0).ProdName;
-                                this.props.navigator.push({
-                                    component:OrderDetails,
-                                    params:{
-                                        ProdName:rows.item(0).ProdName,
-                                        ShopPrice:rows.item(0).ShopPrice,
-                                        Pid:rows.item(0).Pid,
-                                        countm:rows.item(0).ShopNumber,
-                                        promemo:rows.item(0).promemo,
-                                        prototal:rows.item(0).prototal,
-                                        ProdCode:rows.item(0).ProdCode,
-                                        DepCode:rows.item(0).DepCode1,
-                                        SuppCode:rows.item(0).SuppCode,
-                                        ydcountm:countm,
-                                    }
-                                })
-                                // }else{
-                                //     // alert('该商品暂时无法购买')
-                                // }
-                            }else{}
+                });
+
+            }else{
+                dbAdapter.selectAidCode(reminder,1).then((rows)=>{
+                    if(rows.length==0){
+                        alert("该商品不存在")
+                    }else{
+                        Storage.get('FormType').then((tags)=>{
+                            this.setState({
+                                FormType:tags
+                            })
                         })
-                    })
-                }
-            })
+
+                        Storage.get('LinkUrl').then((tags) => {
+                            this.setState({
+                                LinkUrl:tags
+                            })
+                        })
+                        //商品查询
+                        Storage.get('userName').then((tags)=>{
+                            let params = {
+                                reqCode:"App_PosReq",
+                                reqDetailCode:"App_Client_CurrProdQry",
+                                ClientCode:this.state.ClientCode,
+                                sDateTime:Date.parse(new Date()),
+                                Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
+                                username:tags,
+                                usercode:this.state.Usercode,
+                                SuppCode:rows.item(0).SuppCode,
+                                ShopCode:this.state.ShopCode,
+                                ChildShopCode:this.state.ChildShopCode,
+                                ProdCode:rows.item(0).ProdCode,
+                                OrgFormno:this.state.OrgFormno,
+                                FormType:this.state.FormType,
+                            };
+                            FetchUtil.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
+                                var countm=JSON.stringify(data.countm);
+                                var ShopPrice=JSON.stringify(data.ShopPrice);
+                                if(data.retcode == 1){
+                                    // if(data.isFond==1){
+                                    var ShopCar = rows.item(0).ProdName;
+                                    this.props.navigator.push({
+                                        component:OrderDetails,
+                                        params:{
+                                            ProdName:rows.item(0).ProdName,
+                                            ShopPrice:rows.item(0).ShopPrice,
+                                            Pid:rows.item(0).Pid,
+                                            countm:rows.item(0).ShopNumber,
+                                            promemo:rows.item(0).promemo,
+                                            prototal:rows.item(0).prototal,
+                                            ProdCode:rows.item(0).ProdCode,
+                                            DepCode:rows.item(0).DepCode1,
+                                            SuppCode:rows.item(0).SuppCode,
+                                            ydcountm:countm,
+                                        }
+                                    })
+                                    // }else{
+                                    //     // alert('该商品暂时无法购买')
+                                    // }
+                                }else{}
+                            })
+                        })
+                    }
+                })
+            }
+
+
         })
     }
 
@@ -216,12 +294,6 @@ export default class Index extends Component {
             if(lastDepCode ==1){
                 page= 1;
             }
-
-
-            var data={
-                src:require('../images/1_42.png'),
-                type: "1"
-            };
         });
     }
 
@@ -534,17 +606,21 @@ export default class Index extends Component {
 
         }
     }
-
     //功能分类
     ChuMo(){
-        Storage.save("Disting","1");
-        <Image
-            source={data.src}
-        />
+        Storage.save("Disting","0");
+        this.setState({
+            pressStatus:'pressin',
+            PressStatus:0,
+        });
     }
 
     SaoMa(){
-        Storage.save("Disting","0")
+        Storage.save("Disting","1");
+        this.setState({
+            PressStatus:'Pressin',
+            pressStatus:0
+        });
     }
 
     YaoHuo(){
@@ -553,6 +629,11 @@ export default class Index extends Component {
         Storage.delete('shildshop');
         Storage.delete('YuanDan');
         Storage.delete('Screen');
+        Storage.get('Disting').then((tags)=>{
+            this.setState({
+                Disting:tags
+            })
+        })
         if(this.state.ShopCar1>0){
             this._setModalVisible();
             alert("商品未提交")
@@ -563,19 +644,44 @@ export default class Index extends Component {
                 if(rows==true){
                     dbAdapter.selecUserRightA1012(this.state.usercode).then((rows)=>{
                         if(rows==true){
-                            var date = new Date();
-                            var data=JSON.stringify(date.getTime());
-                            Storage.save('Name','要货单');
-                            Storage.save('FormType','YWYW');
-                            Storage.save('ProYH','ProYH');
-                            Storage.save('YdCountm','3');
-                            var invoice = "要货单";
-                            this.setState({
-                                head:invoice,
-                                active:data,
-                            });
-                            Storage.save('Date',this.state.active);
-                            this._setModalVisible();
+                            if(this.state.Disting=="0"){
+                                var date = new Date();
+                                var data=JSON.stringify(date.getTime());
+                                Storage.save('Name','要货单');
+                                Storage.save('FormType','YWYW');
+                                Storage.save('ProYH','ProYH');
+                                Storage.save('YdCountm','3');
+                                Storage.save('YdCountm','1');
+                                var invoice = "要货单";
+                                this.setState({
+                                    head:invoice,
+                                    active:data,
+                                });
+                                Storage.save('Date',this.state.active);
+                                this._setModalVisible();
+                            }else if(this.state.Disting=="1"){
+                                var date = new Date();
+                                var data=JSON.stringify(date.getTime());
+                                Storage.save('Name','要货单');
+                                Storage.save('FormType','YWYW');
+                                Storage.save('ProYH','ProYH');
+                                Storage.save('YdCountm','3');
+                                Storage.save('YdCountm','1');
+                                Storage.save('Date',this.state.active);
+                                var invoice = "要货单";
+                                this.setState({
+                                    head:invoice,
+                                    active:data,
+                                });
+                                var nextRoute={
+                                    name:"主页",
+                                    component:Search
+                                };
+                                this.props.navigator.push(nextRoute)
+                                this._setModalVisible();
+                            }else{
+                                alert("请选择模式")
+                            }
                         }
                     })
                 }else if(rows==false){
@@ -607,13 +713,17 @@ export default class Index extends Component {
                 if (rows == true) {
                     dbAdapter.selecUserRightA1012(this.state.usercode).then((rows) => {
                         if (rows == true) {
-                            Storage.save("invoice", "损益单");
-                            var nextRoute = {
-                                name: "损益",
-                                component: SunYi
-                            };
-                            this.props.navigator.push(nextRoute);
-                            this._setModalVisible();
+                            if(this.state.Disting=="0"||this.state.Disting=="1") {
+                                Storage.save("invoice", "损益单");
+                                var nextRoute = {
+                                    name: "损益",
+                                    component: SunYi
+                                };
+                                this.props.navigator.push(nextRoute);
+                                this._setModalVisible();
+                            }else{
+                                alert("请选择模式")
+                            }
 
                         }
                     })
@@ -641,19 +751,42 @@ export default class Index extends Component {
                 if (rows == true) {
                     dbAdapter.selecUserRightA1012(this.state.usercode).then((rows) => {
                         if (rows == true) {
-                            var date = new Date();
-                            var data=JSON.stringify(date.getTime());
-                            Storage.save('Name','实时盘点单');
-                            Storage.save('FormType','CUPCYW');
-                            Storage.save('ProYH','ProCurrPC');
-                            Storage.save('YdCountm','1');
-                            var invoice = "实时盘点单";
-                            this.setState({
-                                head: invoice,
-                                active:data,
-                            });
-                            Storage.save('Date',this.state.active);
-                            this._setModalVisible();
+                            if(this.state.Disting=="0"||this.state.Disting=="1") {
+                                var date = new Date();
+                                var data = JSON.stringify(date.getTime());
+                                Storage.save('Name', '实时盘点单');
+                                Storage.save('FormType', 'CUPCYW');
+                                Storage.save('ProYH', 'ProCurrPC');
+                                Storage.save('YdCountm', '1');
+                                var invoice = "实时盘点单";
+                                this.setState({
+                                    head: invoice,
+                                    active: data,
+                                });
+                                Storage.save('Date', this.state.active);
+                                this._setModalVisible();
+                            }else if(this.state.Disting=="1"){
+                                var date = new Date();
+                                var data = JSON.stringify(date.getTime());
+                                Storage.save('Name', '实时盘点单');
+                                Storage.save('FormType', 'CUPCYW');
+                                Storage.save('ProYH', 'ProCurrPC');
+                                Storage.save('YdCountm', '1');
+                                var invoice = "实时盘点单";
+                                this.setState({
+                                    head: invoice,
+                                    active: data,
+                                });
+                                Storage.save('Date', this.state.active);
+                                var nextRoute={
+                                    name:"主页",
+                                    component:Search
+                                };
+                                this.props.navigator.push(nextRoute)
+                                this._setModalVisible();
+                            }else{
+                                alert("请选择模式")
+                            }
                         }
                     })
                 } else if (rows == false) {
@@ -682,14 +815,18 @@ export default class Index extends Component {
                 if (rows == true) {
                     dbAdapter.selecUserRightA1012(this.state.usercode).then((rows) => {
                         if (rows == true) {
-                            Storage.save('invoice','商品盘点单');
-                            Storage.save('YdCountm','3');
-                            var nextRoute = {
-                                name: "主页",
-                                component: Query
-                            };
-                            this.props.navigator.push(nextRoute);
-                            this._setModalVisible();
+                            if(this.state.Disting=="0"||this.state.Disting=="1") {
+                                Storage.save('invoice', '商品盘点单');
+                                Storage.save('YdCountm', '3');
+                                var nextRoute = {
+                                    name: "主页",
+                                    component: Query
+                                };
+                                this.props.navigator.push(nextRoute);
+                                this._setModalVisible();
+                            }else{
+                                alert("请选择模式")
+                            }
                         }
                     })
                 } else if (rows == false) {
@@ -716,14 +853,18 @@ export default class Index extends Component {
                 if (rows == true) {
                     dbAdapter.selecUserRightA1012(this.state.usercode).then((rows) => {
                         if (rows == true) {
-                            Storage.save("invoice", "配送收货单");
-                            Storage.save('YdCountm','2');
-                            var nextRoute = {
-                                name: "主页",
-                                component: Distrition
-                            };
-                            this.props.navigator.push(nextRoute);
-                            this._setModalVisible();
+                            if(this.state.Disting=="0"||this.state.Disting=="1") {
+                                Storage.save("invoice", "配送收货单");
+                                Storage.save('YdCountm', '2');
+                                var nextRoute = {
+                                    name: "主页",
+                                    component: Distrition
+                                };
+                                this.props.navigator.push(nextRoute);
+                                this._setModalVisible();
+                            }else{
+                                alert("请选择模式")
+                            }
                         }
                     })
                 } else if (rows == false) {
@@ -750,13 +891,17 @@ export default class Index extends Component {
                 if (rows == true) {
                     dbAdapter.selecUserRightA1012(this.state.usercode).then((rows) => {
                         if (rows == true) {
-                            Storage.save("invoice", "商品采购单");
-                            var nextRoute = {
-                                name: "主页",
-                                component: ProductCG
-                            };
-                            this.props.navigator.push(nextRoute);
-                            this._setModalVisible();
+                            if(this.state.Disting=="0"||this.state.Disting=="1") {
+                                Storage.save("invoice", "商品采购单");
+                                var nextRoute = {
+                                    name: "主页",
+                                    component: ProductCG
+                                };
+                                this.props.navigator.push(nextRoute);
+                                this._setModalVisible();
+                            }else{
+                                alert("请选择模式")
+                            }
                         }
                     })
                 } else if (rows == false) {
@@ -782,14 +927,18 @@ export default class Index extends Component {
                 if (rows == true) {
                     dbAdapter.selecUserRightA1012(this.state.usercode).then((rows) => {
                         if (rows == true) {
-                            Storage.save("invoice", "商品验收单");
-                            Storage.save('YdCountm','2');
-                            var nextRoute = {
-                                name: "主页",
-                                component: ProductYS
-                            };
-                            this.props.navigator.push(nextRoute);
-                            this._setModalVisible();
+                            if(this.state.Disting=="0"||this.state.Disting=="1") {
+                                Storage.save("invoice", "商品验收单");
+                                Storage.save('YdCountm', '2');
+                                var nextRoute = {
+                                    name: "主页",
+                                    component: ProductYS
+                                };
+                                this.props.navigator.push(nextRoute);
+                                this._setModalVisible();
+                            }else{
+                                alert("请选择模式")
+                            }
                         }
                     })
                 } else if (rows == false) {
@@ -815,14 +964,18 @@ export default class Index extends Component {
                 if (rows == true) {
                     dbAdapter.selecUserRightA1012(this.state.usercode).then((rows) => {
                         if (rows == true) {
-                            Storage.save("invoice", "协配采购单");
-                            Storage.save('YdCountm','3');
-                            var nextRoute = {
-                                name: "主页",
-                                component: ProductXP
-                            };
-                            this.props.navigator.push(nextRoute);
-                            this._setModalVisible();
+                            if(this.state.Disting=="0"||this.state.Disting=="1") {
+                                Storage.save("invoice", "协配采购单");
+                                Storage.save('YdCountm', '3');
+                                var nextRoute = {
+                                    name: "主页",
+                                    component: ProductXP
+                                };
+                                this.props.navigator.push(nextRoute);
+                                this._setModalVisible();
+                            }else{
+                                alert("请选择模式")
+                            }
                         }
                     })
                 } else if (rows == false) {
@@ -848,14 +1001,18 @@ export default class Index extends Component {
                 if (rows == true) {
                     dbAdapter.selecUserRightA1012(this.state.usercode).then((rows) => {
                         if (rows == true) {
-                            Storage.save("invoice", "协配收货单");
-                            Storage.save('YdCountm','2');
-                            var nextRoute = {
-                                name: "主页",
-                                component: ProductSH
-                            };
-                            this.props.navigator.push(nextRoute);
-                            this._setModalVisible();
+                            if(this.state.Disting=="0"||this.state.Disting=="1") {
+                                Storage.save("invoice", "协配收货单");
+                                Storage.save('YdCountm', '2');
+                                var nextRoute = {
+                                    name: "主页",
+                                    component: ProductSH
+                                };
+                                this.props.navigator.push(nextRoute);
+                                this._setModalVisible();
+                            }else{
+                                alert("请选择模式")
+                            }
                         }
                     })
                 } else if (rows == false) {
@@ -982,9 +1139,9 @@ export default class Index extends Component {
                     onRequestClose={() => {}} >
                     <View style={styles.modalStyle}>
                         <View style={styles.ModalTitle}>
-                            <TouchableOpacity style={styles.ModalLeft} onPress={this.ChuMo}>
+                            <TouchableOpacity style={styles.ModalLeft} onPress={this.ChuMo.bind(this)}>
                                 <View>
-                                    <Image source={require("../images/1_43.png")} />
+                                    <Image source = {this.state.pressStatus =='pressin' ? require("../images/1_42.png") : require("../images/1_43.png")} />
                                 </View>
                                 <View>
                                     <Text style={styles.ModalImage}>
@@ -998,9 +1155,9 @@ export default class Index extends Component {
                             <View style={styles.ModalLeft1}>
                                 <Image source={require("../images/1_47.png")} />
                             </View>
-                            <TouchableOpacity style={styles.ModalLeft} onPress={this.SaoMa}>
+                            <TouchableOpacity style={styles.ModalLeft} onPress={this.SaoMa.bind(this)}>
                                 <View style={[{marginLeft:14}]}>
-                                    <Image source={require("../images/1_43.png")} />
+                                    <Image source = {this.state.PressStatus =='Pressin' ? require("../images/1_42.png") : require("../images/1_43.png")}  />
                                 </View>
                                 <View>
                                     <Text style={styles.ModalImage}>
@@ -1139,14 +1296,18 @@ export default class Index extends Component {
                                         <Text style={[styles.ShopCar,{paddingTop:3,}]}>{this.state.shopcar}</Text>:null
                                 }
                                 {
-                                    (this.state.shopcar<100)?
+                                    (this.state.shopcar<999)?
                                         null:
-                                        <Text style={[styles.ShopCar,{width:35,height:35,paddingTop:6,}]}>{this.state.shopcar}</Text>
+                                        <Text style={[styles.ShopCar,{width:30,height:30,top:11,lineHeight:21,}]}>{this.state.shopcar}</Text>
                                 }
                                 {
-                                    (this.state.shopcar<1000)?
-                                        null:
-                                        <Text style={[styles.ShopCar,{width:40,height:40,paddingTop:8,right:-49,}]}>{this.state.shopcar}</Text>
+                                    (this.state.shopcar>999)?
+                                        <View>
+                                            <Text style={[styles.ShopCar,{width:30,height:30,top:11,lineHeight:23}]}>{this.state.shopcar}</Text>
+                                            <Text style={styles.Add}>
+                                                +
+                                            </Text>
+                                        </View>:null
                                 }
                             </Image>
                         </View>
@@ -1405,7 +1566,15 @@ const styles = StyleSheet.create({
         textAlign:"center",
         borderRadius:50,
         position:"absolute",
+        top:10,
         right:-42,
+    },
+    Add:{
+        position:"absolute",
+        right:-50,
+        top:5,
+        color:"#ff4e4e",
+        fontWeight:"bold"
     },
     modalStyle:{
         flex:1,

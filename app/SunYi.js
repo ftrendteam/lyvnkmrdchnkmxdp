@@ -15,6 +15,7 @@ import {
     TouchableOpacity,
 } from 'react-native';
 import Index from "./Index";
+import Search from "./Search";
 import NetUtils from "../utils/NetUtils";
 import Storage from '../utils/Storage';
 
@@ -62,25 +63,49 @@ export default class SunYi extends Component {
     }
 
     YiChu(){
-        var date = new Date();
-        var data=JSON.stringify(date.getTime());
-        this.setState({
-            active:data,
-        });
-        var nextRoute={
-            name:"主页",
-            component:Index
-        };
-        this.props.navigator.push(nextRoute);
-        Storage.save('Name','损益单');
-        Storage.save('FormType','SYYW');
-        Storage.save('ProYH','ProSY');
-        Storage.save('YdCountm','3');
-        Storage.save('OrgFormno',"0");
-        Storage.save('Date',this.state.active);
-        Storage.save('valueOf', 'App_Client_ProSY');
-        Storage.save('history', 'App_Client_ProSYQ');
-        Storage.save('historyClass', 'App_Client_ProSYDetailQ');
+        if(this.state.Disting=="0") {
+            var date = new Date();
+            var data=JSON.stringify(date.getTime());
+            this.setState({
+                active:data,
+            });
+            var nextRoute={
+                name:"主页",
+                component:Index
+            };
+            this.props.navigator.push(nextRoute);
+            Storage.save('Name','损益单');
+            Storage.save('FormType','SYYW');
+            Storage.save('ProYH','ProSY');
+            Storage.save('YdCountm','3');
+            Storage.save('OrgFormno',"0");
+            Storage.save('Date',this.state.active);
+            Storage.save('valueOf', 'App_Client_ProSY');
+            Storage.save('history', 'App_Client_ProSYQ');
+            Storage.save('historyClass', 'App_Client_ProSYDetailQ');
+        }else if(){
+            var date = new Date();
+            var data=JSON.stringify(date.getTime());
+            this.setState({
+                active:data,
+            });
+            var nextRoute={
+                name:"主页",
+                component:Search
+            };
+            this.props.navigator.push(nextRoute);
+            Storage.save('Name','损益单');
+            Storage.save('FormType','SYYW');
+            Storage.save('ProYH','ProSY');
+            Storage.save('YdCountm','3');
+            Storage.save('OrgFormno',"0");
+            Storage.save('Date',this.state.active);
+            Storage.save('valueOf', 'App_Client_ProSY');
+            Storage.save('history', 'App_Client_ProSYQ');
+            Storage.save('historyClass', 'App_Client_ProSYDetailQ');
+        }else{
+
+        }
     }
 
     render() {
@@ -131,6 +156,7 @@ const styles = StyleSheet.create({
     HeaderList:{
         flex:6,
         textAlign:"center",
+        paddingRight:50,
         color:"#ffffff",
         fontSize:22,
         marginTop:3,

@@ -177,6 +177,7 @@ const styles = StyleSheet.create({
     HeaderList:{
         flex:6,
         textAlign:"center",
+        paddingRight:50,
         color:"#ffffff",
         fontSize:22,
         marginTop:3,
