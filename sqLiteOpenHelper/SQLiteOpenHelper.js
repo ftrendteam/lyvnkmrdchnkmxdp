@@ -152,6 +152,18 @@ export default class SQLiteOpenHelper {
         }, (err) => {
           console.log(err);
         });
+      tx.executeSql("CREATE TABLE IF NOT EXISTS KgtOpt(OptName varchar(12) null,OptValue varchar(100) null)", [],
+        () => {
+      
+        }, (err) => {
+          console.log(err);
+        });
+      tx.executeSql("CREATE TABLE IF NOT EXISTS PosOpt(PosCode varchar(12) null,ShopCode varchar(12) null,OptName varchar(20) null,OptValue varchar(100) null)", [],
+        () => {
+      
+        }, (err) => {
+          console.log(err);
+        });
     }, (err) => {
       this._errorCB('transaction', err);
     }, () => {

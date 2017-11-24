@@ -6,6 +6,7 @@ import MD5Utils from '../utils/MD5Utils';
 import DataUtils from '../utils/DataUtils';
 import Storage from '../utils/Storage';
 import FetchUtils from '../utils/FetchUtils';
+import DownLoadBasicData from '../utils/DownLoadBasicData';
 import RequestBodyUtils from '../utils/RequestBodyUtils';
 let db;
 let sqLiteOpenHelper
@@ -86,6 +87,101 @@ export default class DBAdapter extends SQLiteOpenHelper {
       this._errorCB('transaction', error);
     }, () => {
       this._successCB('transaction insert data');
+    });
+  }
+  
+  /***
+   * 插入kgopt表数据
+   * @param datas
+   */
+  insertKgopt(datas) {
+    let len = datas.length;
+    if (!db) {
+      this.open();
+    }
+    this.deleteData("KgtOpt");
+    db.transaction((tx) => {
+      for (let i = 0; i < len; i++) {
+        let data = datas[i];
+        let optName = data.OptName;
+        let optValue = data.OptValue;
+        let sql = "INSERT INTO KgtOpt(OptName,OptValue) values(?,?)";
+        tx.executeSql(sql, [optName, optValue], () => {
+        }, (err) => {
+          console.log(err)
+        });
+      }
+    });
+  }
+  
+  selectKgOpt(where) {
+    if (!db) {
+      this.open();
+    }
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        try {
+          let sql = "select * from KgtOpt where upper(OptName) = '" + (where + "").toUpperCase() + "'";
+          //console.log(sql)
+          tx.executeSql(sql, [], (tx, result) => {
+            resolve(result.rows);
+          }, (err) => {
+            reject("");
+            //console.log(err)
+          });
+        } catch (err) {
+          //console.log("kgop=", err)
+        }
+        
+      });
+    });
+  }
+  
+  selectPosOpt(where) {
+    if (!db) {
+      this.open();
+    }
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        try {
+          let sql = "select * from PosOpt where upper(OptName) = '" + (where + "").toUpperCase() + "'";
+          //console.log(sql)
+          tx.executeSql(sql, [], (tx, result) => {
+            resolve(result.rows);
+          }, (err) => {
+            reject("");
+            //console.log("reject=", err)
+          });
+        } catch (err) {
+          //console.log("zhixingdbb=", err);
+        }
+      });
+    });
+  }
+  
+  /***
+   * 插入PosOpt表数据
+   * @param datas
+   */
+  insertPosOpt(datas) {
+    let len = datas.length;
+    if (!db) {
+      this.open();
+    }
+    this.deleteData("PosOpt");
+    db.transaction((tx) => {
+      for (let i = 0; i < len; i++) {
+        let data = datas[i];
+        let posCode = data.PosCode;
+        let shopCode = data.ShopCode;
+        let optName = data.OptName;
+        let optValue = data.OptValue;
+        let sql = "INSERT INTO PosOpt(PosCode,ShopCode,OptName,OptValue) values(?,?,?,?)";
+        tx.executeSql(sql, [posCode, shopCode, optName, optValue], () => {
+        }, (err) => {
+          console.log(err)
+        });
+      }
     });
   }
   
@@ -281,7 +377,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
           //   "prodname":"海鲜菇","countm":1.0000,"kccount":0.0,"prototal":1.0000,"unit":"kg  ","promemo":""
           let sql = " replace INTO shopInfo(pid,ProdCode,prodname,countm,ShopPrice,prototal,promemo,DepCode,ydcountm)" +
             "values(?,?,?,?,?,?,?,?,?)";
-          tx.executeSql(sql, [Pid, ProdCode, shopName, ShopNumber, ShopPrice, ShopAmount, ShopRemark, DepCode,ydcountm], () => {
+          tx.executeSql(sql, [Pid, ProdCode, shopName, ShopNumber, ShopPrice, ShopAmount, ShopRemark, DepCode, ydcountm], () => {
               resolve(true);
             }, (err) => {
               reject(false);
@@ -521,7 +617,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
     });
   }
   
-  isLogin(Usercode, userpwd, currShopCode,posCode) {
+  isLogin(Usercode, userpwd, currShopCode, posCode) {
     let md5Pwd = MD5Utils.encryptMD5(userpwd);
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
@@ -532,7 +628,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
             let item = results.rows.item(0);
             if ((md5Pwd + '') == item.UserPwd) {//密码正确
               let userName = item.UserName;
-                Storage.save("userName", userName);
+              Storage.save("userName", userName);
               // DataUtils.save("userCode", Usercode);
               let shopCode;
               DataUtils.get('code', '').then((data) => {
@@ -543,7 +639,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
                   let categoryBody = RequestBodyUtils.createCategory(currShopCode);
                   this.downProductAndCategory(categoryBody, currShopCode).then((result) => {
                     //if (result) {
-                    console.log("本地没有保存机构号,根据当前的机构号下载商品和品类");
+                    //console.log("本地没有保存机构号,根据当前的机构号下载商品和品类");
                     resolve(true);
                     //}
                   });
@@ -552,7 +648,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
                   let categoryBody = RequestBodyUtils.createCategory(currShopCode);
                   this.downProductAndCategory(categoryBody, currShopCode).then((result) => {
                     //if (result) {
-                    console.log("本地没有保存机构号,根据当前的机构号下载商品和品类");
+                    //console.log("本地没有保存机构号,根据当前的机构号下载商品和品类");
                     resolve(true);
                     //}
                   });
@@ -563,15 +659,12 @@ export default class DBAdapter extends SQLiteOpenHelper {
                    * prductBody 商品信息下载请求体
                    * categoryBody 品类信息下载请求体
                    */
-                  //this.deleteData("product");
-                  //this.deleteData("tdepset");
                   let categoryBody = RequestBodyUtils.createCategory(currShopCode);
                   this.downProductAndCategory(categoryBody, currShopCode).then((result) => {
                     //if (result) {
                     resolve(true);
                     //}
                   });
-                  
                 }
               });
               
@@ -607,7 +700,8 @@ export default class DBAdapter extends SQLiteOpenHelper {
               let suppset = RequestBodyUtils.createSuppset(currShopCode);
               FetchUtils.post(urlData, suppset).then((suppData) => {
                 this.insertSuppeset(suppData.TblRow).then((result) => {
-                  resolve(result);
+                  DownLoadBasicData.downLoadKgtOpt(urlData, currShopCode, this)
+                  resolve(true);
                 });
               })
             });
@@ -662,7 +756,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
           ",ifNull(b.promemo,'') as ShopRemark,'" + DepCode + "' as DepCode1 " +
           " from product a left join shopInfo b on a.Pid=b.Pid where IsDel='0' and prodtype<>'1' ";
         ssql = ssql + " and a.DepCode in (select depcode from tdepset where IsDel='0' and depcode" + DepLevel + "='" + DepCode + "')";
-        ssql = ssql + " limit 9 offset " + (currpage-1)*9;
+        ssql = ssql + " limit 9 offset " + (currpage - 1) * 9;
         tx.executeSql(ssql, [], (tx, results) => {
           resolve(results.rows);
         });
@@ -720,10 +814,10 @@ export default class DBAdapter extends SQLiteOpenHelper {
    * @param funcCode 需要查询的权限号
    * @return true 表示含有某个权限 false 没有权限
    */
-  selectUserRight(userCode,funcCode) {
+  selectUserRight(userCode, funcCode) {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
-        let sql = "select * from tuserright where usercode = '"+userCode+"' and Funccode='" + funcCode+"'";
+        let sql = "select * from tuserright where usercode = '" + userCode + "' and Funccode='" + funcCode + "'";
         tx.executeSql(sql, [], (tx, results) => {
           resolve(results.rows.length != 0);
         })
