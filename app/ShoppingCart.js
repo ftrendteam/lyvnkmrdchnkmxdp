@@ -296,7 +296,8 @@ export default class ShoppingCart extends Component {
                                 OrgFormno:this.state.OrgFormno,
                                 FormType:this.state.FormType,
                             };
-                            FetchUtil.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
+                            alert(this.state.LinkUrl)
+                            FetchUtil.post(this.state.LinkUrl,JSON.stringify(params)).then((data)=>{
                                 var countm=JSON.stringify(data.countm);
                                 var ShopPrice=JSON.stringify(data.ShopPrice);
                                 if(data.retcode == 1){
@@ -360,7 +361,7 @@ export default class ShoppingCart extends Component {
                                 OrgFormno:this.state.OrgFormno,
                                 FormType:this.state.FormType,
                             };
-                            FetchUtils.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
+                            FetchUtils.post(this.state.LinkUrl,JSON.stringify(params)).then((data)=>{
                                 var countm=JSON.stringify(data.countm);
                                 var ShopPrice=JSON.stringify(data.ShopPrice);
                                 if(data.retcode == 1){
