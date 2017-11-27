@@ -122,15 +122,15 @@ export default class DBAdapter extends SQLiteOpenHelper {
       db.transaction((tx) => {
         try {
           let sql = "select * from KgtOpt where upper(OptName) = '" + (where + "").toUpperCase() + "'";
-          //console.log(sql)
+          console.log(sql)
           tx.executeSql(sql, [], (tx, result) => {
             resolve(result.rows);
           }, (err) => {
             reject("");
-            //console.log(err)
+            console.log(err)
           });
         } catch (err) {
-          //console.log("kgop=", err)
+          console.log("kgop=", err)
         }
         
       });
@@ -593,8 +593,86 @@ export default class DBAdapter extends SQLiteOpenHelper {
   }
   
   /***
-   *取目前登录的机构
+   * 根据解析出来的prodCode 查询商品
+   * @param prodCode
+   * @param DepLevel   当前默认传1
+   * @returns {Promise}
    */
+  selectProdCode(prodCode, DepLevel) {
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        let ssql = "select a.*,ifNull(b.countm,0) as ShopNumber,ifNull(b.ShopPrice,a.StdPrice) as ShopPrice ,ifNull(b.prototal,0) as ShopAmount   " +
+          ",ifNull(b.promemo,'') as ShopRemark,c.depcode" + DepLevel + " as DepCode1 " +
+          " from product a left join shopInfo b on a.Pid=b.Pid  ";
+        ssql = ssql + " left join  tdepset c on c.IsDel='0' and a.depcode=c.depcode where a.IsDel='0' and prodtype<>'1'";
+        ssql = ssql + "  and  a.prodcode ='" + prodCode + "'";
+        tx.executeSql(ssql, [], (tx, results) => {
+          resolve(results.rows);
+          
+        });
+      }, (error) => {
+        this._errorCB('transaction', error);
+      });
+    });
+  }
+  
+  /***
+   * 是否可以进行要货，配送收货，协配收货
+   * 返回结果集不为空 表示可以进行单据 为空 提示  <没有配送机构,不能进行该业务>
+   * @param shopCode  当前登录的机构号
+   */
+  isYHPSXP(shopCode) {
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        let ssql = "select PSShop from tShopItem where FNeedPS='1' and ShopCode='" + shopCode + "' and isdel='0'";
+        
+        tx.executeSql(ssql, [], (tx, results) => {
+          resolve(results.rows);
+          
+        });
+      }, (error) => {
+        this._errorCB('transaction', error);
+      });
+    });
+  }
+  
+  /***
+   * 是否可以协配采购
+   * 表示可以进行单据 为空 提示  <配送中心，不能进行该业务>
+   * @param shopCode
+   */
+  isXPCG(shopCode) {
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        let ssql = "select PSShop from tShopItem where FNeedPS='1' and PSShop='" + shopCode + "' and isdel='0' and PSShop<>ShopCode";
+        
+        tx.executeSql(ssql, [], (tx, results) => {
+          resolve(results.rows);
+          
+        });
+      }, (error) => {
+        this._errorCB('transaction', error);
+      });
+    });
+  }
+  
+  /***
+   * 是否可以采购和验收功能
+   * 结果集为空 提示 本机构没有采购权,不能进行该业务
+   * @param shopCode 当前登录的机构信息
+   */
+  isCGYS(shopCode) {
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        let ssql = "select FCanCG  from tShopItem  where isdel='0' and ShopCode='" + shopCode + "' and FCanCG='1'";
+        tx.executeSql(ssql, [], (tx, results) => {
+          resolve(results.rows);
+        });
+      }, (error) => {
+        this._errorCB('transaction', error);
+      });
+    });
+  }
   
   /***
    *  根据用户编码，密码，校验是否正确，正确的话，保存当前登录的机构信息
