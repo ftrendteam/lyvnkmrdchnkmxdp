@@ -522,7 +522,22 @@ export default class ShoppingCart extends Component {
                                 this.setState({
                                     dataSource:this.state.dataSource.cloneWithRows(this.screen),
                                 })
-                                if(this.screen==''){
+                                if(scode==null){
+                                    alert("提交成功");
+                                    dbAdapter.deleteData("shopInfo");
+                                    this.dataRows=[];
+                                    var price="";
+                                    var date = new Date();
+                                    var data=JSON.stringify(date.getTime());
+                                    this.setState({
+                                        dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
+                                        ShopNumber:price,
+                                        ShopAmount:price,
+                                        shopcar:"",
+                                        active:data,
+                                    })
+                                    Storage.save('Date',this.state.active);
+                                }else if(this.screen==""){
                                     alert("提交成功");
                                     dbAdapter.deleteData("shopInfo");
                                     this.dataRows=[];
@@ -837,47 +852,45 @@ export default class ShoppingCart extends Component {
                     visible={this.state.ScreenBod}
                     onShow={() => {}}
                     onRequestClose={() => {}} >
-                    <TouchableOpacity style={styles.modalStyle}>
-                        <View style={styles.ModalView}>
-                            <View style={styles.DanJu}>
-                                <View style={styles.danju}><Text style={styles.DanText}>商品数量不相等，是否继续？</Text></View>
+                    <TouchableOpacity style={styles.ModalStyle}>
+                        <View style={styles.DanJu}>
+                            <View style={styles.danju}><Text style={styles.DanText}>以下商品数量与原单数量不相等，是否继续？</Text></View>
+                        </View>
+                        <View style={styles.ScreenTitle}>
+                            <View style={styles.coulumnScreen}>
+                                <Text style={styles.coulumnText}>
+                                    商品名称
+                                </Text>
                             </View>
-                            <View style={styles.ScreenTitle}>
-                                <View style={styles.coulumnScreen}>
-                                    <Text style={styles.coulumnText}>
-                                        商品名称
-                                    </Text>
-                                </View>
-                                <View style={styles.coulumnScreen}>
-                                    <Text style={styles.coulumnText}>
-                                        原始数量
-                                    </Text>
-                                </View>
-                                <View style={styles.coulumnScreen}>
-                                    <Text style={styles.coulumnText}>
-                                        数量
-                                    </Text>
-                                </View>
+                            <View style={styles.coulumnScreen}>
+                                <Text style={styles.coulumnText}>
+                                    原始数量
+                                </Text>
                             </View>
-                            <View style={[{maxHeight:300,}]}>
-                                <ListView
-                                    dataSource={this.state.dataSource}
-                                    showsVerticalScrollIndicator={true}
-                                    renderRow={this._Screen.bind(this)}
-                                />
+                            <View style={styles.coulumnScreen}>
+                                <Text style={styles.coulumnText}>
+                                    数量
+                                </Text>
                             </View>
-                            <View style={styles.Determine}>
-                                <TouchableOpacity style={styles.Cancel} onPress={this.ScreenBod.bind(this)}>
-                                    <Text style={styles.CancelText}>
-                                        取消
-                                    </Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity style={[styles.Cancel,{marginRight:25,}]} onPress={this.submit1.bind(this)}>
-                                    <Text style={styles.CancelText}>
-                                        确定
-                                    </Text>
-                                </TouchableOpacity>
-                            </View>
+                        </View>
+                        <View style={[{maxHeight:300,}]}>
+                            <ListView
+                                dataSource={this.state.dataSource}
+                                showsVerticalScrollIndicator={true}
+                                renderRow={this._Screen.bind(this)}
+                            />
+                        </View>
+                        <View style={styles.Determine}>
+                            <TouchableOpacity style={styles.Cancel} onPress={this.ScreenBod.bind(this)}>
+                                <Text style={styles.CancelText}>
+                                    取消
+                                </Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={[styles.Cancel,{marginRight:25,}]} onPress={this.submit1.bind(this)}>
+                                <Text style={styles.CancelText}>
+                                    确定
+                                </Text>
+                            </TouchableOpacity>
                         </View>
                     </TouchableOpacity>
                 </Modal>
@@ -1021,16 +1034,10 @@ const styles = StyleSheet.create({
         paddingBottom:15,
         flex:2,
     },
-    modalStyle: {
+    ModalStyle: {
         flex:1,
-    },
-    ModalView:{
-        backgroundColor:"#ffffff",
-        borderRadius:5,
-        paddingBottom:20,
-        marginLeft:50,
-        marginRight:50,
-        marginTop:200,
+        backgroundColor:"#F2F2F2",
+
     },
     DanJu:{
         paddingTop:13,
@@ -1150,7 +1157,7 @@ const styles = StyleSheet.create({
     ScreenList:{
         paddingTop:8,
         paddingBottom:8,
-        height:55,
+        height:53,
         overflow:"hidden",
         flexDirection:"row",
         backgroundColor:"#ffffff",

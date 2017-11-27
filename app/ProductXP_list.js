@@ -40,19 +40,23 @@ export default class ProductXP_list extends Component {
                     invoice:tags
                 })
             })
+
+
             this.fetch();
         });
     }
 
     fetch(){
-        dbAdapter.selectAllData("tshopitem").then((rows)=>{
-            for(let i =0;i<rows.length;i++){
-                var row = rows.item(i);
-                this.dataRows.push(row);
-            }
+        Storage.get('code').then((tags)=>{
+            dbAdapter.selectXPShopCode(tags).then((rows)=>{
+                for(let i =0;i<rows.length;i++){
+                    var row = rows.item(i);
+                    this.dataRows.push(row);
+                }
 
-            this.setState({
-                dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
+                this.setState({
+                    dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
+                })
             })
         })
     }

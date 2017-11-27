@@ -105,7 +105,7 @@ export default class ProductCG extends Component {
                 Storage.save('Name','商品验收单');
                 Storage.save('FormType','YSYW');
                 Storage.save('valueOf','App_Client_ProYS');
-                Storage.save('histoasry','App_Client_ProYSQ');
+                Storage.save('history','App_Client_ProYSQ');
                 Storage.save('historyClass','App_Client_ProYSDetailQ');
                 Storage.save('ProYH','ProYS');
                 Storage.save('YuanDan','1');
@@ -130,7 +130,7 @@ export default class ProductCG extends Component {
                 Storage.save('Name','商品采购单');
                 Storage.save('FormType','CGYW');
                 Storage.save('valueOf','App_Client_ProCG');
-                Storage.save('history','App_Client_ProCGQ');
+                Storage.save('history','App_Client_ProYSQ');
                 Storage.save('historyClass','App_Client_ProCGDetailQ');
                 Storage.save('ProYH','ProCG');
                 Storage.save('YdCountm','3');

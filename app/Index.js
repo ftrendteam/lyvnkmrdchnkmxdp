@@ -294,6 +294,25 @@ export default class Index extends Component {
             if(lastDepCode ==1){
                 page= 1;
             }
+
+            Storage.get('Disting').then((tags)=>{
+                this.setState({
+                    Disting:tags,
+                })
+
+                if(this.state.Disting=="0"){
+                    this.setState({
+                        pressStatus:'pressin',
+                        PressStatus:'0',
+                    });
+                }else if(this.state.Disting=="1"){
+                    this.setState({
+                        PressStatus:'Pressin',
+                        pressStatus:0
+                    });
+                }
+            })
+
         });
     }
 
@@ -611,12 +630,12 @@ export default class Index extends Component {
         Storage.save("Disting","0");
         Storage.get('Disting').then((tags)=>{
             this.setState({
-                Disting:tags
+                Disting:tags,
             })
         })
         this.setState({
             pressStatus:'pressin',
-            PressStatus:0,
+            PressStatus:'0',
         });
     }
 

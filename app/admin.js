@@ -26,12 +26,14 @@ import PickedDate_list from "./PickedDate_list";
 import DataUtils from "../utils/DataUtils";
 import NetUtils from "../utils/NetUtils";
 import FetchUtil from "../utils/FetchUtils";
+import UpData from "../utils/UpData";
 import DBAdapter from "../adapter/DBAdapter";
 import Storage from "../utils/Storage";
 import Picker from 'react-native-picker';
 import ModalDropdown from 'react-native-modal-dropdown';
 
 let dbAdapter = new DBAdapter();
+let updata = new UpData();
 let db
 
 export default class admin extends Component {
@@ -208,6 +210,18 @@ export default class admin extends Component {
         this._ErrorModalVisible();
     }
 
+    UpData(){
+        var code = ""+this.state.sCode1;
+        Storage.save('code',code);
+        if(this.state.sCode1==""){
+            alert("请选择用户编码及机构信息")
+        }else{
+            Storage.get('code').then((tags) => {
+                updata.downLoadAllData(this.state.linkurl,dbAdapter,code);
+            })
+        }
+
+    }
   render() {
     return (
         <Image source={require("../images/bj.png")} style={styles.container}>
@@ -310,7 +324,7 @@ export default class admin extends Component {
                     </View>
                 </Modal>
             </ScrollView>
-            <TouchableOpacity style={styles.refresh}>
+            <TouchableOpacity onPress={this.UpData.bind(this)} style={styles.refresh}>
                 <Image source={require("../images/1_21.png")}></Image>
                 <Text style={styles.DataText}>数据更新</Text>
             </TouchableOpacity>

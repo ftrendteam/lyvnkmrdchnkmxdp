@@ -1010,7 +1010,26 @@ export default class DBAdapter extends SQLiteOpenHelper {
     });
     
   }
-  
+
+    /***
+     * 查询协配采购单中的机构号
+     * @param dbName 表明
+     * @return {Promise}
+     */
+    selectXPShopCode = (shopCode) => {
+        return new Promise((resolve, reject) => {
+            db.transaction((tx) => {
+                let sql = "select * from tshopitem where isdel='0' and PSShop='"+shopCode+"'";
+                tx.executeSql(sql, [], (tx, results) => {
+                        resolve((results.rows));
+                    }, (error) => {
+                        console.log("err===", error);
+                    }
+                );
+            });
+        });
+
+    }
   
   /***
    * 关闭表
