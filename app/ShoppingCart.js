@@ -35,6 +35,7 @@ import ProductCG from "./ProductCG";
 import ProductYS from "./ProductYS";
 import ProductXP from "./ProductXP";
 import ProductSH from "./ProductSH";
+import DeCodePrePrint18 from "../utils/DeCodePrePrint18";
 import NetUtils from "../utils/NetUtils";
 import FetchUtils from "../utils/FetchUtils";
 import DBAdapter from "../adapter/DBAdapter";
@@ -44,6 +45,7 @@ import SideMenu from 'react-native-side-menu';
 var {NativeModules} = require('react-native');
 var RNScannerAndroid = NativeModules.RNScannerAndroid;
 let dbAdapter = new DBAdapter();
+let decodepreprint = new DeCodePrePrint18();
 let db;
 
 export default class ShoppingCart extends Component {
@@ -279,6 +281,7 @@ export default class ShoppingCart extends Component {
                                 LinkUrl:tags
                             })
                         })
+                        alert(this.state.LinkUrl)
                         //商品查询
                         Storage.get('userName').then((tags)=>{
                             let params = {
@@ -296,7 +299,6 @@ export default class ShoppingCart extends Component {
                                 OrgFormno:this.state.OrgFormno,
                                 FormType:this.state.FormType,
                             };
-                            alert(this.state.LinkUrl)
                             FetchUtil.post(this.state.LinkUrl,JSON.stringify(params)).then((data)=>{
                                 var countm=JSON.stringify(data.countm);
                                 var ShopPrice=JSON.stringify(data.ShopPrice);
@@ -427,7 +429,6 @@ export default class ShoppingCart extends Component {
             FetchUtils.post(this.state.LinkUrl,JSON.stringify(params)).then((data)=>{
                 var countm=JSON.stringify(data.countm);
                 var ShopPrice=JSON.stringify(data.ShopPrice);
-                // alert(JSON.stringify(data))
                 if(data.retcode == 1){
                     // if(data.isFond==1){
                     this.props.navigator.push({
@@ -522,7 +523,7 @@ export default class ShoppingCart extends Component {
                     };
                     FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
                         if(data.retcode == 1){
-                            if(this.state.Screen=="1"){
+                            if(this.state.Screen=="1"||this.state.Screen=="2"){
                                 var DetailInfo2=params.DetailInfo2;
                                 for(let i =0;i<DetailInfo2.length;i++){
                                     let detail = DetailInfo2[i];
@@ -1035,25 +1036,51 @@ export default class ShoppingCart extends Component {
                     onRequestClose={() => {}} >
                     <TouchableOpacity style={styles.ModalStyle}>
                         <View style={styles.DanJu}>
-                            <View style={styles.danju}><Text style={styles.DanText}>以下商品数量与原单数量不相等，是否继续？</Text></View>
+                            <View style={styles.danju}><Text style={styles.DanText}>
+                                以下商品数量不相等，是否继续？</Text></View>
                         </View>
-                        <View style={styles.ScreenTitle}>
-                            <View style={styles.coulumnScreen}>
-                                <Text style={styles.coulumnText}>
-                                    商品名称
-                                </Text>
-                            </View>
-                            <View style={styles.coulumnScreen}>
-                                <Text style={styles.coulumnText}>
-                                    原始数量
-                                </Text>
-                            </View>
-                            <View style={styles.coulumnScreen}>
-                                <Text style={styles.coulumnText}>
-                                    数量
-                                </Text>
-                            </View>
-                        </View>
+                        {
+                            (this.state.Screen == "1") ?
+                                <View style={styles.ScreenTitle}>
+                                    <View style={styles.coulumnScreen}>
+                                        <Text style={styles.coulumnText}>
+                                            商品名称
+                                        </Text>
+                                    </View>
+                                    <View style={styles.coulumnScreen}>
+                                        <Text style={styles.coulumnText}>
+                                            原始数量
+                                        </Text>
+                                    </View>
+                                    <View style={styles.coulumnScreen}>
+                                        <Text style={styles.coulumnText}>
+                                            数量
+                                        </Text>
+                                    </View>
+                                </View>:null
+                        }
+
+                        {
+                            (this.state.Screen=="2")?
+                                <View style={styles.ScreenTitle}>
+                                    <View style={styles.coulumnScreen}>
+                                        <Text style={styles.coulumnText}>
+                                            商品名称
+                                        </Text>
+                                    </View>
+                                    <View style={styles.coulumnScreen}>
+                                        <Text style={styles.coulumnText}>
+                                            现在库存
+                                        </Text>
+                                    </View>
+                                    <View style={styles.coulumnScreen}>
+                                        <Text style={styles.coulumnText}>
+                                            数量
+                                        </Text>
+                                    </View>
+                                </View>:null
+                        }
+
                         <View style={[{maxHeight:300,}]}>
                             <ListView
                                 dataSource={this.state.dataSource}

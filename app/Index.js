@@ -755,10 +755,8 @@ export default class Index extends Component {
 
     SSPanDian(){
         Storage.delete('OrgFormno');
-        Storage.delete('scode');
         Storage.delete('shildshop');
         Storage.delete('YuanDan');
-        Storage.delete('Screen');
         Storage.delete('Document');
         if(this.state.ShopCar1>0){
             this._setModalVisible();
@@ -775,6 +773,8 @@ export default class Index extends Component {
                         Storage.save('FormType', 'CUPCYW');
                         Storage.save('ProYH', 'ProCurrPC');
                         Storage.save('YdCountm', '1');
+                        Storage.save('Screen','2');
+                        Storage.save("scode","1");
                         var invoice = "实时盘点单";
                         this.setState({
                             head: invoice,
