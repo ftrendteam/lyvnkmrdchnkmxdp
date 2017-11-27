@@ -29,14 +29,20 @@ export default class Query extends Component {
             Number:"",
             sCode1:"",
             active:"",
+            Disting:"",
         };
     }
 
     componentDidMount(){
-        // Storage.delete("PickedDate");
         Storage.get('invoice').then((tags)=>{
             this.setState({
                 invoice:tags
+            })
+        })
+
+        Storage.get('Disting').then((tags)=>{
+            this.setState({
+                Disting:tags
             })
         })
     }
@@ -52,52 +58,75 @@ export default class Query extends Component {
         });
     }
 
-    pressPush(){
-        var str=this.state.sCode1;
-        if(this.state.sCode1==""){
-            alert("请选择原始单号");
-        }else{
-            var nextRoute={
-                name:"主页",
-                component:Search
-            };
-            this.props.navigator.push(nextRoute);
-
-            var date = new Date();
-            var data=JSON.stringify(date.getTime());
-            Storage.delete('YuanDan');
-            Storage.delete('Screen');
-            Storage.save('OrgFormno',str);
-            Storage.save('Date',data);
-            Storage.save('Name','商品盘点单');
-            Storage.save('FormType','PCYW');
-            Storage.save('valueOf','App_Client_ProPSSH');
-            Storage.save('history','App_Client_ProPSSHQ');
-            Storage.save('historyClass','App_Client_ProPSSHDetailQ');
-            Storage.save('ProYH','ProPC');
-        }
-    }
+    // pressPush(){
+    //     var str=this.state.sCode1;
+    //     if(this.state.sCode1==""){
+    //         alert("请选择原始单号");
+    //     }else{
+    //         var nextRoute={
+    //             name:"主页",
+    //             component:Search
+    //         };
+    //         this.props.navigator.push(nextRoute);
+    //
+    //         var date = new Date();
+    //         var data=JSON.stringify(date.getTime());
+    //         Storage.delete('YuanDan');
+    //         Storage.delete('Screen');
+    //         Storage.save('OrgFormno',str);
+    //         Storage.save('Date',data);
+    //         Storage.save('Name','商品盘点单');
+    //         Storage.save('FormType','PCYW');
+    //         Storage.save('valueOf','App_Client_ProPSSH');
+    //         Storage.save('history','App_Client_ProPSSHQ');
+    //         Storage.save('historyClass','App_Client_ProPSSHDetailQ');
+    //         Storage.save('ProYH','ProPC');
+    //     }
+    // }
 
     Home(){
-        var str=this.state.sCode1;
-        var date = new Date();
-        var data=JSON.stringify(date.getTime());
-        if(this.state.sCode1==""){
-            alert("请选择原始单号");
-        }else{
-            var nextRoute={
-                name:"主页",
-                component:Index
-            };
-            this.props.navigator.push(nextRoute);
-            Storage.delete('YuanDan');
-            Storage.save('OrgFormno',str);
-            Storage.save('Date',data);
-            Storage.save('Name','商品盘点单');
-            Storage.save('valueOf','App_Client_ProPC');
-            Storage.save('history','App_Client_ProCurrPCQ');
-            Storage.save('historyClass','App_Client_ProPCDetailQ');
-            Storage.save('ProYH','ProPC');
+        if(this.state.Disting=="0") {
+            var str=this.state.sCode1;
+            var date = new Date();
+            var data=JSON.stringify(date.getTime());
+            if(this.state.sCode1==""){
+                alert("请选择原始单号");
+            }else{
+                var nextRoute={
+                    name:"主页",
+                    component:Index
+                };
+                this.props.navigator.push(nextRoute);
+                Storage.delete('YuanDan');
+                Storage.save('OrgFormno',str);
+                Storage.save('Date',data);
+                Storage.save('Name','商品盘点单');
+                Storage.save('valueOf','App_Client_ProPC');
+                Storage.save('history','App_Client_ProCurrPCQ');
+                Storage.save('historyClass','App_Client_ProPCDetailQ');
+                Storage.save('ProYH','ProPC');
+            }
+        }else if(this.state.Disting=="1") {
+            var str = this.state.sCode1;
+            var date = new Date();
+            var data = JSON.stringify(date.getTime());
+            if (this.state.sCode1 == "") {
+                alert("请选择原始单号");
+            } else {
+                var nextRoute = {
+                    name: "Search",
+                    component: Search
+                };
+                this.props.navigator.push(nextRoute);
+                Storage.delete('YuanDan');
+                Storage.save('OrgFormno', str);
+                Storage.save('Date', data);
+                Storage.save('Name', '商品盘点单');
+                Storage.save('valueOf', 'App_Client_ProPC');
+                Storage.save('history', 'App_Client_ProCurrPCQ');
+                Storage.save('historyClass', 'App_Client_ProPCDetailQ');
+                Storage.save('ProYH', 'ProPC');
+            }
         }
     }
 
@@ -147,9 +176,6 @@ export default class Query extends Component {
                     </TouchableOpacity>
                 </View>
                 <View style={styles.search}>
-                    <TouchableOpacity style={styles.determine} onPress={this.pressPush.bind(this)}>
-                        <Text style={styles.determine1}>查询/扫描</Text>
-                    </TouchableOpacity>
                     <TouchableOpacity style={styles.determine} onPress={this.Home.bind(this)}>
                         <Text style={styles.determine1}>确定</Text>
                     </TouchableOpacity>

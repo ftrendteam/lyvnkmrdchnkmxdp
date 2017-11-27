@@ -40,6 +40,12 @@ export default class ProductCG extends Component {
                 invoice:tags
             })
         })
+
+        Storage.get('Disting').then((tags)=>{
+            this.setState({
+                Disting:tags
+            })
+        })
     }
 
     Return(){
@@ -83,33 +89,64 @@ export default class ProductCG extends Component {
     }
 
     Button(){
-        var date = new Date();
-        var data=JSON.stringify(date.getTime());
-        var str=this.state.sCode1;
-        var str1=this.state.shopname1;
-        if(this.state.sCode1==""){
-            alert("请选择供应商")
-        }else if(this.state.shopname1==""){
-            alert("请选择机构")
-        }else{
-            Storage.delete('YuanDan');
-            Storage.delete('Screen');
-            var nextRoute={
-                name:"Index",
-                component:Index,
-            };
-            this.props.navigator.push(nextRoute);
-            Storage.save('Name','协配采购单');
-            Storage.save('FormType','XPCGYW');
-            Storage.save('valueOf','App_Client_ProXPCG');
-            Storage.save('history','App_Client_ProXPCGQ');
-            Storage.save('historyClass','App_Client_ProXPDetailCGQ');
-            Storage.save('ProYH','ProXPCG');
-            Storage.save('Screen','1');
-            Storage.save('Date',data);
-            Storage.save("scode",str);
-            Storage.save('shildshop',str1)
+        if(this.state.Disting=="0") {
+            var date = new Date();
+            var data=JSON.stringify(date.getTime());
+            var str=this.state.sCode1;
+            var str1=this.state.shopname1;
+            if(this.state.sCode1==""){
+                alert("请选择供应商")
+            }else if(this.state.shopname1==""){
+                alert("请选择机构")
+            }else{
+                Storage.delete('YuanDan');
+                Storage.delete('Screen');
+                var nextRoute={
+                    name:"Index",
+                    component:Index,
+                };
+                this.props.navigator.push(nextRoute);
+                Storage.save('Name','协配采购单');
+                Storage.save('FormType','XPCGYW');
+                Storage.save('valueOf','App_Client_ProXPCG');
+                Storage.save('history','App_Client_ProXPCGQ');
+                Storage.save('historyClass','App_Client_ProXPDetailCGQ');
+                Storage.save('ProYH','ProXPCG');
+                Storage.save('Screen','1');
+                Storage.save('Date',data);
+                Storage.save("scode",str);
+                Storage.save('shildshop',str1)
+            }
+        }else if(this.state.Disting=="1"){
+            var date = new Date();
+            var data=JSON.stringify(date.getTime());
+            var str=this.state.sCode1;
+            var str1=this.state.shopname1;
+            if(this.state.sCode1==""){
+                alert("请选择供应商")
+            }else if(this.state.shopname1==""){
+                alert("请选择机构")
+            }else{
+                Storage.delete('YuanDan');
+                Storage.delete('Screen');
+                var nextRoute={
+                    name:"Search",
+                    component:Search,
+                };
+                this.props.navigator.push(nextRoute);
+                Storage.save('Name','协配采购单');
+                Storage.save('FormType','XPCGYW');
+                Storage.save('valueOf','App_Client_ProXPCG');
+                Storage.save('history','App_Client_ProXPCGQ');
+                Storage.save('historyClass','App_Client_ProXPDetailCGQ');
+                Storage.save('ProYH','ProXPCG');
+                Storage.save('Screen','1');
+                Storage.save('Date',data);
+                Storage.save("scode",str);
+                Storage.save('shildshop',str1)
+            }
         }
+
     }
 
     render() {

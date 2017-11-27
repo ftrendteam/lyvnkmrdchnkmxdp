@@ -151,6 +151,11 @@ export default class Distrition_list extends Component {
                 this.props.SearchShopname(rowData.Formno)
             }
         }
+        if(this.props.SearchShopname1){
+            if(this.state.shopPandian=='App_Client_NOYSCGQ'||this.state.shopPandian=='App_Client_NOYSXPCGQ'){
+                this.props.SearchShopname1(rowData.suppcode)
+            }
+        }
         this.props.navigator.pop();
     }
 
@@ -159,8 +164,8 @@ export default class Distrition_list extends Component {
             <TouchableOpacity style={styles.header}>
                 {
                     (this.state.shopPandian=='App_Client_NoEndPCQ'||this.state.shopPandian=='App_Client_NOYSPSQ')?
-                        <TouchableOpacity onPress={()=>this.pressPop(rowData)}>
-                            <View style={styles.coding}>
+                        <TouchableOpacity onPress={()=>this.pressPop(rowData)} style={styles.coding}>
+                            <View >
                                 <Text style={styles.codingText}>{rowData.Formno}</Text>
                             </View>
                         </TouchableOpacity>:null

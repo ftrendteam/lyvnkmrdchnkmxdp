@@ -374,10 +374,11 @@ export default class DBAdapter extends SQLiteOpenHelper {
           let ProdCode = shopInfo.ProdCode;
           let DepCode = shopInfo.DepCode;
           let ydcountm = shopInfo.ydcountm;
+          let suppCode = shopInfo.SuppCode;
           //   "prodname":"海鲜菇","countm":1.0000,"kccount":0.0,"prototal":1.0000,"unit":"kg  ","promemo":""
-          let sql = " replace INTO shopInfo(pid,ProdCode,prodname,countm,ShopPrice,prototal,promemo,DepCode,ydcountm)" +
-            "values(?,?,?,?,?,?,?,?,?)";
-          tx.executeSql(sql, [Pid, ProdCode, shopName, ShopNumber, ShopPrice, ShopAmount, ShopRemark, DepCode, ydcountm], () => {
+          let sql = " replace INTO shopInfo(pid,ProdCode,prodname,countm,ShopPrice,prototal,promemo,DepCode,ydcountm,SuppCode)" +
+            "values(?,?,?,?,?,?,?,?,?,?)";
+          tx.executeSql(sql, [Pid, ProdCode, shopName, ShopNumber, ShopPrice, ShopAmount, ShopRemark, DepCode, ydcountm,suppCode], () => {
               resolve(true);
             }, (err) => {
               reject(false);
@@ -583,9 +584,10 @@ export default class DBAdapter extends SQLiteOpenHelper {
   selectTUserShopData(Usercode) {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
-        tx.executeSql("select b.ShopCode,b.ShopName from tUserShop a inner join tshopitem b on b.SubCode+rtrim(b.shopcode)+';' like '%;'+rtrim(a.shopcode)+';%' or a.shopcode='0' where a.UserCode='" + Usercode + "'" + Usercode + "'", [], (tx, results) => {
+        tx.executeSql("select b.ShopCode,b.ShopName from tUserShop a inner join tshopitem b on b.SubCode+rtrim(b.shopcode)+';' like '%;'+rtrim(a.shopcode)+';%' or a.shopcode='0' where a.UserCode='" + Usercode + "'" , [], (tx, results) => {
           resolve(results.rows);
         });
+
       }, (error) => {
         this._errorCB('transaction', error);
       });

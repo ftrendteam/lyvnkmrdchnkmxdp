@@ -41,6 +41,12 @@ export default class ProductCG extends Component {
                 invoice:tags
             })
         })
+
+        Storage.get('Disting').then((tags)=>{
+            this.setState({
+                Disting:tags
+            })
+        })
     }
 
     Return(){
@@ -66,29 +72,56 @@ export default class ProductCG extends Component {
     }
 
     Button(){
-        var str=this.state.sCode1;
-        if(this.state.sCode1==""){
-            alert("请选择供应商")
-        }else{
-            var date = new Date();
-            var data=JSON.stringify(date.getTime());
-            var nextRoute={
-                name:"Index",
-                component:Index,
-            };
-            this.props.navigator.push(nextRoute);
-            Storage.delete('YuanDan');
-            Storage.delete('Screen');
-            Storage.save('Name','商品采购单');
-            Storage.save('FormType','CGYW');
-            Storage.save('valueOf','App_Client_ProCG');
-            Storage.save('history','App_Client_ProCGQ');
-            Storage.save('historyClass','App_Client_ProCGDetailQ');
-            Storage.save('ProYH','ProCG');
-            Storage.save('YdCountm','3');
-            Storage.save('Date',data);
-            Storage.save("scode",str)
+        if(this.state.Disting=="0") {
+            var str=this.state.sCode1;
+            if(this.state.sCode1==""){
+                alert("请选择供应商")
+            }else{
+                var date = new Date();
+                var data=JSON.stringify(date.getTime());
+                var nextRoute={
+                    name:"Index",
+                    component:Index,
+                };
+                this.props.navigator.push(nextRoute);
+                Storage.delete('YuanDan');
+                Storage.delete('Screen');
+                Storage.save('Name','商品采购单');
+                Storage.save('FormType','CGYW');
+                Storage.save('valueOf','App_Client_ProCG');
+                Storage.save('history','App_Client_ProCGQ');
+                Storage.save('historyClass','App_Client_ProCGDetailQ');
+                Storage.save('ProYH','ProCG');
+                Storage.save('YdCountm','3');
+                Storage.save('Date',data);
+                Storage.save("scode",str)
+            }
+        }else if(this.state.Disting=="1"){
+            var str=this.state.sCode1;
+            if(this.state.sCode1==""){
+                alert("请选择供应商")
+            }else{
+                var date = new Date();
+                var data=JSON.stringify(date.getTime());
+                var nextRoute={
+                    name:"Search",
+                    component:Search,
+                };
+                this.props.navigator.push(nextRoute);
+                Storage.delete('YuanDan');
+                Storage.delete('Screen');
+                Storage.save('Name','商品采购单');
+                Storage.save('FormType','CGYW');
+                Storage.save('valueOf','App_Client_ProCG');
+                Storage.save('history','App_Client_ProCGQ');
+                Storage.save('historyClass','App_Client_ProCGDetailQ');
+                Storage.save('ProYH','ProCG');
+                Storage.save('YdCountm','3');
+                Storage.save('Date',data);
+                Storage.save("scode",str)
+            }
         }
+
     }
 
     render() {

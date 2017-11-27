@@ -106,11 +106,15 @@ export default class GoodsDetails extends Component {
             })
         });
 
-        if(this.state.Number == "1"){
-            this.setState({
-                Number:this.state.ydcountm
-            })
-        }
+        Storage.get('YuanDan').then((tags)=>{
+            if(tags==1){
+                if(this.state.Number == "1"){
+                    this.setState({
+                        Number:this.state.ydcountm
+                    })
+                }
+            }
+        })
     }
 // 失焦时触发事件
     inputOnBlur(){
@@ -250,7 +254,7 @@ export default class GoodsDetails extends Component {
                   </View>
                   <View style={[styles.List,{paddingTop:10,}]}>
                       <View style={styles.left2}>
-                          <Text style={[styles.left,{marginTop:5,}]}>备注</Text>
+                          <Text style={[styles.left,{marginTop:9,}]}>备注</Text>
                           <TextInput
                               style={styles.Number1}
                               placeholder="暂无备注"

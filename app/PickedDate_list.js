@@ -30,8 +30,6 @@ export default class PickedDate_list extends Component {
         super(props);
         this.state = {
             search:"",
-            linkurl:"",
-            invoice:"",
             show:false,
             dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => true,}),
         };
@@ -40,38 +38,20 @@ export default class PickedDate_list extends Component {
     }
     componentDidMount(){
         InteractionManager.runAfterInteractions(() => {
-            Storage.get('LinkUrl').then((tags) => {
-                this.setState({
-                    linkurl:tags
-                })
-            })
-            Storage.get('PickedDate').then((tags)=>{
-                this.setState({
-                    invoice:tags
-                })
-            })
             this.fetch();
         });
     }
 
     fetch(){
-        Storage.get('ClientCode').then((tags) => {
-            let params = {
-                reqCode:"App_PosReq",
-                reqDetailCode:"App_Client_UseQry",
-                ClientCode:tags,
-                sDateTime:Date.parse(new Date()),//获取当前时间转换成时间戳
-                Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_UseQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
-            };
-            FetchUtil.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
-                if(data.retcode == 1){
-                    var DetailInfo1 = data.DetailInfo1;
-                    this.dataRows = this.dataRows.concat(DetailInfo1);
-                    this.setState({
-                        dataSource:this.state.dataSource.cloneWithRows(this.dataRows)
-                    })
-                }else{
+        Storage.get('Usercode').then((tags) => {
+            dbAdapter.selectTUserShopData(tags).then((rows)=>{
+                for(let i =0;i<rows.length;i++){
+                    var row = rows.item(i);
+                    this.dataRows.push(row);
                 }
+                this.setState({
+                    dataSource:this.state.dataSource.cloneWithRows(this.dataRows)
+                })
             })
         })
     }

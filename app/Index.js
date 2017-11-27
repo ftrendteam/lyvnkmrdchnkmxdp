@@ -137,9 +137,9 @@ export default class Index extends Component {
 
             var number = "279001501234012341";
 
-            decodepreprint.init(number,dbAdapter);
+            decodepreprint.init(reminder,dbAdapter);
 
-            if(number.length==18&&decodepreprint.deCodePreFlag()){
+            if(reminder.length==18&&decodepreprint.deCodePreFlag()){
                 decodepreprint.deCodeProdCode().then((datas)=>{
                     dbAdapter.selectProdCode(datas,1).then((rows)=>{
                         Storage.get('FormType').then((tags)=>{
@@ -609,6 +609,11 @@ export default class Index extends Component {
     //功能分类
     ChuMo(){
         Storage.save("Disting","0");
+        Storage.get('Disting').then((tags)=>{
+            this.setState({
+                Disting:tags
+            })
+        })
         this.setState({
             pressStatus:'pressin',
             PressStatus:0,
@@ -617,6 +622,11 @@ export default class Index extends Component {
 
     SaoMa(){
         Storage.save("Disting","1");
+        Storage.get('Disting').then((tags)=>{
+            this.setState({
+                Disting:tags
+            })
+        })
         this.setState({
             PressStatus:'Pressin',
             pressStatus:0
@@ -629,11 +639,6 @@ export default class Index extends Component {
         Storage.delete('shildshop');
         Storage.delete('YuanDan');
         Storage.delete('Screen');
-        Storage.get('Disting').then((tags)=>{
-            this.setState({
-                Disting:tags
-            })
-        })
         if(this.state.ShopCar1>0){
             this._setModalVisible();
             alert("商品未提交")
@@ -650,7 +655,6 @@ export default class Index extends Component {
                                 Storage.save('Name','要货单');
                                 Storage.save('FormType','YWYW');
                                 Storage.save('ProYH','ProYH');
-                                Storage.save('YdCountm','3');
                                 Storage.save('YdCountm','1');
                                 var invoice = "要货单";
                                 this.setState({
@@ -682,11 +686,11 @@ export default class Index extends Component {
                             }else{
                                 alert("请选择模式")
                             }
+                        }else if (rows == false) {
+                            alert("该店铺没有此权限");
+                            this._setModalVisible();
                         }
                     })
-                }else if(rows==false){
-                    alert("该店铺没有此权限");
-                    this._setModalVisible();
                 }
             })
 
@@ -725,11 +729,11 @@ export default class Index extends Component {
                                 alert("请选择模式")
                             }
 
+                        }else if (rows == false) {
+                            alert("该店铺没有此权限");
+                            this._setModalVisible();
                         }
                     })
-                } else if (rows == false) {
-                    alert("该店铺没有此权限");
-                    this._setModalVisible();
                 }
             })
         }
@@ -751,7 +755,7 @@ export default class Index extends Component {
                 if (rows == true) {
                     dbAdapter.selecUserRightA1012(this.state.usercode).then((rows) => {
                         if (rows == true) {
-                            if(this.state.Disting=="0"||this.state.Disting=="1") {
+                            if(this.state.Disting=="0") {
                                 var date = new Date();
                                 var data = JSON.stringify(date.getTime());
                                 Storage.save('Name', '实时盘点单');
@@ -787,11 +791,11 @@ export default class Index extends Component {
                             }else{
                                 alert("请选择模式")
                             }
+                        }else if (rows == false) {
+                            alert("该店铺没有此权限");
+                            this._setModalVisible();
                         }
                     })
-                } else if (rows == false) {
-                    alert("该店铺没有此权限");
-                    this._setModalVisible();
                 }
             })
             Storage.save('valueOf', 'App_Client_ProCurrPC');
@@ -827,11 +831,11 @@ export default class Index extends Component {
                             }else{
                                 alert("请选择模式")
                             }
+                        }else if (rows == false) {
+                            alert("该店铺没有此权限");
+                            this._setModalVisible();
                         }
                     })
-                } else if (rows == false) {
-                    alert("该店铺没有此权限");
-                    this._setModalVisible();
                 }
             })
         }
@@ -865,11 +869,11 @@ export default class Index extends Component {
                             }else{
                                 alert("请选择模式")
                             }
+                        }else if (rows == false) {
+                            alert("该店铺没有此权限");
+                            this._setModalVisible();
                         }
                     })
-                } else if (rows == false) {
-                    alert("该店铺没有此权限");
-                    this._setModalVisible();
                 }
             })
         }
@@ -902,11 +906,11 @@ export default class Index extends Component {
                             }else{
                                 alert("请选择模式")
                             }
+                        }else if (rows == false) {
+                            alert("该店铺没有此权限");
+                            this._setModalVisible();
                         }
                     })
-                } else if (rows == false) {
-                    alert("该店铺没有此权限");
-                    this._setModalVisible();
                 }
             })
         }
@@ -939,11 +943,11 @@ export default class Index extends Component {
                             }else{
                                 alert("请选择模式")
                             }
+                        }else if (rows == false) {
+                            alert("该店铺没有此权限");
+                            this._setModalVisible();
                         }
                     })
-                } else if (rows == false) {
-                    alert("该店铺没有此权限");
-                    this._setModalVisible();
                 }
             })
         }
@@ -976,11 +980,11 @@ export default class Index extends Component {
                             }else{
                                 alert("请选择模式")
                             }
+                        }else if (rows == false) {
+                            alert("该店铺没有此权限");
+                            this._setModalVisible();
                         }
                     })
-                } else if (rows == false) {
-                    alert("该店铺没有此权限");
-                    this._setModalVisible();
                 }
             })
         }
@@ -1013,11 +1017,11 @@ export default class Index extends Component {
                             }else{
                                 alert("请选择模式")
                             }
+                        }else if (rows == false) {
+                            alert("该店铺没有此权限");
+                            this._setModalVisible();
                         }
                     })
-                } else if (rows == false) {
-                    alert("该店铺没有此权限");
-                    this._setModalVisible();
                 }
             })
         }

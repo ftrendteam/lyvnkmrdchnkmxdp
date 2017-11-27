@@ -40,6 +40,12 @@ export default class ProductCG extends Component {
                 invoice:tags
             })
         })
+
+        Storage.get('Disting').then((tags)=>{
+            this.setState({
+                Disting:tags
+            })
+        })
     }
 
     Return(){
@@ -69,36 +75,68 @@ export default class ProductCG extends Component {
         this.setState({
             suppcode1:Suppcode,
         });
+    }
 
+    SearchShopname1(Suppcode1) {
+        Suppcode1 = String(Suppcode1);
+        this.setState({
+            sCode1:Suppcode1,
+        });
     }
 
     Button(){
-        var date = new Date();
-        var data=JSON.stringify(date.getTime());
-        var str=this.state.sCode1;
-        var str1=this.state.suppcode1;
-        if(this.state.sCode1==""){
-            alert("请选择供应商")
-        }else if(this.state.suppcode1==""){
-            alert("请选择采购单")
-        }else{
-            Storage.delete('YuanDan');
-            var nextRoute={
-                name:"Index",
-                component:Index,
-            };
-            this.props.navigator.push(nextRoute);
-            Storage.save('OrgFormno',str1);
-            Storage.save('Name','商品验收单');
-            Storage.save('FormType','YSYW');
-            Storage.save('valueOf','App_Client_ProYS');
-            Storage.save('histoasry','App_Client_ProYSQ');
-            Storage.save('historyClass','App_Client_ProYSDetailQ');
-            Storage.save('ProYH','ProYS');
-            Storage.save('YuanDan','1');
-            Storage.save('Screen','1');
-            Storage.save('Date',data);
-            Storage.save("scode",str)
+        if(this.state.Disting=="0") {
+            var date = new Date();
+            var data=JSON.stringify(date.getTime());
+            var str=this.state.sCode1;
+            var str1=this.state.suppcode1;
+            if(this.state.sCode1==""){
+                alert("请选择供应商")
+            }else if(this.state.suppcode1==""){
+                alert("请选择采购单")
+            }else{
+                Storage.delete('YuanDan');
+                var nextRoute={
+                    name:"Index",
+                    component:Index,
+                };
+                this.props.navigator.push(nextRoute);
+                Storage.save('OrgFormno',str1);
+                Storage.save('Name','商品验收单');
+                Storage.save('FormType','YSYW');
+                Storage.save('valueOf','App_Client_ProYS');
+                Storage.save('histoasry','App_Client_ProYSQ');
+                Storage.save('historyClass','App_Client_ProYSDetailQ');
+                Storage.save('ProYH','ProYS');
+                Storage.save('YuanDan','1');
+                Storage.save('Screen','1');
+                Storage.save('Date',data);
+                Storage.save("scode",str)
+            }
+        }else if(this.state.Disting=="1"){
+            var str=this.state.sCode1;
+            if(this.state.sCode1==""){
+                alert("请选择供应商")
+            }else{
+                var date = new Date();
+                var data=JSON.stringify(date.getTime());
+                var nextRoute={
+                    name:"Search",
+                    component:Search,
+                };
+                this.props.navigator.push(nextRoute);
+                Storage.delete('YuanDan');
+                Storage.delete('Screen');
+                Storage.save('Name','商品采购单');
+                Storage.save('FormType','CGYW');
+                Storage.save('valueOf','App_Client_ProCG');
+                Storage.save('history','App_Client_ProCGQ');
+                Storage.save('historyClass','App_Client_ProCGDetailQ');
+                Storage.save('ProYH','ProCG');
+                Storage.save('YdCountm','3');
+                Storage.save('Date',data);
+                Storage.save("scode",str)
+            }
         }
     }
 
@@ -108,7 +146,8 @@ export default class ProductCG extends Component {
             name:"Distrition_list",
             component:Distrition_list,
             params: {
-                SearchShopname:(Suppcode)=>this.SearchShopname(Suppcode)
+                SearchShopname:(Suppcode)=>this.SearchShopname(Suppcode),
+                SearchShopname1:(Suppcode1)=>this.SearchShopname1(Suppcode1)
             }
         };
         this.props.navigator.push(nextRoute)
@@ -228,6 +267,7 @@ const styles = StyleSheet.create({
         fontSize:16,
     },
     TextInput1:{
+        width:200,
         paddingLeft:5,
         paddingRight:5,
         marginBottom:2,

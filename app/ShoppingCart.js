@@ -255,68 +255,135 @@ export default class ShoppingCart extends Component {
     Code(){
         RNScannerAndroid.openScanner();
         DeviceEventEmitter.addListener("code", (reminder) => {
-            dbAdapter.selectAidCode(reminder,1).then((rows)=>{
-                if(rows.length==0){
-                    alert("该商品不存在")
-                }else{
+            var number = "279001501234012341";
+            decodepreprint.init(reminder,dbAdapter);
 
-                    Storage.get('FormType').then((tags)=>{
-                        this.setState({
-                            FormType:tags
+            if(reminder.length==18&&decodepreprint.deCodePreFlag()){
+                decodepreprint.deCodeProdCode().then((datas)=>{
+                    dbAdapter.selectProdCode(datas,1).then((rows)=>{
+                        Storage.get('FormType').then((tags)=>{
+                            this.setState({
+                                FormType:tags
+                            })
                         })
-                    })
 
-                    Storage.get('LinkUrl').then((tags) => {
-                        this.setState({
-                            LinkUrl:tags
+                        Storage.get('LinkUrl').then((tags) => {
+                            this.setState({
+                                LinkUrl:tags
+                            })
+                        })
+                        //商品查询
+                        Storage.get('userName').then((tags)=>{
+                            let params = {
+                                reqCode:"App_PosReq",
+                                reqDetailCode:"App_Client_CurrProdQry",
+                                ClientCode:this.state.ClientCode,
+                                sDateTime:Date.parse(new Date()),
+                                Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
+                                username:tags,
+                                usercode:this.state.Usercode,
+                                SuppCode:rows.item(0).SuppCode,
+                                ShopCode:this.state.ShopCode,
+                                ChildShopCode:this.state.ChildShopCode,
+                                ProdCode:datas,
+                                OrgFormno:this.state.OrgFormno,
+                                FormType:this.state.FormType,
+                            };
+                            FetchUtil.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
+                                var countm=JSON.stringify(data.countm);
+                                var ShopPrice=JSON.stringify(data.ShopPrice);
+                                if(data.retcode == 1){
+                                    // if(data.isFond==1){
+                                    var ShopCar = rows.item(0).ProdName;
+                                    this.props.navigator.push({
+                                        component:OrderDetails,
+                                        params:{
+                                            ProdName:rows.item(0).ProdName,
+                                            ShopPrice:rows.item(0).ShopPrice,
+                                            Pid:rows.item(0).Pid,
+                                            countm:rows.item(0).ShopNumber,
+                                            promemo:rows.item(0).promemo,
+                                            prototal:rows.item(0).prototal,
+                                            ProdCode:rows.item(0).ProdCode,
+                                            DepCode:rows.item(0).DepCode1,
+                                            SuppCode:rows.item(0).SuppCode,
+                                            ydcountm:countm,
+                                        }
+                                    })
+                                    // }else{
+                                    //     // alert('该商品暂时无法购买')
+                                    // }
+                                }else{}
+                            })
                         })
                     })
-                    //商品查询
-                    Storage.get('userName').then((tags)=>{
-                        let params = {
-                            reqCode:"App_PosReq",
-                            reqDetailCode:"App_Client_CurrProdQry",
-                            ClientCode:this.state.ClientCode,
-                            sDateTime:Date.parse(new Date()),
-                            Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
-                            username:tags,
-                            usercode:this.state.Usercode,
-                            SuppCode:rows.item(0).SuppCode,
-                            ShopCode:this.state.ShopCode,
-                            ChildShopCode:this.state.ChildShopCode,
-                            ProdCode:rows.item(0).ProdCode,
-                            OrgFormno:this.state.OrgFormno,
-                            FormType:this.state.FormType,
-                        };
-                        FetchUtils.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
-                            var countm=JSON.stringify(data.countm);
-                            var ShopPrice=JSON.stringify(data.ShopPrice);
-                            if(data.retcode == 1){
-                                // if(data.isFond==1){
-                                var ShopCar = rows.item(0).ProdName;
-                                this.props.navigator.push({
-                                    component:OrderDetails,
-                                    params:{
-                                        ProdName:rows.item(0).ProdName,
-                                        ShopPrice:rows.item(0).ShopPrice,
-                                        Pid:rows.item(0).Pid,
-                                        countm:rows.item(0).ShopNumber,
-                                        promemo:rows.item(0).promemo,
-                                        prototal:rows.item(0).prototal,
-                                        ProdCode:rows.item(0).ProdCode,
-                                        DepCode:rows.item(0).DepCode1,
-                                        SuppCode:rows.item(0).SuppCode,
-                                        ydcountm:countm,
-                                    }
-                                })
-                                // }else{
-                                //     // alert('该商品暂时无法购买')
-                                // }
-                            }else{}
+                });
+
+            }else{
+                dbAdapter.selectAidCode(reminder,1).then((rows)=>{
+                    if(rows.length==0){
+                        alert("该商品不存在")
+                    }else{
+
+                        Storage.get('FormType').then((tags)=>{
+                            this.setState({
+                                FormType:tags
+                            })
                         })
-                    })
-                }
-            })
+
+                        Storage.get('LinkUrl').then((tags) => {
+                            this.setState({
+                                LinkUrl:tags
+                            })
+                        })
+                        //商品查询
+                        Storage.get('userName').then((tags)=>{
+                            let params = {
+                                reqCode:"App_PosReq",
+                                reqDetailCode:"App_Client_CurrProdQry",
+                                ClientCode:this.state.ClientCode,
+                                sDateTime:Date.parse(new Date()),
+                                Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
+                                username:tags,
+                                usercode:this.state.Usercode,
+                                SuppCode:rows.item(0).SuppCode,
+                                ShopCode:this.state.ShopCode,
+                                ChildShopCode:this.state.ChildShopCode,
+                                ProdCode:rows.item(0).ProdCode,
+                                OrgFormno:this.state.OrgFormno,
+                                FormType:this.state.FormType,
+                            };
+                            FetchUtils.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
+                                var countm=JSON.stringify(data.countm);
+                                var ShopPrice=JSON.stringify(data.ShopPrice);
+                                if(data.retcode == 1){
+                                    // if(data.isFond==1){
+                                    var ShopCar = rows.item(0).ProdName;
+                                    this.props.navigator.push({
+                                        component:OrderDetails,
+                                        params:{
+                                            ProdName:rows.item(0).ProdName,
+                                            ShopPrice:rows.item(0).ShopPrice,
+                                            Pid:rows.item(0).Pid,
+                                            countm:rows.item(0).ShopNumber,
+                                            promemo:rows.item(0).promemo,
+                                            prototal:rows.item(0).prototal,
+                                            ProdCode:rows.item(0).ProdCode,
+                                            DepCode:rows.item(0).DepCode1,
+                                            SuppCode:rows.item(0).SuppCode,
+                                            ydcountm:countm,
+                                        }
+                                    })
+                                    // }else{
+                                    //     // alert('该商品暂时无法购买')
+                                    // }
+                                }else{}
+                            })
+                        })
+                    }
+                })
+            }
+
         })
     }
 
@@ -333,7 +400,6 @@ export default class ShoppingCart extends Component {
                 LinkUrl:tags
             })
         })
-        //商品查询
         Storage.get('userName').then((tags)=>{
             let params = {
                 reqCode:"App_PosReq",
@@ -350,9 +416,10 @@ export default class ShoppingCart extends Component {
                 OrgFormno:this.state.OrgFormno,
                 FormType:this.state.FormType,
             };
-            FetchUtils.post('http://192.168.0.47:8018/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
+            FetchUtils.post(this.state.LinkUrl,JSON.stringify(params)).then((data)=>{
                 var countm=JSON.stringify(data.countm);
                 var ShopPrice=JSON.stringify(data.ShopPrice);
+                // alert(JSON.stringify(data))
                 if(data.retcode == 1){
                     // if(data.isFond==1){
                     this.props.navigator.push({
@@ -367,10 +434,7 @@ export default class ShoppingCart extends Component {
                             ydcountm:countm,
                         }
                     })
-                    // }else{
-                    //     // alert('该商品暂时无法购买')
-                    // }
-                }else{}
+                }
             })
         })
     }
@@ -575,8 +639,8 @@ export default class ShoppingCart extends Component {
                         })
                         Storage.save('Date', this.state.active);
                     } else {
-                        alert("提交失败");
-                        // alert(JSON.stringify(data))
+                        // alert("提交失败");
+                        alert(JSON.stringify(data))
                     }
                 })
             })
@@ -783,7 +847,7 @@ export default class ShoppingCart extends Component {
                     <TouchableOpacity style={styles.modalStyle}>
                         <View style={styles.ModalView}>
                             <View style={styles.DanJu}>
-                                <View style={styles.danju}><Text style={styles.DanText}>以下商品数量与原始数量不匹配，是否继续？</Text></View>
+                                <View style={styles.danju}><Text style={styles.DanText}>商品数量与原单数量不匹配，是否继续？</Text></View>
                                 <TouchableOpacity style={styles.ModalLeft} onPress={this.ScreenBod.bind(this)}>
                                     <Image source={require("../images/2_02.png")} />
                                 </TouchableOpacity>
@@ -1111,6 +1175,8 @@ const styles = StyleSheet.create({
     coulumnScreen:{
         flex:1,
         paddingLeft:5,
+        height:30,
+        overflow:"hidden"
     },
     coulumnText:{
         fontSize:16,

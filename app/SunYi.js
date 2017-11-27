@@ -34,6 +34,12 @@ export default class SunYi extends Component {
                 invoice:tags
             })
         })
+
+        Storage.get('Disting').then((tags)=>{
+            this.setState({
+                Disting:tags
+            })
+        })
     }
 
     Return(){
@@ -41,25 +47,47 @@ export default class SunYi extends Component {
     }
 
     BaoSun(){
-        var date = new Date();
-        var data=JSON.stringify(date.getTime());
-        this.setState({
-            active:data,
-        });
-        var nextRoute={
-            name:"主页",
-            component:Index
-        };
-        this.props.navigator.push(nextRoute);
-        Storage.save('Name','损益单');
-        Storage.save('FormType','SYYW');
-        Storage.save('ProYH','ProSY');
-        Storage.save('YdCountm','3');
-        Storage.save('OrgFormno',"1");
-        Storage.save('Date',this.state.active);
-        Storage.save('valueOf', 'App_Client_ProSY');
-        Storage.save('history', 'App_Client_ProSYQ');
-        Storage.save('historyClass', 'App_Client_ProSYDetailQ');
+        if(this.state.Disting=="0") {
+            var date = new Date();
+            var data=JSON.stringify(date.getTime());
+            this.setState({
+                active:data,
+            });
+            var nextRoute={
+                name:"主页",
+                component:Index
+            };
+            this.props.navigator.push(nextRoute);
+            Storage.save('Name','损益单');
+            Storage.save('FormType','SYYW');
+            Storage.save('ProYH','ProSY');
+            Storage.save('YdCountm','3');
+            Storage.save('OrgFormno',"1");
+            Storage.save('Date',this.state.active);
+            Storage.save('valueOf', 'App_Client_ProSY');
+            Storage.save('history', 'App_Client_ProSYQ');
+            Storage.save('historyClass', 'App_Client_ProSYDetailQ');
+        }else if(this.state.Disting=="1"){
+            var date = new Date();
+            var data=JSON.stringify(date.getTime());
+            this.setState({
+                active:data,
+            });
+            var nextRoute={
+                name:"Search",
+                component:Search
+            };
+            this.props.navigator.push(nextRoute);
+            Storage.save('Name','损益单');
+            Storage.save('FormType','SYYW');
+            Storage.save('ProYH','ProSY');
+            Storage.save('YdCountm','3');
+            Storage.save('OrgFormno',"1");
+            Storage.save('Date',this.state.active);
+            Storage.save('valueOf', 'App_Client_ProSY');
+            Storage.save('history', 'App_Client_ProSYQ');
+            Storage.save('historyClass', 'App_Client_ProSYDetailQ');
+        }
     }
 
     YiChu(){
@@ -83,14 +111,14 @@ export default class SunYi extends Component {
             Storage.save('valueOf', 'App_Client_ProSY');
             Storage.save('history', 'App_Client_ProSYQ');
             Storage.save('historyClass', 'App_Client_ProSYDetailQ');
-        }else if(){
+        }else if(this.state.Disting=="1"){
             var date = new Date();
             var data=JSON.stringify(date.getTime());
             this.setState({
                 active:data,
             });
             var nextRoute={
-                name:"主页",
+                name:"Search",
                 component:Search
             };
             this.props.navigator.push(nextRoute);
@@ -103,8 +131,6 @@ export default class SunYi extends Component {
             Storage.save('valueOf', 'App_Client_ProSY');
             Storage.save('history', 'App_Client_ProSYQ');
             Storage.save('historyClass', 'App_Client_ProSYDetailQ');
-        }else{
-
         }
     }
 

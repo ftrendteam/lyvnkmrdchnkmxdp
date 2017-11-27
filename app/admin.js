@@ -173,15 +173,28 @@ export default class admin extends Component {
     }
 
     PickedDate(){
-        Storage.save('PickedDate','机构信息')
-        var nextRoute={
-            name:"PickedDate_list",
-            component:PickedDate_list,
-            params: {
-                reloadView:(sCode)=>this._reloadView(sCode)
-            }
-        };
-        this.props.navigator.push(nextRoute)
+        if(this.state.Usercode==""){
+            alert("请输入用户编码")
+        }else{
+            var Usercode=this.state.Usercode;
+            Storage.save('Usercode',Usercode);
+            var nextRoute={
+                name:"PickedDate_list",
+                component:PickedDate_list,
+                params: {
+                    reloadView:(sCode)=>this._reloadView(sCode)
+                }
+            };
+            this.props.navigator.push(nextRoute)
+        }
+    }
+
+    inputOnBlur(){
+        if(this.state.Usercode){
+            this.setState({
+                sCode1:""
+            });
+        }
     }
 
     _reloadView(sCode) {
@@ -212,6 +225,7 @@ export default class admin extends Component {
                         underlineColorAndroid='transparent'
                         placeholderTextColor="#bcbdc1"
                         style={styles.admin}
+                        onBlur={this.inputOnBlur.bind(this)}
                         onChangeText={(value)=>{
                             this.setState({
                                 Usercode:value

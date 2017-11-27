@@ -42,6 +42,12 @@ export default class ProductCG extends Component {
                 invoice:tags
             })
         })
+
+        Storage.get('Disting').then((tags)=>{
+            this.setState({
+                Disting:tags
+            })
+        })
     }
 
     Return(){
@@ -91,38 +97,80 @@ export default class ProductCG extends Component {
         });
     }
 
-    Button(){
-        var date = new Date();
-        var data=JSON.stringify(date.getTime());
-        var str=this.state.sCode1;
-        var str1=this.state.shopname1;
-        var str2=this.state.suppcode1;
-        if(this.state.sCode1==""){
-            alert("请选择供应商")
-        }else if(this.state.shopname1==""){
-            alert("请选择机构")
-        }else{
-            var nextRoute={
-                name:"Index",
-                component:Index,
-            };
-            this.props.navigator.push(nextRoute);
-            Storage.save('OrgFormno',str2);
-            Storage.save('Name','协配收货单');
-            Storage.save('FormType','XPYSYW');
-            Storage.save('valueOf','App_Client_ProXPYS');
-            Storage.save('history','App_Client_ProXPYSQ');
-            Storage.save('historyClass','App_Client_ProXPDetailYSQ');
-            Storage.save('ProYH','ProXPYS');
-            Storage.save('YuanDan','1');
-            Storage.save('Screen','1');
-            Storage.save('shopPandian','App_Client_NOYSXPCGQ');
-            Storage.save('Date',data);
-            Storage.save('Date',data);
-            Storage.save("scode",str);
-            Storage.save('shildshop',str1);
+    SearchShopname1(Suppcode1) {
+        Suppcode1 = String(Suppcode1);
+        this.setState({
+            sCode1:Suppcode1,
+        });
+    }
 
+    Button(){
+        if(this.state.Disting=="0") {
+            var date = new Date();
+            var data=JSON.stringify(date.getTime());
+            var str=this.state.sCode1;
+            var str1=this.state.shopname1;
+            var str2=this.state.suppcode1;
+            if(this.state.sCode1==""){
+                alert("请选择供应商")
+            }else if(this.state.shopname1==""){
+                alert("请选择机构")
+            }else{
+                var nextRoute={
+                    name:"Index",
+                    component:Index,
+                };
+                this.props.navigator.push(nextRoute);
+                Storage.save('OrgFormno',str2);
+                Storage.save('Name','协配收货单');
+                Storage.save('FormType','XPYSYW');
+                Storage.save('valueOf','App_Client_ProXPYS');
+                Storage.save('history','App_Client_ProXPYSQ');
+                Storage.save('historyClass','App_Client_ProXPDetailYSQ');
+                Storage.save('ProYH','ProXPYS');
+                Storage.save('YuanDan','1');
+                Storage.save('Screen','1');
+                Storage.save('shopPandian','App_Client_NOYSXPCGQ');
+                Storage.save('Date',data);
+                Storage.save('Date',data);
+                Storage.save("scode",str);
+                Storage.save('shildshop',str1);
+
+            }
+        }else if(this.state.Disting=="1"){
+            var date = new Date();
+            var data=JSON.stringify(date.getTime());
+            var str=this.state.sCode1;
+            var str1=this.state.shopname1;
+            var str2=this.state.suppcode1;
+            if(this.state.sCode1==""){
+                alert("请选择供应商")
+            }else if(this.state.shopname1==""){
+                alert("请选择机构")
+            }else{
+                var nextRoute={
+                    name:"Search",
+                    component:Search,
+                };
+                this.props.navigator.push(nextRoute);
+                Storage.save('OrgFormno',str2);
+                Storage.save('Name','协配收货单');
+                Storage.save('FormType','XPYSYW');
+                Storage.save('valueOf','App_Client_ProXPYS');
+                Storage.save('history','App_Client_ProXPYSQ');
+                Storage.save('historyClass','App_Client_ProXPDetailYSQ');
+                Storage.save('ProYH','ProXPYS');
+                Storage.save('YuanDan','1');
+                Storage.save('Screen','1');
+                Storage.save('shopPandian','App_Client_NOYSXPCGQ');
+                Storage.save('Date',data);
+                Storage.save('Date',data);
+                Storage.save("scode",str);
+                Storage.save('shildshop',str1);
+
+            }
         }
+
     }
 
     Search(){
@@ -131,7 +179,8 @@ export default class ProductCG extends Component {
             name:"Distrition_list",
             component:Distrition_list,
             params: {
-                SearchShopname:(Suppcode)=>this.SearchShopname(Suppcode)
+                SearchShopname:(Suppcode)=>this.SearchShopname(Suppcode),
+                SearchShopname1:(Suppcode1)=>this.SearchShopname1(Suppcode1)
             }
         };
         this.props.navigator.push(nextRoute)
