@@ -56,11 +56,6 @@ export default class Enquiries extends Component {
          })
      });
 
-     Storage.get('scode').then((tags)=>{
-         this.setState({
-             suppcode:tags
-         })
-     })
   }
 
   Return(){
@@ -142,12 +137,21 @@ export default class Enquiries extends Component {
                 {
                     (this.state.name=="商品采购单"||this.state.name=="商品验收单"||this.state.name=="协配采购单"||this.state.name=="协配收货单")?
                     <View style={styles.ContList}>
-                        <Text style={styles.ContLeft}>供应商编码</Text>
-                        <Text style={styles.ContLeft1}>{this.state.suppcode}</Text>
+                        <Text style={[styles.ContLeft,{marginTop:5,}]}>供应商编码</Text>
+                        <TextInput
+                            underlineColorAndroid='transparent'
+                            placeholder="请输入供应商编码"
+                            placeholderTextColor="#999999"
+                            style={styles.ContRight}
+                            onChangeText={(value)=>{
+                                this.setState({
+                                    suppcode:value
+                                })
+                        }}/>
                     </View>:null
                 }
                 <View style={styles.ContList}>
-                    <Text style={styles.ContLeft}>单据号</Text>
+                    <Text style={[styles.ContLeft,{marginTop:5,}]}>单据号</Text>
                     <TextInput
                     underlineColorAndroid='transparent'
                     placeholder="请输入单据号"
@@ -160,7 +164,7 @@ export default class Enquiries extends Component {
                     }}/>
                 </View>
                 <View style={styles.ContList}>
-                    <Text style={styles.ContLeft}>商品编码</Text>
+                    <Text style={[styles.ContLeft,{marginTop:5,}]}>商品编码</Text>
                     <TextInput
                     underlineColorAndroid='transparent'
                     placeholder="请输入商品编码"
@@ -227,7 +231,7 @@ const styles = StyleSheet.create({
         color:"#666666",
         fontSize:16,
         width:100,
-        textAlign:"right"
+        textAlign:"right",
     },
     Contright:{
         color:"#333333",

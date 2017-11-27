@@ -96,7 +96,6 @@ export default class ProductCG extends Component {
             suppcode1:Suppcode,
         });
     }
-
     SearchShopname1(Suppcode1) {
         Suppcode1 = String(Suppcode1);
         this.setState({
@@ -113,8 +112,6 @@ export default class ProductCG extends Component {
             var str2=this.state.suppcode1;
             if(this.state.sCode1==""){
                 alert("请选择供应商")
-            }else if(this.state.shopname1==""){
-                alert("请选择机构")
             }else{
                 var nextRoute={
                     name:"Index",
@@ -138,37 +135,7 @@ export default class ProductCG extends Component {
 
             }
         }else if(this.state.Disting=="1"){
-            var date = new Date();
-            var data=JSON.stringify(date.getTime());
-            var str=this.state.sCode1;
-            var str1=this.state.shopname1;
-            var str2=this.state.suppcode1;
-            if(this.state.sCode1==""){
-                alert("请选择供应商")
-            }else if(this.state.shopname1==""){
-                alert("请选择机构")
-            }else{
-                var nextRoute={
-                    name:"Search",
-                    component:Search,
-                };
-                this.props.navigator.push(nextRoute);
-                Storage.save('OrgFormno',str2);
-                Storage.save('Name','协配收货单');
-                Storage.save('FormType','XPYSYW');
-                Storage.save('valueOf','App_Client_ProXPYS');
-                Storage.save('history','App_Client_ProXPYSQ');
-                Storage.save('historyClass','App_Client_ProXPDetailYSQ');
-                Storage.save('ProYH','ProXPYS');
-                Storage.save('YuanDan','1');
-                Storage.save('Screen','1');
-                Storage.save('shopPandian','App_Client_NOYSXPCGQ');
-                Storage.save('Date',data);
-                Storage.save('Date',data);
-                Storage.save("scode",str);
-                Storage.save('shildshop',str1);
 
-            }
         }
 
     }
@@ -217,27 +184,6 @@ export default class ProductCG extends Component {
                         />
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.listimages} onPress={this.onclick.bind(this)}>
-                        <Image source={require("../images/2_03.png")} style={styles.Image}></Image>
-                    </TouchableOpacity>
-                </View>
-                <View style={styles.ContList}>
-                    <View style={styles.listleft}>
-                        <Text style={styles.listLeftText}>机构:</Text>
-                    </View>
-                    <TouchableOpacity style={styles.listcont} onPress={this.Monclick.bind(this)}>
-                        <TextInput
-                            style={styles.TextInput1}
-                            autofocus={true}
-                            editable={false}
-                            defaultValue ={this.state.shopname1}
-                            numberoflines={1}
-                            placeholder="请选择机构信息"
-                            textalign="center"
-                            underlineColorAndroid='transparent'
-                            placeholderTextColor="#cccccc"
-                        />
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.listimages} onPress={this.Monclick.bind(this)}>
                         <Image source={require("../images/2_03.png")} style={styles.Image}></Image>
                     </TouchableOpacity>
                 </View>

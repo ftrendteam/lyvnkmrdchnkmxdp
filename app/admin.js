@@ -240,7 +240,6 @@ export default class admin extends Component {
                         numberoflines={1}
                         keyboardType="numeric"
                         placeholder="请输入密码"
-                        maxLength={6}
                         textalign="center"
                         underlineColorAndroid='transparent'
                         placeholderTextColor="#bcbdc1"

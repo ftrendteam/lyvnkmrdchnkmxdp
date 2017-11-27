@@ -639,60 +639,69 @@ export default class Index extends Component {
         Storage.delete('shildshop');
         Storage.delete('YuanDan');
         Storage.delete('Screen');
+
         if(this.state.ShopCar1>0){
             this._setModalVisible();
             alert("商品未提交")
         }else if(this.state.username==null){
             this._setModalVisible();
         }else{
-            dbAdapter.selectUserRight(this.state.usercode,"K0801").then((rows)=>{
-                if(rows==true){
-                    dbAdapter.selecUserRightA1012(this.state.usercode).then((rows)=>{
-                        if(rows==true){
-                            if(this.state.Disting=="0"){
-                                var date = new Date();
-                                var data=JSON.stringify(date.getTime());
-                                Storage.save('Name','要货单');
-                                Storage.save('FormType','YWYW');
-                                Storage.save('ProYH','ProYH');
-                                Storage.save('YdCountm','1');
-                                var invoice = "要货单";
-                                this.setState({
-                                    head:invoice,
-                                    active:data,
-                                });
-                                Storage.save('Date',this.state.active);
-                                this._setModalVisible();
-                            }else if(this.state.Disting=="1"){
-                                var date = new Date();
-                                var data=JSON.stringify(date.getTime());
-                                Storage.save('Name','要货单');
-                                Storage.save('FormType','YWYW');
-                                Storage.save('ProYH','ProYH');
-                                Storage.save('YdCountm','3');
-                                Storage.save('YdCountm','1');
-                                Storage.save('Date',this.state.active);
-                                var invoice = "要货单";
-                                this.setState({
-                                    head:invoice,
-                                    active:data,
-                                });
-                                var nextRoute={
-                                    name:"主页",
-                                    component:Search
-                                };
-                                this.props.navigator.push(nextRoute)
-                                this._setModalVisible();
-                            }else{
-                                alert("请选择模式")
+            Storage.get('code').then((tags) => {
+                dbAdapter.isYHPSXP(tags).then((rows)=>{
+                    if(rows.length>=1){
+                        dbAdapter.selectUserRight(this.state.usercode,"K0801").then((rows)=>{
+                            if(rows==true){
+                                dbAdapter.selecUserRightA1012(this.state.usercode).then((rows)=>{
+                                    if(rows==true){
+                                        if(this.state.Disting=="0"){
+                                            var date = new Date();
+                                            var data=JSON.stringify(date.getTime());
+                                            Storage.save('Name','要货单');
+                                            Storage.save('FormType','YWYW');
+                                            Storage.save('ProYH','ProYH');
+                                            Storage.save('YdCountm','1');
+                                            var invoice = "要货单";
+                                            this.setState({
+                                                head:invoice,
+                                                active:data,
+                                            });
+                                            Storage.save('Date',this.state.active);
+                                            this._setModalVisible();
+                                        }else if(this.state.Disting=="1"){
+                                            var date = new Date();
+                                            var data=JSON.stringify(date.getTime());
+                                            Storage.save('Name','要货单');
+                                            Storage.save('FormType','YWYW');
+                                            Storage.save('ProYH','ProYH');
+                                            Storage.save('YdCountm','3');
+                                            Storage.save('YdCountm','1');
+                                            Storage.save('Date',this.state.active);
+                                            var invoice = "要货单";
+                                            this.setState({
+                                                head:invoice,
+                                                active:data,
+                                            });
+                                            var nextRoute={
+                                                name:"主页",
+                                                component:Search
+                                            };
+                                            this.props.navigator.push(nextRoute)
+                                            this._setModalVisible();
+                                        }else{
+                                            alert("请选择模式")
+                                        }
+                                    }else if (rows == false) {
+                                        alert("该店铺没有此权限");
+                                        this._setModalVisible();
+                                    }
+                                })
                             }
-                        }else if (rows == false) {
-                            alert("该店铺没有此权限");
-                            this._setModalVisible();
-                        }
-                    })
-                }
-            })
+                        })
+                    }else{
+                        alert("没有配送机构,不能进行该业务")
+                    }
+                })
+            });
 
             //将内容保存到本地数据库
             Storage.save('valueOf','App_Client_ProYH');
@@ -852,30 +861,37 @@ export default class Index extends Component {
         }else if(this.state.username==null){
             this._setModalVisible();
         }else {
-            // Storage.delete("Name");
-            dbAdapter.selectUserRight(this.state.usercode,"K0802").then((rows) => {
-                if (rows == true) {
-                    dbAdapter.selecUserRightA1012(this.state.usercode).then((rows) => {
-                        if (rows == true) {
-                            if(this.state.Disting=="0"||this.state.Disting=="1") {
-                                Storage.save("invoice", "配送收货单");
-                                Storage.save('YdCountm', '2');
-                                var nextRoute = {
-                                    name: "主页",
-                                    component: Distrition
-                                };
-                                this.props.navigator.push(nextRoute);
-                                this._setModalVisible();
-                            }else{
-                                alert("请选择模式")
+            Storage.get('code').then((tags) => {
+                dbAdapter.isYHPSXP(tags).then((rows)=>{
+                    if(rows.length>=1){
+                        dbAdapter.selectUserRight(this.state.usercode,"K0802").then((rows) => {
+                            if (rows == true) {
+                                dbAdapter.selecUserRightA1012(this.state.usercode).then((rows) => {
+                                    if (rows == true) {
+                                        if(this.state.Disting=="0"||this.state.Disting=="1") {
+                                            Storage.save("invoice", "配送收货单");
+                                            Storage.save('YdCountm', '2');
+                                            var nextRoute = {
+                                                name: "主页",
+                                                component: Distrition
+                                            };
+                                            this.props.navigator.push(nextRoute);
+                                            this._setModalVisible();
+                                        }else{
+                                            alert("请选择模式")
+                                        }
+                                    }else if (rows == false) {
+                                        alert("该店铺没有此权限");
+                                        this._setModalVisible();
+                                    }
+                                })
                             }
-                        }else if (rows == false) {
-                            alert("该店铺没有此权限");
-                            this._setModalVisible();
-                        }
-                    })
-                }
-            })
+                        })
+                    }else{
+                        alert("没有配送机构,不能进行该业务")
+                    }
+                })
+            });
         }
 
     }
@@ -890,29 +906,36 @@ export default class Index extends Component {
         }else if(this.state.username==null){
             this._setModalVisible();
         }else {
-            // Storage.delete("Name");
-            dbAdapter.selectUserRight(this.state.usercode,"K0504").then((rows) => {
-                if (rows == true) {
-                    dbAdapter.selecUserRightA1012(this.state.usercode).then((rows) => {
-                        if (rows == true) {
-                            if(this.state.Disting=="0"||this.state.Disting=="1") {
-                                Storage.save("invoice", "商品采购单");
-                                var nextRoute = {
-                                    name: "主页",
-                                    component: ProductCG
-                                };
-                                this.props.navigator.push(nextRoute);
-                                this._setModalVisible();
-                            }else{
-                                alert("请选择模式")
+            Storage.get('code').then((tags) => {
+                dbAdapter.isCGYS(tags).then((rows)=>{
+                    if(rows.length>=1) {
+                        dbAdapter.selectUserRight(this.state.usercode,"K0504").then((rows) => {
+                            if (rows == true) {
+                                dbAdapter.selecUserRightA1012(this.state.usercode).then((rows) => {
+                                    if (rows == true) {
+                                        if(this.state.Disting=="0"||this.state.Disting=="1") {
+                                            Storage.save("invoice", "商品采购单");
+                                            var nextRoute = {
+                                                name: "主页",
+                                                component: ProductCG
+                                            };
+                                            this.props.navigator.push(nextRoute);
+                                            this._setModalVisible();
+                                        }else{
+                                            alert("请选择模式")
+                                        }
+                                    }else if (rows == false) {
+                                        alert("该店铺没有此权限");
+                                        this._setModalVisible();
+                                    }
+                                })
                             }
-                        }else if (rows == false) {
-                            alert("该店铺没有此权限");
-                            this._setModalVisible();
-                        }
-                    })
-                }
-            })
+                        })
+                    }else{
+                        alert("没有配送机构,不能进行该业务")
+                    }
+                })
+            });
         }
     }
 
@@ -926,30 +949,37 @@ export default class Index extends Component {
         }else if(this.state.username==null){
             this._setModalVisible();
         }else {
-            // Storage.delete("Name");
-            dbAdapter.selectUserRight(this.state.usercode,"K0505").then((rows) => {
-                if (rows == true) {
-                    dbAdapter.selecUserRightA1012(this.state.usercode).then((rows) => {
-                        if (rows == true) {
-                            if(this.state.Disting=="0"||this.state.Disting=="1") {
-                                Storage.save("invoice", "商品验收单");
-                                Storage.save('YdCountm', '2');
-                                var nextRoute = {
-                                    name: "主页",
-                                    component: ProductYS
-                                };
-                                this.props.navigator.push(nextRoute);
-                                this._setModalVisible();
-                            }else{
-                                alert("请选择模式")
+            Storage.get('code').then((tags) => {
+                dbAdapter.isCGYS(tags).then((rows)=>{
+                    if(rows.length>=1) {
+                        dbAdapter.selectUserRight(this.state.usercode,"K0505").then((rows) => {
+                            if (rows == true) {
+                                dbAdapter.selecUserRightA1012(this.state.usercode).then((rows) => {
+                                    if (rows == true) {
+                                        if(this.state.Disting=="0"||this.state.Disting=="1") {
+                                            Storage.save("invoice", "商品验收单");
+                                            Storage.save('YdCountm', '2');
+                                            var nextRoute = {
+                                                name: "主页",
+                                                component: ProductYS
+                                            };
+                                            this.props.navigator.push(nextRoute);
+                                            this._setModalVisible();
+                                        }else{
+                                            alert("请选择模式")
+                                        }
+                                    }else if (rows == false) {
+                                        alert("该店铺没有此权限");
+                                        this._setModalVisible();
+                                    }
+                                })
                             }
-                        }else if (rows == false) {
-                            alert("该店铺没有此权限");
-                            this._setModalVisible();
-                        }
-                    })
-                }
-            })
+                        })
+                    }else{
+                        alert("没有配送机构,不能进行该业务")
+                    }
+                })
+            });
         }
     }
 
@@ -963,30 +993,38 @@ export default class Index extends Component {
         }else if(this.state.username==null){
             this._setModalVisible();
         }else {
-            // Storage.delete("Name");
-            dbAdapter.selectUserRight(this.state.usercode,"K0707").then((rows) => {
-                if (rows == true) {
-                    dbAdapter.selecUserRightA1012(this.state.usercode).then((rows) => {
-                        if (rows == true) {
-                            if(this.state.Disting=="0"||this.state.Disting=="1") {
-                                Storage.save("invoice", "协配采购单");
-                                Storage.save('YdCountm', '3');
-                                var nextRoute = {
-                                    name: "主页",
-                                    component: ProductXP
-                                };
-                                this.props.navigator.push(nextRoute);
-                                this._setModalVisible();
-                            }else{
-                                alert("请选择模式")
+            Storage.get('code').then((tags) => {
+                dbAdapter.isXPCG(tags).then((rows)=>{
+                    if(rows.length>=1) {
+                        dbAdapter.selectUserRight(this.state.usercode, "K0707").then((rows) => {
+                            if (rows == true) {
+                                dbAdapter.selecUserRightA1012(this.state.usercode).then((rows) => {
+                                    if (rows == true) {
+                                        if (this.state.Disting == "0" || this.state.Disting == "1") {
+                                            Storage.save("invoice", "协配采购单");
+                                            Storage.save('YdCountm', '3');
+                                            var nextRoute = {
+                                                name: "主页",
+                                                component: ProductXP
+                                            };
+                                            this.props.navigator.push(nextRoute);
+                                            this._setModalVisible();
+                                        } else {
+                                            alert("请选择模式")
+                                        }
+                                    } else if (rows == false) {
+                                        alert("该店铺没有此权限");
+                                        this._setModalVisible();
+                                    }
+                                })
                             }
-                        }else if (rows == false) {
-                            alert("该店铺没有此权限");
-                            this._setModalVisible();
-                        }
-                    })
-                }
-            })
+                        })
+                    }else{
+                        alert("没有配送机构,不能进行该业务")
+                    }
+                })
+            });
+
         }
     }
 
@@ -1000,30 +1038,38 @@ export default class Index extends Component {
         }else if(this.state.username==null){
             this._setModalVisible();
         }else {
-            // Storage.delete("Name");
-            dbAdapter.selectUserRight(this.state.usercode,"K0803").then((rows) => {
-                if (rows == true) {
-                    dbAdapter.selecUserRightA1012(this.state.usercode).then((rows) => {
-                        if (rows == true) {
-                            if(this.state.Disting=="0"||this.state.Disting=="1") {
-                                Storage.save("invoice", "协配收货单");
-                                Storage.save('YdCountm', '2');
-                                var nextRoute = {
-                                    name: "主页",
-                                    component: ProductSH
-                                };
-                                this.props.navigator.push(nextRoute);
-                                this._setModalVisible();
-                            }else{
-                                alert("请选择模式")
+            Storage.get('code').then((tags) => {
+                dbAdapter.isYHPSXP(tags).then((rows)=>{
+                    if(rows.length>=1){
+                        dbAdapter.selectUserRight(this.state.usercode,"K0803").then((rows) => {
+                            if (rows == true) {
+                                dbAdapter.selecUserRightA1012(this.state.usercode).then((rows) => {
+                                    if (rows == true) {
+                                        if(this.state.Disting=="0"||this.state.Disting=="1") {
+                                            Storage.save("invoice", "协配收货单");
+                                            Storage.save('YdCountm', '2');
+                                            var nextRoute = {
+                                                name: "主页",
+                                                component: ProductSH
+                                            };
+                                            this.props.navigator.push(nextRoute);
+                                            this._setModalVisible();
+                                        }else{
+                                            alert("请选择模式")
+                                        }
+                                    }else if (rows == false) {
+                                        alert("该店铺没有此权限");
+                                        this._setModalVisible();
+                                    }
+                                })
                             }
-                        }else if (rows == false) {
-                            alert("该店铺没有此权限");
-                            this._setModalVisible();
-                        }
-                    })
-                }
-            })
+                        })
+                    }else{
+                        alert("没有配送机构,不能进行该业务")
+                    }
+                })
+            });
+
         }
     }
 

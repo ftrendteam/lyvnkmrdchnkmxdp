@@ -136,7 +136,6 @@ export default class  login extends Component{
                             numberoflines="{1}"
                             keyboardType="numeric"
                             placeholder="请输入商户密码"
-                            maxLength={6}
                             textalign="center"
                             underlineColorAndroid='transparent'
                             placeholderTextColor="#bcbdc1"

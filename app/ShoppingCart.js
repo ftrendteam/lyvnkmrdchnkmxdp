@@ -454,15 +454,10 @@ export default class ShoppingCart extends Component {
     //提交
     submit(){
         this.screen = [];
+
         Storage.get('shildshop').then((tags)=>{
             this.setState({
                 shildshop:tags
-            })
-        })
-
-        Storage.get('scode').then((tags)=>{
-            this.setState({
-                suppcode:tags
             })
         })
 
@@ -492,41 +487,60 @@ export default class ShoppingCart extends Component {
                         };
                     });
                 });
-                let params = {
-                    reqCode: "App_PosReq",
-                    reqDetailCode: this.state.reqDetailCode,
-                    ClientCode: this.state.ClientCode,
-                    sDateTime: "2017-08-09 12:12:12",
-                    Sign: NetUtils.MD5("App_PosReq" + "##" +this.state.reqDetailCode + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',
-                    username: this.state.Username,
-                    usercode: this.state.Userpwd,
-                    DetailInfo1: {
-                        "ShopCode": tags,
-                        "OrgFormno": this.state.OrgFormno,
-                        "ProMemo": this.state.Remark,
-                        "SuppCode":this.state.suppcode,
-                        "childshop":this.state.shildshop,
-                        "pdaGuid":this.state.IMEI,
-                        "pdgFormno":this.state.ProYH+this.state.Date
-                    },
-                    DetailInfo2: this.dataRows,
-                };
-                FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
-                    if(data.retcode == 1){
-                        if(this.state.Screen=="1"){
-                            var DetailInfo2=params.DetailInfo2;
-                            for(let i =0;i<DetailInfo2.length;i++){
-                                let detail = DetailInfo2[i];
-                                let ydcountm = detail.ydcountm;
-                                let countm = detail.countm;
-                                if(ydcountm!==countm){
-                                    this.screen.push(detail);
+                Storage.get('scode').then((scode)=>{
+                    let params = {
+                        reqCode: "App_PosReq",
+                        reqDetailCode: this.state.reqDetailCode,
+                        ClientCode: this.state.ClientCode,
+                        sDateTime: "2017-08-09 12:12:12",
+                        Sign: NetUtils.MD5("App_PosReq" + "##" +this.state.reqDetailCode + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',
+                        username: this.state.Username,
+                        usercode: this.state.Userpwd,
+                        DetailInfo1: {
+                            "ShopCode": tags,
+                            "OrgFormno": this.state.OrgFormno,
+                            "ProMemo": this.state.Remark,
+                            "SuppCode":scode,
+                            "childshop":this.state.shildshop,
+                            "pdaGuid":this.state.IMEI,
+                            "pdgFormno":this.state.ProYH+this.state.Date
+                        },
+                        DetailInfo2: this.dataRows,
+                    };
+                    FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
+                        if(data.retcode == 1){
+                            if(this.state.Screen=="1"){
+                                var DetailInfo2=params.DetailInfo2;
+                                for(let i =0;i<DetailInfo2.length;i++){
+                                    let detail = DetailInfo2[i];
+                                    let ydcountm = detail.ydcountm;
+                                    let countm = detail.countm;
+                                    if(ydcountm!==countm){
+                                        this.screen.push(detail);
+                                    }
+                                };
+                                this.setState({
+                                    dataSource:this.state.dataSource.cloneWithRows(this.screen),
+                                })
+                                if(this.screen==''){
+                                    alert("提交成功");
+                                    dbAdapter.deleteData("shopInfo");
+                                    this.dataRows=[];
+                                    var price="";
+                                    var date = new Date();
+                                    var data=JSON.stringify(date.getTime());
+                                    this.setState({
+                                        dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
+                                        ShopNumber:price,
+                                        ShopAmount:price,
+                                        shopcar:"",
+                                        active:data,
+                                    })
+                                    Storage.save('Date',this.state.active);
+                                }else{
+                                    this.ScreenBod();
                                 }
-                            };
-                            this.setState({
-                                dataSource:this.state.dataSource.cloneWithRows(this.screen),
-                            })
-                            if(this.screen==''){
+                            }else{
                                 alert("提交成功");
                                 dbAdapter.deleteData("shopInfo");
                                 this.dataRows=[];
@@ -539,31 +553,14 @@ export default class ShoppingCart extends Component {
                                     ShopAmount:price,
                                     shopcar:"",
                                     active:data,
+                                    BeiZhu:"暂无备注",
                                 })
                                 Storage.save('Date',this.state.active);
-                            }else{
-                                this.ScreenBod();
                             }
                         }else{
-                            alert("提交成功");
-                            dbAdapter.deleteData("shopInfo");
-                            this.dataRows=[];
-                            var price="";
-                            var date = new Date();
-                            var data=JSON.stringify(date.getTime());
-                            this.setState({
-                                dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
-                                ShopNumber:price,
-                                ShopAmount:price,
-                                shopcar:"",
-                                active:data,
-                                BeiZhu:"暂无备注",
-                            })
-                            Storage.save('Date',this.state.active);
+                            // alert(JSON.stringify(data))
                         }
-                    }else{
-                        alert(JSON.stringify(data))
-                    }
+                    })
                 })
             })
         }
@@ -573,12 +570,6 @@ export default class ShoppingCart extends Component {
         Storage.get('shildshop').then((tags) => {
             this.setState({
                 shildshop: tags
-            })
-        })
-
-        Storage.get('scode').then((tags) => {
-            this.setState({
-                suppcode: tags
             })
         })
 
@@ -602,46 +593,48 @@ export default class ShoppingCart extends Component {
                         };
                     });
                 });
-                let params = {
-                    reqCode: "App_PosReq",
-                    reqDetailCode: this.state.reqDetailCode,
-                    ClientCode: this.state.ClientCode,
-                    sDateTime: "2017-08-09 12:12:12",
-                    Sign: NetUtils.MD5("App_PosReq" + "##" + this.state.reqDetailCode + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs") + '',
-                    username: this.state.Username,
-                    usercode: this.state.Userpwd,
-                    DetailInfo1: {
-                        "ShopCode": tags,
-                        "OrgFormno": this.state.OrgFormno,
-                        "ProMemo": this.state.Remark,
-                        "SuppCode": this.state.suppcode,
-                        "childshop": this.state.shildshop,
-                        "pdaGuid": this.state.IMEI,
-                        "pdgFormno": this.state.ProYH + this.state.Date
-                    },
-                    DetailInfo2: this.dataRows,
-                };
-                FetchUtils.post(this.state.linkurl, JSON.stringify(params)).then((data) => {
-                    if (data.retcode == 1) {
-                        this.ScreenBod();
-                        alert("提交成功");
-                        dbAdapter.deleteData("shopInfo");
-                        this.dataRows = [];
-                        var price = "";
-                        var date = new Date();
-                        var data = JSON.stringify(date.getTime());
-                        this.setState({
-                            dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
-                            ShopNumber: price,
-                            ShopAmount: price,
-                            shopcar: "",
-                            active: data,
-                        })
-                        Storage.save('Date', this.state.active);
-                    } else {
-                        // alert("提交失败");
-                        alert(JSON.stringify(data))
-                    }
+                Storage.get('scode').then((scod) => {
+                    let params = {
+                        reqCode: "App_PosReq",
+                        reqDetailCode: this.state.reqDetailCode,
+                        ClientCode: this.state.ClientCode,
+                        sDateTime: "2017-08-09 12:12:12",
+                        Sign: NetUtils.MD5("App_PosReq" + "##" + this.state.reqDetailCode + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs") + '',
+                        username: this.state.Username,
+                        usercode: this.state.Userpwd,
+                        DetailInfo1: {
+                            "ShopCode": tags,
+                            "OrgFormno": this.state.OrgFormno,
+                            "ProMemo": this.state.Remark,
+                            "SuppCode": scod,
+                            "childshop": this.state.shildshop,
+                            "pdaGuid": this.state.IMEI,
+                            "pdgFormno": this.state.ProYH + this.state.Date
+                        },
+                        DetailInfo2: this.dataRows,
+                    };
+                    FetchUtils.post(this.state.linkurl, JSON.stringify(params)).then((data) => {
+                        if (data.retcode == 1) {
+                            this.ScreenBod();
+                            alert("提交成功");
+                            dbAdapter.deleteData("shopInfo");
+                            this.dataRows = [];
+                            var price = "";
+                            var date = new Date();
+                            var data = JSON.stringify(date.getTime());
+                            this.setState({
+                                dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
+                                ShopNumber: price,
+                                ShopAmount: price,
+                                shopcar: "",
+                                active: data,
+                            })
+                            Storage.save('Date', this.state.active);
+                        } else {
+                            // alert("提交失败");
+                            alert(JSON.stringify(data))
+                        }
+                    })
                 })
             })
         }
@@ -847,10 +840,7 @@ export default class ShoppingCart extends Component {
                     <TouchableOpacity style={styles.modalStyle}>
                         <View style={styles.ModalView}>
                             <View style={styles.DanJu}>
-                                <View style={styles.danju}><Text style={styles.DanText}>商品数量与原单数量不匹配，是否继续？</Text></View>
-                                <TouchableOpacity style={styles.ModalLeft} onPress={this.ScreenBod.bind(this)}>
-                                    <Image source={require("../images/2_02.png")} />
-                                </TouchableOpacity>
+                                <View style={styles.danju}><Text style={styles.DanText}>商品数量不相等，是否继续？</Text></View>
                             </View>
                             <View style={styles.ScreenTitle}>
                                 <View style={styles.coulumnScreen}>

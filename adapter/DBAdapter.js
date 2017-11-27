@@ -632,10 +632,9 @@ export default class DBAdapter extends SQLiteOpenHelper {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
         let ssql = "select PSShop from tShopItem where FNeedPS='1' and ShopCode='" + shopCode + "' and isdel='0'";
-        
+        console.log(ssql);
         tx.executeSql(ssql, [], (tx, results) => {
           resolve(results.rows);
-          
         });
       }, (error) => {
         this._errorCB('transaction', error);
