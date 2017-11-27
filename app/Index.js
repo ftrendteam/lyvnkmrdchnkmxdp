@@ -1006,7 +1006,7 @@ export default class Index extends Component {
                 dbAdapter.isYHPSXP(tags).then((rows)=>{
                     if(rows.length>=1){
                         dbAdapter.selectUserRight(this.state.usercode,"K0803").then((rows) => {
-                            if (rows == true) { {
+                            if (rows == true) {
                                 if(this.state.Disting=="0"||this.state.Disting=="1") {
                                     Storage.save("invoice", "协配收货单");
                                     Storage.save('YdCountm', '2');
@@ -1220,7 +1220,7 @@ export default class Index extends Component {
                                         <Image source={require("../images/1_38.png")} />
                                     </Text>
                                     <Text style={styles.ModalHeadText}>
-                                        损益
+                                        损溢
                                     </Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity style={styles.ModalHeadImage} onPress={this.SPCaiGou.bind(this)}>

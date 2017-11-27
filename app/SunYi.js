@@ -58,7 +58,7 @@ export default class SunYi extends Component {
                 component:Index
             };
             this.props.navigator.push(nextRoute);
-            Storage.save('Name','损益单');
+            Storage.save('Name','损溢单');
             Storage.save('FormType','SYYW');
             Storage.save('ProYH','ProSY');
             Storage.save('YdCountm','3');
@@ -78,7 +78,7 @@ export default class SunYi extends Component {
                 component:Search
             };
             this.props.navigator.push(nextRoute);
-            Storage.save('Name','损益单');
+            Storage.save('Name','损溢单');
             Storage.save('FormType','SYYW');
             Storage.save('ProYH','ProSY');
             Storage.save('YdCountm','3');
@@ -102,7 +102,7 @@ export default class SunYi extends Component {
                 component:Index
             };
             this.props.navigator.push(nextRoute);
-            Storage.save('Name','损益单');
+            Storage.save('Name','损溢单');
             Storage.save('FormType','SYYW');
             Storage.save('ProYH','ProSY');
             Storage.save('YdCountm','3');
@@ -122,7 +122,7 @@ export default class SunYi extends Component {
                 component:Search
             };
             this.props.navigator.push(nextRoute);
-            Storage.save('Name','损益单');
+            Storage.save('Name','损溢单');
             Storage.save('FormType','SYYW');
             Storage.save('ProYH','ProSY');
             Storage.save('YdCountm','3');
