@@ -55,30 +55,21 @@ export default class HistoricalDocument extends Component {
         this.dataRows = [];
   }
 
-  HISTORY(){
-      var nextRoute={
-          name:"主页",
-          component:HistoricalDocument
-      };
-      this.props.navigator.push(nextRoute)
-  }
+    Shop(){
+        var nextRoute={
+            name:"主页",
+            component:Index
+        };
+        this.props.navigator.push(nextRoute)
+    }
 
-  HOME(){
-      var nextRoute={
-          name:"主页",
-          component:Index
-      };
-      this.props.navigator.push(nextRoute);
-  }
-
-  SHOP(){
-      var nextRoute={
-          name:"主页",
-
-          component:ShoppingCart
-      };
-      this.props.navigator.push(nextRoute)
-  }
+    ShopList(){
+        var nextRoute={
+            name:"主页",
+            component:ShoppingCart
+        };
+        this.props.navigator.push(nextRoute)
+    }
 
   pressPush(){
     var nextRoute={
@@ -291,14 +282,32 @@ export default class HistoricalDocument extends Component {
         </View>
         <View style={styles.footer}>
             <TouchableOpacity style={styles.Home}><Image source={require("../images/1_30.png")}></Image><Text style={styles.home2}>历史单据查询</Text></TouchableOpacity>
-            <TouchableOpacity style={styles.Home} onPress={this.HOME.bind(this)}><Image source={require("../images/1_311.png")}></Image><Text style={styles.home1}>商品</Text></TouchableOpacity>
-            <TouchableOpacity style={styles.Home} onPress={this.SHOP.bind(this)}>
+            <TouchableOpacity style={styles.Home} onPress={this.Shop.bind(this)}><Image source={require("../images/1_311.png")}></Image><Text style={styles.home1}>商品</Text></TouchableOpacity>
+            <TouchableOpacity style={styles.Home} onPress={this.ShopList.bind(this)}>
                  <View>
                     <Image source={require("../images/1_322.png")}>
                         {
-                           (this.state.shopcar==0)?
-                            null:
-                            <Text style={styles.ShopCar}>{this.state.shopcar}</Text>
+                            (this.state.shopcar==0)?
+                                null:
+                                <Text style={[{position:"absolute", right:-200,}]}>{this.state.shopcar}</Text>
+                        }
+                        {
+                            (this.state.shopcar>0)?
+                                <Text style={[styles.ShopCar,{paddingTop:3,}]}>{this.state.shopcar}</Text>:null
+                        }
+                        {
+                            (this.state.shopcar<999)?
+                                null:
+                                <Text style={[styles.ShopCar,{width:30,height:30,top:11,lineHeight:21,}]}>{this.state.shopcar}</Text>
+                        }
+                        {
+                            (this.state.shopcar>999)?
+                                <View>
+                                    <Text style={[styles.ShopCar,{width:30,height:30,top:11,lineHeight:23}]}>{this.state.shopcar}</Text>
+                                    <Text style={styles.Add}>
+                                        +
+                                    </Text>
+                                </View>:null
                         }
                     </Image>
                  </View>
@@ -329,7 +338,7 @@ const styles = StyleSheet.create({
  },
  header:{
      height:60,
-     backgroundColor:"#ff4f4d",
+     backgroundColor:"#ff4e4e",
      paddingTop:10,
  },
  cont:{
@@ -346,6 +355,7 @@ const styles = StyleSheet.create({
     textAlign:"center",
     color:"#ffffff",
     fontSize:22,
+    marginTop:3,
  },
  Cont:{
      marginBottom:10,
@@ -362,12 +372,14 @@ const styles = StyleSheet.create({
  },
  List:{
     flexDirection:"row",
-    fontSize:14,
+    fontSize:16,
  },
  ListLeft:{
+    fontSize:16,
     color:"#666666",
  },
  ListRight:{
+    fontSize:14,
     color:"#333333",
     lineHeight:28,
  },
@@ -386,7 +398,7 @@ const styles = StyleSheet.create({
     flex:2,
     flexDirection:"row",
     borderTopWidth:1,
-    borderTopColor:"#cacccb"
+    borderTopColor:"#f2f2f2"
  },
   source:{
    flexDirection:"row",
@@ -400,21 +412,34 @@ const styles = StyleSheet.create({
   },
   home1:{
     color:'#999999',
-    fontSize:12,
+    fontSize:16,
     marginTop:5,
     flex:1,
   },
   home2:{
      color:'#ff4e4e',
-     fontSize:12,
+     fontSize:16,
      marginTop:5,
      flex:1,
   },
-  ShopCar:{
-   color:"red",
-   position:"absolute",
-   right:-42,
-  },
+    ShopCar:{
+        width:25,
+        height:25,
+        backgroundColor:"#ffba00",
+        color:"#ffffff",
+        textAlign:"center",
+        borderRadius:50,
+        position:"absolute",
+        top:10,
+        right:-42,
+    },
+    Add:{
+        position:"absolute",
+        right:-50,
+        top:5,
+        color:"#ff4e4e",
+        fontWeight:"bold"
+    },
     LoadCenter:{
         flex:1,
         justifyContent: 'center',

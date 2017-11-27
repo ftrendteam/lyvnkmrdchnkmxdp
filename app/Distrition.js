@@ -65,7 +65,6 @@ export default class Distrition extends Component {
         };
         this.props.navigator.push(nextRoute);
         Storage.delete('YuanDan');
-        Storage.delete('Screen');
         Storage.save('OrgFormno',str);
         Storage.save('Date',data);
         Storage.save('Name','配送收货单');
@@ -88,15 +87,17 @@ export default class Distrition extends Component {
             component:Index
         };
         this.props.navigator.push(nextRoute);
-        Storage.delete('YuanDan');
+        Storage.save('YuanDan','1');
         Storage.save('OrgFormno',str);
         Storage.save("scode",str);
         Storage.save('Date',this.state.active);
         Storage.save('Name','配送收货单');
+        Storage.save('FormType','PSSHYW');
         Storage.save('valueOf','App_Client_ProPSSH');
         Storage.save('history','App_Client_ProPSSHQ');
         Storage.save('historyClass','App_Client_ProPSSHDetailQ');
         Storage.save('ProYH','ProPSSH');
+        Storage.save('Screen','1');
     }
 
     Search(){
@@ -114,14 +115,13 @@ export default class Distrition extends Component {
     render() {
         return (
             <View style={styles.container}>
-                <View style={styles.Head}>
+                <View style={styles.header}>
                     <View style={styles.cont}>
-                        <TouchableOpacity style={styles.Images} onPress={this.Return.bind(this)}>
-                            <Image source={require("../images/left.png")} style={styles.HeaderImage}></Image>
+                        <TouchableOpacity onPress={this.Return.bind(this)}>
+                            <Image source={require("../images/2_01.png")} style={styles.HeaderImage}></Image>
                         </TouchableOpacity>
-                        <View style={styles.HeadList}>
-                            <Text style={styles.HeadText}>{this.state.invoice}</Text>
-                        </View>
+                        <Text style={styles.HeaderList}>{this.state.invoice}</Text>
+
                     </View>
                 </View>
                 <View style={styles.ContList}>
@@ -142,12 +142,12 @@ export default class Distrition extends Component {
                         />
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.listimages} onPress={this.Search.bind(this)}>
-                        <Image source={require("../images/right.png")} style={styles.Image}></Image>
+                        <Image source={require("../images/2_03.png")} style={styles.Image}></Image>
                     </TouchableOpacity>
                 </View>
                 <View style={styles.search}>
-                    <TouchableOpacity style={styles.textsearch} onPress={this.pressPush.bind(this)}>
-                        <Text style={styles.textsearch1}>查询/扫描</Text>
+                    <TouchableOpacity style={styles.determine} onPress={this.pressPush.bind(this)}>
+                        <Text style={styles.determine1}>查询/扫描</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.determine} onPress={this.Home.bind(this)}>
                         <Text style={styles.determine1}>确定</Text>
@@ -163,56 +163,42 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#ffffff',
     },
-    Head:{
-        height:50,
-        backgroundColor:"#f47882",
+    header:{
+        height:60,
+        backgroundColor:"#ff4e4e",
         paddingTop:10,
-        borderBottomWidth:1,
-        borderBottomColor:"#cacccb",
     },
     cont:{
         flexDirection:"row",
-        marginLeft:25,
+        paddingLeft:16,
+        paddingRight:16,
     },
-    Images:{
-        width:60,
-    },
-    HeadList:{
+    HeaderList:{
         flex:6,
-        marginTop:2,
-        paddingRight:70,
-    },
-    HeadText:{
-        color:"#ffffff",
-        fontSize:18,
         textAlign:"center",
+        paddingRight:50,
+        color:"#ffffff",
+        fontSize:22,
+        marginTop:3,
     },
-    admin:{
-        borderRadius:3,
-        backgroundColor:"#f5f5f5",
-        color: "#333333",
-        paddingTop:8,
-        paddingBottom:8,
-        paddingLeft:12,
-        paddingRight:60,
-        fontSize:16,
-        flex:5,
-    },ContList:{
-        height:50,
-        marginTop:20,
-        marginLeft:25,
-        marginRight:15,
-        paddingTop:10,
+    ContList:{
+        height:55,
+        paddingLeft:25,
+        paddingRight:15,
+        paddingTop:15,
+        backgroundColor:"#ffffff",
         flexDirection:"row",
         borderBottomWidth:1,
-        borderBottomColor:"#eeeeee",
+        borderBottomColor:"#f2f2f2",
     },
     listleft:{
         width:60,
+        marginTop:4,
     },
     listLeftText:{
-        color:"#323232",
-        fontSize:17,
+        color:"#333333",
+        fontSize:16,
+        textAlign:"right"
     },
     listcont:{
         flex:7,
@@ -220,25 +206,20 @@ const styles = StyleSheet.create({
         paddingRight:5,
     },
     listContText:{
-        color:"#323232",
-        fontSize:17,
-    },
-    listimages:{
-        flex:1,
-    },
-    TextInput:{
-        flex:7,
-
+        color:"#333333",
+        fontSize:16,
     },
     TextInput1:{
         paddingLeft:5,
         paddingRight:5,
+        marginBottom:2,
         fontSize:16,
-        color:"#323232"
+        color:"#333333"
     },
     search:{
         flexDirection:"row",
-        marginTop:40,
+        marginTop:30,
+        paddingLeft:25,
     },
     textsearch:{
         marginLeft:30,
@@ -255,12 +236,12 @@ const styles = StyleSheet.create({
         color:"#ffffff",
     },
     determine:{
-        flex:2,
-        backgroundColor:"#f47882",
+        flex:1,
+        backgroundColor:"#ff4e4e",
         borderRadius:3,
-        paddingTop:10,
-        paddingBottom:10,
-        marginRight:30,
+        paddingTop:13,
+        paddingBottom:13,
+        marginRight:25,
     },
     determine1:{
         textAlign:"center",

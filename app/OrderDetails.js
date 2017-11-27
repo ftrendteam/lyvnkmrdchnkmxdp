@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
   },
   header:{
       height:60,
-      backgroundColor:"#ff4f4d",
+      backgroundColor:"#ff4e4e",
       paddingTop:10,
   },
   cont:{
@@ -312,9 +312,10 @@ const styles = StyleSheet.create({
   HeaderList:{
       flex:6,
       textAlign:"center",
+      paddingRight:56,
       color:"#ffffff",
       fontSize:22,
-      marginTop:2,
+      marginTop:3,
   },
   List:{
     height:54,

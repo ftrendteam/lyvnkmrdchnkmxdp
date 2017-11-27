@@ -843,7 +843,31 @@ export default class DBAdapter extends SQLiteOpenHelper {
       });
     })
   }
-  
+
+    /***
+     * 根据解析出来的prodCode 查询商品
+     * @param prodCode
+     * @param DepLevel   当前默认传1
+     * @returns {Promise}
+     */
+    selectProdCode(prodCode, DepLevel) {
+        return new Promise((resolve, reject) => {
+            db.transaction((tx) => {
+                let ssql = "select a.*,ifNull(b.countm,0) as ShopNumber,ifNull(b.ShopPrice,a.StdPrice) as ShopPrice ,ifNull(b.prototal,0) as ShopAmount   " +
+                    ",ifNull(b.promemo,'') as ShopRemark,c.depcode" + DepLevel + " as DepCode1 " +
+                    " from product a left join shopInfo b on a.Pid=b.Pid  ";
+                ssql = ssql + " left join  tdepset c on c.IsDel='0' and a.depcode=c.depcode where a.IsDel='0' and prodtype<>'1'";
+                ssql = ssql + "  and  a.prodcode ='" + prodCode + "'";
+                tx.executeSql(ssql, [], (tx, results) => {
+                    resolve(results.rows);
+
+                });
+            }, (error) => {
+                this._errorCB('transaction', error);
+            });
+        })
+    }
+
   /***
    * 助记码查询商品
    */

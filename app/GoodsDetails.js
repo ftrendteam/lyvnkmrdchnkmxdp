@@ -146,12 +146,10 @@ export default class GoodsDetails extends Component {
             <View style={styles.List}>
                 <View style={styles.ListLeft}>
                     <Text style={styles.ListText}>盘点仓库：</Text>
-                    <Text style={styles.write}></Text>
                     <Text style={styles.ListText}>系统默认仓库</Text>
                 </View>
                 <View style={styles.ListRight}>
                     <Text style={styles.ListText}>货品数：</Text>
-                    <Text style={styles.write}></Text>
                     <Text style={styles.ListText}>{this.state.Number}</Text>
                 </View>
             </View>
@@ -164,7 +162,6 @@ export default class GoodsDetails extends Component {
             <View style={styles.List}>
                 <View style={styles.ListLeft}>
                     <Text style={styles.ListText}>制单日期：</Text>
-                    <Text style={styles.write}></Text>
                     <Text style={styles.ListText}>{this.state.FormDate}</Text>
                 </View>
             </View>
@@ -173,7 +170,6 @@ export default class GoodsDetails extends Component {
                     <View style={styles.List}>
                         <View style={styles.ListLeft}>
                             <Text style={styles.ListText}>供应商编码：</Text>
-                            <Text style={styles.write}></Text>
                             <Text style={styles.ListText}>{this.state.storecode}</Text>
                         </View>
                     </View>:null
@@ -183,7 +179,6 @@ export default class GoodsDetails extends Component {
                     <View style={styles.List}>
                         <View style={styles.ListLeft}>
                             <Text style={styles.ListText}>机构号：</Text>
-                            <Text style={styles.write}></Text>
                             <Text style={styles.ListText}>{this.state.numbershop}</Text>
                         </View>
                     </View>:null
@@ -214,7 +209,7 @@ const styles = StyleSheet.create({
     },
     header:{
         height:60,
-        backgroundColor:"#ff4f4d",
+        backgroundColor:"#ff4e4e",
         paddingTop:10,
     },
     cont:{
@@ -227,7 +222,7 @@ const styles = StyleSheet.create({
         textAlign:"center",
         color:"#ffffff",
         fontSize:22,
-        marginTop:2,
+        marginTop:3,
     },
     Cont:{
         paddingLeft:25,
@@ -240,14 +235,11 @@ const styles = StyleSheet.create({
         flexDirection:"row",
    },
    ListText:{
-        fontSize:14,
+        fontSize:16,
         color:"#333333"
    },
    ListLeft:{
         flexDirection:"row",
-   },
-   write:{
-        width:10,
    },
    ListRight:{
         position:"absolute",
@@ -273,6 +265,7 @@ const styles = StyleSheet.create({
     paddingRight:25,
     paddingTop:20,
     paddingBottom:20,
+    height:61,
     backgroundColor:"#ffffff",
     flexDirection:"row",
     borderBottomWidth:1,

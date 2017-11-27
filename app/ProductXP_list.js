@@ -89,10 +89,10 @@ export default class ProductXP_list extends Component {
         return(
             <TouchableOpacity style={styles.header} onPress={()=>this.pressPop(rowData)}>
                 <View style={styles.coding}>
-                    <Text style={styles.codingText1}>{rowData.shopcode}</Text>
+                    <Text style={styles.codingText}>{rowData.shopcode}</Text>
                 </View>
                 <View style={styles.name}>
-                    <Text style={styles.nameText1}>{rowData.shopname}</Text>
+                    <Text style={styles.codingText}>{rowData.shopname}</Text>
                 </View>
             </TouchableOpacity>
         )
@@ -101,24 +101,14 @@ export default class ProductXP_list extends Component {
     render() {
         return (
             <View style={styles.container}>
-                <View style={styles.Head}>
-                    <View style={styles.cont}>
-                        <TouchableOpacity style={styles.images} onPress={this.Return.bind(this)}>
-                            <Image source={require("../images/left.png")} style={styles.HeaderImage}></Image>
-                        </TouchableOpacity>
-                        <View style={styles.HeadList}>
-                            <Text style={styles.HeadText}>{this.state.invoice}</Text>
-                        </View>
-                    </View>
-                </View>
-                <View style={styles.Search}>
+                <View style={styles.Title}>
                     <TextInput
                         autofocus="{true}"
                         returnKeyType="search"
                         placeholder="搜索相关单号"
                         placeholderColor="#323232"
                         underlineColorAndroid='transparent'
-                        style={styles.searchContect}
+                        style={styles.Search}
                         onChangeText={(value)=>{
                             this.setState({
                                 search:value
@@ -126,6 +116,10 @@ export default class ProductXP_list extends Component {
                             this.Search(value)
                         }}
                     />
+                    <Image source={require("../images/2.png")} style={styles.SearchImage} />
+                    <View style={styles.Right}>
+                        <TouchableOpacity style={styles.Text1}><Text style={styles.Text} onPress={this.Return.bind(this)}>取消</Text></TouchableOpacity>
+                    </View>
                 </View>
                 <View>
                     <View style={styles.head}>
@@ -133,7 +127,7 @@ export default class ProductXP_list extends Component {
                             <Text style={styles.codingText}>机构号</Text>
                         </View>
                         <View style={styles.name}>
-                            <Text style={styles.nameText}>名称</Text>
+                            <Text style={styles.codingText}>名称</Text>
                         </View>
                     </View>
                     <ListView
@@ -151,101 +145,84 @@ export default class ProductXP_list extends Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#ffffff',
+        backgroundColor: '#f2f2f2',
     },
-    Head:{
-        height:50,
-        backgroundColor:"#f47882",
-        paddingTop:10,
-    },
-    cont:{
+    Title:{
+        backgroundColor:"#ff4e4e",
+        paddingLeft:16,
+        paddingRight:16,
+        paddingTop:15,
+        paddingBottom:15,
         flexDirection:"row",
-        marginLeft:25,
+        borderBottomWidth:1,
+        borderBottomColor:"#cacccb"
     },
-    images:{
-        width:60,
-    },
-    HeadList:{
-        flex:6,
-        marginTop:2,
-        paddingRight:70,
-    },
-    HeadText:{
-        color:"#ffffff",
-        fontSize:18,
-        textAlign:"center",
+    SearchImage:{
+        position:"absolute",
+        top:22,
+        left:24,
     },
     Search:{
-        marginLeft:25,
-        marginRight:25,
-        marginTop:15,
+        borderRadius:30,
+        backgroundColor:"#ffffff",
+        color: "#333333",
+        paddingLeft:46,
+        paddingBottom:15,
+        paddingTop:6,
+        paddingBottom:6,
+        fontSize:14,
+        flex:1,
     },
-    searchContect:{
-        borderRadius:5,
-        backgroundColor:"#f5f5f5",
-        color: "#323232",
-        paddingTop:8,
-        paddingBottom:8,
-        paddingLeft:25,
+    Right:{
+        width:60,
+        flexDirection:"row",
+        paddingTop:3,
+        paddingLeft:6
+    },
+    Text:{
         fontSize:16,
-        borderTopWidth:1,
-        borderTopColor:"#cacccb",
-        borderBottomWidth:1,
-        borderBottomColor:"#cacccb",
-        borderLeftWidth:1,
-        borderLeftColor:"#cacccb",
-        borderRightWidth:1,
-        borderRightColor:"#cacccb",
+        color:"#ffffff",
+        paddingTop:5,
+        paddingLeft:10,
     },
     head:{
-        height:45,
         flexDirection:"row",
-        marginLeft:25,
-        marginRight:25,
-        marginTop:15,
-        borderBottomWidth:1,
-        borderBottomColor:"#cacccb",
+        paddingTop:13,
+        paddingBottom:13,
+        paddingLeft:25,
+        paddingRight:25,
     },
     coding:{
         flex:1,
         paddingLeft:12
     },
     codingText:{
-        color:"#323232",
-        fontSize:17,
+        color:"#333333",
+        fontSize:16,
+        height:22,
+        overflow:"hidden"
     },
     name:{
         flex:1,
     },
-    nameText:{
-        color:"#323232",
-        fontSize:17,
-    },
     header:{
-        height:35,
         flexDirection:"row",
-        marginLeft:25,
-        marginRight:25,
-        marginTop:15,
+        paddingLeft:25,
+        paddingRight:25,
+        paddingTop:13,
+        paddingBottom:13,
+        backgroundColor:"#ffffff",
         borderBottomWidth:1,
-        borderBottomColor:"#f5f5f5",
+        borderBottomColor:"#f2f2f2",
     },
     coding:{
         flex:1,
         paddingLeft:12
     },
-    codingText1:{
-        color:"#323232",
-        fontSize:16,
-    },
     name:{
         flex:1,
     },
-    nameText1:{
-        color:"#323232",
-        fontSize:16,
-    },
     scrollview:{
-        marginBottom:200,
+        marginBottom:180,
     }
 });
