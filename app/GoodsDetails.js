@@ -145,7 +145,7 @@ export default class GoodsDetails extends Component {
         <View style={styles.Cont}>
             <View style={styles.List}>
                 <View style={styles.ListLeft}>
-                    <Text style={styles.ListText}>盘点仓库：</Text>
+                    <Text style={styles.ListText}>仓库：</Text>
                     <Text style={styles.ListText}>系统默认仓库</Text>
                 </View>
                 <View style={styles.ListRight}>

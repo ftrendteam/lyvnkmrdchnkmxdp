@@ -105,6 +105,7 @@ export default class Query extends Component {
                 Storage.save('history','App_Client_ProCurrPCQ');
                 Storage.save('historyClass','App_Client_ProPCDetailQ');
                 Storage.save('ProYH','ProPC');
+                Storage.save('Document', "商品盘点");
             }
         }else if(this.state.Disting=="1") {
             var str = this.state.sCode1;
@@ -126,6 +127,7 @@ export default class Query extends Component {
                 Storage.save('history', 'App_Client_ProCurrPCQ');
                 Storage.save('historyClass', 'App_Client_ProPCDetailQ');
                 Storage.save('ProYH', 'ProPC');
+                Storage.save('Document', "商品盘点");
             }
         }
     }

@@ -115,7 +115,8 @@ export default class ProductCG extends Component {
                 Storage.save('Screen','1');
                 Storage.save('Date',data);
                 Storage.save("scode",str);
-                Storage.save('shildshop',str1)
+                Storage.save('shildshop',str1);
+                Storage.save('Document', "协配采购");
             }
         }else if(this.state.Disting=="1"){
             var date = new Date();
@@ -143,7 +144,8 @@ export default class ProductCG extends Component {
                 Storage.save('Screen','1');
                 Storage.save('Date',data);
                 Storage.save("scode",str);
-                Storage.save('shildshop',str1)
+                Storage.save('shildshop',str1);
+                Storage.save('Document', "协配采购");
             }
         }
 

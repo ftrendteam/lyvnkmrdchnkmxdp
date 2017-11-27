@@ -29,6 +29,12 @@ import HistoricalDocument from "./HistoricalDocument";
 import Code from "./Code";
 import Search from "./Search1";
 import OrderDetails from "./OrderDetails3";
+import Query from "./Query";
+import Distrition from "./Distrition";
+import ProductCG from "./ProductCG";
+import ProductYS from "./ProductYS";
+import ProductXP from "./ProductXP";
+import ProductSH from "./ProductSH";
 import NetUtils from "../utils/NetUtils";
 import FetchUtils from "../utils/FetchUtils";
 import DBAdapter from "../adapter/DBAdapter";
@@ -65,6 +71,7 @@ export default class ShoppingCart extends Component {
             OrgFormno:"",
             FormType:"",
             LinkUrl:"",
+            Document:"",
             BeiZhu:"暂无备注",
             dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
         };
@@ -473,6 +480,11 @@ export default class ShoppingCart extends Component {
             })
         })
 
+        Storage.get('Document').then((tags)=>{
+            this.setState({
+                Document:tags
+            })
+        })
         if(this.dataRows==0){
             alert("请添加商品")
         }else{
@@ -524,6 +536,48 @@ export default class ShoppingCart extends Component {
                                 })
                                 if(scode==null){
                                     alert("提交成功");
+                                    if(this.state.Document=="商品盘点"){
+                                        var nextRoute={
+                                            name:"Query",
+                                            component:Query
+                                        };
+                                        this.props.navigator.push(nextRoute);
+                                    }
+                                    if(this.state.Document=="配送收货"){
+                                        var nextRoute={
+                                            name:"Distrition",
+                                            component:Distrition
+                                        };
+                                        this.props.navigator.push(nextRoute);
+                                    }
+                                    if(this.state.Document=="商品采购"){
+                                        var nextRoute={
+                                            name:"ProductCG",
+                                            component:ProductCG
+                                        };
+                                        this.props.navigator.push(nextRoute);
+                                    }
+                                    if(this.state.Document=="商品验收"){
+                                        var nextRoute={
+                                            name:"ProductYS",
+                                            component:ProductYS
+                                        };
+                                        this.props.navigator.push(nextRoute);
+                                    }
+                                    if(this.state.Document=="协配采购"){
+                                        var nextRoute={
+                                            name:"ProductXP",
+                                            component:ProductXP
+                                        };
+                                        this.props.navigator.push(nextRoute);
+                                    }
+                                    if(this.state.Document=="协配收货"){
+                                        var nextRoute={
+                                            name:"ProductSH",
+                                            component:ProductSH
+                                        };
+                                        this.props.navigator.push(nextRoute);
+                                    }
                                     dbAdapter.deleteData("shopInfo");
                                     this.dataRows=[];
                                     var price="";
@@ -539,6 +593,48 @@ export default class ShoppingCart extends Component {
                                     Storage.save('Date',this.state.active);
                                 }else if(this.screen==""){
                                     alert("提交成功");
+                                    if(this.state.Document=="商品盘点"){
+                                        var nextRoute={
+                                            name:"Query",
+                                            component:Query
+                                        };
+                                        this.props.navigator.push(nextRoute);
+                                    }
+                                    if(this.state.Document=="配送收货"){
+                                        var nextRoute={
+                                            name:"Distrition",
+                                            component:Distrition
+                                        };
+                                        this.props.navigator.push(nextRoute);
+                                    }
+                                    if(this.state.Document=="商品采购"){
+                                        var nextRoute={
+                                            name:"ProductCG",
+                                            component:ProductCG
+                                        };
+                                        this.props.navigator.push(nextRoute);
+                                    }
+                                    if(this.state.Document=="商品验收"){
+                                        var nextRoute={
+                                            name:"ProductYS",
+                                            component:ProductYS
+                                        };
+                                        this.props.navigator.push(nextRoute);
+                                    }
+                                    if(this.state.Document=="协配采购"){
+                                        var nextRoute={
+                                            name:"ProductXP",
+                                            component:ProductXP
+                                        };
+                                        this.props.navigator.push(nextRoute);
+                                    }
+                                    if(this.state.Document=="协配收货"){
+                                        var nextRoute={
+                                            name:"ProductSH",
+                                            component:ProductSH
+                                        };
+                                        this.props.navigator.push(nextRoute);
+                                    }
                                     dbAdapter.deleteData("shopInfo");
                                     this.dataRows=[];
                                     var price="";
@@ -557,6 +653,48 @@ export default class ShoppingCart extends Component {
                                 }
                             }else{
                                 alert("提交成功");
+                                if(this.state.Document=="商品盘点"){
+                                    var nextRoute={
+                                        name:"Query",
+                                        component:Query
+                                    };
+                                    this.props.navigator.push(nextRoute);
+                                }
+                                if(this.state.Document=="配送收货"){
+                                    var nextRoute={
+                                        name:"Distrition",
+                                        component:Distrition
+                                    };
+                                    this.props.navigator.push(nextRoute);
+                                }
+                                if(this.state.Document=="商品采购"){
+                                    var nextRoute={
+                                        name:"ProductCG",
+                                        component:ProductCG
+                                    };
+                                    this.props.navigator.push(nextRoute);
+                                }
+                                if(this.state.Document=="商品验收"){
+                                    var nextRoute={
+                                        name:"ProductYS",
+                                        component:ProductYS
+                                    };
+                                    this.props.navigator.push(nextRoute);
+                                }
+                                if(this.state.Document=="协配采购"){
+                                    var nextRoute={
+                                        name:"ProductXP",
+                                        component:ProductXP
+                                    };
+                                    this.props.navigator.push(nextRoute);
+                                }
+                                if(this.state.Document=="协配收货"){
+                                    var nextRoute={
+                                        name:"ProductSH",
+                                        component:ProductSH
+                                    };
+                                    this.props.navigator.push(nextRoute);
+                                }
                                 dbAdapter.deleteData("shopInfo");
                                 this.dataRows=[];
                                 var price="";
@@ -632,6 +770,48 @@ export default class ShoppingCart extends Component {
                         if (data.retcode == 1) {
                             this.ScreenBod();
                             alert("提交成功");
+                            if(this.state.Document=="商品盘点"){
+                                var nextRoute={
+                                    name:"Query",
+                                    component:Query
+                                };
+                                this.props.navigator.push(nextRoute);
+                            }
+                            if(this.state.Document=="配送收货"){
+                                var nextRoute={
+                                    name:"Distrition",
+                                    component:Distrition
+                                };
+                                this.props.navigator.push(nextRoute);
+                            }
+                            if(this.state.Document=="商品采购"){
+                                var nextRoute={
+                                    name:"ProductCG",
+                                    component:ProductCG
+                                };
+                                this.props.navigator.push(nextRoute);
+                            }
+                            if(this.state.Document=="商品验收"){
+                                var nextRoute={
+                                    name:"ProductYS",
+                                    component:ProductYS
+                                };
+                                this.props.navigator.push(nextRoute);
+                            }
+                            if(this.state.Document=="协配采购"){
+                                var nextRoute={
+                                    name:"ProductXP",
+                                    component:ProductXP
+                                };
+                                this.props.navigator.push(nextRoute);
+                            }
+                            if(this.state.Document=="协配收货"){
+                                var nextRoute={
+                                    name:"ProductSH",
+                                    component:ProductSH
+                                };
+                                this.props.navigator.push(nextRoute);
+                            }
                             dbAdapter.deleteData("shopInfo");
                             this.dataRows = [];
                             var price = "";

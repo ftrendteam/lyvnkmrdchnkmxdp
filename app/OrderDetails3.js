@@ -25,6 +25,7 @@ import Index from "./Index";
 import ShoppingCart from "./ShoppingCart";
 import OrderDetails from "./OrderDetails";
 import Search from "./Search";
+import NumberUtils from "../utils/NumberUtils";
 import Storage from "../utils/Storage";
 import DBAdapter from "../adapter/DBAdapter";
 let dbAdapter = new DBAdapter();
@@ -48,6 +49,7 @@ export default class GoodsDetails extends Component {
             totalPrice:"",
             name:"",
             YdCountm:"",
+            numberFormat2:""
         }
     }
     GoodsDetails(){
@@ -115,6 +117,13 @@ export default class GoodsDetails extends Component {
                 }
             }
         })
+
+        let numberFormat1 = NumberUtils.numberFormat2(this.state.ShopPrice);
+        let numberFormat2 = NumberUtils.numberFormat2((this.state.Number)*(this.state.ShopPrice));
+        this.setState({
+            ShopPrice:numberFormat1,
+            numberFormat2:numberFormat2,
+        })
     }
 // 失焦时触发事件
     inputOnBlur(){
@@ -128,13 +137,21 @@ export default class GoodsDetails extends Component {
     add(){
         var Number1=this.state.Number;
         this.setState({
-           Number:parseInt(Number1)+1
-       });
+            Number:parseInt(Number1)+1,
+        });
+        let numberFormat2 = NumberUtils.numberFormat2((parseInt(Number1)+1)*(this.state.ShopPrice));
+        this.setState({
+            numberFormat2:numberFormat2,
+        });
     }
     subtraction(){
         var Number1=this.state.Number;
         this.setState({
-           Number:parseInt(Number1)-1
+            Number:parseInt(Number1)-1,
+        });
+        let numberFormat2 = NumberUtils.numberFormat2((parseInt(Number1)-1)*(this.state.ShopPrice));
+        this.setState({
+            numberFormat2:numberFormat2,
         });
         if(Number1 == 0){
             ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
@@ -245,7 +262,7 @@ export default class GoodsDetails extends Component {
                       <View style={styles.left2}>
                           <Text style={styles.left}>金额</Text>
                           <Text style={styles.Price1}>
-                              {(this.state.Number)*(this.state.ShopPrice)}
+                              {this.state.numberFormat2}
                           </Text>
                       </View>
                       <View style={styles.right2}>

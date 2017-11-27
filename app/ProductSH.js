@@ -132,10 +132,39 @@ export default class ProductCG extends Component {
                 Storage.save('Date',data);
                 Storage.save("scode",str);
                 Storage.save('shildshop',str1);
+                Storage.save('Document', "协配收货");
 
             }
         }else if(this.state.Disting=="1"){
-
+            var date = new Date();
+            var data=JSON.stringify(date.getTime());
+            var str=this.state.sCode1;
+            var str1=this.state.shopname1;
+            var str2=this.state.suppcode1;
+            if(this.state.sCode1==""){
+                alert("请选择供应商")
+            }else {
+                var nextRoute = {
+                    name: "Search",
+                    component: Search,
+                };
+                this.props.navigator.push(nextRoute);
+                Storage.save('OrgFormno', str2);
+                Storage.save('Name', '协配收货单');
+                Storage.save('FormType', 'XPYSYW');
+                Storage.save('valueOf', 'App_Client_ProXPYS');
+                Storage.save('history', 'App_Client_ProXPYSQ');
+                Storage.save('historyClass', 'App_Client_ProXPDetailYSQ');
+                Storage.save('ProYH', 'ProXPYS');
+                Storage.save('YuanDan', '1');
+                Storage.save('Screen', '1');
+                Storage.save('shopPandian', 'App_Client_NOYSXPCGQ');
+                Storage.save('Date', data);
+                Storage.save('Date', data);
+                Storage.save("scode", str);
+                Storage.save('shildshop', str1);
+                Storage.save('Document', "协配收货");
+            }
         }
 
     }

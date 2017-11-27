@@ -111,7 +111,8 @@ export default class ProductCG extends Component {
                 Storage.save('YuanDan','1');
                 Storage.save('Screen','1');
                 Storage.save('Date',data);
-                Storage.save("scode",str)
+                Storage.save("scode",str);
+                Storage.save('Document', "商品验收");
             }
         }else if(this.state.Disting=="1"){
             var str=this.state.sCode1;
@@ -135,7 +136,8 @@ export default class ProductCG extends Component {
                 Storage.save('ProYH','ProCG');
                 Storage.save('YdCountm','3');
                 Storage.save('Date',data);
-                Storage.save("scode",str)
+                Storage.save("scode",str);
+                Storage.save('Document', "商品验收");
             }
         }
     }

@@ -105,6 +105,7 @@ export default class Distrition extends Component {
             Storage.save('historyClass','App_Client_ProPSSHDetailQ');
             Storage.save('ProYH','ProPSSH');
             Storage.save('Screen','1');
+            Storage.save('Document', "配送收货");
         }else if(this.state.Disting=="1"){
             var date = new Date();
             var data=JSON.stringify(date.getTime());
@@ -128,6 +129,7 @@ export default class Distrition extends Component {
             Storage.save('historyClass','App_Client_ProPSSHDetailQ');
             Storage.save('ProYH','ProPSSH');
             Storage.save('Screen','1');
+            Storage.save('Document', "配送收货");
         }
     }
 
