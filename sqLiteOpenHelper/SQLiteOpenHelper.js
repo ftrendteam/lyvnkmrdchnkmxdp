@@ -41,7 +41,7 @@ export default class SQLiteOpenHelper {
     db.transaction((tx) => {
       //创建机构信息
       tx.executeSql('CREATE TABLE IF NOT EXISTS tshopitem(pid int not null Primary Key,shopcode varchar(20) null,shopname varchar(200) null,' +
-        'UniqueCode varchar(5) null,shoplevel int null,subcode varchar(200) null,FNeedPS char(1) null,FCanPH char(1) null)'
+        'UniqueCode varchar(5) null,shoplevel int null,subcode varchar(200) null,FNeedPS char(1) null,FCanPH char(1) null,PSShop varchar(20) null,isdel varchar(1) null,FCanCG varchar(1) null)'
         , [], () => {
           //this._successCB('executeSql');
         }, (err) => {
@@ -154,13 +154,13 @@ export default class SQLiteOpenHelper {
         });
       tx.executeSql("CREATE TABLE IF NOT EXISTS KgtOpt(OptName varchar(12) null,OptValue varchar(100) null)", [],
         () => {
-      
+        
         }, (err) => {
           console.log(err);
         });
       tx.executeSql("CREATE TABLE IF NOT EXISTS PosOpt(PosCode varchar(12) null,ShopCode varchar(12) null,OptName varchar(20) null,OptValue varchar(100) null)", [],
         () => {
-      
+        
         }, (err) => {
           console.log(err);
         });
