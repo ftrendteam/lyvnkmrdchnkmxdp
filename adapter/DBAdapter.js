@@ -74,9 +74,14 @@ export default class DBAdapter extends SQLiteOpenHelper {
         let subcode = tShopItem.subcode;
         let FNeedPS = tShopItem.FNeedPS;
         let FCanPH = tShopItem.FCanPH;
-        let sql = "INSERT INTO tshopitem(pid,shopcode,shopname,UniqueCode,shoplevel,subcode,FNeedPS,FCanPH)" +
-          "values(?,?,?,?,?,?,?,?)";
-        tx.executeSql(sql, [pid, shopcode, shopname, UniqueCode, shoplevel, subcode, FNeedPS, FCanPH], () => {
+        
+        let PSShop = tShopItem.PSShop;
+        let isdel = tShopItem.isdel;
+        let FCanCG = tShopItem.FCanCG;
+      
+        let sql = "INSERT INTO tshopitem(pid,shopcode,shopname,UniqueCode,shoplevel,subcode,FNeedPS,FCanPH,PSShop,isdel,FCanCG)" +
+          "values(?,?,?,?,?,?,?,?,?,?,?)";
+        tx.executeSql(sql, [pid, shopcode, shopname, UniqueCode, shoplevel, subcode, FNeedPS, FCanPH,PSShop,isdel,FCanCG], () => {
           
           }, (err) => {
             console.log(err);
