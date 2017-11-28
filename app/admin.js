@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
         fontSize:16,
     },
     Image:{
-        marginTop:10,
+        marginTop:15,
         marginLeft:25,
         justifyContent: 'center',
         alignItems: 'center',

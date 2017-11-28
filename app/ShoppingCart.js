@@ -1401,7 +1401,7 @@ const styles = StyleSheet.create({
         paddingTop:15,
         paddingBottom:15,
         borderRadius:25,
-        width:400,
+        width:350,
         backgroundColor:"#ff4e4e",
     },
     DeterMineText:{

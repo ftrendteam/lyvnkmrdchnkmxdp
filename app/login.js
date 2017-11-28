@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
         height:null,
     },
     TextInput:{
-        marginTop:25,
+        marginTop:15,
     },
     admin:{
         borderRadius:5,
