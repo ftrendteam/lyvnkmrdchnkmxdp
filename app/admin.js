@@ -344,7 +344,7 @@ const styles = StyleSheet.create({
         height:null,
     },
     TextInput:{
-        marginTop:30,
+        marginTop:15,
     },
     admin:{
         borderRadius:5,
@@ -365,7 +365,8 @@ const styles = StyleSheet.create({
         fontSize:16,
     },
     Image:{
-        marginTop:30,
+        marginTop:10,
+        marginLeft:25,
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom:10,

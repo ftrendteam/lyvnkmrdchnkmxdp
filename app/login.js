@@ -221,11 +221,11 @@ const styles = StyleSheet.create({
         fontSize:16,
     },
     Image:{
-        marginTop:30,
+        marginTop:15,
+        marginLeft:25,
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom:10,
-
     },
     login:{
         marginTop:40,

@@ -95,6 +95,8 @@ export default class Index extends Component {
             isloading:true,
             show:false,
             Show:false,
+            Promp:false,
+            Permissions:false,
             depcode:this.props.DepCode ? this.props.DepCode : "",
             dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
         };
@@ -658,7 +660,6 @@ export default class Index extends Component {
         Storage.delete('shildshop');
         Storage.delete('YuanDan');
         Storage.delete('Screen');
-        Storage.delete('Document');
         if(this.state.ShopCar1>0){
             this._setModalVisible();
             alert("商品未提交")
@@ -674,6 +675,7 @@ export default class Index extends Component {
                                     var date = new Date();
                                     var data=JSON.stringify(date.getTime());
                                     Storage.save('Name','要货单');
+                                    Storage.save('Document', "要货单");
                                     Storage.save('FormType','YWYW');
                                     Storage.save('ProYH','ProYH');
                                     Storage.save('YdCountm','1');
@@ -688,6 +690,7 @@ export default class Index extends Component {
                                     var date = new Date();
                                     var data=JSON.stringify(date.getTime());
                                     Storage.save('Name','要货单');
+                                    Storage.save('Document', "要货单");
                                     Storage.save('FormType','YWYW');
                                     Storage.save('ProYH','ProYH');
                                     Storage.save('YdCountm','3');
@@ -705,12 +708,12 @@ export default class Index extends Component {
                                     this.props.navigator.push(nextRoute)
                                     this._setModalVisible();
                                 }else{
-                                    alert("请选择模式")
+                                    this.Promp();
                                 }
                             }
                         })
                     }else{
-                        alert("没有配送机构,不能进行该业务")
+                        this.Permissions()
                     }
                 })
             });
@@ -728,7 +731,6 @@ export default class Index extends Component {
         Storage.delete('shildshop');
         Storage.delete('YuanDan');
         Storage.delete('Screen');
-        Storage.delete('Document');
         if(this.state.ShopCar1>0){
             this._setModalVisible();
             alert("商品未提交")
@@ -738,15 +740,16 @@ export default class Index extends Component {
             dbAdapter.selectUserRight(this.state.usercode,"K0604").then((rows) => {
                 if (rows == true) {
                     if(this.state.Disting=="0"||this.state.Disting=="1") {
-                        Storage.save("invoice", "损益单");
+                        Storage.save("invoice", "损溢单");
+                        Storage.save('Document', "损溢单");
                         var nextRoute = {
-                            name: "损益",
+                            name: "损溢",
                             component: SunYi
                         };
                         this.props.navigator.push(nextRoute);
                         this._setModalVisible();
                     }else{
-                        alert("请选择模式")
+                        this.Promp();
                     }
                 }
             })
@@ -757,7 +760,6 @@ export default class Index extends Component {
         Storage.delete('OrgFormno');
         Storage.delete('shildshop');
         Storage.delete('YuanDan');
-        Storage.delete('Document');
         if(this.state.ShopCar1>0){
             this._setModalVisible();
             alert("商品未提交")
@@ -770,6 +772,7 @@ export default class Index extends Component {
                         var date = new Date();
                         var data = JSON.stringify(date.getTime());
                         Storage.save('Name', '实时盘点单');
+                        Storage.save('Document', "实时盘点单");
                         Storage.save('FormType', 'CUPCYW');
                         Storage.save('ProYH', 'ProCurrPC');
                         Storage.save('YdCountm', '1');
@@ -786,6 +789,7 @@ export default class Index extends Component {
                         var date = new Date();
                         var data = JSON.stringify(date.getTime());
                         Storage.save('Name', '实时盘点单');
+                        Storage.save('Document', "实时盘点单");
                         Storage.save('FormType', 'CUPCYW');
                         Storage.save('ProYH', 'ProCurrPC');
                         Storage.save('YdCountm', '1');
@@ -802,7 +806,7 @@ export default class Index extends Component {
                         this.props.navigator.push(nextRoute)
                         this._setModalVisible();
                     }else{
-                        alert("请选择模式")
+                        this.Promp();
                     }
                 }
             })
@@ -835,7 +839,7 @@ export default class Index extends Component {
                         this.props.navigator.push(nextRoute);
                         this._setModalVisible();
                     }else{
-                        alert("请选择模式")
+                        this.Promp();
                     }
                 }
             })
@@ -868,12 +872,12 @@ export default class Index extends Component {
                                     this.props.navigator.push(nextRoute);
                                     this._setModalVisible();
                                 }else{
-                                    alert("请选择模式")
+                                    this.Promp();
                                 }
                             }
                         })
                     }else{
-                        alert("没有配送机构,不能进行该业务")
+                        this.Permissions()
                     }
                 })
             });
@@ -905,12 +909,12 @@ export default class Index extends Component {
                                     this.props.navigator.push(nextRoute);
                                     this._setModalVisible();
                                 }else{
-                                    alert("请选择模式")
+                                    this.Promp();
                                 }
                             }
                         })
                     }else{
-                        alert("没有配送机构,不能进行该业务")
+                        this.Permissions()
                     }
                 })
             });
@@ -942,12 +946,12 @@ export default class Index extends Component {
                                     this.props.navigator.push(nextRoute);
                                     this._setModalVisible();
                                 }else{
-                                    alert("请选择模式")
+                                    this.Promp();
                                 }
                             }
                         })
                     }else{
-                        alert("没有配送机构,不能进行该业务")
+                        this.Permissions()
                     }
                 })
             });
@@ -979,12 +983,12 @@ export default class Index extends Component {
                                     this.props.navigator.push(nextRoute);
                                     this._setModalVisible();
                                 } else {
-                                    alert("请选择模式")
+                                    this.Promp();
                                 }
                             }
                         })
                     }else{
-                        alert("没有配送机构,不能进行该业务")
+                        this.Permissions()
                     }
                 })
             });
@@ -1017,12 +1021,12 @@ export default class Index extends Component {
                                     this.props.navigator.push(nextRoute);
                                     this._setModalVisible();
                                 }else{
-                                    alert("请选择模式")
+                                    this.Promp();
                                 }
                             }
                         })
                     }else{
-                        alert("没有配送机构,不能进行该业务")
+                        this.Permissions()
                     }
                 })
             });
@@ -1034,6 +1038,7 @@ export default class Index extends Component {
         Storage.delete('username');
         Storage.delete('history');
         Storage.delete('FirstTime1');
+        Storage.delete("Disting");
         this._setModalVisible();
         if(this.state.ShopCar1>0){
             alert("商品未提交")
@@ -1092,6 +1097,30 @@ export default class Index extends Component {
         }
     }
 
+    //用户模式选择
+    Promp(){
+        let isShow = this.state.Promp;
+        this.setState({
+            Promp:!isShow,
+        });
+    }
+
+    Mode(){
+        this.Promp()
+    }
+
+    //单据权限弹框
+    Permissions(){
+        let isShow = this.state.Permissions;
+        this.setState({
+            Permissions:!isShow,
+        });
+    }
+
+    MoDe(){
+        this.Permissions()
+    }
+
     render() {
         const {data} = this.state;
         return (
@@ -1138,6 +1167,40 @@ export default class Index extends Component {
                         />
                     </View>
                 </View>
+                <View style={styles.footer}>
+                    <TouchableOpacity style={styles.Home} onPress={this.History.bind(this)}><Image source={require("../images/1_300.png")}></Image><Text style={styles.home1}>历史单据查询</Text></TouchableOpacity>
+                    <TouchableOpacity style={styles.Home}><Image source={require("../images/1_31.png")}></Image><Text style={styles.home2}>商品</Text></TouchableOpacity>
+                    <TouchableOpacity style={styles.Home} onPress={this.ShopList.bind(this)}>
+                        <View>
+                            <Image source={require("../images/1_322.png")}>
+                                {
+                                    (this.state.shopcar==0)?
+                                        null:
+                                        <Text style={[{position:"absolute", right:-200,}]}>{this.state.shopcar}</Text>
+                                }
+                                {
+                                    (this.state.shopcar>0)?
+                                        <Text style={[styles.ShopCar,{paddingTop:3,}]}>{this.state.shopcar}</Text>:null
+                                }
+                                {
+                                    (this.state.shopcar<999)?
+                                        null:
+                                        <Text style={[styles.ShopCar,{width:30,height:30,top:11,lineHeight:21,}]}>{this.state.shopcar}</Text>
+                                }
+                                {
+                                    (this.state.shopcar>999)?
+                                        <View>
+                                            <Text style={[styles.ShopCar,{width:30,height:30,top:11,lineHeight:23}]}>{this.state.shopcar}</Text>
+                                            <Text style={styles.Add}>
+                                                +
+                                            </Text>
+                                        </View>:null
+                                }
+                            </Image>
+                        </View>
+                        <Text style={styles.home1}>清单</Text>
+                    </TouchableOpacity>
+                </View>
                 <Modal
                     animationType='fade'
                     transparent={true}
@@ -1176,7 +1239,7 @@ export default class Index extends Component {
                                 </View>
                             </TouchableOpacity>
                         </View>
-                        <View style={styles.ModalCont}>
+                        <ScrollView style={styles.ModalCont}>
                             <View style={styles.ModalHead}>
                                 <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.YaoHuo.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
@@ -1264,7 +1327,7 @@ export default class Index extends Component {
                             <View style={styles.ModalLine}>
                                 <Image source={require("../images/1_48.png")} style={styles.ModalImageLine} />
                             </View>
-                            <View style={styles.ModalHead}>
+                            <View style={[styles.ModalHead,{marginBottom:10}]}>
                                 <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.pullOut.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_56.png")} />
@@ -1281,46 +1344,51 @@ export default class Index extends Component {
                                         数据更新
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.ModalHeadImage}>
-                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.ModalHeadImage}></TouchableOpacity>
                             </View>
-                        </View>
+                        </ScrollView>
                     </View>
                 </Modal>
-                <View style={styles.footer}>
-                    <TouchableOpacity style={styles.Home} onPress={this.History.bind(this)}><Image source={require("../images/1_300.png")}></Image><Text style={styles.home1}>历史单据查询</Text></TouchableOpacity>
-                    <TouchableOpacity style={styles.Home}><Image source={require("../images/1_31.png")}></Image><Text style={styles.home2}>商品</Text></TouchableOpacity>
-                    <TouchableOpacity style={styles.Home} onPress={this.ShopList.bind(this)}>
-                        <View>
-                            <Image source={require("../images/1_322.png")}>
-                                {
-                                    (this.state.shopcar==0)?
-                                        null:
-                                        <Text style={[{position:"absolute", right:-200,}]}>{this.state.shopcar}</Text>
-                                }
-                                {
-                                    (this.state.shopcar>0)?
-                                        <Text style={[styles.ShopCar,{paddingTop:3,}]}>{this.state.shopcar}</Text>:null
-                                }
-                                {
-                                    (this.state.shopcar<999)?
-                                        null:
-                                        <Text style={[styles.ShopCar,{width:30,height:30,top:11,lineHeight:21,}]}>{this.state.shopcar}</Text>
-                                }
-                                {
-                                    (this.state.shopcar>999)?
-                                        <View>
-                                            <Text style={[styles.ShopCar,{width:30,height:30,top:11,lineHeight:23}]}>{this.state.shopcar}</Text>
-                                            <Text style={styles.Add}>
-                                                +
-                                            </Text>
-                                        </View>:null
-                                }
-                            </Image>
+                <Modal
+                    transparent={true}
+                    visible={this.state.Promp}
+                    onShow={() => {}}
+                    onRequestClose={() => {}} >
+                    <Image source={require("../images/background.png")} style={[styles.ModalStyle,{justifyContent: 'center',alignItems: 'center',}]}>
+                        <View style={styles.ModalStyleCont}>
+                            <View style={styles.ModalStyleTitle}>
+                                <Text style={styles.ModalTitleText}>
+                                    请选择用户模式
+                                </Text>
+                            </View>
+                            <TouchableOpacity onPress={this.Mode.bind(this)} style={styles.Button}>
+                                <Text style={styles.ModalTitleText}>
+                                    好的
+                                </Text>
+                            </TouchableOpacity>
                         </View>
-                        <Text style={styles.home1}>清单</Text>
-                    </TouchableOpacity>
-                </View>
+                    </Image>
+                </Modal>
+                <Modal
+                    transparent={true}
+                    visible={this.state.Permissions}
+                    onShow={() => {}}
+                    onRequestClose={() => {}} >
+                    <Image source={require("../images/background.png")} style={[styles.ModalStyle,{justifyContent: 'center',alignItems: 'center',}]}>
+                        <View style={styles.ModalStyleCont}>
+                            <View style={styles.ModalStyleTitle}>
+                                <Text style={styles.ModalTitleText}>
+                                    没有配送机构,不能进行该业务
+                                </Text>
+                            </View>
+                            <TouchableOpacity onPress={this.MoDe.bind(this)} style={styles.Button}>
+                                <Text style={styles.ModalTitleText}>
+                                    好的
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+                    </Image>
+                </Modal>
             </View>
         );
     };
@@ -1538,7 +1606,7 @@ const styles = StyleSheet.create({
         fontSize:22
     },
     footer:{
-        flex:3,
+        height:80,
         flexDirection:"row",
         borderTopWidth:1,
         borderTopColor:"#f2f2f2"
@@ -1550,7 +1618,7 @@ const styles = StyleSheet.create({
     Home:{
         flex:1,
         alignItems: 'center',
-        paddingTop:7,
+        paddingTop:10,
         backgroundColor:"#ffffff",
     },
     home1:{
@@ -1640,4 +1708,34 @@ const styles = StyleSheet.create({
     ModalImageLine:{
         width:null,
     },
+    ModalStyle:{
+        flex:1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        width:null,
+        height:null,
+    },
+    ModalStyleCont:{
+        height:130,
+        paddingTop:30,
+        paddingLeft:10,
+        paddingRight:10,
+        borderRadius:5,
+        backgroundColor:"#ffffff",
+    },
+    ModalStyleTitle:{
+        height:40,
+        paddingLeft:100,
+        paddingRight:100,
+        borderBottomWidth:1,
+        borderBottomColor:"#f5f5f5",
+    },
+    ModalTitleText:{
+        fontSize:16,
+        color:"#333333",
+        textAlign:"center",
+    },
+    Button:{
+        paddingTop:20,
+    }
 });

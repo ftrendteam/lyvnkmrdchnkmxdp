@@ -55,6 +55,8 @@ export default class ShoppingCart extends Component {
             show:false,
             Show:false,
             ScreenBod:false,
+            Succeed:false,
+            Wait:false,
             ShopNumber:"",
             ShopAmount:"",
             reqDetailCode:"",
@@ -73,7 +75,6 @@ export default class ShoppingCart extends Component {
             OrgFormno:"",
             FormType:"",
             LinkUrl:"",
-            Document:"",
             BeiZhu:"暂无备注",
             dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
         };
@@ -464,6 +465,8 @@ export default class ShoppingCart extends Component {
     submit(){
         this.screen = [];
 
+        this.Wait();
+
         Storage.get('shildshop').then((tags)=>{
             this.setState({
                 shildshop:tags
@@ -482,11 +485,6 @@ export default class ShoppingCart extends Component {
             })
         })
 
-        Storage.get('Document').then((tags)=>{
-            this.setState({
-                Document:tags
-            })
-        })
         if(this.dataRows==0){
             alert("请添加商品")
         }else{
@@ -537,180 +535,19 @@ export default class ShoppingCart extends Component {
                                     dataSource:this.state.dataSource.cloneWithRows(this.screen),
                                 })
                                 if(scode==null){
-                                    alert("提交成功");
-                                    if(this.state.Document=="商品盘点"){
-                                        var nextRoute={
-                                            name:"Query",
-                                            component:Query
-                                        };
-                                        this.props.navigator.push(nextRoute);
-                                    }
-                                    if(this.state.Document=="配送收货"){
-                                        var nextRoute={
-                                            name:"Distrition",
-                                            component:Distrition
-                                        };
-                                        this.props.navigator.push(nextRoute);
-                                    }
-                                    if(this.state.Document=="商品采购"){
-                                        var nextRoute={
-                                            name:"ProductCG",
-                                            component:ProductCG
-                                        };
-                                        this.props.navigator.push(nextRoute);
-                                    }
-                                    if(this.state.Document=="商品验收"){
-                                        var nextRoute={
-                                            name:"ProductYS",
-                                            component:ProductYS
-                                        };
-                                        this.props.navigator.push(nextRoute);
-                                    }
-                                    if(this.state.Document=="协配采购"){
-                                        var nextRoute={
-                                            name:"ProductXP",
-                                            component:ProductXP
-                                        };
-                                        this.props.navigator.push(nextRoute);
-                                    }
-                                    if(this.state.Document=="协配收货"){
-                                        var nextRoute={
-                                            name:"ProductSH",
-                                            component:ProductSH
-                                        };
-                                        this.props.navigator.push(nextRoute);
-                                    }
-                                    dbAdapter.deleteData("shopInfo");
-                                    this.dataRows=[];
-                                    var price="";
-                                    var date = new Date();
-                                    var data=JSON.stringify(date.getTime());
-                                    this.setState({
-                                        dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
-                                        ShopNumber:price,
-                                        ShopAmount:price,
-                                        shopcar:"",
-                                        active:data,
-                                    })
-                                    Storage.save('Date',this.state.active);
+                                    this.Wait();
+                                    this.Succeed();
                                 }else if(this.screen==""){
-                                    alert("提交成功");
-                                    if(this.state.Document=="商品盘点"){
-                                        var nextRoute={
-                                            name:"Query",
-                                            component:Query
-                                        };
-                                        this.props.navigator.push(nextRoute);
-                                    }
-                                    if(this.state.Document=="配送收货"){
-                                        var nextRoute={
-                                            name:"Distrition",
-                                            component:Distrition
-                                        };
-                                        this.props.navigator.push(nextRoute);
-                                    }
-                                    if(this.state.Document=="商品采购"){
-                                        var nextRoute={
-                                            name:"ProductCG",
-                                            component:ProductCG
-                                        };
-                                        this.props.navigator.push(nextRoute);
-                                    }
-                                    if(this.state.Document=="商品验收"){
-                                        var nextRoute={
-                                            name:"ProductYS",
-                                            component:ProductYS
-                                        };
-                                        this.props.navigator.push(nextRoute);
-                                    }
-                                    if(this.state.Document=="协配采购"){
-                                        var nextRoute={
-                                            name:"ProductXP",
-                                            component:ProductXP
-                                        };
-                                        this.props.navigator.push(nextRoute);
-                                    }
-                                    if(this.state.Document=="协配收货"){
-                                        var nextRoute={
-                                            name:"ProductSH",
-                                            component:ProductSH
-                                        };
-                                        this.props.navigator.push(nextRoute);
-                                    }
-                                    dbAdapter.deleteData("shopInfo");
-                                    this.dataRows=[];
-                                    var price="";
-                                    var date = new Date();
-                                    var data=JSON.stringify(date.getTime());
-                                    this.setState({
-                                        dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
-                                        ShopNumber:price,
-                                        ShopAmount:price,
-                                        shopcar:"",
-                                        active:data,
-                                    })
-                                    Storage.save('Date',this.state.active);
+                                    this.Wait();
+                                    this.Succeed();
+
                                 }else{
+                                    this.Wait();
                                     this.ScreenBod();
                                 }
                             }else{
-                                alert("提交成功");
-                                if(this.state.Document=="商品盘点"){
-                                    var nextRoute={
-                                        name:"Query",
-                                        component:Query
-                                    };
-                                    this.props.navigator.push(nextRoute);
-                                }
-                                if(this.state.Document=="配送收货"){
-                                    var nextRoute={
-                                        name:"Distrition",
-                                        component:Distrition
-                                    };
-                                    this.props.navigator.push(nextRoute);
-                                }
-                                if(this.state.Document=="商品采购"){
-                                    var nextRoute={
-                                        name:"ProductCG",
-                                        component:ProductCG
-                                    };
-                                    this.props.navigator.push(nextRoute);
-                                }
-                                if(this.state.Document=="商品验收"){
-                                    var nextRoute={
-                                        name:"ProductYS",
-                                        component:ProductYS
-                                    };
-                                    this.props.navigator.push(nextRoute);
-                                }
-                                if(this.state.Document=="协配采购"){
-                                    var nextRoute={
-                                        name:"ProductXP",
-                                        component:ProductXP
-                                    };
-                                    this.props.navigator.push(nextRoute);
-                                }
-                                if(this.state.Document=="协配收货"){
-                                    var nextRoute={
-                                        name:"ProductSH",
-                                        component:ProductSH
-                                    };
-                                    this.props.navigator.push(nextRoute);
-                                }
-                                dbAdapter.deleteData("shopInfo");
-                                this.dataRows=[];
-                                var price="";
-                                var date = new Date();
-                                var data=JSON.stringify(date.getTime());
-                                this.setState({
-                                    dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
-                                    ShopNumber:price,
-                                    ShopAmount:price,
-                                    shopcar:"",
-                                    active:data,
-                                    BeiZhu:"暂无备注",
-                                })
-                                Storage.save('Date',this.state.active);
+                                this.Wait();
+                                this.Succeed();
                             }
                         }else{
                             // alert(JSON.stringify(data))
@@ -771,62 +608,7 @@ export default class ShoppingCart extends Component {
                     FetchUtils.post(this.state.linkurl, JSON.stringify(params)).then((data) => {
                         if (data.retcode == 1) {
                             this.ScreenBod();
-                            alert("提交成功");
-                            if(this.state.Document=="商品盘点"){
-                                var nextRoute={
-                                    name:"Query",
-                                    component:Query
-                                };
-                                this.props.navigator.push(nextRoute);
-                            }
-                            if(this.state.Document=="配送收货"){
-                                var nextRoute={
-                                    name:"Distrition",
-                                    component:Distrition
-                                };
-                                this.props.navigator.push(nextRoute);
-                            }
-                            if(this.state.Document=="商品采购"){
-                                var nextRoute={
-                                    name:"ProductCG",
-                                    component:ProductCG
-                                };
-                                this.props.navigator.push(nextRoute);
-                            }
-                            if(this.state.Document=="商品验收"){
-                                var nextRoute={
-                                    name:"ProductYS",
-                                    component:ProductYS
-                                };
-                                this.props.navigator.push(nextRoute);
-                            }
-                            if(this.state.Document=="协配采购"){
-                                var nextRoute={
-                                    name:"ProductXP",
-                                    component:ProductXP
-                                };
-                                this.props.navigator.push(nextRoute);
-                            }
-                            if(this.state.Document=="协配收货"){
-                                var nextRoute={
-                                    name:"ProductSH",
-                                    component:ProductSH
-                                };
-                                this.props.navigator.push(nextRoute);
-                            }
-                            dbAdapter.deleteData("shopInfo");
-                            this.dataRows = [];
-                            var price = "";
-                            var date = new Date();
-                            var data = JSON.stringify(date.getTime());
-                            this.setState({
-                                dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
-                                ShopNumber: price,
-                                ShopAmount: price,
-                                shopcar: "",
-                                active: data,
-                            })
-                            Storage.save('Date', this.state.active);
+                            this.Succeed();
                         } else {
                             // alert("提交失败");
                             alert(JSON.stringify(data))
@@ -880,6 +662,111 @@ export default class ShoppingCart extends Component {
         let isShow = this.state.Show;
         this.setState({
             Show:!isShow,
+        });
+    }
+
+    //成功弹层
+    Succeed(){
+        let isShow = this.state.Succeed;
+        this.setState({
+            Succeed:!isShow,
+        });
+    }
+
+    //成功返回
+    Return(){
+        this.Succeed();
+        this.DataSource();
+    }
+
+    //提交时各单据判断
+    DeterMine(){
+        Storage.get('Document').then((tags)=>{
+            if(tags=="商品盘点"){
+                this.Succeed();
+                var nextRoute={
+                    name:"Query",
+                    component:Query
+                };
+                this.props.navigator.push(nextRoute);
+                this.DataSource();
+            }
+            if(tags=="配送收货"){
+                this.Succeed();
+                var nextRoute={
+                    name:"Distrition",
+                    component:Distrition
+                };
+                this.props.navigator.push(nextRoute);
+                this.DataSource();
+            }
+            if(tags=="商品采购"){
+                this.Succeed();
+                var nextRoute={
+                    name:"ProductCG",
+                    component:ProductCG
+                };
+                this.props.navigator.push(nextRoute);
+                this.DataSource();
+            }
+            if(tags=="商品验收"){
+                this.Succeed();
+                var nextRoute={
+                    name:"ProductYS",
+                    component:ProductYS
+                };
+                this.props.navigator.push(nextRoute);
+                this.DataSource();
+            }
+            if(tags=="协配采购"){
+                this.Succeed();
+                var nextRoute={
+                    name:"ProductXP",
+                    component:ProductXP
+                };
+                this.props.navigator.push(nextRoute);
+                this.DataSource();
+            }
+            if(tags=="协配收货"){
+                this.Succeed();
+                var nextRoute={
+                    name:"ProductSH",
+                    component:ProductSH
+                };
+                this.props.navigator.push(nextRoute);
+                this.DataSource();
+            }
+            if(tags=="要货单"||tags=="损溢单"||tags=="实时盘点单"){
+                this.DataSource();
+                this.Succeed();
+            }
+
+        })
+    }
+
+    //提交时清空数据及更新setState
+    DataSource(){
+        dbAdapter.deleteData("shopInfo");
+        this.dataRows=[];
+        var price="";
+        var date = new Date();
+        var data=JSON.stringify(date.getTime());
+        this.setState({
+            dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
+            ShopNumber:price,
+            ShopAmount:price,
+            shopcar:"",
+            active:data,
+            // BeiZhu:"暂无备注",
+        })
+        Storage.save('Date',this.state.active);
+    }
+
+    //提交商品等待框
+    Wait(){
+        let isShow = this.state.Wait;
+        this.setState({
+            Wait:!isShow,
         });
     }
 
@@ -1000,8 +887,9 @@ export default class ShoppingCart extends Component {
                     visible={this.state.show}
                     onShow={() => {}}
                     onRequestClose={() => {}} >
-                    <TouchableOpacity style={styles.modalStyle}>
-                        <View style={styles.ModalView}>
+                    <View style={[styles.modalStyle,{justifyContent: 'center',alignItems: 'center',}]}>
+                        <View style={[styles.ModalView,{borderRadius:5,paddingBottom:20,width:300,
+                            height:330,backgroundColor:"#ffffff"}]}>
                             <View style={styles.DanJu}>
                                 <View style={styles.danju}><Text style={styles.DanText}>单据备注</Text></View>
                                 <TouchableOpacity style={styles.ModalLeft} onPress={this._setModalVisible.bind(this)}>
@@ -1026,7 +914,7 @@ export default class ShoppingCart extends Component {
                                 </Text>
                             </TouchableOpacity>
                         </View>
-                    </TouchableOpacity>
+                    </View>
                 </Modal>
                 <Modal
                     animationType='fade'
@@ -1034,7 +922,7 @@ export default class ShoppingCart extends Component {
                     visible={this.state.ScreenBod}
                     onShow={() => {}}
                     onRequestClose={() => {}} >
-                    <TouchableOpacity style={styles.ModalStyle}>
+                    <View style={styles.ModalStyle}>
                         <View style={styles.DanJu}>
                             <View style={styles.danju}><Text style={styles.DanText}>
                                 以下商品数量不相等，是否继续？</Text></View>
@@ -1100,7 +988,49 @@ export default class ShoppingCart extends Component {
                                 </Text>
                             </TouchableOpacity>
                         </View>
-                    </TouchableOpacity>
+                    </View>
+                </Modal>
+                <Modal
+                    animationType='fade'
+                    transparent={true}
+                    visible={this.state.Succeed}
+                    onShow={() => {}}
+                    onRequestClose={() => {}}>
+                    <View style={styles.Succeed}>
+                        <View style={styles.header}>
+                            <View style={styles.cont}>
+                                <TouchableOpacity onPress={this.Return.bind(this)}>
+                                    <Image source={require("../images/2_01.png")}></Image>
+                                </TouchableOpacity>
+                                <Text style={[styles.HeaderList,{textAlign:"left",marginLeft:10,}]}>{this.state.head}</Text>
+                            </View>
+                        </View>
+                        <View style={styles.SucceedCont}>
+                            <Image source={require("../images/succeed.png")}/>
+                            <Text style={styles.SucceedText}>
+                                提交成功
+                            </Text>
+                            <TouchableOpacity onPress={this.DeterMine.bind(this)} style={styles.DeterMine}>
+                                <Text style={styles.DeterMineText}>
+                                    确定
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+
+                    </View>
+                </Modal>
+                <Modal
+                    animationType='fade'
+                    transparent={true}
+                    visible={this.state.Wait}
+                    onShow={() => {}}
+                    onRequestClose={() => {}} >
+                    <View style={styles.LoadCenter}>
+                        <View style={styles.loading}>
+                            <ActivityIndicator key="1" color="#ffffff" size="large" style={styles.activity}></ActivityIndicator>
+                            <Text style={styles.TextLoading}>正在提交</Text>
+                        </View>
+                    </View>
                 </Modal>
             </View>
         );
@@ -1183,7 +1113,7 @@ const styles = StyleSheet.create({
         overflow:"hidden",
     },
     ContList1:{
-        flex:12,
+        flex:16,
         marginBottom:60,
     },
     CommoditySettlement:{
@@ -1406,7 +1336,7 @@ const styles = StyleSheet.create({
         textAlign:"center",
     },
     footer:{
-        flex:3,
+        height:80,
         flexDirection:"row",
         borderTopWidth:1,
         borderTopColor:"#f2f2f2"
@@ -1418,7 +1348,7 @@ const styles = StyleSheet.create({
     Home:{
         flex:1,
         alignItems: 'center',
-        paddingTop:9,
+        paddingTop:10,
         backgroundColor:"#ffffff",
     },
     home1:{
@@ -1450,5 +1380,33 @@ const styles = StyleSheet.create({
         top:5,
         color:"#ff4e4e",
         fontWeight:"bold"
+    },
+    Succeed:{
+        flex:1,
+        backgroundColor:"#ffffff",
+    },
+    SucceedCont:{
+        justifyContent: 'center',
+        alignItems: 'center',
+        flex:1,
+    },
+    SucceedText:{
+        marginTop:20,
+        fontSize:18,
+        color:"#333333"
+    },
+    DeterMine:{
+        position:"absolute",
+        bottom:40,
+        paddingTop:15,
+        paddingBottom:15,
+        borderRadius:25,
+        width:400,
+        backgroundColor:"#ff4e4e",
+    },
+    DeterMineText:{
+        color:"#ffffff",
+        fontSize:16,
+        textAlign:"center"
     },
 });

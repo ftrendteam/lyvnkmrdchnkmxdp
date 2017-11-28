@@ -395,7 +395,7 @@ const styles = StyleSheet.create({
     textAlign:"center"
  },
  footer:{
-    flex:2,
+    height:80,
     flexDirection:"row",
     borderTopWidth:1,
     borderTopColor:"#f2f2f2"
@@ -407,7 +407,7 @@ const styles = StyleSheet.create({
   Home:{
      flex:1,
      alignItems: 'center',
-     paddingTop:7,
+     paddingTop:10,
      backgroundColor:"#ffffff",
   },
   home1:{
