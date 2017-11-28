@@ -1109,7 +1109,7 @@ export default class Index extends Component {
         this.Promp()
     }
 
-    //单据权限弹框
+    //单据权限弹层
     Permissions(){
         let isShow = this.state.Permissions;
         this.setState({
