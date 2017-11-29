@@ -97,7 +97,7 @@ export default class ProductCG extends Component {
             if(this.state.sCode1==""){
                 alert("请选择供应商")
             }else if(this.state.shopname1==""){
-                alert("请选择机构")
+                alert("请选择机构信息")
             }else{
                 Storage.delete('YuanDan');
                 Storage.delete('Screen');
@@ -126,7 +126,7 @@ export default class ProductCG extends Component {
             if(this.state.sCode1==""){
                 alert("请选择供应商")
             }else if(this.state.shopname1==""){
-                alert("请选择机构")
+                alert("请选择机构信息")
             }else{
                 Storage.delete('YuanDan');
                 Storage.delete('Screen');

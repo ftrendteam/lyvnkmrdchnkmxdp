@@ -92,8 +92,6 @@ export default class ProductCG extends Component {
             var str1=this.state.suppcode1;
             if(this.state.sCode1==""){
                 alert("请选择供应商")
-            }else if(this.state.suppcode1==""){
-                alert("请选择采购单")
             }else{
                 Storage.delete('YuanDan');
                 var nextRoute={
