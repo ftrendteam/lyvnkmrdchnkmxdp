@@ -589,7 +589,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
   selectTUserShopData(Usercode) {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
-        tx.executeSql("select b.ShopCode,b.ShopName from tUserShop a inner join tshopitem b on b.SubCode+rtrim(b.shopcode)+';' like '%;'+rtrim(a.shopcode)+';%' or a.shopcode='0' where a.UserCode='" + Usercode + "'" , [], (tx, results) => {
+        tx.executeSql("select b.ShopCode,b.ShopName from tUserShop a inner join tshopitem b on b.SubCode+rtrim(b.shopcode)+';' like '%;'+rtrim(a.shopcode)+';%' or rtrim(a.shopcode)='0'  where a.UserCode='" + Usercode + "'" , [], (tx, results) => {
           resolve(results.rows);
         });
 
@@ -945,6 +945,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
         let sql = "select * from tuserright where usercode='" + userCode + "' and Funccode='A1012'";
+        console.log(sql);
         tx.executeSql(sql, [], (tx, results) => {
           resolve((results.rows.length != 0));
         })
