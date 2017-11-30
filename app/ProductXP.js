@@ -110,9 +110,8 @@ export default class ProductCG extends Component {
                 Storage.save('FormType','XPCGYW');
                 Storage.save('valueOf','App_Client_ProXPCG');
                 Storage.save('history','App_Client_ProXPCGQ');
-                Storage.save('historyClass','App_Client_ProXPDetailCGQ');
+                Storage.save('historyClass','App_Client_ProXPCGDetailQ');
                 Storage.save('ProYH','ProXPCG');
-                Storage.save('Screen','1');
                 Storage.save('Date',data);
                 Storage.save("scode",str);
                 Storage.save('shildshop',str1);
@@ -139,9 +138,8 @@ export default class ProductCG extends Component {
                 Storage.save('FormType','XPCGYW');
                 Storage.save('valueOf','App_Client_ProXPCG');
                 Storage.save('history','App_Client_ProXPCGQ');
-                Storage.save('historyClass','App_Client_ProXPDetailCGQ');
+                Storage.save('historyClass','App_Client_ProXPCGDetailQ');
                 Storage.save('ProYH','ProXPCG');
-                Storage.save('Screen','1');
                 Storage.save('Date',data);
                 Storage.save("scode",str);
                 Storage.save('shildshop',str1);

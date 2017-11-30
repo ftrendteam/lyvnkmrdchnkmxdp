@@ -519,7 +519,6 @@ export default class ShoppingCart extends Component {
                         },
                         DetailInfo2: this.dataRows,
                     };
-                    // alert(JSON.stringify(params))
                     FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
                         if(data.retcode == 1){
                             if(this.state.Screen=="1"||this.state.Screen=="2"){
@@ -552,7 +551,7 @@ export default class ShoppingCart extends Component {
                             }
                         }else{
                             this.Wait();
-                            alert(JSON.stringify(data))
+                            // alert(JSON.stringify(data))
                         }
                     })
                 })

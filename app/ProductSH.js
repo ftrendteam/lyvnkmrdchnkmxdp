@@ -123,7 +123,7 @@ export default class ProductCG extends Component {
                 Storage.save('FormType','XPYSYW');
                 Storage.save('valueOf','App_Client_ProXPYS');
                 Storage.save('history','App_Client_ProXPYSQ');
-                Storage.save('historyClass','App_Client_ProXPDetailYSQ');
+                Storage.save('historyClass','App_Client_ProXPYSDetailQ');
                 Storage.save('ProYH','ProXPYS');
                 Storage.save('YuanDan','1');
                 Storage.save('Screen','1');
@@ -154,7 +154,7 @@ export default class ProductCG extends Component {
                 Storage.save('FormType', 'XPYSYW');
                 Storage.save('valueOf', 'App_Client_ProXPYS');
                 Storage.save('history', 'App_Client_ProXPYSQ');
-                Storage.save('historyClass', 'App_Client_ProXPDetailYSQ');
+                Storage.save('historyClass', 'App_Client_ProXPYSDetailQ');
                 Storage.save('ProYH', 'ProXPYS');
                 Storage.save('YuanDan', '1');
                 Storage.save('Screen', '1');

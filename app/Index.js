@@ -41,6 +41,7 @@ import ProductYS from "./ProductYS";
 import ProductXP from "./ProductXP";
 import ProductSH from "./ProductSH";
 import Sell from "./Sell";
+import Pay from "./Pay";
 import NetUtils from "../utils/NetUtils";
 import FetchUtil from "../utils/FetchUtils";
 import UpData from "../utils/UpData";
@@ -1041,7 +1042,7 @@ export default class Index extends Component {
         Storage.save('Name','销售');
         var nextRoute = {
             name: "销售",
-            component: Sell
+            component: Pay
         };
         this.props.navigator.push(nextRoute);
         this._setModalVisible();
@@ -1350,14 +1351,6 @@ export default class Index extends Component {
                                 <Image source={require("../images/1_48.png")} style={styles.ModalImageLine} />
                             </View>
                             <View style={[styles.ModalHead,{marginBottom:10}]}>
-                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.Sell.bind(this)}>
-                                    <Text style={styles.ModalHeadImage1}>
-                                        <Image source={require("../images/1_57.png")} />
-                                    </Text>
-                                    <Text style={styles.ModalHeadText}>
-                                        销售
-                                    </Text>
-                                </TouchableOpacity>
                                 <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.pullOut.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_56.png")} />
@@ -1366,13 +1359,15 @@ export default class Index extends Component {
                                         退出账号
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity onPress={this.UpData.bind(this)} style={styles.ModalHeadImage}>
+                                <TouchableOpacity onPress={this.UpData.bind(this)} style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_59.png")} />
                                     </Text>
                                     <Text style={styles.ModalHeadText}>
                                         数据更新
                                     </Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.ModalHeadImage}>
                                 </TouchableOpacity>
                             </View>
                         </ScrollView>

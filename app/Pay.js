@@ -18,7 +18,7 @@ import {
 
 import Storage from "../utils/Storage";
 import Swiper from 'react-native-swiper'
-export default class Sell extends Component {
+export default class Pay extends Component {
 
     constructor(props){
         super(props);
@@ -44,10 +44,10 @@ export default class Sell extends Component {
 
     _renderRow(rowData, sectionID, rowID){
         return (
-            <View>
-                <Text>
-                    1
-                </Text>
+            <View style={styles.BankList}>
+                <View style={styles.FirstBankList}>
+                    <Text style={styles.FirstBankText}></Text>
+                </View>
             </View>
         );
     }
@@ -142,67 +142,6 @@ export default class Sell extends Component {
                             showsVerticalScrollIndicator={true}
                             renderRow={this._renderRow.bind(this)}
                         />
-                    </View>
-                    <View style={styles.Prece}>
-                        <View style={styles.InputingLeft}>
-                            <Text style={styles.InpuTingText}>请输入：</Text>
-                        </View>
-                        <View style={styles.InputingRight}>
-                            <TextInput
-                                autofocus={true}
-                                numberoflines={1}
-                                keyboardType="numeric"
-                                textalign="center"
-                                underlineColorAndroid='transparent'
-                                style={styles.TextInput}
-                            />
-                        </View>
-                    </View>
-                    <View style={[styles.Prece,{height:28,marginTop:16,backgroundColor:"#f2f2f2"}]}>
-                        <View style={styles.Inputing}>
-                            <View style={[styles.Inputingleft,{width:110}]}>
-                                <Text style={[styles.InputingText,{fontWeight:"bold"}]}>合计金额：</Text>
-                            </View>
-                            <View style={styles.Inputingright}>
-                                <Text style={[styles.InputingText,{fontWeight:"bold",fontSize:20,color:"red"}]}>33</Text>
-                            </View>
-                        </View>
-                        <View style={styles.Inputing1}>
-                            <View style={styles.Inputingleft}>
-                                <Text style={styles.InputingText}>卡号：</Text>
-                            </View>
-                            <View style={styles.Inputingright}>
-                                <Text style={styles.InputingText}>32051261201201</Text>
-                            </View>
-                        </View>
-                    </View>
-                    <View style={[styles.Prece,{height:28,marginTop:16,backgroundColor:"#f2f2f2"}]}>
-                        <View style={styles.Inputing}>
-                            <View style={[styles.Inputingleft,{width:110}]}>
-                                <Text style={[styles.InputingText,{fontWeight:"bold"}]}>合计数量：</Text>
-                            </View>
-                            <View style={styles.Inputingright}>
-                                <Text style={[styles.InputingText,{fontWeight:"bold",fontSize:20,color:"red"}]}>22</Text>
-                            </View>
-                        </View>
-                        <View style={styles.Inputing1}>
-                            <View style={[styles.Inputingright,styles.Inputing1Left]}>
-                                <View style={styles.Inputingleft}>
-                                    <Text style={styles.InputingText}>积分：</Text>
-                                </View>
-                                <View style={styles.Inputingright}>
-                                    <Text style={styles.InputingText}>1234.00</Text>
-                                </View>
-                            </View>
-                            <View style={[styles.Inputingright,styles.Inputing1Left]}>
-                                <View style={styles.Inputingleft}>
-                                    <Text style={styles.InputingText}>余额：</Text>
-                                </View>
-                                <View style={styles.Inputingright}>
-                                    <Text style={styles.InputingText}>1234.00</Text>
-                                </View>
-                            </View>
-                        </View>
                     </View>
                 </View>
                 <View style={styles.Swiper}>
@@ -348,6 +287,23 @@ export default class Sell extends Component {
                             </View>
                         </View>
                     </Swiper>
+                </View>
+                <View style={styles.ShopCont}>
+                    <View style={[styles.Prece,{marginTop:20,}]}>
+                        <View style={styles.InputingLeft}>
+                            <Text style={styles.InpuTingText}>请输入：</Text>
+                        </View>
+                        <View style={styles.InputingRight}>
+                            <TextInput
+                                autofocus={true}
+                                numberoflines={1}
+                                keyboardType="numeric"
+                                textalign="center"
+                                underlineColorAndroid='transparent'
+                                style={styles.TextInput}
+                            />
+                        </View>
+                    </View>
                 </View>
             </View>
         );
