@@ -840,7 +840,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
           ",ifNull(b.promemo,'') as ShopRemark,'" + DepCode + "' as DepCode1 " +
           " from product a left join shopInfo b on a.Pid=b.Pid where IsDel='0' and prodtype<>'1' ";
         ssql = ssql + " and a.DepCode in (select depcode from tdepset where IsDel='0' and depcode" + DepLevel + "='" + DepCode + "')";
-        ssql = ssql + " limit 9 offset " + (currpage - 1) * 9;
+        ssql = ssql + " limit 15 offset " + (currpage - 1) * 9;
         tx.executeSql(ssql, [], (tx, results) => {
           resolve(results.rows);
         });

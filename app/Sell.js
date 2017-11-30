@@ -110,7 +110,11 @@ export default class Sell extends Component {
                     <View style={[{backgroundColor:"#ff4e4e",width:10,height:60,position:"absolute",left:0,}]}></View>
                     <View style={[{backgroundColor:"#ff4e4e",width:10,height:60,position:"absolute",right:0,}]}></View>
                     <View style={styles.ShopList}>
-
+                        <View>
+                            <View>
+                                <Text></Text>
+                            </View>
+                        </View>
                     </View>
                 </View>
             </View>
