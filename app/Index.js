@@ -40,8 +40,10 @@ import ProductCG from "./ProductCG";
 import ProductYS from "./ProductYS";
 import ProductXP from "./ProductXP";
 import ProductSH from "./ProductSH";
+import Sell from "./Sell";
 import NetUtils from "../utils/NetUtils";
 import FetchUtil from "../utils/FetchUtils";
+import UpData from "../utils/UpData";
 import DBAdapter from "../adapter/DBAdapter";
 import Storage from '../utils/Storage';
 import DeCodePrePrint18 from "../utils/DeCodePrePrint18";
@@ -51,6 +53,7 @@ var {NativeModules} = require('react-native');
 var RNScannerAndroid = NativeModules.RNScannerAndroid;
 
 let dbAdapter = new DBAdapter();
+let updata = new UpData();
 
 let decodepreprint = new DeCodePrePrint18();
 
@@ -1034,6 +1037,16 @@ export default class Index extends Component {
         }
     }
 
+    Sell(){
+        Storage.save('Name','销售');
+        var nextRoute = {
+            name: "销售",
+            component: Sell
+        };
+        this.props.navigator.push(nextRoute);
+        this._setModalVisible();
+    }
+
     pullOut(){
         Storage.delete('username');
         Storage.delete('history');
@@ -1053,6 +1066,15 @@ export default class Index extends Component {
             this.props.navigator.push(nextRoute)
         }
     }
+
+    UpData(){
+        Storage.get('code').then((tags) => {
+            Storage.get('LinkUrl').then((LinkUrl) => {
+                updata.downLoadAllData(LinkUrl,dbAdapter,tags);
+            })
+        })
+    }
+
     //功能分类结束
 
     keyExtractor(item: Object, index: number) {
@@ -1328,6 +1350,14 @@ export default class Index extends Component {
                                 <Image source={require("../images/1_48.png")} style={styles.ModalImageLine} />
                             </View>
                             <View style={[styles.ModalHead,{marginBottom:10}]}>
+                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.Sell.bind(this)}>
+                                    <Text style={styles.ModalHeadImage1}>
+                                        <Image source={require("../images/1_57.png")} />
+                                    </Text>
+                                    <Text style={styles.ModalHeadText}>
+                                        销售
+                                    </Text>
+                                </TouchableOpacity>
                                 <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.pullOut.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_56.png")} />
@@ -1336,7 +1366,7 @@ export default class Index extends Component {
                                         退出账号
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]}>
+                                <TouchableOpacity onPress={this.UpData.bind(this)} style={styles.ModalHeadImage}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_59.png")} />
                                     </Text>
@@ -1344,7 +1374,6 @@ export default class Index extends Component {
                                         数据更新
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.ModalHeadImage}></TouchableOpacity>
                             </View>
                         </ScrollView>
                     </View>

@@ -217,7 +217,7 @@ export default class admin extends Component {
             alert("请选择用户编码及机构信息")
         }else{
             Storage.get('code').then((tags) => {
-                updata.downLoadAllData(this.state.linkurl,dbAdapter,code);
+                updata.downLoadAllData(this.state.linkurl,dbAdapter,tags);
             })
         }
 
