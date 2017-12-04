@@ -114,11 +114,22 @@ export default class HistoricalDocument extends Component {
       });
   }
   _get(){
-        Storage.get('Name').then((tags) => {
-             this.setState({
-                 name:tags
-             })
-        });
+
+      Storage.get('StateMent').then((tags) => {
+          if(tags==0){
+              Storage.get('name').then((tags) => {
+                  this.setState({
+                      name:tags
+                  })
+              });
+          }else{
+              Storage.get('Name').then((tags) => {
+                  this.setState({
+                      name:tags
+                  })
+              });
+          }
+      });
 
      //username获取
      Storage.get('username').then((tags) => {
@@ -171,12 +182,11 @@ export default class HistoricalDocument extends Component {
              BeginDate:this.state.kaishi1,
              EndDate:this.state.jieshu1,
              shopcode:tags,
-             childshopcode:"0",
+             childshopcode:"",
              formno:this.state.danzi1,
              prodcode:this.state.codesw1,
              Sign:NetUtils.MD5("App_PosReq" + "##" +this.state.reqDetailCode + "##" + Date.parse(new Date()) + "##" + "PosControlCs")+'',
          };
-
          FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
             var DetailInfo1 = JSON.stringify(data.DetailInfo1)
             if(Detailnfo1 = null){
@@ -193,6 +203,10 @@ export default class HistoricalDocument extends Component {
                        dataSource:this.state.dataSource.cloneWithRows(this.dataRows)
                     })
                 }
+            }else if(this.state.name==null){
+                return;
+            }else{
+                alert(JSON.stringify(data))
             }
          })
      });

@@ -452,9 +452,10 @@ export default class DBAdapter extends SQLiteOpenHelper {
    * 修改某个商品的数量-1
    */
   upDataShopInfoCountmSub(ProdCode) {
+    console.log("a",ProdCode);
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
-        tx.executeSql('update shopInfo set countm=countm-1 where ProdCode=' + ProdCode + '', [], (tx, results) => {
+        tx.executeSql("update shopInfo set countm=countm-1 where ProdCode='" + ProdCode + "'", [], (tx, results) => {
           try {
             resolve(true);
           } catch (err) {
@@ -651,7 +652,6 @@ export default class DBAdapter extends SQLiteOpenHelper {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
         let ssql = "select PSShop from tShopItem where FNeedPS='1' and PSShop='" + shopCode + "' and isdel='0' and PSShop<>ShopCode";
-        
         tx.executeSql(ssql, [], (tx, results) => {
           resolve(results.rows);
           
@@ -670,7 +670,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
   isCGYS(shopCode) {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
-        let ssql = "select FCanCG  from tShopItem  where isdel='0' and ShopCode='" + shopCode + "' and FCanCG='1'";
+        let ssql = "select FCanCG  from tShopItem  where isdel='0' and ((ShopCode='" + shopCode + "'  and FCanCG='1') or '"+shopCode+"'='0')";
         tx.executeSql(ssql, [], (tx, results) => {
           resolve(results.rows);
         });
@@ -1001,6 +1001,11 @@ export default class DBAdapter extends SQLiteOpenHelper {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
         let sql = "select * from " + dbName;
+        if (dbName=="tsuppset")
+        {
+            sql=sql+" where supptype<>'1'";
+        }
+
         tx.executeSql(sql, [], (tx, results) => {
             resolve((results.rows));
           }, (error) => {

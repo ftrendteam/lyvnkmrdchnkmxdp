@@ -290,9 +290,9 @@ export default class GoodsDetails extends Component {
                             onChangeText={(value)=>{this.setState({Remark:value})}}/>
                     </View>
                 </View>
-                <View style={styles.button}>
+                <TouchableOpacity style={styles.button}>
                     <Text style={styles.ButtonText} onPress={this.pressPop.bind(this)}>确定</Text>
-                </View>
+                </TouchableOpacity>
             </View>
         </ScrollView>
       </View>

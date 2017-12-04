@@ -102,7 +102,7 @@ export default class Query extends Component {
                 Storage.save('Date',data);
                 Storage.save('Name','商品盘点单');
                 Storage.save('valueOf','App_Client_ProPC');
-                Storage.save('history','App_Client_ProCurrPCQ');
+                Storage.save('history','App_Client_ProPCQ');
                 Storage.save('historyClass','App_Client_ProPCDetailQ');
                 Storage.save('ProYH','ProPC');
                 Storage.save('Document', "商品盘点");
@@ -124,7 +124,7 @@ export default class Query extends Component {
                 Storage.save('Date', data);
                 Storage.save('Name', '商品盘点单');
                 Storage.save('valueOf', 'App_Client_ProPC');
-                Storage.save('history', 'App_Client_ProCurrPCQ');
+                Storage.save('history', 'App_Client_ProPCQ');
                 Storage.save('historyClass', 'App_Client_ProPCDetailQ');
                 Storage.save('ProYH', 'ProPC');
                 Storage.save('Document', "商品盘点");

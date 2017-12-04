@@ -105,7 +105,7 @@ export default class admin extends Component {
                       dbAdapter.insertTUsershopData(detailInfo4);
                       //var acquiring = DataUtils.get("LinkUrl",LinkUrl);
                  }else{
-                     ToastAndroid.show('网络请求失败', ToastAndroid.SHORT);
+                     alert(JSON.stringify(data))
                  }
             })
         });
@@ -142,7 +142,7 @@ export default class admin extends Component {
         }else{
             <ActivityIndicator key="1"></ActivityIndicator>
         }
-        var code = ""+this.state.sCode1;//获取到之后前面加""+
+        var code = ""+this.state.sCode1.replace(/(^\s+)|(\s+$)/g, "");//获取到之后前面加""+
         var Usercode=this.state.Usercode;
         var UserPwd=this.state.UserPwd;
         str1 = code.split('_');
@@ -152,7 +152,7 @@ export default class admin extends Component {
             if(isLogin){
                var strin = this.state.sCode1;
                strjj = ""+strin;
-               code = strjj.substring(strjj.indexOf('_') + 1,strjj.length);
+               code = strjj.substring(strjj.indexOf('_') + 1,strjj.length).replace(/(^\s+)|(\s+$)/g, "");
                Storage.save('code',code);
                Storage.save('username',Usercode);
                Storage.save('Usercode',Usercode);
@@ -169,7 +169,6 @@ export default class admin extends Component {
             }else{
                this._setModalVisible();
                this._ErrorModalVisible();
-               // ToastAndroid.show('用户编码或密码错误', ToastAndroid.SHORT);
             }
         });
     }
@@ -323,11 +322,11 @@ export default class admin extends Component {
                         </View>
                     </View>
                 </Modal>
+                <TouchableOpacity onPress={this.UpData.bind(this)} style={styles.refresh}>
+                    <Image source={require("../images/1_21.png")}></Image>
+                    <Text style={styles.DataText}>数据更新</Text>
+                </TouchableOpacity>
             </ScrollView>
-            <TouchableOpacity onPress={this.UpData.bind(this)} style={styles.refresh}>
-                <Image source={require("../images/1_21.png")}></Image>
-                <Text style={styles.DataText}>数据更新</Text>
-            </TouchableOpacity>
       </Image>
     );
   }
@@ -382,9 +381,10 @@ const styles = StyleSheet.create({
       fontSize:18,
    },
   refresh:{
-    position:"absolute",
-    bottom:10,
-    right:30,
+      justifyContent: 'center',
+      alignItems: 'center',
+    height:30,
+    marginTop:25,
     flexDirection:'row'
   },
   DataText:{

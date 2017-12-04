@@ -112,7 +112,7 @@ export default class GoodsDetails extends Component {
                        numbershop:numbershop
                     })
                  }else{
-                   ToastAndroid.show('网络请求失败', ToastAndroid.SHORT);
+                     alert(JSON.stringify(data))
                  }
              })
          })

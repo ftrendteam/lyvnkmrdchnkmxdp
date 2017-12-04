@@ -20,7 +20,6 @@ import {
 import DBAdapter from "../adapter/DBAdapter";
 import Storage from '../utils/Storage';
 import NetUtils from "../utils/NetUtils";
-import FetchUtil from "../utils/FetchUtils";
 
 let dbAdapter = new DBAdapter();
 let db;

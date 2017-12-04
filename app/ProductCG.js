@@ -149,7 +149,7 @@ export default class ProductCG extends Component {
                             editable={false}
                             defaultValue ={this.state.sCode1}
                             numberoflines={1}
-                            placeholder="请选择采购单"
+                            placeholder="请选择供应商"
                             textalign="center"
                             underlineColorAndroid='transparent'
                             placeholderTextColor="#cccccc"

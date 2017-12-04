@@ -108,7 +108,9 @@ export default class Search extends Component {
                               // }else{
                               //     // alert('该商品暂时无法购买')
                               // }
-                          }else{}
+                          }else{
+                              alert(JSON.stringify(data))
+                          }
                       })
                   })
               }
@@ -213,7 +215,9 @@ export default class Search extends Component {
                         this.inputOnBlur(value)
                     }}
                 />
-                <Image source={require("../images/2.png")} style={styles.SearchImage} />
+                <TouchableOpacity onPress={this.Code.bind(this)} style={styles.onclick}>
+                    <Image source={require("../images/1_05.png")} style={styles.HeaderImage}></Image>
+                </TouchableOpacity>
                 <View style={styles.Right}>
                     <TouchableOpacity style={styles.Text1}><Text style={styles.Text} onPress={this.pressPop.bind(this)}>取消</Text></TouchableOpacity>
                 </View>

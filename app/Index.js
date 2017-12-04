@@ -100,7 +100,13 @@ export default class Index extends Component {
             show:false,
             Show:false,
             Promp:false,
+            Promp1:false,
             Permissions:false,
+            Permissions1:false,
+            Permissions2:false,
+            statement:false,
+            receiving:false,
+            emptydata:false,
             depcode:this.props.DepCode ? this.props.DepCode : "",
             dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
         };
@@ -140,8 +146,6 @@ export default class Index extends Component {
     Code(){
         RNScannerAndroid.openScanner();
         DeviceEventEmitter.addListener("code", (reminder) => {
-
-            var number = "279001501234012341";
 
             decodepreprint.init(reminder,dbAdapter);
 
@@ -200,12 +204,13 @@ export default class Index extends Component {
                                     // }else{
                                     //     // alert('该商品暂时无法购买')
                                     // }
-                                }else{}
+                                }else{
+                                    alert(JSON.stringify(data))
+                                }
                             })
                         })
                     })
                 });
-
             }else{
                 dbAdapter.selectAidCode(reminder,1).then((rows)=>{
                     if(rows.length==0){
@@ -278,19 +283,6 @@ export default class Index extends Component {
         this._setModalVisible()
         this.props.navigator.pop();
     }
-
-    //单据弹层
-    _rightButtonClick() {
-        this._setModalVisible();
-    }
-
-    _setModalVisible() {
-        let isShow = this.state.show;
-        this.setState({
-            show:!isShow,
-        });
-    }
-    //单据弹层结束
 
     //进入页面执行方法
     componentDidMount(){
@@ -408,6 +400,7 @@ export default class Index extends Component {
                 totalPage = total % 15 == 0 ? total / 15 : Math.floor(total / 15) + 1;
                 this.productData=priductData;
                 this.setState({
+                    currentindex:this.state.depcode,
                     data:priductData,
                     isloading:false,
                 });
@@ -437,6 +430,7 @@ export default class Index extends Component {
             this.setState({
                 shopcar:ShopCar
             });
+            // alert(JSON.stringify(ShopCar))
         });
     }
 
@@ -446,9 +440,9 @@ export default class Index extends Component {
                 {
                     (rowData.ShopNumber == 0) ?
                         null :
-                    <View style={styles.addnumber}>
-                        <Text style={styles.Reduction1}>{rowData.ShopNumber}</Text>
-                    </View>
+                        <View style={styles.addnumber}>
+                            <Text style={styles.Reduction1}>{rowData.ShopNumber}</Text>
+                        </View>
                 }
 
                 <Text style={styles.Active}>{rowData.DepName}</Text>
@@ -535,6 +529,8 @@ export default class Index extends Component {
 
     //修改商品数量增减查询
     Countm(item){
+        console.log("itme=",item);
+        // alert("wtf=",item);
         //调取数量
         dbAdapter.upDataShopInfoCountmSub(item.item.ProdCode).then((rows)=>{});
         item.item.ShopNumber=item.item.ShopNumber-1;
@@ -568,6 +564,7 @@ export default class Index extends Component {
         );
     }
 
+    //商品查询
     OrderDetails(item){
         var title = this.state.head;
         Storage.get('FormType').then((tags)=>{
@@ -583,7 +580,7 @@ export default class Index extends Component {
         })
 
         if(title ==null){
-            alert("请选择单据");
+            this._Emptydata();
         }else{
             //商品查询
             Storage.get('userName').then((tags)=>{
@@ -607,31 +604,36 @@ export default class Index extends Component {
                     var ShopPrice=JSON.stringify(data.ShopPrice);
                     if(data.retcode == 1){
                         // if(data.isFond==1){
-                            this.props.navigator.push({
-                                component:OrderDetails,
-                                params:{
-                                    ProdName:item.item.ProdName,
-                                    ShopPrice:ShopPrice,
-                                    Pid:item.item.Pid,
-                                    countm:item.item.ShopNumber,
-                                    promemo:item.item.promemo,
-                                    prototal:item.item.prototal,
-                                    ProdCode:item.item.ProdCode,
-                                    DepCode:item.item.DepCode1,
-                                    SuppCode:item.item.SuppCode,
-                                    ydcountm:countm,
-                                }
-                            })
+                        this.props.navigator.push({
+                            component:OrderDetails,
+                            params:{
+                                ProdName:item.item.ProdName,
+                                ShopPrice:ShopPrice,
+                                Pid:item.item.Pid,
+                                countm:item.item.ShopNumber,
+                                promemo:item.item.promemo,
+                                prototal:item.item.prototal,
+                                ProdCode:item.item.ProdCode,
+                                DepCode:item.item.DepCode1,
+                                SuppCode:item.item.SuppCode,
+                                ydcountm:countm,
+                            }
+                        })
                         // }else{
                         //     // alert('该商品暂时无法购买')
                         // }
-                    }else{}
+                    }else{
+                        alert(JSON.stringify(data))
+                    }
                 })
             })
 
         }
     }
-    //功能分类
+
+    //单据功能分类
+
+    //选择单据
     ChuMo(){
         Storage.save("Disting","0");
         Storage.get('Disting').then((tags)=>{
@@ -664,6 +666,7 @@ export default class Index extends Component {
         Storage.delete('shildshop');
         Storage.delete('YuanDan');
         Storage.delete('Screen');
+        Storage.delete('StateMent');
         if(this.state.ShopCar1>0){
             this._setModalVisible();
             alert("商品未提交")
@@ -735,6 +738,7 @@ export default class Index extends Component {
         Storage.delete('shildshop');
         Storage.delete('YuanDan');
         Storage.delete('Screen');
+        Storage.delete('StateMent');
         if(this.state.ShopCar1>0){
             this._setModalVisible();
             alert("商品未提交")
@@ -764,6 +768,7 @@ export default class Index extends Component {
         Storage.delete('OrgFormno');
         Storage.delete('shildshop');
         Storage.delete('YuanDan');
+        Storage.delete('StateMent');
         if(this.state.ShopCar1>0){
             this._setModalVisible();
             alert("商品未提交")
@@ -824,6 +829,7 @@ export default class Index extends Component {
         Storage.delete('OrgFormno');
         Storage.delete('scode');
         Storage.delete('shildshop');
+        Storage.delete('StateMent');
         if(this.state.ShopCar1>0){
             this._setModalVisible();
             alert("商品未提交")
@@ -855,6 +861,7 @@ export default class Index extends Component {
         Storage.delete('OrgFormno');
         Storage.delete('scode');
         Storage.delete('shildshop');
+        Storage.delete('StateMent');
         if(this.state.ShopCar1>0){
             this._setModalVisible();
             alert("商品未提交")
@@ -893,6 +900,7 @@ export default class Index extends Component {
         Storage.delete('OrgFormno');
         Storage.delete('scode');
         Storage.delete('shildshop');
+        Storage.delete('StateMent');
         if(this.state.ShopCar1>0){
             this._setModalVisible();
             alert("商品未提交")
@@ -918,7 +926,7 @@ export default class Index extends Component {
                             }
                         })
                     }else{
-                        this.Permissions()
+                        this.Permissions2()
                     }
                 })
             });
@@ -929,6 +937,7 @@ export default class Index extends Component {
         Storage.delete('OrgFormno');
         Storage.delete('scode');
         Storage.delete('shildshop');
+        Storage.delete('StateMent');
         if(this.state.ShopCar1>0){
             this._setModalVisible();
             alert("商品未提交")
@@ -955,7 +964,7 @@ export default class Index extends Component {
                             }
                         })
                     }else{
-                        this.Permissions()
+                        this.Permissions2()
                     }
                 })
             });
@@ -966,6 +975,7 @@ export default class Index extends Component {
         Storage.delete('OrgFormno');
         Storage.delete('scode');
         Storage.delete('shildshop');
+        Storage.delete('StateMent');
         if(this.state.ShopCar1>0){
             this._setModalVisible();
             alert("商品未提交")
@@ -992,11 +1002,10 @@ export default class Index extends Component {
                             }
                         })
                     }else{
-                        this.Permissions()
+                        this.Permissions1()
                     }
                 })
             });
-
         }
     }
 
@@ -1004,6 +1013,7 @@ export default class Index extends Component {
         Storage.delete('OrgFormno');
         Storage.delete('scode');
         Storage.delete('shildshop');
+        Storage.delete('StateMent');
         if(this.state.ShopCar1>0){
             this._setModalVisible();
             alert("商品未提交")
@@ -1043,6 +1053,7 @@ export default class Index extends Component {
         var nextRoute = {
             name: "销售",
             component: Pay
+            //Sell
         };
         this.props.navigator.push(nextRoute);
         this._setModalVisible();
@@ -1076,13 +1087,245 @@ export default class Index extends Component {
         })
     }
 
-    //功能分类结束
+    //报表(业务及收银)
+    StateMent(){
+        Storage.get('Disting').then((tags)=>{
+            if(tags==0){
+                this._setModalVisible();
+                this._StateMent();
+                this.YeWu();
+                Storage.save("StateMent","0");
+                Storage.delete('Name');
+            }else if(tags==1){
+                this.Promp1();
+            }else{
+                this.Promp();
+            }
+        })
+    }
 
+    YeWu(){
+        Storage.save("Disting","0");
+        Storage.get('Disting').then((tags)=>{
+            this.setState({
+                Disting:tags,
+            })
+        })
+        this.setState({
+            pressStatus:'pressin',
+            PressStatus:'0',
+        });
+    }
+
+    ShouYin(){
+        Storage.save("Disting","1");
+        Storage.get('Disting').then((tags)=>{
+            this.setState({
+                Disting:tags
+            })
+        })
+        this.setState({
+            PressStatus:'Pressin',
+            pressStatus:0
+        });
+        this._Receiving();
+        this._StateMent();
+    }
+
+    YeWu1(){
+        Storage.save("Disting","0");
+        Storage.get('Disting').then((tags)=>{
+            this.setState({
+                Disting:tags,
+            })
+        })
+        this.setState({
+            pressStatus:'pressin',
+            PressStatus:'0',
+        });
+        this._StateMent();
+        this._Receiving();
+    }
+
+    ShouYin1(){
+        Storage.save("Disting","1");
+        Storage.get('Disting').then((tags)=>{
+            this.setState({
+                Disting:tags
+            })
+        })
+        this.setState({
+            PressStatus:'Pressin',
+            pressStatus:0
+        });
+    }
+
+    YaoHuo1(){
+        Storage.get('code').then((tags) => {
+            dbAdapter.isYHPSXP(tags).then((rows) => {
+                if (rows.length >= 1) {
+                    this._StateMent();
+                    var nextRoute = {
+                        name: "HistoricalDocument",
+                        component: HistoricalDocument
+                    };
+                    this.props.navigator.push(nextRoute);
+                    Storage.save('name', '要货单');
+                    Storage.save('history', 'App_Client_ProYHQ');
+                    Storage.save('historyClass', 'App_Client_ProYHDetailQ');
+                } else {
+                    this.Permissions()
+                }
+            })
+        })
+    }
+
+    SunYi1(){
+        this._StateMent();
+        var nextRoute = {
+            name: "HistoricalDocument",
+            component: HistoricalDocument
+        };
+        this.props.navigator.push(nextRoute);
+        Storage.save('name','损溢单');
+        Storage.save('history', 'App_Client_ProSYQ');
+        Storage.save('historyClass', 'App_Client_ProSYDetailQ');
+    }
+
+    SSPanDian1(){
+        this._StateMent();
+        var nextRoute = {
+            name: "HistoricalDocument",
+            component: HistoricalDocument
+        };
+        this.props.navigator.push(nextRoute);
+        Storage.save('name','实时盘点单');
+        Storage.save('history', 'App_Client_ProCurrPCQ');
+        Storage.save('historyClass', 'App_Client_ProCurrPCDetailQ');
+    }
+
+    SPPanDian1(){
+        this._StateMent();
+        var nextRoute = {
+            name: "HistoricalDocument",
+            component: HistoricalDocument
+        };
+        this.props.navigator.push(nextRoute);
+        Storage.save('name','商品盘点单');
+        Storage.save('history', 'App_Client_ProPCQ');
+        Storage.save('historyClass', 'App_Client_ProPCDetailQ');
+    }
+
+    PSShouHuo1(){
+        Storage.get('code').then((tags) => {
+            dbAdapter.isYHPSXP(tags).then((rows) => {
+                if (rows.length >= 1) {
+                    this._StateMent();
+                    var nextRoute = {
+                        name: "HistoricalDocument",
+                        component: HistoricalDocument
+                    };
+                    this.props.navigator.push(nextRoute);
+                    Storage.save('name','配送收货单');
+                    Storage.save('history','App_Client_ProPSSHQ');
+                    Storage.save('historyClass','App_Client_ProPSSHDetailQ');
+                } else {
+                    this.Permissions()
+                }
+            })
+        })
+    }
+
+    SPCaiGou1(){
+        Storage.get('code').then((tags) => {
+            dbAdapter.isCGYS(tags).then((rows)=>{
+                if(rows.length>=1) {
+                    this._StateMent();
+                    var nextRoute = {
+                        name: "HistoricalDocument",
+                        component: HistoricalDocument
+                    };
+                    this.props.navigator.push(nextRoute);
+                    Storage.save('name','商品采购单');
+                    Storage.save('history','App_Client_ProCGQ');
+                    Storage.save('historyClass','App_Client_ProCGDetailQ');
+                }else{
+                    this.Permissions2()
+                }
+            })
+        });
+    }
+
+    SPYanShou1(){
+        Storage.get('code').then((tags) => {
+            dbAdapter.isCGYS(tags).then((rows)=>{
+                if(rows.length>=1) {
+                    this._StateMent();
+                    var nextRoute = {
+                        name: "HistoricalDocument",
+                        component: HistoricalDocument
+                    };
+                    this.props.navigator.push(nextRoute);
+                    Storage.save('name','商品验收单');
+                    Storage.save('history','App_Client_ProYSQ');
+                    Storage.save('historyClass','App_Client_ProYSDetailQ');
+                }else{
+                    this.Permissions2()
+                }
+            })
+        });
+
+    }
+
+    XPCaiGou1(){
+        Storage.get('code').then((tags) => {
+            dbAdapter.isXPCG(tags).then((rows)=>{
+                if(rows.length>=1) {
+                    this._StateMent();
+                    var nextRoute = {
+                        name: "HistoricalDocument",
+                        component: HistoricalDocument
+                    };
+                    this.props.navigator.push(nextRoute);
+                    Storage.save('name','协配采购单');
+                    Storage.save('history','App_Client_ProXPCGQ');
+                    Storage.save('historyClass','App_Client_ProXPCGDetailQ');
+                } else {
+                    this.Permissions1()
+                }
+            })
+        })
+    }
+
+    XPShouHuo1(){
+        Storage.get('code').then((tags) => {
+            dbAdapter.isYHPSXP(tags).then((rows) => {
+                if (rows.length >= 1) {
+                    this._StateMent();
+                    var nextRoute = {
+                        name: "HistoricalDocument",
+                        component: HistoricalDocument
+                    };
+                    this.props.navigator.push(nextRoute);
+                    Storage.save('name','协配收货单');
+                    Storage.save('history','App_Client_ProXPYSQ');
+                    Storage.save('historyClass','App_Client_ProXPYSDetailQ');
+                } else {
+                    this.Permissions()
+                }
+            })
+        })
+    }
+
+    Sell1(){}
+    //单据功能分类结束
+
+    //FlatList加入kay值
     keyExtractor(item: Object, index: number) {
         return item.ProdName//FlatList使用json中的ProdName动态绑定key
     }
 
-    //翻页列表
+    //FlatList翻页刷新列表
     _onload(){
         if(this.state.isloading){
             return true
@@ -1120,6 +1363,45 @@ export default class Index extends Component {
         }
     }
 
+    //弹层
+    //单据弹层
+    _rightButtonClick() {
+        this._setModalVisible();
+    }
+
+    _setModalVisible() {
+        let isShow = this.state.show;
+        this.setState({
+            show:!isShow,
+        });
+    }
+
+    _StateMent() {
+        let isShow = this.state.statement;
+        this.setState({
+            statement:!isShow,
+        });
+    }
+
+    _Receiving(){
+        let isShow = this.state.receiving;
+        this.setState({
+            receiving:!isShow,
+        });
+    }
+
+    //未选择单据时
+    _Emptydata(){
+        let isShow = this.state.emptydata;
+        this.setState({
+            emptydata:!isShow,
+        });
+    }
+
+    Emptydata(){
+        this._Emptydata();
+    }
+
     //用户模式选择
     Promp(){
         let isShow = this.state.Promp;
@@ -1130,6 +1412,17 @@ export default class Index extends Component {
 
     Mode(){
         this.Promp()
+    }
+
+    Promp1(){
+        let isShow = this.state.Promp1;
+        this.setState({
+            Promp1:!isShow,
+        });
+    }
+
+    Mode1(){
+        this.Promp1()
     }
 
     //单据权限弹层
@@ -1143,6 +1436,28 @@ export default class Index extends Component {
     MoDe(){
         this.Permissions()
     }
+
+    Permissions1(){
+        let isShow = this.state.Permissions1;
+        this.setState({
+            Permissions1:!isShow,
+        });
+    }
+    MoDe1(){
+        this.Permissions1()
+    }
+
+    Permissions2(){
+        let isShow = this.state.Permissions2;
+        this.setState({
+            Permissions2:!isShow,
+        });
+    }
+    MoDe2(){
+        this.Permissions2()
+    }
+
+    //单据弹层结束
 
     render() {
         const {data} = this.state;
@@ -1351,7 +1666,23 @@ export default class Index extends Component {
                                 <Image source={require("../images/1_48.png")} style={styles.ModalImageLine} />
                             </View>
                             <View style={[styles.ModalHead,{marginBottom:10}]}>
-                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.pullOut.bind(this)}>
+                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.Sell.bind(this)}>
+                                    <Text style={styles.ModalHeadImage1}>
+                                        <Image source={require("../images/1_57.png")} />
+                                    </Text>
+                                    <Text style={styles.ModalHeadText}>
+                                        销售
+                                    </Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.StateMent.bind(this)}>
+                                    <Text style={styles.ModalHeadImage1}>
+                                        <Image source={require("../images/1_56.png")} />
+                                    </Text>
+                                    <Text style={styles.ModalHeadText}>
+                                        报表
+                                    </Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.ModalHeadImage} onPress={this.pullOut.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_56.png")} />
                                     </Text>
@@ -1359,7 +1690,12 @@ export default class Index extends Component {
                                         退出账号
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity onPress={this.UpData.bind(this)} style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]}>
+                            </View>
+                            <View style={styles.ModalLine}>
+                                <Image source={require("../images/1_48.png")} style={styles.ModalImageLine} />
+                            </View>
+                            <View style={[styles.ModalHead,{marginBottom:10}]}>
+                                <TouchableOpacity onPress={this.UpData.bind(this)} style={styles.ModalHeadImage}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_59.png")} />
                                     </Text>
@@ -1367,11 +1703,220 @@ export default class Index extends Component {
                                         数据更新
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.ModalHeadImage}>
-                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.ModalHeadImage}></TouchableOpacity>
+                                <TouchableOpacity style={styles.ModalHeadImage}></TouchableOpacity>
                             </View>
                         </ScrollView>
                     </View>
+                </Modal>
+                <Modal
+                    animationType='fade'//业务
+                    transparent={true}
+                    visible={this.state.statement}
+                    onShow={() => {}}
+                    onRequestClose={() => {}} >
+                    <View style={styles.modalStyle}>
+                        <View style={styles.ModalTitle}>
+                            <TouchableOpacity style={styles.ModalLeft} onPress={this.YeWu.bind(this)}>
+                                <View>
+                                    <Image source = {this.state.pressStatus =='pressin' ? require("../images/1_42.png") : require("../images/1_43.png")} />
+                                </View>
+                                <View>
+                                    <Text style={styles.ModalImage}>
+                                        <Image source={require("../images/1_39.png")} />
+                                    </Text>
+                                    <Text style={styles.ModalText}>
+                                        业务
+                                    </Text>
+                                </View>
+                            </TouchableOpacity>
+                            <View style={styles.ModalLeft1}>
+                                <Image source={require("../images/1_47.png")} />
+                            </View>
+                            <TouchableOpacity style={styles.ModalLeft} onPress={this.ShouYin.bind(this)}>
+                                <View style={[{marginLeft:14}]}>
+                                    <Image source = {this.state.PressStatus =='Pressin' ? require("../images/1_42.png") : require("../images/1_43.png")}  />
+                                </View>
+                                <View>
+                                    <Text style={styles.ModalImage}>
+                                        <Image source={require("../images/1_41.png")} />
+                                    </Text>
+                                    <Text style={styles.ModalText}>
+                                        收银
+                                    </Text>
+                                </View>
+                            </TouchableOpacity>
+                        </View>
+                        <ScrollView style={styles.ModalCont}>
+                            <View style={styles.ModalHead}>
+                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.YaoHuo1.bind(this)}>
+                                    <Text style={styles.ModalHeadImage1}>
+                                        <Image source={require("../images/1_25.png")} />
+                                    </Text>
+                                    <Text style={styles.ModalHeadText}>
+                                        要货
+                                    </Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.PSShouHuo1.bind(this)}>
+                                    <Text style={styles.ModalHeadImage1}>
+                                        <Image source={require("../images/1_28.png")} />
+                                    </Text>
+                                    <Text style={styles.ModalHeadText}>
+                                        配送收货
+                                    </Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.ModalHeadImage} onPress={this.SSPanDian1.bind(this)}>
+                                    <Text style={styles.ModalHeadImage1}>
+                                        <Image source={require("../images/1_29.png")} />
+                                    </Text>
+                                    <Text style={styles.ModalHeadText}>
+                                        实时盘点
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={styles.ModalLine}>
+                                <Image source={require("../images/1_48.png")} style={styles.ModalImageLine} />
+                            </View>
+                            <View style={styles.ModalHead}>
+                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.SPPanDian1.bind(this)}>
+                                    <Text style={styles.ModalHeadImage1}>
+                                        <Image source={require("../images/1_36.png")} />
+                                    </Text>
+                                    <Text style={styles.ModalHeadText}>
+                                        商品盘点
+                                    </Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.SunYi1.bind(this)}>
+                                    <Text style={styles.ModalHeadImage1}>
+                                        <Image source={require("../images/1_38.png")} />
+                                    </Text>
+                                    <Text style={styles.ModalHeadText}>
+                                        损溢
+                                    </Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.ModalHeadImage} onPress={this.SPCaiGou1.bind(this)}>
+                                    <Text style={styles.ModalHeadImage1}>
+                                        <Image source={require("../images/1_40.png")} />
+                                    </Text>
+                                    <Text style={styles.ModalHeadText}>
+                                        商品采购
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={styles.ModalLine}>
+                                <Image source={require("../images/1_48.png")} style={styles.ModalImageLine} />
+                            </View>
+                            <View style={styles.ModalHead}>
+                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.SPYanShou1.bind(this)}>
+                                    <Text style={styles.ModalHeadImage1}>
+                                        <Image source={require("../images/1_44.png")} />
+                                    </Text>
+                                    <Text style={styles.ModalHeadText}>
+                                        商品验收
+                                    </Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.XPCaiGou1.bind(this)}>
+                                    <Text style={styles.ModalHeadImage1}>
+                                        <Image source={require("../images/1_45.png")} />
+                                    </Text>
+                                    <Text style={styles.ModalHeadText}>
+                                        协配采购
+                                    </Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.ModalHeadImage} onPress={this.XPShouHuo1.bind(this)}>
+                                    <Text style={styles.ModalHeadImage1}>
+                                        <Image source={require("../images/1_46.png")} />
+                                    </Text>
+                                    <Text style={styles.ModalHeadText}>
+                                        协配收货
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={styles.ModalLine}>
+                                <Image source={require("../images/1_48.png")} style={styles.ModalImageLine} />
+                            </View>
+                            <View style={[styles.ModalHead,{marginBottom:10}]}>
+                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.Sell1.bind(this)}>
+                                    <Text style={styles.ModalHeadImage1}>
+                                        <Image source={require("../images/1_57.png")} />
+                                    </Text>
+                                    <Text style={styles.ModalHeadText}>
+                                        销售
+                                    </Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.ModalHeadImage}></TouchableOpacity>
+                                <TouchableOpacity style={styles.ModalHeadImage}></TouchableOpacity>
+                            </View>
+                        </ScrollView>
+                    </View>
+                </Modal>
+                <Modal
+                    animationType='fade'//收银
+                    transparent={true}
+                    visible={this.state.receiving}
+                    onShow={() => {}}
+                    onRequestClose={() => {}} >
+                    <View style={styles.modalStyle}>
+                        <View style={styles.ModalTitle}>
+                            <TouchableOpacity style={styles.ModalLeft} onPress={this.YeWu1.bind(this)}>
+                                <View>
+                                    <Image source = {this.state.pressStatus =='pressin' ? require("../images/1_42.png") : require("../images/1_43.png")} />
+                                </View>
+                                <View>
+                                    <Text style={styles.ModalImage}>
+                                        <Image source={require("../images/1_39.png")} />
+                                    </Text>
+                                    <Text style={styles.ModalText}>
+                                        业务
+                                    </Text>
+                                </View>
+                            </TouchableOpacity>
+                            <View style={styles.ModalLeft1}>
+                                <Image source={require("../images/1_47.png")} />
+                            </View>
+                            <TouchableOpacity style={styles.ModalLeft} onPress={this.ShouYin1.bind(this)}>
+                                <View style={[{marginLeft:14}]}>
+                                    <Image source = {this.state.PressStatus =='Pressin' ? require("../images/1_42.png") : require("../images/1_43.png")}  />
+                                </View>
+                                <View>
+                                    <Text style={styles.ModalImage}>
+                                        <Image source={require("../images/1_41.png")} />
+                                    </Text>
+                                    <Text style={styles.ModalText}>
+                                        收银
+                                    </Text>
+                                </View>
+                            </TouchableOpacity>
+                        </View>
+                        <ScrollView style={styles.ModalCont}>
+                            <View style={styles.ModalHead}>
+                                <Text>
+                                    敬请期待~~~
+                                </Text>
+                            </View>
+
+                        </ScrollView>
+                    </View>
+                </Modal>
+                <Modal
+                    transparent={true}
+                    visible={this.state.emptydata}
+                    onShow={() => {}}
+                    onRequestClose={() => {}} >
+                    <Image source={require("../images/background.png")} style={[styles.ModalStyle,{justifyContent: 'center',alignItems: 'center',}]}>
+                        <View style={styles.ModalStyleCont}>
+                            <View style={styles.ModalStyleTitle}>
+                                <Text style={styles.ModalTitleText}>
+                                    请选择单据
+                                </Text>
+                            </View>
+                            <TouchableOpacity onPress={this.Emptydata.bind(this)} style={styles.Button}>
+                                <Text style={styles.ModalTitleText}>
+                                    好的
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+                    </Image>
                 </Modal>
                 <Modal
                     transparent={true}
@@ -1395,6 +1940,26 @@ export default class Index extends Component {
                 </Modal>
                 <Modal
                     transparent={true}
+                    visible={this.state.Promp1}
+                    onShow={() => {}}
+                    onRequestClose={() => {}} >
+                    <Image source={require("../images/background.png")} style={[styles.ModalStyle,{justifyContent: 'center',alignItems: 'center',}]}>
+                        <View style={styles.ModalStyleCont}>
+                            <View style={styles.ModalStyleTitle}>
+                                <Text style={styles.ModalTitleText}>
+                                    请将模式改为触摸
+                                </Text>
+                            </View>
+                            <TouchableOpacity onPress={this.Mode1.bind(this)} style={styles.Button}>
+                                <Text style={styles.ModalTitleText}>
+                                    好的
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+                    </Image>
+                </Modal>
+                <Modal
+                    transparent={true}
                     visible={this.state.Permissions}
                     onShow={() => {}}
                     onRequestClose={() => {}} >
@@ -1406,6 +1971,46 @@ export default class Index extends Component {
                                 </Text>
                             </View>
                             <TouchableOpacity onPress={this.MoDe.bind(this)} style={styles.Button}>
+                                <Text style={styles.ModalTitleText}>
+                                    好的
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+                    </Image>
+                </Modal>
+                <Modal
+                    transparent={true}
+                    visible={this.state.Permissions1}
+                    onShow={() => {}}
+                    onRequestClose={() => {}} >
+                    <Image source={require("../images/background.png")} style={[styles.ModalStyle,{justifyContent: 'center',alignItems: 'center',}]}>
+                        <View style={styles.ModalStyleCont}>
+                            <View style={styles.ModalStyleTitle}>
+                                <Text style={styles.ModalTitleText}>
+                                    该店不是配送中心,不能进行该业务
+                                </Text>
+                            </View>
+                            <TouchableOpacity onPress={this.MoDe1.bind(this)} style={styles.Button}>
+                                <Text style={styles.ModalTitleText}>
+                                    好的
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+                    </Image>
+                </Modal>
+                <Modal
+                    transparent={true}
+                    visible={this.state.Permissions2}
+                    onShow={() => {}}
+                    onRequestClose={() => {}} >
+                    <Image source={require("../images/background.png")} style={[styles.ModalStyle,{justifyContent: 'center',alignItems: 'center',}]}>
+                        <View style={styles.ModalStyleCont}>
+                            <View style={styles.ModalStyleTitle}>
+                                <Text style={styles.ModalTitleText}>
+                                    该机构没有采购权
+                                </Text>
+                            </View>
+                            <TouchableOpacity onPress={this.MoDe2.bind(this)} style={styles.Button}>
                                 <Text style={styles.ModalTitleText}>
                                     好的
                                 </Text>

@@ -551,7 +551,7 @@ export default class ShoppingCart extends Component {
                             }
                         }else{
                             this.Wait();
-                            // alert(JSON.stringify(data))
+                            alert(JSON.stringify(data))
                         }
                     })
                 })
@@ -758,7 +758,7 @@ export default class ShoppingCart extends Component {
             ShopAmount:price,
             shopcar:"",
             active:data,
-            // BeiZhu:"暂无备注",
+            BeiZhu:"暂无备注",
         })
         Storage.save('Date',this.state.active);
     }
@@ -837,7 +837,7 @@ export default class ShoppingCart extends Component {
                     </View>
                 </View>
                 <View style={styles.footer}>
-                    <TouchableOpacity style={styles.Home} onPress={this.History.bind(this)}><Image source={require("../images/1_300.png")}></Image><Text style={styles.home3}>历史单据查询</Text></TouchableOpacity>
+                    <TouchableOpacity style={styles.Home} onPress={this.History.bind(this)}><Image source={require("../images/1_300.png")}></Image><Text style={styles.home1}>历史单据查询</Text></TouchableOpacity>
                     <TouchableOpacity style={styles.Home} onPress={this.Shop.bind(this)}><Image source={require("../images/1_311.png")}></Image><Text style={styles.home1}>商品</Text></TouchableOpacity>
                     <TouchableOpacity style={styles.Home}>
                         <View>
