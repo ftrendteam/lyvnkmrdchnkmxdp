@@ -1,5 +1,4 @@
 package com.smartpos.hspos;
-
 import android.telephony.TelephonyManager;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReactApplicationContext;
