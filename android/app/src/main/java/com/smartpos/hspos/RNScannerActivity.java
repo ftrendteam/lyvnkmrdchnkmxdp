@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.Context;
 import com.smartpos.utils.SystemUtils;
-
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.smartpos.scanner.ScannerMainActivity;
 public class RNScannerActivity extends ReactContextBaseJavaModule{
@@ -21,7 +20,6 @@ public class RNScannerActivity extends ReactContextBaseJavaModule{
                 ".broadcast";
         public static final String SCN_CUST_EX_SCODE = "scannerdata";
         public static final String SCN_CUST_ACTION_START = "android.intent.action.SCANNER_BUTTON_DOWN";
-
 
         public RNScannerActivity(ReactApplicationContext reactContext) {
             super(reactContext);
@@ -45,6 +43,8 @@ public class RNScannerActivity extends ReactContextBaseJavaModule{
          */
         @ReactMethod
         public void openScanner() {
+
+
          if("SHT".equals(deviceModel)||"SHT36".equals(deviceModel)){
             Intent scannerIntent = new Intent(SCN_CUST_ACTION_START);
             getReactApplicationContext().sendBroadcast(scannerIntent);
@@ -59,6 +59,8 @@ public class RNScannerActivity extends ReactContextBaseJavaModule{
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction().equals(SCN_CUST_ACTION_SCODE)) {
                    String message = intent.getStringExtra(SCN_CUST_EX_SCODE);
+
+
                    reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("code",message);
                 }
             }
