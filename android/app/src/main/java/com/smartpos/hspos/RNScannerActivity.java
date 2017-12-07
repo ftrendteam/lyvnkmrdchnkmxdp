@@ -12,8 +12,9 @@ import android.content.Context;
 import com.smartpos.utils.SystemUtils;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.smartpos.scanner.ScannerMainActivity;
-public class RNScannerActivity extends ReactContextBaseJavaModule{
 
+public class RNScannerActivity extends ReactContextBaseJavaModule{
+        private static final int REQUEST_CAMERA = 0;
         public ReactApplicationContext reactContext;
         private String deviceModel;
         public static final String SCN_CUST_ACTION_SCODE = "com.android.server.scannerservice" +
@@ -43,15 +44,14 @@ public class RNScannerActivity extends ReactContextBaseJavaModule{
          */
         @ReactMethod
         public void openScanner() {
-
-
-         if("SHT".equals(deviceModel)||"SHT36".equals(deviceModel)){
-            Intent scannerIntent = new Intent(SCN_CUST_ACTION_START);
-            getReactApplicationContext().sendBroadcast(scannerIntent);
-         }else{
-            Intent startIntent = new Intent(reactContext,ScannerMainActivity.class);
-            reactContext.startActivityForResult(startIntent, 1,null);
-         }
+            if("SHT".equals(deviceModel)||"SHT36".equals(deviceModel)){
+                Intent scannerIntent = new Intent(SCN_CUST_ACTION_START);
+                getReactApplicationContext().sendBroadcast(scannerIntent);
+            }else{
+                    Intent startIntent = new Intent(reactContext,ScannerMainActivity.class);
+                    startIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+                    reactContext.startActivity(startIntent);
+            }
         }
 
         private BroadcastReceiver mSamDataReceiver = new BroadcastReceiver() {
