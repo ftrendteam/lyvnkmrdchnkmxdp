@@ -465,8 +465,6 @@ export default class ShoppingCart extends Component {
     submit(){
         this.screen = [];
 
-        this.Wait();
-
         Storage.get('shildshop').then((tags)=>{
             this.setState({
                 shildshop:tags
@@ -486,8 +484,9 @@ export default class ShoppingCart extends Component {
         })
 
         if(this.dataRows==0){
-            alert("请添加商品")
+            alert("请添加商品");
         }else{
+            this.Wait();
             Storage.get('code').then((tags) => {
                 Storage.get("usercode","").then((usercode)=>{
                     Storage.get("username","").then((username)=>{
@@ -519,41 +518,48 @@ export default class ShoppingCart extends Component {
                         },
                         DetailInfo2: this.dataRows,
                     };
-                    FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
-                        if(data.retcode == 1){
-                            if(this.state.Screen=="1"||this.state.Screen=="2"){
-                                var DetailInfo2=params.DetailInfo2;
-                                for(let i =0;i<DetailInfo2.length;i++){
-                                    let detail = DetailInfo2[i];
-                                    let ydcountm = detail.ydcountm;
-                                    let countm = detail.countm;
-                                    if(ydcountm!==countm){
-                                        this.screen.push(detail);
+                    if(this.state.Screen=="1"||this.state.Screen=="2"){
+                        var DetailInfo2=params.DetailInfo2;
+                        for(let i =0;i<DetailInfo2.length;i++){
+                            let detail = DetailInfo2[i];
+                            let ydcountm = detail.ydcountm;
+                            let countm = detail.countm;
+                            if(ydcountm!==countm){
+                                this.screen.push(detail);
+                            }
+                        }
+                        if(this.screen==""){
+                            FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
+                                if(data.retcode == 1){
+                                    if(this.state.Screen!=="1"||this.state.Screen!=="2"||this.screen==""||scode==null){
+                                        this.Wait();
+                                        this.Succeed();
                                     }
-                                };
-                                this.setState({
-                                    dataSource:this.state.dataSource.cloneWithRows(this.screen),
-                                })
-                                if(scode==null){
-                                    this.Wait();
-                                    this.Succeed();
-                                }else if(this.screen==""){
-                                    this.Wait();
-                                    this.Succeed();
-
                                 }else{
                                     this.Wait();
-                                    this.ScreenBod();
+                                    alert(JSON.stringify(data))
+                                }
+                            })
+                        }else{
+                            this.setState({
+                                dataSource:this.state.dataSource.cloneWithRows(this.screen),
+                            })
+                            this.Wait();
+                            this.ScreenBod();
+                        }
+                    }else{
+                        FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
+                            if(data.retcode == 1){
+                                if(this.state.Screen!=="1"||this.state.Screen!=="2"||this.screen==""||scode==null){
+                                    this.Wait();
+                                    this.Succeed();
                                 }
                             }else{
                                 this.Wait();
-                                this.Succeed();
+                                alert(JSON.stringify(data))
                             }
-                        }else{
-                            this.Wait();
-                            alert(JSON.stringify(data))
-                        }
-                    })
+                        })
+                    }
                 })
             })
         }
@@ -899,6 +905,7 @@ export default class ShoppingCart extends Component {
                             </View>
                             <TextInput
                                 multiline={true}
+                                maxLength={250}
                                 placeholder="请填写单据备注信息"
                                 underlineColorAndroid='transparent'
                                 placeholderTextColor="#888888"
@@ -1296,8 +1303,6 @@ const styles = StyleSheet.create({
     ScreenList:{
         paddingTop:8,
         paddingBottom:8,
-        height:53,
-        overflow:"hidden",
         flexDirection:"row",
         backgroundColor:"#ffffff",
         marginBottom:2,
@@ -1311,8 +1316,6 @@ const styles = StyleSheet.create({
     coulumnScreen:{
         flex:1,
         paddingLeft:5,
-        height:30,
-        overflow:"hidden"
     },
     coulumnText:{
         fontSize:16,
@@ -1402,7 +1405,7 @@ const styles = StyleSheet.create({
         paddingTop:15,
         paddingBottom:15,
         borderRadius:25,
-        width:350,
+        width:300,
         backgroundColor:"#ff4e4e",
     },
     DeterMineText:{

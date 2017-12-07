@@ -269,7 +269,7 @@ export default class GoodsDetails extends Component {
                             style={styles.Number1}
                             placeholder="暂无备注"
                             placeholderTextColor="#333333"
-                            maxLength={24}
+                            maxLength={50}
                             value={this.state.Remark.toString()}
                             underlineColorAndroid='transparent'
                             onChangeText={(value)=>{this.setState({Remark:value})}}/>

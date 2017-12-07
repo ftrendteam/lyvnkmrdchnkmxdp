@@ -157,8 +157,6 @@ const styles = StyleSheet.create({
         paddingTop:15,
         paddingBottom:15,
         flexDirection:"row",
-        borderBottomWidth:1,
-        borderBottomColor:"#cacccb"
     },
     SearchImage:{
         position:"absolute",
@@ -183,7 +181,7 @@ const styles = StyleSheet.create({
         paddingLeft:6
     },
     Text:{
-        fontSize:16,
+        fontSize:18,
         color:"#ffffff",
         paddingTop:5,
         paddingLeft:10,
