@@ -74,10 +74,22 @@ export default class admin extends Component {
 
     //初始化render之后只执行一次
     componentDidMount(){
+
         //获取数据库url地址
         Storage.get('LinkUrl').then((tags) => {
             this.setState({
                 linkurl:tags
+            })
+            //apk版本自动更新
+            FetchUtil.post(tags+"/Default2.aspx?jsonStr={'TblName':'AndroidYWVersion'}").then((data) => {
+                alert(data)
+
+                NativeModules.AndroidDeviceInfo.getVerCode((msg) => {
+                    // if (data > msg) {
+                    //
+                    // }
+                    NativeModules.UpApk.isUpdata(tags);
+                });
             })
         })
 
