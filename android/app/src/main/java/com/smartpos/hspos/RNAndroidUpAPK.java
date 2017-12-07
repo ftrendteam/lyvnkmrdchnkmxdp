@@ -17,6 +17,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.app.Activity;
+import com.facebook.react.bridge.Callback;
 public class RNAndroidUpAPK extends ReactContextBaseJavaModule{
     private final int PD_DISMISS = 0X01;
     private final int PD_SHOW = 0X02;
@@ -35,20 +36,14 @@ public class RNAndroidUpAPK extends ReactContextBaseJavaModule{
     }
 
 
-    private void downloadApk(String url){
+    private void downloadApk(String url,final Callback successCallback){
         String saveDir = Environment.getExternalStorageDirectory()
-                        .getAbsolutePath();
-                final String fileName = Environment.getExternalStorageDirectory() +
-                        "/安卓yw.apk";
+                                    .getAbsolutePath();
                 DownloadUtil.get().download(url + "/Down/安卓yw.apk", saveDir, new DownloadUtil.OnDownloadListener() {
                     @Override
                     public void onDownloadSuccess() {
-                        Intent intent = new Intent();
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        intent.setAction(android.content.Intent.ACTION_VIEW);
-                        intent.setDataAndType(Uri.fromFile(new File(fileName)),
-                                     "application/vnd.android.package-archive");
-                        reactContext.startActivity(intent);
+                        successCallback.invoke(true);
+
                     }
 
                     @Override
@@ -65,16 +60,26 @@ public class RNAndroidUpAPK extends ReactContextBaseJavaModule{
     }
 
     @ReactMethod
-    public void isUpdata(final String url) {
+    public void isUpdata(final String url,final Callback successCallback) {
         new Thread(new Runnable() {
                 @Override
                 public void run() {
                     if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-                        downloadApk(url);
+                        downloadApk(url,successCallback);
                     }
                 }
             }).start();
     }
 
-
+    @ReactMethod
+    public void installAPK(){
+        String fileName = Environment.getExternalStorageDirectory() +
+            "/安卓yw.apk";
+        Intent intent = new Intent();
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setAction(android.content.Intent.ACTION_VIEW);
+        intent.setDataAndType(Uri.fromFile(new File(fileName)),
+                 "application/vnd.android.package-archive");
+        reactContext.startActivity(intent);
+    }
 }
