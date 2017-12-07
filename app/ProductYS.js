@@ -113,7 +113,10 @@ export default class ProductCG extends Component {
                 Storage.save('Document', "商品验收");
             }
         }else if(this.state.Disting=="1"){
+            var date = new Date();
+            var data=JSON.stringify(date.getTime());
             var str=this.state.sCode1;
+            var str1=this.state.suppcode1;
             if(this.state.sCode1==""){
                 alert("请选择供应商")
             }else{
@@ -124,15 +127,15 @@ export default class ProductCG extends Component {
                     component:Search,
                 };
                 this.props.navigator.push(nextRoute);
-                Storage.delete('YuanDan');
-                Storage.delete('Screen');
-                Storage.save('Name','商品采购单');
-                Storage.save('FormType','CGYW');
-                Storage.save('valueOf','App_Client_ProCG');
+                Storage.save('OrgFormno',str1);
+                Storage.save('Name','商品验收单');
+                Storage.save('FormType','YSYW');
+                Storage.save('valueOf','App_Client_ProYS');
                 Storage.save('history','App_Client_ProYSQ');
                 Storage.save('historyClass','App_Client_ProCGDetailQ');
                 Storage.save('ProYH','ProCG');
-                Storage.save('YdCountm','3');
+                Storage.save('YuanDan','1');
+                Storage.save('Screen','1');
                 Storage.save('Date',data);
                 Storage.save("scode",str);
                 Storage.save('Document', "商品验收");

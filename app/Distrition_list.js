@@ -255,8 +255,6 @@ const styles = StyleSheet.create({
         paddingTop:15,
         paddingBottom:15,
         flexDirection:"row",
-        borderBottomWidth:1,
-        borderBottomColor:"#cacccb"
     },
     SearchImage:{
         position:"absolute",
@@ -281,7 +279,7 @@ const styles = StyleSheet.create({
         paddingLeft:6
     },
     Text:{
-        fontSize:16,
+        fontSize:18,
         color:"#ffffff",
         paddingTop:5,
         paddingLeft:10,
@@ -294,8 +292,8 @@ const styles = StyleSheet.create({
         paddingRight:25,
     },
     coding:{
-        flex:1,
-        paddingLeft:12
+        flex:2,
+        paddingLeft:5
     },
     codingText:{
         color:"#333333",
@@ -315,13 +313,6 @@ const styles = StyleSheet.create({
         backgroundColor:"#ffffff",
         borderBottomWidth:1,
         borderBottomColor:"#f2f2f2",
-    },
-    coding:{
-        flex:1,
-        paddingLeft:12
-    },
-    name:{
-        flex:1,
     },
     scrollview:{
         marginBottom:120,

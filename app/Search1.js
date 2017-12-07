@@ -14,7 +14,8 @@ import {
   ListView,
   TextInput,
   TouchableOpacity,
-  DeviceEventEmitter
+  DeviceEventEmitter,
+  InteractionManager,
 } from 'react-native';
 
 import Index from "./Index";
@@ -25,11 +26,13 @@ import NetUtils from "../utils/NetUtils";
 import FetchUtil from "../utils/FetchUtils";
 import DBAdapter from "../adapter/DBAdapter";
 import Storage from '../utils/Storage';
+import DeCodePrePrint18 from "../utils/DeCodePrePrint18";
 
 var {NativeModules} = require('react-native');
 var RNScannerAndroid = NativeModules.RNScannerAndroid;
 let dbAdapter = new DBAdapter();
 let db;
+let decodepreprint = new DeCodePrePrint18();
 
 export default class Search extends Component {
   constructor(props){
@@ -41,82 +44,158 @@ export default class Search extends Component {
       this.dataRows = [];
   }
 
-  pressPop(){
+  componentDidMount(){
+      InteractionManager.runAfterInteractions(() => {
+        Storage.get('Name').then((tags) => {
+            this.setState({
+                head:tags
+            })
+        });
+        this.Device()
+      })
+  }
+
+    Device(){
+        RNScannerAndroid.openScanner();
+        DeviceEventEmitter.addListener("code", (reminder) => {
+            var title = this.state.head;
+            decodepreprint.init(reminder,dbAdapter);
+            if(title ==null){
+                this._Emptydata();
+            }else {
+                if(reminder.length==18&&decodepreprint.deCodePreFlag()){
+                    decodepreprint.deCodeProdCode().then((datas)=>{
+                        dbAdapter.selectProdCode(datas,1).then((rows)=>{
+                            Storage.get('FormType').then((tags)=>{
+                                this.setState({
+                                    FormType:tags
+                                })
+                            })
+
+                            Storage.get('LinkUrl').then((tags) => {
+                                this.setState({
+                                    LinkUrl:tags
+                                })
+                            })
+                            //商品查询
+                            Storage.get('userName').then((tags)=>{
+                                let params = {
+                                    reqCode:"App_PosReq",
+                                    reqDetailCode:"App_Client_CurrProdQry",
+                                    ClientCode:this.state.ClientCode,
+                                    sDateTime:Date.parse(new Date()),
+                                    Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
+                                    username:tags,
+                                    usercode:this.state.Usercode,
+                                    SuppCode:rows.item(0).SuppCode,
+                                    ShopCode:this.state.ShopCode,
+                                    ChildShopCode:this.state.ChildShopCode,
+                                    ProdCode:datas,
+                                    OrgFormno:this.state.OrgFormno,
+                                    FormType:this.state.FormType,
+                                };
+                                FetchUtil.post(this.state.LinkUrl,JSON.stringify(params)).then((data)=>{
+                                    var countm=JSON.stringify(data.countm);
+                                    var ShopPrice=JSON.stringify(data.ShopPrice);
+                                    if(data.retcode == 1){
+                                        var ShopCar = rows.item(0).ProdName;
+                                        this.props.navigator.push({
+                                            component:OrderDetails,
+                                            params:{
+                                                ProdName:rows.item(0).ProdName,
+                                                ShopPrice:rows.item(0).ShopPrice,
+                                                Pid:rows.item(0).Pid,
+                                                countm:rows.item(0).ShopNumber,
+                                                promemo:rows.item(0).promemo,
+                                                prototal:rows.item(0).prototal,
+                                                ProdCode:rows.item(0).ProdCode,
+                                                DepCode:rows.item(0).DepCode1,
+                                                SuppCode:rows.item(0).SuppCode,
+                                                ydcountm:countm,
+                                            }
+                                        })
+                                        DeviceEventEmitter.removeAllListeners();
+                                    }else{
+                                        alert(JSON.stringify(data))
+                                    }
+                                })
+                            })
+                        })
+                    });
+                }else{
+                    dbAdapter.selectAidCode(reminder,1).then((rows)=>{
+                        if(rows.length==0){
+                            alert("该商品不存在")
+                        }else{
+                            Storage.get('FormType').then((tags)=>{
+                                this.setState({
+                                    FormType:tags
+                                })
+                            })
+
+                            Storage.get('LinkUrl').then((tags) => {
+                                this.setState({
+                                    LinkUrl:tags
+                                })
+                            })
+                            //商品查询
+                            Storage.get('userName').then((tags)=>{
+                                let params = {
+                                    reqCode:"App_PosReq",
+                                    reqDetailCode:"App_Client_CurrProdQry",
+                                    ClientCode:this.state.ClientCode,
+                                    sDateTime:Date.parse(new Date()),
+                                    Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
+                                    username:tags,
+                                    usercode:this.state.Usercode,
+                                    SuppCode:rows.item(0).SuppCode,
+                                    ShopCode:this.state.ShopCode,
+                                    ChildShopCode:this.state.ChildShopCode,
+                                    ProdCode:rows.item(0).ProdCode,
+                                    OrgFormno:this.state.OrgFormno,
+                                    FormType:this.state.FormType,
+                                };
+                                FetchUtil.post(this.state.LinkUrl,JSON.stringify(params)).then((data)=>{
+                                    var countm=JSON.stringify(data.countm);
+                                    var ShopPrice=JSON.stringify(data.ShopPrice);
+                                    if(data.retcode == 1){
+                                        var ShopCar = rows.item(0).ProdName;
+                                        this.props.navigator.push({
+                                            component:OrderDetails,
+                                            params:{
+                                                ProdName:rows.item(0).ProdName,
+                                                ShopPrice:rows.item(0).ShopPrice,
+                                                Pid:rows.item(0).Pid,
+                                                countm:rows.item(0).ShopNumber,
+                                                promemo:rows.item(0).promemo,
+                                                prototal:rows.item(0).prototal,
+                                                ProdCode:rows.item(0).ProdCode,
+                                                DepCode:rows.item(0).DepCode1,
+                                                SuppCode:rows.item(0).SuppCode,
+                                                ydcountm:countm,
+                                            }
+                                        })
+                                        DeviceEventEmitter.removeAllListeners();
+                                    }else{
+                                        alert(JSON.stringify(data))
+                                    }
+                                })
+                            })
+                        }
+                    })
+                }
+            }
+        })
+    }
+
+
+    pressPop(){
       var nextRoute={
          name:"主页",
          component:ShoppingCart,
       };
       this.props.navigator.push(nextRoute);
-  }
-
-  Code(){
-      RNScannerAndroid.openScanner();
-      DeviceEventEmitter.addListener("code", (reminder) => {
-          dbAdapter.selectAidCode(reminder,1).then((rows)=>{
-              if(rows.length==0){
-                  alert("该商品不存在")
-              }else{
-                  Storage.get('FormType').then((tags)=>{
-                      this.setState({
-                          FormType:tags
-                      })
-                  })
-
-                  Storage.get('LinkUrl').then((tags) => {
-                      this.setState({
-                          LinkUrl:tags
-                      })
-                  })
-                  //商品查询
-                  Storage.get('userName').then((tags)=>{
-                      let params = {
-                          reqCode:"App_PosReq",
-                          reqDetailCode:"App_Client_CurrProdQry",
-                          ClientCode:this.state.ClientCode,
-                          sDateTime:Date.parse(new Date()),
-                          Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
-                          username:tags,
-                          usercode:this.state.Usercode,
-                          SuppCode:rows.item(0).SuppCode,
-                          ShopCode:this.state.ShopCode,
-                          ChildShopCode:this.state.ChildShopCode,
-                          ProdCode:rows.item(0).ProdCode,
-                          OrgFormno:this.state.OrgFormno,
-                          FormType:this.state.FormType,
-                      };
-                      FetchUtil.post(this.state.LinkUrl,JSON.stringify(params)).then((data)=>{
-                          var countm=JSON.stringify(data.countm);
-                          var ShopPrice=JSON.stringify(data.ShopPrice);
-                          if(data.retcode == 1){
-                              // if(data.isFond==1){
-                              var ShopCar = rows.item(0).ProdName;
-                              this.props.navigator.push({
-                                  component:OrderDetails,
-                                  params:{
-                                      ProdName:rows.item(0).ProdName,
-                                      ShopPrice:rows.item(0).ShopPrice,
-                                      Pid:rows.item(0).Pid,
-                                      countm:rows.item(0).ShopNumber,
-                                      promemo:rows.item(0).promemo,
-                                      prototal:rows.item(0).prototal,
-                                      ProdCode:rows.item(0).ProdCode,
-                                      DepCode:rows.item(0).DepCode1,
-                                      SuppCode:rows.item(0).SuppCode,
-                                      ydcountm:countm,
-                                  }
-                              })
-                              // }else{
-                              //     // alert('该商品暂时无法购买')
-                              // }
-                          }else{
-                              alert(JSON.stringify(data))
-                          }
-                      })
-                  })
-              }
-          })
-      })
-  }
+    }
 
   inputOnBlur(value){
       dbAdapter.selectAidCode(value,1).then((rows)=>{
@@ -215,12 +294,10 @@ export default class Search extends Component {
                         this.inputOnBlur(value)
                     }}
                 />
-                <TouchableOpacity onPress={this.Code.bind(this)} style={styles.onclick}>
-                    <Image source={require("../images/1_05.png")} style={styles.HeaderImage}></Image>
+                <Image source={require("../images/2.png")} style={styles.SearchImage}></Image>
+                <TouchableOpacity onPress={this.pressPop.bind(this)} style={styles.Right}>
+                    <View style={styles.Text1}><Text style={styles.Text}>取消</Text></View>
                 </TouchableOpacity>
-                <View style={styles.Right}>
-                    <TouchableOpacity style={styles.Text1}><Text style={styles.Text} onPress={this.pressPop.bind(this)}>取消</Text></TouchableOpacity>
-                </View>
             </View>
             <View style={styles.BlockList}>
                 {
@@ -288,7 +365,7 @@ const styles = StyleSheet.create({
         flex:1
     },
     Text:{
-        fontSize:16,
+        fontSize:18,
         color:"#ffffff",
         paddingTop:5,
         paddingLeft:10,

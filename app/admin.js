@@ -44,6 +44,8 @@ export default class admin extends Component {
             show:false,
             ErrorShow:false,
             animating:false,
+            NewData:false,
+            DataComplete:false,
             reqCode:"",
             reqDetailCode:"",
             ClientCode:"",
@@ -123,6 +125,24 @@ export default class admin extends Component {
         this.setState({
             ErrorShow:!isshow,
         });
+    }
+
+    NewData(){
+        let isshow = this.state.NewData;
+        this.setState({
+            NewData:!isshow,
+        });
+    }
+
+    DataComplete(){
+        let isshow = this.state.DataComplete;
+        this.setState({
+            DataComplete:!isshow,
+        });
+    }
+
+    Datacomplete(){
+        this.DataComplete();
     }
 
     //登录
@@ -213,65 +233,50 @@ export default class admin extends Component {
         var code = ""+this.state.sCode1;
         Storage.save('code',code);
         if(this.state.sCode1==""){
-            alert("请选择用户编码及机构信息")
+            alert("请选择机构信息")
         }else{
+            this.NewData();
             Storage.get('code').then((tags) => {
                 updata.downLoadAllData(this.state.linkurl,dbAdapter,tags);
+                this.NewData();
+                this.DataComplete();
             })
         }
 
     }
   render() {
     return (
-        <Image source={require("../images/bj.png")} style={styles.container}>
-            <ScrollView style={styles.ScrollView}  scrollEnabled={false}>
-                <View style={styles.Image}>
-                    <Image source={require("../images/logo.png")}></Image>
-                </View>
-                <View style={styles.TextInput}>
-                    <TextInput
-                        autofocus={true}
-                        numberoflines={1}
-                        keyboardType="numeric"
-                        placeholder="请输入用户编码"
-                        textalign="center"
-                        underlineColorAndroid='transparent'
-                        placeholderTextColor="#bcbdc1"
-                        style={styles.admin}
-                        onBlur={this.inputOnBlur.bind(this)}
-                        onChangeText={(value)=>{
-                            this.setState({
-                                Usercode:value
-                            })
-                        }}/>
-                    <Image source={require("../images/1_07.png")} style={styles.TextImage1}></Image>
-                </View>
-                <View style={[styles.TextInput,{marginTop:15}]}>
-                    <TextInput
-                        autofocus={true}
-                        secureTextEntry={true}
-                        numberoflines={1}
-                        keyboardType="numeric"
-                        placeholder="请输入密码"
-                        textalign="center"
-                        underlineColorAndroid='transparent'
-                        placeholderTextColor="#bcbdc1"
-                        style={styles.pass}
-                        onChangeText={(value)=>{
-                            this.setState({
-                                UserPwd:value
-                            })
-                        }}
-                        />
-                    <Image source={require("../images/1_11.png")} style={styles.TextImage1}></Image>
-                </View>
-                <View style={[styles.TextInput,{marginTop:15}]}>
-                    <TouchableOpacity onPress={this.PickedDate.bind(this)}>
+        <ScrollView  style={styles.Container}>
+            <Image source={require("../images/bj.png")} style={styles.container}>
+                <ScrollView style={styles.ScrollView}  scrollEnabled={false}>
+                    <View style={styles.Image}>
+                        <Image source={require("../images/logo.png")}></Image>
+                    </View>
+                    <View style={styles.TextInput}>
                         <TextInput
                             autofocus={true}
-                            editable={false}
-                            defaultValue ={this.state.sCode1}
-                            placeholder="请选择机构信息"
+                            numberoflines={1}
+                            keyboardType="numeric"
+                            placeholder="请输入用户编码"
+                            textalign="center"
+                            underlineColorAndroid='transparent'
+                            placeholderTextColor="#bcbdc1"
+                            style={styles.admin}
+                            onBlur={this.inputOnBlur.bind(this)}
+                            onChangeText={(value)=>{
+                                this.setState({
+                                    Usercode:value
+                                })
+                            }}/>
+                        <Image source={require("../images/1_07.png")} style={styles.TextImage1}></Image>
+                    </View>
+                    <View style={[styles.TextInput,{marginTop:15}]}>
+                        <TextInput
+                            autofocus={true}
+                            secureTextEntry={true}
+                            numberoflines={1}
+                            keyboardType="numeric"
+                            placeholder="请输入密码"
                             textalign="center"
                             underlineColorAndroid='transparent'
                             placeholderTextColor="#bcbdc1"
@@ -281,58 +286,116 @@ export default class admin extends Component {
                                     UserPwd:value
                                 })
                             }}
-                        />
-                        <Image source={require("../images/1_14.png")} style={styles.TextImage1}></Image>
+                            />
+                        <Image source={require("../images/1_11.png")} style={styles.TextImage1}></Image>
+                    </View>
+                    <View style={[styles.TextInput,{marginTop:15}]}>
+                        <TouchableOpacity onPress={this.PickedDate.bind(this)}>
+                            <TextInput
+                                autofocus={true}
+                                editable={false}
+                                defaultValue ={this.state.sCode1}
+                                placeholder="请选择机构信息"
+                                textalign="center"
+                                underlineColorAndroid='transparent'
+                                placeholderTextColor="#bcbdc1"
+                                style={styles.pass}
+                                onChangeText={(value)=>{
+                                    this.setState({
+                                        UserPwd:value
+                                    })
+                                }}
+                            />
+                            <Image source={require("../images/1_14.png")} style={styles.TextImage1}></Image>
+                        </TouchableOpacity>
+                    </View>
+                    <TouchableOpacity onPress={this.pressPush.bind(this)}>
+                       <Text style={styles.login}>登录</Text>
                     </TouchableOpacity>
-                </View>
-                <TouchableOpacity onPress={this.pressPush.bind(this)}>
-                   <Text style={styles.login}>登录</Text>
-                </TouchableOpacity>
-                <Modal
-                    animationType='fade'
-                    transparent={true}
-                    visible={this.state.show}
-                    onShow={() => {}}
-                    onRequestClose={() => {}} >
-                    <View style={styles.LoadCenter}>
-                        <View style={styles.loading}>
-                            <ActivityIndicator key="1" color="#ffffff" size="large" style={styles.activity}></ActivityIndicator>
-                            <Text style={styles.TextLoading}>登录中</Text>
-                        </View>
-                    </View>
-                </Modal>
-                <Modal
-                    animationType='fade'
-                    transparent={true}
-                    visible={this.state.ErrorShow}
-                    onShow={() => {}}
-                    onRequestClose={() => {}} >
-                    <View style={styles.Error}>
-                        <View style={styles.ErrorCont}>
-                            <View style={styles.LoginError}>
-                                <Text style={styles.ErrorText}>
-                                    登录失败：账号或密码错误
-                                </Text>
+                    <Modal
+                        animationType='fade'
+                        transparent={true}
+                        visible={this.state.show}
+                        onShow={() => {}}
+                        onRequestClose={() => {}} >
+                        <View style={styles.LoadCenter}>
+                            <View style={styles.loading}>
+                                <ActivityIndicator key="1" color="#ffffff" size="large" style={styles.activity}></ActivityIndicator>
+                                <Text style={styles.TextLoading}>登录中</Text>
                             </View>
-                            <TouchableOpacity style={styles.LoginOk} onPress={this.LoginError.bind(this)}>
-                                <Text style={styles.ErrorText}>
-                                    好的
-                                </Text>
-                            </TouchableOpacity>
                         </View>
-                    </View>
-                </Modal>
-                <TouchableOpacity onPress={this.UpData.bind(this)} style={styles.refresh}>
-                    <Image source={require("../images/1_21.png")}></Image>
-                    <Text style={styles.DataText}>数据更新</Text>
-                </TouchableOpacity>
-            </ScrollView>
-      </Image>
+                    </Modal>
+                    <Modal
+                        animationType='fade'
+                        transparent={true}
+                        visible={this.state.NewData}
+                        onShow={() => {}}
+                        onRequestClose={() => {}} >
+                        <View style={styles.LoadCenter}>
+                            <View style={styles.loading}>
+                                <ActivityIndicator key="1" color="#ffffff" size="large" style={styles.activity}></ActivityIndicator>
+                                <Text style={styles.TextLoading}>更新数据中...</Text>
+                            </View>
+                        </View>
+                    </Modal>
+                    <Modal
+                        animationType='fade'
+                        transparent={true}
+                        visible={this.state.DataComplete}
+                        onShow={() => {}}
+                        onRequestClose={() => {}} >
+                        <View style={styles.DataComplete}>
+                            <View style={styles.ErrorCont}>
+                                <View style={styles.LoginError}>
+                                    <Text style={styles.ErrorText}>
+                                        数据更新完毕
+                                    </Text>
+                                </View>
+                                <TouchableOpacity style={styles.LoginOk} onPress={this.Datacomplete.bind(this)}>
+                                    <Text style={styles.ErrorText}>
+                                        确定
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </Modal>
+                    <Modal
+                        animationType='fade'
+                        transparent={true}
+                        visible={this.state.ErrorShow}
+                        onShow={() => {}}
+                        onRequestClose={() => {}} >
+                        <View style={styles.Error}>
+                            <View style={styles.ErrorCont}>
+                                <View style={styles.LoginError}>
+                                    <Text style={styles.ErrorText}>
+                                        登录失败：账号或密码错误
+                                    </Text>
+                                </View>
+                                <TouchableOpacity style={styles.LoginOk} onPress={this.LoginError.bind(this)}>
+                                    <Text style={styles.ErrorText}>
+                                        好的
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </Modal>
+                    <TouchableOpacity onPress={this.UpData.bind(this)} style={styles.refresh}>
+                        <Image source={require("../images/1_21.png")}></Image>
+                        <Text style={styles.DataText}>数据更新</Text>
+                    </TouchableOpacity>
+                </ScrollView>
+            </Image>
+        </ScrollView>
     );
   }
 }
 
 const styles = StyleSheet.create({
+    Container:{
+        flex:1,
+        backgroundColor:"#ff5263"
+    },
     container:{
         flex:1,
         paddingTop:20,
@@ -449,6 +512,13 @@ const styles = StyleSheet.create({
         backgroundColor:"#000000",
         opacity:0.9
     },
+    DataComplete:{
+        flex:1,
+        backgroundColor:"#000000",
+        opacity:0.9,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
     ErrorCont:{
         width:320,
         backgroundColor:"#ffffff",
@@ -470,6 +540,6 @@ const styles = StyleSheet.create({
         textAlign:"center"
     },
     LoginOk:{
-        marginTop:22,
+        paddingTop:22,
     },
 });
