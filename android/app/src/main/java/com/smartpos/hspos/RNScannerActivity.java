@@ -9,9 +9,6 @@ import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.Context;
-import android.support.v4.content.ContextCompat;
-import android.Manifest;
-import android.content.pm.PackageManager;
 import com.smartpos.utils.SystemUtils;
 
 import com.facebook.react.modules.core.DeviceEventManagerModule;
@@ -43,7 +40,7 @@ public class RNScannerActivity extends ReactContextBaseJavaModule{
 
 
         /*
-         * 要导出一个方法给JavaScript使用，Java方法需要使用注解@ReactMethod
+         * 要导出的方法给JavaScript使用，Java方法需要使用注解@ReactMethod
          *
          */
         @ReactMethod
@@ -52,11 +49,9 @@ public class RNScannerActivity extends ReactContextBaseJavaModule{
             Intent scannerIntent = new Intent(SCN_CUST_ACTION_START);
             getReactApplicationContext().sendBroadcast(scannerIntent);
          }else{
-
             Intent startIntent = new Intent(reactContext,ScannerMainActivity.class);
             reactContext.startActivityForResult(startIntent, 1,null);
          }
-
         }
 
         private BroadcastReceiver mSamDataReceiver = new BroadcastReceiver() {

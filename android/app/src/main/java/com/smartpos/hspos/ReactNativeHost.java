@@ -16,6 +16,8 @@ public class ReactNativeHost extends com.facebook.react.ReactNativeHost {
     protected ReactNativeHost(Application application) {
         super(application);
     }
+
+
     @Override
     public boolean getUseDeveloperSupport() {
         return BuildConfig.DEBUG;
@@ -30,7 +32,10 @@ public class ReactNativeHost extends com.facebook.react.ReactNativeHost {
                 new SQLitePluginPackage(),
                 new JsScannerReactPackage(),
                 new JSAndroidIMEIReactPackage(),
-                new MainReactPackage()
+                new MainReactPackage(),
+                new JSUpApkReactPackage(),
+                new JSDeviceInfo()
+
         );
     }
 }
