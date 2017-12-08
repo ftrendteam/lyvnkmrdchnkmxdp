@@ -72,6 +72,7 @@ export default class  login extends Component{
         };
         this._setModalVisible();
         FetchUtil.post('http://register.smartpos.top:8091/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
+            alert(JSON.stringify(data))
             if(data.retcode == 1){
                 DetailInfo = JSON.stringify(data.DetailInfo);// 在这里从接口取出要保存的数据，然后执行save方法
                 var  DetailInfo = JSON.stringify(data.DetailInfo);
@@ -79,8 +80,8 @@ export default class  login extends Component{
                    LinkUrl = value.LinkUrl;//获取url地址
                    var str=LinkUrl;
                    var Url=LinkUrl;
-                   var items=str.replace('?wsdl',"");//截取字符
-                   var Items=Url.replace('/WebService/FTrendWs.asmx?wsdl',"");
+                   var items=str.replace('?WSDL',"");//截取字符
+                   var Items=Url.replace('/WEBSERVICE/FTRENDWS.ASMX?WSDL',"");
                    Storage.save('Url',Items);
                    var data='/FMJsonInterfaceByDownToPos';
                    var date=items+'/FMJsonInterfaceByDownToPos';//拼接字符

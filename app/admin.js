@@ -87,9 +87,8 @@ export default class admin extends Component {
         Storage.get('Url').then((tags) => {
             //apk版本自动更新
             FetchUtil.post(tags+"/Default2.aspx?jsonStr={'TblName':'AndroidYWVersion'}").then((data) => {//获取最新apk版本号
-
                 NativeModules.AndroidDeviceInfo.getVerCode((msg) => {//获取当前apk版本号
-                    if (data > msg) {
+                    if (data = msg) {
                         this.Edition();
                     }
 
