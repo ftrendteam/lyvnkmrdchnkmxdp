@@ -114,7 +114,7 @@ export default class Index extends Component {
         };
         this.dataRows = [];
         this.productData = [];
-        this.moreTime = 0;
+        //this.moreTime = 0;
         var timer1 = null;
         if (!db) {
             db = dbAdapter.open();
@@ -212,6 +212,8 @@ export default class Index extends Component {
                                     }else{
                                         alert(JSON.stringify(data))
                                     }
+                                },(err)=>{
+                                    alert("网络请求失败");
                                 })
                             })
                         })
@@ -271,6 +273,8 @@ export default class Index extends Component {
                                         })
                                         DeviceEventEmitter.removeAllListeners();
                                     }else{}
+                                },(err)=>{
+                                    alert("网络请求失败");
                                 })
                             })
                         }
@@ -620,6 +624,8 @@ export default class Index extends Component {
                     }else{
                         alert(JSON.stringify(data))
                     }
+                },(err)=>{
+                    alert("网络请求失败");
                 })
             })
 
@@ -656,18 +662,18 @@ export default class Index extends Component {
     }
 
     YaoHuo(){
-        Storage.delete('OrgFormno');
-        Storage.delete('scode');
-        Storage.delete('shildshop');
-        Storage.delete('YuanDan');
-        Storage.delete('Screen');
-        Storage.delete('StateMent');
         if(this.state.ShopCar1>0){
             this._setModalVisible();
             alert("商品未提交")
         }else if(this.state.username==null){
             this._setModalVisible();
         }else{
+            Storage.delete('OrgFormno');
+            Storage.delete('scode');
+            Storage.delete('shildshop');
+            Storage.delete('YuanDan');
+            Storage.delete('Screen');
+            Storage.delete('StateMent');
             Storage.get('code').then((tags) => {
                 dbAdapter.isYHPSXP(tags).then((rows)=>{
                     if(rows.length>=1){
@@ -728,18 +734,18 @@ export default class Index extends Component {
     }
 
     SunYi(){
-        Storage.delete('OrgFormno');
-        Storage.delete('scode');
-        Storage.delete('shildshop');
-        Storage.delete('YuanDan');
-        Storage.delete('Screen');
-        Storage.delete('StateMent');
         if(this.state.ShopCar1>0){
             this._setModalVisible();
             alert("商品未提交")
         }else if(this.state.username==null){
             this._setModalVisible();
         }else {
+            Storage.delete('OrgFormno');
+            Storage.delete('scode');
+            Storage.delete('shildshop');
+            Storage.delete('YuanDan');
+            Storage.delete('Screen');
+            Storage.delete('StateMent');
             dbAdapter.selectUserRight(this.state.usercode,"K0604").then((rows) => {
                 if (rows == true) {
                     if(this.state.Disting=="0"||this.state.Disting=="1") {
@@ -763,16 +769,16 @@ export default class Index extends Component {
     }
 
     SSPanDian(){
-        Storage.delete('OrgFormno');
-        Storage.delete('shildshop');
-        Storage.delete('YuanDan');
-        Storage.delete('StateMent');
         if(this.state.ShopCar1>0){
             this._setModalVisible();
             alert("商品未提交")
         }else if(this.state.username==null){
             this._setModalVisible();
         }else {
+            Storage.delete('OrgFormno');
+            Storage.delete('shildshop');
+            Storage.delete('YuanDan');
+            Storage.delete('StateMent');
             dbAdapter.selectUserRight(this.state.usercode,"K0611").then((rows) => {
                 if (rows == true) {
                     if(this.state.Disting=="0") {
@@ -827,17 +833,16 @@ export default class Index extends Component {
     }
 
     SPPanDian(){
-        Storage.delete('OrgFormno');
-        Storage.delete('scode');
-        Storage.delete('shildshop');
-        Storage.delete('StateMent');
         if(this.state.ShopCar1>0){
             this._setModalVisible();
             alert("商品未提交")
         }else if(this.state.username==null){
             this._setModalVisible();
         }else {
-            // Storage.delete("Name");
+            Storage.delete('OrgFormno');
+            Storage.delete('scode');
+            Storage.delete('shildshop');
+            Storage.delete('StateMent');
             dbAdapter.selectUserRight(this.state.usercode,"K0607").then((rows) => {
                 if (rows == true) {
                     if(this.state.Disting=="0"||this.state.Disting=="1") {
@@ -862,16 +867,16 @@ export default class Index extends Component {
     }
 
     PSShouHuo(){
-        Storage.delete('OrgFormno');
-        Storage.delete('scode');
-        Storage.delete('shildshop');
-        Storage.delete('StateMent');
         if(this.state.ShopCar1>0){
             this._setModalVisible();
             alert("商品未提交")
         }else if(this.state.username==null){
             this._setModalVisible();
         }else {
+            Storage.delete('OrgFormno');
+            Storage.delete('scode');
+            Storage.delete('shildshop');
+            Storage.delete('StateMent');
             Storage.get('code').then((tags) => {
                 dbAdapter.isYHPSXP(tags).then((rows)=>{
                     if(rows.length>=1){
@@ -904,16 +909,16 @@ export default class Index extends Component {
     }
 
     SPCaiGou(){
-        Storage.delete('OrgFormno');
-        Storage.delete('scode');
-        Storage.delete('shildshop');
-        Storage.delete('StateMent');
         if(this.state.ShopCar1>0){
             this._setModalVisible();
             alert("商品未提交")
         }else if(this.state.username==null){
             this._setModalVisible();
         }else {
+            Storage.delete('OrgFormno');
+            Storage.delete('scode');
+            Storage.delete('shildshop');
+            Storage.delete('StateMent');
             Storage.get('code').then((tags) => {
                 dbAdapter.isCGYS(tags).then((rows)=>{
                     if(rows.length>=1) {
@@ -944,16 +949,16 @@ export default class Index extends Component {
     }
 
     SPYanShou(){
-        Storage.delete('OrgFormno');
-        Storage.delete('scode');
-        Storage.delete('shildshop');
-        Storage.delete('StateMent');
         if(this.state.ShopCar1>0){
             this._setModalVisible();
             alert("商品未提交")
         }else if(this.state.username==null){
             this._setModalVisible();
         }else {
+            Storage.delete('OrgFormno');
+            Storage.delete('scode');
+            Storage.delete('shildshop');
+            Storage.delete('StateMent');
             Storage.get('code').then((tags) => {
                 dbAdapter.isCGYS(tags).then((rows)=>{
                     if(rows.length>=1) {
@@ -985,16 +990,16 @@ export default class Index extends Component {
     }
 
     XPCaiGou(){
-        Storage.delete('OrgFormno');
-        Storage.delete('scode');
-        Storage.delete('shildshop');
-        Storage.delete('StateMent');
         if(this.state.ShopCar1>0){
             this._setModalVisible();
             alert("商品未提交")
         }else if(this.state.username==null){
             this._setModalVisible();
         }else {
+            Storage.delete('OrgFormno');
+            Storage.delete('scode');
+            Storage.delete('shildshop');
+            Storage.delete('StateMent');
             Storage.get('code').then((tags) => {
                 dbAdapter.isXPCG(tags).then((rows)=>{
                     if(rows.length>=1) {
@@ -1026,16 +1031,16 @@ export default class Index extends Component {
     }
 
     XPShouHuo(){
-        Storage.delete('OrgFormno');
-        Storage.delete('scode');
-        Storage.delete('shildshop');
-        Storage.delete('StateMent');
         if(this.state.ShopCar1>0){
             this._setModalVisible();
             alert("商品未提交")
         }else if(this.state.username==null){
             this._setModalVisible();
         }else {
+            Storage.delete('OrgFormno');
+            Storage.delete('scode');
+            Storage.delete('shildshop');
+            Storage.delete('StateMent');
             Storage.get('code').then((tags) => {
                 dbAdapter.isYHPSXP(tags).then((rows)=>{
                     if(rows.length>=1){

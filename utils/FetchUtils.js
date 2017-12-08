@@ -59,6 +59,7 @@ export default class FetchUtils {
         resolve(jsonResult);
       }).catch((err) => {
         console.log(err);
+          reject(err);
       })
     })
   };

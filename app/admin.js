@@ -20,7 +20,6 @@ import {
   ToastAndroid,
   ScrollView,
   ActivityIndicator,
-  NativeModules,
 } from 'react-native';
 import Index from "./Index";
 import PickedDate_list from "./PickedDate_list";
@@ -33,6 +32,7 @@ import Storage from "../utils/Storage";
 import Picker from 'react-native-picker';
 import ModalDropdown from 'react-native-modal-dropdown';
 
+var {NativeModules} = require('react-native');
 let dbAdapter = new DBAdapter();
 let updata = new UpData();
 let db
@@ -60,7 +60,7 @@ export default class admin extends Component {
             Product:"",
             detailInfo1:"",
             linkurl:"",
-            sCode1:""
+            sCode1:"",
         };
         this.pickerData=[]
     }
@@ -88,11 +88,13 @@ export default class admin extends Component {
             //apk版本自动更新
             FetchUtil.post(tags+"/Default2.aspx?jsonStr={'TblName':'AndroidYWVersion'}").then((data) => {//获取最新apk版本号
                 NativeModules.AndroidDeviceInfo.getVerCode((msg) => {//获取当前apk版本号
-                    if (data = msg) {
+                    if (data > msg) {
                         this.Edition();
                     }
 
                 });
+            },(err)=>{
+                alert("网络请求失败");
             })
         })
 
@@ -124,6 +126,8 @@ export default class admin extends Component {
                  }else{
                      alert(JSON.stringify(data))
                  }
+            },(err)=>{
+                alert("网络请求失败");
             })
         });
     }
@@ -209,35 +213,47 @@ export default class admin extends Component {
         }else{
             <ActivityIndicator key="1"></ActivityIndicator>
         }
-        var code = ""+this.state.sCode1.replace(/(^\s+)|(\s+$)/g, "");//获取到之后前面加""+
-        var Usercode=this.state.Usercode;
-        var UserPwd=this.state.UserPwd;
-        str1 = code.split('_');
-        str2 = str1[1];
-        this._setModalVisible();
-        dbAdapter.isLogin(Usercode, this.state.UserPwd, str2).then((isLogin)=>{
-            if(isLogin){
-               var strin = this.state.sCode1;
-               strjj = ""+strin;
-               code = strjj.substring(strjj.indexOf('_') + 1,strjj.length).replace(/(^\s+)|(\s+$)/g, "");
-               Storage.save('code',code);
-               Storage.save('username',Usercode);
-               Storage.save('Usercode',Usercode);
-               Storage.save('userpwd',UserPwd);
-               Storage.save('str2',str2);
-               Storage.save('FirstTime1','2');
-               var nextRoute={
-                   name:"主页",
-                   component:Index,
-               };
-               this.props.navigator.push(nextRoute);
-               this._setModalVisible();
-                ToastAndroid.show('登录成功', ToastAndroid.SHORT);
-            }else{
-               this._setModalVisible();
-               this._ErrorModalVisible();
-            }
-        });
+        NativeModules.AndroidDeviceInfo.getIMEI((IMEI)=>{
+            Storage.get('IMEI').then((tags) => {
+                if(IMEI==tags){
+                    var code = ""+this.state.sCode1.replace(/(^\s+)|(\s+$)/g, "");//获取到之后前面加""+
+                    var Usercode=this.state.Usercode;
+                    var UserPwd=this.state.UserPwd;
+                    str1 = code.split('_');
+                    str2 = str1[1];
+                    this._setModalVisible();
+                    dbAdapter.isLogin(Usercode, this.state.UserPwd, str2).then((isLogin)=>{
+
+                        if(isLogin){
+                            var strin = this.state.sCode1;
+                            strjj = ""+strin;
+                            code = strjj.substring(strjj.indexOf('_') + 1,strjj.length).replace(/(^\s+)|(\s+$)/g, "");
+                            Storage.save('code',code);
+                            Storage.save('username',Usercode);
+                            Storage.save('Usercode',Usercode);
+                            Storage.save('userpwd',UserPwd);
+                            Storage.save('str2',str2);
+                            Storage.save('FirstTime1','2');
+                            var nextRoute={
+                                name:"主页",
+                                component:Index,
+                            };
+                            this.props.navigator.push(nextRoute);
+                            this._setModalVisible();
+                            ToastAndroid.show('登录成功', ToastAndroid.SHORT);
+                        }else{
+                            this._setModalVisible();
+                            this._ErrorModalVisible();
+                        }
+                    },(err)=>{
+                        this._setModalVisible();
+                        alert("cuowu");
+                    });
+                }else{
+                    alert("当前商户名不同，该机器无法运行")
+                }
+            })
+        })
     }
 
     PickedDate(){
@@ -398,7 +414,7 @@ export default class admin extends Component {
                                         数据更新完毕
                                     </Text>
                                 </View>
-                                <TouchableOpacity style={styles.LoginOk} onPress={this.Datacomplete.bind(this)}>
+                                <TouchableOpacity style={styles.LoginOk1} onPress={this.Datacomplete.bind(this)}>
                                     <Text style={styles.ErrorText}>
                                         确定
                                     </Text>

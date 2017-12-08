@@ -111,6 +111,8 @@ export default class Distrition_list extends Component {
                         })
                     }
                 }else{}
+            },(err)=>{
+                alert("网络请求失败");
             })
         })
     }

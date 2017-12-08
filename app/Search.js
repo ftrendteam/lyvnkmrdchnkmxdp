@@ -113,6 +113,8 @@ export default class Search extends Component {
                                   }else{
                                       alert(JSON.stringify(data))
                                   }
+                              },(err)=>{
+                                  alert("网络请求失败");
                               })
                           })
                       })
@@ -174,6 +176,8 @@ export default class Search extends Component {
                                   }else{
                                       alert(JSON.stringify(data))
                                   }
+                              },(err)=>{
+                                  alert("网络请求失败");
                               })
                           })
                       }
@@ -314,6 +318,8 @@ export default class Search extends Component {
               }else{
                   alert(JSON.stringify(data))
               }
+          },(err)=>{
+              alert("网络请求失败");
           })
       })
   }

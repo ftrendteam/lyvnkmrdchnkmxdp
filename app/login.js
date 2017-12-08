@@ -12,7 +12,7 @@ import {
     ToastAndroid,
     TouchableOpacity,
     ActivityIndicator,
-    DeviceEventEmitter
+    DeviceEventEmitter,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import admin from "./admin";
@@ -38,6 +38,68 @@ export default class  login extends Component{
         };
     }
 
+    pressPush(){
+        if(this.state.ClientCode == ""){
+            ToastAndroid.show('请输入商户号', ToastAndroid.SHORT)
+            return;
+        }
+        if(this.state.Pwd == ""){
+            ToastAndroid.show('请输入密码', ToastAndroid.SHORT)
+            return;
+        }
+        NativeModules.AndroidDeviceInfo.getIMEI((IMEI)=>{
+            let params = {
+                reqCode:"App_PosReq",
+                reqDetailCode:"App_Client_Qry",
+                ClientCode:this.state.ClientCode,
+                sDateTime:Date.parse(new Date()),//获取当前时间转换成时间戳
+                Pwd:NetUtils.MD5(this.state.Pwd)+'',//获取到密码之后md5加密
+                IMEI1:IMEI,
+                IMEI2:"",
+                SignIMEI1:NetUtils.MD5("1q2w3e4r%"+IMEI)+'',
+                SignIMEI2:NetUtils.MD5("1q2w3e4r%"+"")+'',
+                Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_Qry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
+            };
+            this._setModalVisible();
+            FetchUtil.post('http://register.smartpos.top:8091/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
+                if(data.retcode == 1){
+                    DetailInfo = JSON.stringify(data.DetailInfo);// 在这里从接口取出要保存的数据，然后执行save方法
+                    var  DetailInfo = JSON.stringify(data.DetailInfo);
+                    for(var value of data.DetailInfo){//获取DetailInfo数据
+                       LinkUrl = value.LinkUrl;//获取url地址
+                       var str=LinkUrl;
+                       var Url=LinkUrl;
+                       var items=str.replace('?WSDL',"");//截取字符
+                       var Items=Url.replace('/WEBSERVICE/FTRENDWS.ASMX?WSDL',"");
+                       Storage.save('Url',Items);
+                       var data='/FMJsonInterfaceByDownToPos';
+                       var date=items+'/FMJsonInterfaceByDownToPos';//拼接字符
+                       Storage.save('LinkUrl',date);
+                    }
+                    RNAndroidIMEI.getAndroidIMEI();
+                    Storage.save('ClientCode',this.state.ClientCode);
+                    Storage.save('IMEI',IMEI);
+                    Storage.save('FirstTime','1');
+                    this.props.navigator.push({
+                        component:admin,
+                    });
+                    this._setModalVisible();
+                    ToastAndroid.show('登录成功', ToastAndroid.SHORT);
+                }else{
+                   this._setModalVisible();
+                   this._ErrorModalVisible()
+                }
+            },(err)=>{
+                this._setModalVisible();
+                alert("网络请求失败");
+            })
+        });
+    }
+
+    LoginError(){
+        this._ErrorModalVisible();
+    }
+
     _setModalVisible() {
         let isShow = this.state.show;
         this.setState({
@@ -50,63 +112,6 @@ export default class  login extends Component{
         this.setState({
             ErrorShow:!isshow,
         });
-    }
-
-    pressPush(){
-        if(this.state.ClientCode == ""){
-            ToastAndroid.show('请输入商户号', ToastAndroid.SHORT)
-            return;
-        }
-        if(this.state.Pwd == ""){
-            ToastAndroid.show('请输入密码', ToastAndroid.SHORT)
-            return;
-        }
-
-        let params = {
-            reqCode:"App_PosReq",
-            reqDetailCode:"App_Client_Qry",
-            ClientCode:this.state.ClientCode,
-            sDateTime:Date.parse(new Date()),//获取当前时间转换成时间戳
-            Pwd:NetUtils.MD5(this.state.Pwd)+'',//获取到密码之后md5加密
-            Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_Qry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
-        };
-        this._setModalVisible();
-        FetchUtil.post('http://register.smartpos.top:8091/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
-            alert(JSON.stringify(data))
-            if(data.retcode == 1){
-                DetailInfo = JSON.stringify(data.DetailInfo);// 在这里从接口取出要保存的数据，然后执行save方法
-                var  DetailInfo = JSON.stringify(data.DetailInfo);
-                for(var value of data.DetailInfo){//获取DetailInfo数据
-                   LinkUrl = value.LinkUrl;//获取url地址
-                   var str=LinkUrl;
-                   var Url=LinkUrl;
-                   var items=str.replace('?WSDL',"");//截取字符
-                   var Items=Url.replace('/WEBSERVICE/FTRENDWS.ASMX?WSDL',"");
-                   Storage.save('Url',Items);
-                   var data='/FMJsonInterfaceByDownToPos';
-                   var date=items+'/FMJsonInterfaceByDownToPos';//拼接字符
-                   Storage.save('LinkUrl',date);
-                }
-                Storage.save('FirstTime','1');
-                Storage.save('ClientCode',this.state.ClientCode);
-                RNAndroidIMEI.getAndroidIMEI();
-                DeviceEventEmitter.addListener("AndroidIMEI", (IMEI) => {
-                    Storage.save('IMEI',IMEI)
-                });
-                this.props.navigator.push({
-                    component:admin,
-                });
-                this._setModalVisible();
-                ToastAndroid.show('登录成功', ToastAndroid.SHORT);
-            }else{
-               this._setModalVisible();
-               this._ErrorModalVisible()
-            }
-        })
-    }
-
-    LoginError(){
-        this._ErrorModalVisible();
     }
 
     render(){

@@ -324,7 +324,11 @@ export default class ShoppingCart extends Component {
                                     // }else{
                                     //     // alert('该商品暂时无法购买')
                                     // }
-                                }else{}
+                                }else{
+                                    alert(JSON.stringify(data))
+                                }
+                            },(err)=>{
+                                alert("网络请求失败");
                             })
                         })
                     })
@@ -388,7 +392,11 @@ export default class ShoppingCart extends Component {
                                     // }else{
                                     //     // alert('该商品暂时无法购买')
                                     // }
-                                }else{}
+                                }else{
+                                    alert(JSON.stringify(data))
+                                }
+                            },(err)=>{
+                                alert("网络请求失败");
                             })
                         })
                     }
@@ -444,7 +452,11 @@ export default class ShoppingCart extends Component {
                             ydcountm:countm,
                         }
                     })
+                }else{
+                    alert(JSON.stringify(data))
                 }
+            },(err)=>{
+                alert("网络请求失败");
             })
         })
     }
@@ -528,7 +540,7 @@ export default class ShoppingCart extends Component {
                                 this.screen.push(detail);
                             }
                         }
-                        if(this.screen==""){
+                        if(this.screen==""||this.state.OrgFormno==null){
                             FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
                                 if(data.retcode == 1){
                                     if(this.state.Screen!=="1"||this.state.Screen!=="2"||this.screen==""||scode==null){
@@ -539,6 +551,8 @@ export default class ShoppingCart extends Component {
                                     this.Wait();
                                     alert(JSON.stringify(data))
                                 }
+                            },(err)=>{
+                                alert("网络请求失败");
                             })
                         }else{
                             this.setState({
@@ -558,6 +572,8 @@ export default class ShoppingCart extends Component {
                                 this.Wait();
                                 alert(JSON.stringify(data))
                             }
+                        },(err)=>{
+                            alert("网络请求失败");
                         })
                     }
                 })
@@ -617,9 +633,10 @@ export default class ShoppingCart extends Component {
                             this.ScreenBod();
                             this.Succeed();
                         } else {
-                            // alert("提交失败");
                             alert(JSON.stringify(data))
                         }
+                    },(err)=>{
+                        alert("网络请求失败");
                     })
                 })
             })

@@ -208,6 +208,8 @@ export default class HistoricalDocument extends Component {
             }else{
                 alert(JSON.stringify(data))
             }
+         },(err)=>{
+             alert("网络请求失败");
          })
      });
   }

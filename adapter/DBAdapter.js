@@ -723,22 +723,26 @@ export default class DBAdapter extends SQLiteOpenHelper {
                   let categoryBody = RequestBodyUtils.createCategory(currShopCode);
                   this.downProductAndCategory(categoryBody, currShopCode).then((result) => {
                     //if (result) {
-                    //console.log("本地没有保存机构号,根据当前的机构号下载商品和品类");
-                    resolve(true);
+                    console.log("本地没有保存机构号,根据当前的机构号下载商品和品类");
+                    resolve(result);
                     //}
+                  },(err)=>{
+                      reject(false);
                   });
                   resolve(true);
                 } else if (shopCode == '') {//本地没有保存机构号,根据当前的机构号下载商品和品类
                   let categoryBody = RequestBodyUtils.createCategory(currShopCode);
                   this.downProductAndCategory(categoryBody, currShopCode).then((result) => {
                     //if (result) {
-                    //console.log("本地没有保存机构号,根据当前的机构号下载商品和品类");
-                    resolve(true);
+                    console.log("本地没有保存机构号,根据当前的机构号下载商品和品类");
+                    resolve(result);
                     //}
+                  },(err)=>{
+                      reject(false);
                   });
                 } else {//当前登录的机构号和本地保存的机构号不同.重新保存并下载新的品类和商品信息
                   DataUtils.save('shopCode', currShopCode);
-                  // console.log("cccc重新保存并下载新的品类和商品信息");
+                  console.log("cccc重新保存并下载新的品类和商品信息");
                   /***
                    * prductBody 商品信息下载请求体
                    * categoryBody 品类信息下载请求体
@@ -746,17 +750,19 @@ export default class DBAdapter extends SQLiteOpenHelper {
                   let categoryBody = RequestBodyUtils.createCategory(currShopCode);
                   this.downProductAndCategory(categoryBody, currShopCode).then((result) => {
                     //if (result) {
-                    resolve(true);
+                    resolve(result);
                     //}
+                  },(err)=>{
+                      reject(false);
                   });
                 }
               });
               
             } else {
-              resolve(false);
+                reject(false);
             }
           } else {
-            resolve(false);
+              reject(false);
           }
           
           //}
@@ -787,9 +793,15 @@ export default class DBAdapter extends SQLiteOpenHelper {
                   DownLoadBasicData.downLoadKgtOpt(urlData, currShopCode, this)
                   resolve(true);
                 });
+              },(err)=>{
+                  reject(false);
               })
             });
+          },(err)=>{
+              reject(false);
           });
+        },(err)=>{
+            reject(false);
         });
       });
     });
