@@ -78,9 +78,12 @@ export default class  login extends Component{
                 for(var value of data.DetailInfo){//获取DetailInfo数据
                    LinkUrl = value.LinkUrl;//获取url地址
                    var str=LinkUrl;
-                   var items=str.replace('?wsdl',"")
+                   var Url=LinkUrl;
+                   var items=str.replace('?wsdl',"");//截取字符
+                   var Items=Url.replace('/WebService/FTrendWs.asmx?wsdl',"");
+                   Storage.save('Url',Items);
                    var data='/FMJsonInterfaceByDownToPos';
-                   var date=items+'/FMJsonInterfaceByDownToPos';
+                   var date=items+'/FMJsonInterfaceByDownToPos';//拼接字符
                    Storage.save('LinkUrl',date);
                 }
                 Storage.save('FirstTime','1');

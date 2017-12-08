@@ -20,6 +20,7 @@ import {
   ToastAndroid,
   ScrollView,
   ActivityIndicator,
+  NativeModules,
 } from 'react-native';
 import Index from "./Index";
 import PickedDate_list from "./PickedDate_list";
@@ -46,6 +47,8 @@ export default class admin extends Component {
             animating:false,
             NewData:false,
             DataComplete:false,
+            Edition:false,
+            NewEdition:false,
             reqCode:"",
             reqDetailCode:"",
             ClientCode:"",
@@ -80,15 +83,16 @@ export default class admin extends Component {
             this.setState({
                 linkurl:tags
             })
+        })
+        Storage.get('Url').then((tags) => {
             //apk版本自动更新
-            FetchUtil.post(tags+"/Default2.aspx?jsonStr={'TblName':'AndroidYWVersion'}").then((data) => {
-                alert(data)
+            FetchUtil.post(tags+"/Default2.aspx?jsonStr={'TblName':'AndroidYWVersion'}").then((data) => {//获取最新apk版本号
 
-                NativeModules.AndroidDeviceInfo.getVerCode((msg) => {
-                    // if (data > msg) {
-                    //
-                    // }
-                    NativeModules.UpApk.isUpdata(tags);
+                NativeModules.AndroidDeviceInfo.getVerCode((msg) => {//获取当前apk版本号
+                    if (data > msg) {
+                        this.Edition();
+                    }
+
                 });
             })
         })
@@ -157,6 +161,38 @@ export default class admin extends Component {
         this.DataComplete();
     }
 
+    //版本自动更新弹框
+    Edition(){
+        let isshow = this.state.Edition;
+        this.setState({
+            Edition:!isshow,
+        });
+    }
+
+    Datermine(){
+        Storage.get('Url').then((tags) => {
+            this.Edition();
+            this.NewEdition();
+            NativeModules.UpApk.isUpdata(tags,(finish)=>{
+                if (finish) {
+                    this.NewEdition();
+                    NativeModules.UpApk.installAPK();
+                }
+            });
+        })
+    }
+
+    NoDatermine(){
+        this.Edition();
+    }
+
+    NewEdition(){
+        let isshow = this.state.NewEdition;
+        this.setState({
+            NewEdition:!isshow,
+        });
+    }
+    //版本自动更新弹框over
     //登录
     pressPush(){
         //等待对话框 显示隐藏
@@ -384,11 +420,52 @@ export default class admin extends Component {
                                         登录失败：账号或密码错误
                                     </Text>
                                 </View>
-                                <TouchableOpacity style={styles.LoginOk} onPress={this.LoginError.bind(this)}>
+                                <TouchableOpacity style={styles.LoginOk1} onPress={this.LoginError.bind(this)}>
                                     <Text style={styles.ErrorText}>
                                         好的
                                     </Text>
                                 </TouchableOpacity>
+                            </View>
+                        </View>
+                    </Modal>
+                    <Modal
+                        animationType='fade'
+                        transparent={true}
+                        visible={this.state.Edition}
+                        onShow={() => {}}
+                        onRequestClose={() => {}} >
+                        <View style={styles.Error}>
+                            <View style={styles.ErrorCont}>
+                                <View style={styles.LoginError}>
+                                    <Text style={styles.ErrorText}>
+                                        当前版本不是最新版本，是否更新？
+                                    </Text>
+                                </View>
+                                <View style={styles.Edition}>
+                                    <TouchableOpacity style={styles.LoginOk} onPress={this.Datermine.bind(this)}>
+                                        <Text style={styles.ErrorText}>
+                                            确定
+                                        </Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity style={styles.LoginOk} onPress={this.NoDatermine.bind(this)}>
+                                        <Text style={styles.ErrorText}>
+                                            取消
+                                        </Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </View>
+                    </Modal>
+                    <Modal
+                        animationType='fade'
+                        transparent={true}
+                        visible={this.state.NewEdition}
+                        onShow={() => {}}
+                        onRequestClose={() => {}} >
+                        <View style={styles.LoadCenter}>
+                            <View style={styles.loading}>
+                                <ActivityIndicator key="1" color="#ffffff" size="large" style={styles.activity}></ActivityIndicator>
+                                <Text style={styles.TextLoading}>正在下载最新版本...</Text>
                             </View>
                         </View>
                     </Modal>
@@ -551,7 +628,14 @@ const styles = StyleSheet.create({
         fontSize:16,
         textAlign:"center"
     },
+    Edition:{
+        flexDirection:"row"
+    },
     LoginOk:{
+        flex:1,
+        paddingTop:22,
+    },
+    LoginOk1:{
         paddingTop:22,
     },
 });
