@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
     },
     listleft:{
         width:70,
-        marginTop:4,
+        marginTop:6,
     },
     listLeftText:{
         color:"#333333",

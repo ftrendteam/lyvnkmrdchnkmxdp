@@ -1101,6 +1101,24 @@ export default class Index extends Component {
         }
     }
 
+    pullOut1(){
+        this._StateMent();
+        if(this.state.ShopCar1>0){
+            alert("商品未提交")
+        }else{
+            var nextRoute={
+                name:"主页",
+                component:admin
+            };
+            this.props.navigator.push(nextRoute);
+            Storage.delete('Name');
+            Storage.delete('username');
+            Storage.delete('history');
+            Storage.delete('FirstTime1');
+            Storage.delete("Disting");
+        }
+    }
+
     UpData(){
         this.NewData();
         Storage.get('code').then((tags) => {
@@ -1120,7 +1138,6 @@ export default class Index extends Component {
                 this._StateMent();
                 this.YeWu();
                 Storage.save("StateMent","0");
-                Storage.delete('Name');
             }else if(tags==1){
                 this.Promp1();
             }else{
@@ -1195,6 +1212,7 @@ export default class Index extends Component {
                         component: HistoricalDocument
                     };
                     this.props.navigator.push(nextRoute);
+                    Storage.delete('Name');
                     Storage.save('name', '要货单');
                     Storage.save('history', 'App_Client_ProYHQ');
                     Storage.save('historyClass', 'App_Client_ProYHDetailQ');
@@ -1212,6 +1230,7 @@ export default class Index extends Component {
             component: HistoricalDocument
         };
         this.props.navigator.push(nextRoute);
+        Storage.delete('Name');
         Storage.save('name','损溢单');
         Storage.save('history', 'App_Client_ProSYQ');
         Storage.save('historyClass', 'App_Client_ProSYDetailQ');
@@ -1224,6 +1243,7 @@ export default class Index extends Component {
             component: HistoricalDocument
         };
         this.props.navigator.push(nextRoute);
+        Storage.delete('Name');
         Storage.save('name','实时盘点单');
         Storage.save('history', 'App_Client_ProCurrPCQ');
         Storage.save('historyClass', 'App_Client_ProCurrPCDetailQ');
@@ -1236,6 +1256,7 @@ export default class Index extends Component {
             component: HistoricalDocument
         };
         this.props.navigator.push(nextRoute);
+        Storage.delete('Name');
         Storage.save('name','商品盘点单');
         Storage.save('history', 'App_Client_ProPCQ');
         Storage.save('historyClass', 'App_Client_ProPCDetailQ');
@@ -1251,6 +1272,7 @@ export default class Index extends Component {
                         component: HistoricalDocument
                     };
                     this.props.navigator.push(nextRoute);
+                    Storage.delete('Name');
                     Storage.save('name','配送收货单');
                     Storage.save('history','App_Client_ProPSSHQ');
                     Storage.save('historyClass','App_Client_ProPSSHDetailQ');
@@ -1271,6 +1293,7 @@ export default class Index extends Component {
                         component: HistoricalDocument
                     };
                     this.props.navigator.push(nextRoute);
+                    Storage.delete('Name');
                     Storage.save('name','商品采购单');
                     Storage.save('history','App_Client_ProCGQ');
                     Storage.save('historyClass','App_Client_ProCGDetailQ');
@@ -1291,6 +1314,7 @@ export default class Index extends Component {
                         component: HistoricalDocument
                     };
                     this.props.navigator.push(nextRoute);
+                    Storage.delete('Name');
                     Storage.save('name','商品验收单');
                     Storage.save('history','App_Client_ProYSQ');
                     Storage.save('historyClass','App_Client_ProYSDetailQ');
@@ -1312,6 +1336,7 @@ export default class Index extends Component {
                         component: HistoricalDocument
                     };
                     this.props.navigator.push(nextRoute);
+                    Storage.delete('Name');
                     Storage.save('name','协配采购单');
                     Storage.save('history','App_Client_ProXPCGQ');
                     Storage.save('historyClass','App_Client_ProXPCGDetailQ');
@@ -1332,6 +1357,7 @@ export default class Index extends Component {
                         component: HistoricalDocument
                     };
                     this.props.navigator.push(nextRoute);
+                    Storage.delete('Name');
                     Storage.save('name','协配收货单');
                     Storage.save('history','App_Client_ProXPYSQ');
                     Storage.save('historyClass','App_Client_ProXPYSDetailQ');
@@ -1888,7 +1914,14 @@ export default class Index extends Component {
                                         销售
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.ModalHeadImage}></TouchableOpacity>
+                                <TouchableOpacity style={styles.ModalHeadImage} onPress={this.pullOut1.bind(this)}>
+                                    <Text style={styles.ModalHeadImage1}>
+                                        <Image source={require("../images/1_56.png")} />
+                                    </Text>
+                                    <Text style={styles.ModalHeadText}>
+                                        退出账号
+                                    </Text>
+                                </TouchableOpacity>
                                 <TouchableOpacity style={styles.ModalHeadImage}></TouchableOpacity>
                             </View>
                         </ScrollView>
