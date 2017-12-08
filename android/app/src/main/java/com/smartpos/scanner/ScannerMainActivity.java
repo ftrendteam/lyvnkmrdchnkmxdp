@@ -22,7 +22,9 @@ import com.sunmi.scan.ImageScanner;
 import com.sunmi.scan.Symbol;
 import com.sunmi.scan.SymbolSet;
 import android.content.Intent;
+import com.smartpos.utils.SystemUtils;
 import com.smartpos.utils.PermissionUtils;
+import com.acker.simplezxing.activity.CaptureActivity;
 public class ScannerMainActivity extends Activity implements SurfaceHolder.Callback {
     private Camera mCamera;
     private SurfaceHolder mHolder;
@@ -40,17 +42,13 @@ public class ScannerMainActivity extends Activity implements SurfaceHolder.Callb
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.ac_sunmi_scan_finder);
-       // permissionUtils = new PermissionUtils(this);
-       // boolean a = permissionUtils.checkPermission("Manifest.permission.CAMERA");
-       // System.out.println("是否有权限="+a);
-        //if(!a){
-         //   permissionUtils.showCamera();
-        //}else{
-          //  permissionUtils.showCamera();
-           // init();
-        //}
 
-        init();
+        if (SystemUtils.getDeviceModel().equals("P1")) {
+            init();
+        } else {
+            startActivityForResult(new Intent(ScannerMainActivity.this,
+                    CaptureActivity.class), CaptureActivity.REQ_CODE);
+        }
     }
 
     private void init() {
@@ -70,6 +68,26 @@ public class ScannerMainActivity extends Activity implements SurfaceHolder.Callb
         autoFocusHandler = new Handler();
         asyncDecode = new AsyncDecode();
 
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent
+            data) {
+        switch (requestCode) {
+            case CaptureActivity.REQ_CODE:
+                switch (resultCode) {
+                    case RESULT_OK:
+                       String stringExtra = data.getStringExtra
+                                                       (CaptureActivity.EXTRA_SCAN_RESULT);
+                         Intent intent = new Intent();
+                         intent.setAction("com.android.server.scannerservice.broadcast");
+                         intent.putExtra("scannerdata", stringExtra);
+                         sendBroadcast(intent);
+                         finish();
+                        break;
+
+                }
+                break;
+        }
     }
 
     @Override
@@ -92,7 +110,7 @@ public class ScannerMainActivity extends Activity implements SurfaceHolder.Callb
             mCamera.setPreviewDisplay(mHolder);
             mCamera.setPreviewCallback(previewCallback);
             mCamera.startPreview();
-            mCamera.autoFocus(autoFocusCallback);
+           // mCamera.autoFocus(autoFocusCallback);
         } catch (Exception e) {
             Log.d("DBG", "Error starting camera preview: " + e.getMessage());
         }
@@ -191,6 +209,7 @@ public class ScannerMainActivity extends Activity implements SurfaceHolder.Callb
     public void surfaceCreated(SurfaceHolder holder) {
         try {
             mCamera = Camera.open();
+            System.out.println("mCamerasd="+mCamera);
         } catch (Exception e) {
             mCamera = null;
         }
@@ -244,6 +263,8 @@ public class ScannerMainActivity extends Activity implements SurfaceHolder.Callb
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        asyncDecode.cancel(true);
+        if(asyncDecode!=null){
+            asyncDecode.cancel(true);
+        }
     }
 }

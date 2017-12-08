@@ -6,6 +6,8 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Callback;
+
+
 public class DeviceInfo extends ReactContextBaseJavaModule{
         private ReactApplicationContext reactContext;
 
@@ -29,4 +31,6 @@ public class DeviceInfo extends ReactContextBaseJavaModule{
         public void getVerName(Callback successCallback){
             successCallback.invoke(SystemUtils.getVerName(reactContext));
         }
+
+
 }
