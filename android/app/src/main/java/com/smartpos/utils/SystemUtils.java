@@ -1,6 +1,7 @@
 package com.smartpos.utils;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.telephony.TelephonyManager;
 public class SystemUtils{
 
      /**
@@ -30,5 +31,19 @@ public class SystemUtils{
      */
     public static String getDeviceModel() {
         return android.os.Build.MODEL;
+    }
+
+     /**
+     * 获取设备的IMEI
+     */
+    public String getIMEI(Context context) {
+        String imei = null;
+        try {
+            TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+            imei = tm.getDeviceId();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return imei;
     }
 }
