@@ -44,13 +44,15 @@ public class RNScannerActivity extends ReactContextBaseJavaModule{
          */
         @ReactMethod
         public void openScanner() {
+
             if("SHT".equals(deviceModel)||"SHT36".equals(deviceModel)){
-                Intent scannerIntent = new Intent(SCN_CUST_ACTION_START);
-                getReactApplicationContext().sendBroadcast(scannerIntent);
+                //System.out.println("sc-a");
+                //Intent scannerIntent = new Intent(SCN_CUST_ACTION_START);
+                //reactContext.sendBroadcast(scannerIntent);
             }else{
-                    Intent startIntent = new Intent(reactContext,ScannerMainActivity.class);
-                    startIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-                    reactContext.startActivity(startIntent);
+                Intent startIntent = new Intent(reactContext,ScannerMainActivity.class);
+                startIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+                reactContext.startActivity(startIntent);
             }
         }
 
@@ -59,9 +61,8 @@ public class RNScannerActivity extends ReactContextBaseJavaModule{
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction().equals(SCN_CUST_ACTION_SCODE)) {
                    String message = intent.getStringExtra(SCN_CUST_EX_SCODE);
-
-
                    reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("code",message);
+
                 }
             }
         };
