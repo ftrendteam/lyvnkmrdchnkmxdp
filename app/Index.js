@@ -373,12 +373,13 @@ export default class Index extends Component {
 
     //获取左侧商品品类信息、商品总数、触发第一个列表
     _fetch(){
+        let ShopCar1 = 0;
         dbAdapter.selectTDepSet('1').then((rows)=>{
             for(let i =0;i<rows.length;i++){
                 var row = rows.item(i);
                 this.dataRows.push(row);
                 var ShopCar = rows.item(0).DepCode;
-                var ShopCar1 = rows.item(0).ShopNumber;
+                ShopCar1 = row.ShopNumber+ShopCar1;
             }
             if(this.state.depcode == "") {
                 this.setState({
@@ -1057,7 +1058,7 @@ export default class Index extends Component {
                                     this._setModalVisible();
                                     if(this.state.Disting=="1"){
                                         DeviceEventEmitter.removeAllListeners();
-                                    }react-native
+                                    }
                                 }else{
                                     this.Promp();
                                 }
@@ -1736,14 +1737,7 @@ export default class Index extends Component {
                                 <Image source={require("../images/1_48.png")} style={styles.ModalImageLine} />
                             </View>
                             <View style={[styles.ModalHead,{marginBottom:10}]}>
-                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.Sell.bind(this)}>
-                                    <Text style={styles.ModalHeadImage1}>
-                                        <Image source={require("../images/1_57.png")} />
-                                    </Text>
-                                    <Text style={styles.ModalHeadText}>
-                                        销售
-                                    </Text>
-                                </TouchableOpacity>
+
                                 <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.StateMent.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_56.png")} />
@@ -1752,7 +1746,7 @@ export default class Index extends Component {
                                         报表
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.ModalHeadImage} onPress={this.pullOut.bind(this)}>
+                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.pullOut.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_56.png")} />
                                     </Text>
@@ -1760,11 +1754,6 @@ export default class Index extends Component {
                                         退出账号
                                     </Text>
                                 </TouchableOpacity>
-                            </View>
-                            <View style={styles.ModalLine}>
-                                <Image source={require("../images/1_48.png")} style={styles.ModalImageLine} />
-                            </View>
-                            <View style={[styles.ModalHead,{marginBottom:10}]}>
                                 <TouchableOpacity onPress={this.UpData.bind(this)} style={styles.ModalHeadImage}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_59.png")} />
@@ -1773,8 +1762,6 @@ export default class Index extends Component {
                                         数据更新
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.ModalHeadImage}></TouchableOpacity>
-                                <TouchableOpacity style={styles.ModalHeadImage}></TouchableOpacity>
                             </View>
                         </ScrollView>
                     </View>
@@ -1906,15 +1893,7 @@ export default class Index extends Component {
                                 <Image source={require("../images/1_48.png")} style={styles.ModalImageLine} />
                             </View>
                             <View style={[styles.ModalHead,{marginBottom:10}]}>
-                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.Sell1.bind(this)}>
-                                    <Text style={styles.ModalHeadImage1}>
-                                        <Image source={require("../images/1_57.png")} />
-                                    </Text>
-                                    <Text style={styles.ModalHeadText}>
-                                        销售
-                                    </Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity style={styles.ModalHeadImage} onPress={this.pullOut1.bind(this)}>
+                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.pullOut1.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_56.png")} />
                                     </Text>
@@ -1922,6 +1901,7 @@ export default class Index extends Component {
                                         退出账号
                                     </Text>
                                 </TouchableOpacity>
+                                <TouchableOpacity style={styles.ModalHeadImage}></TouchableOpacity>
                                 <TouchableOpacity style={styles.ModalHeadImage}></TouchableOpacity>
                             </View>
                         </ScrollView>
@@ -2132,6 +2112,7 @@ export default class Index extends Component {
         );
     };
 }
+
 const styles = StyleSheet.create({
     container:{
         flex:1,
