@@ -41,6 +41,7 @@ export default class GoodsDetails extends Component {
             Remark:this.props.Remark ? this.props.Remark : "",
             prototal:this.props.prototal ? this.props.prototal : "",
             Number:this.props.countm ? this.props.countm : "1",
+            isFrist:this.props.countm ? true : false,
             DepCode:this.props.DepCode ? this.props.DepCode : "",
             ydcountm:this.props.ydcountm ? this.props.ydcountm : "",
             SuppCode:this.props.SuppCode ? this.props.SuppCode : "",
@@ -53,14 +54,11 @@ export default class GoodsDetails extends Component {
         }
     }
     GoodsDetails(){
-        this.props.navigator.pop();
-    }
-    pressPush(){
         var nextRoute={
             name:"主页",
             component:Search
         };
-       this.props.navigator.push(nextRoute)
+        this.props.navigator.push(nextRoute)
     }
     Code(){
         RNScannerAndroid.openScanner();
@@ -110,20 +108,21 @@ export default class GoodsDetails extends Component {
 
         Storage.get('YuanDan').then((tags)=>{
             if(tags=="1"){
-                if(this.state.Number == "1"){
+                if(this.state.Number == "1"&&!this.state.isFrist){
                     this.setState({
                         Number:this.state.ydcountm
                     })
                 }
             }
+            let numberFormat1 = NumberUtils.numberFormat2(this.state.ShopPrice);
+            let numberFormat2 = NumberUtils.numberFormat2((this.state.Number)*(this.state.ShopPrice));
+            this.setState({
+                ShopPrice:numberFormat1,
+                numberFormat2:numberFormat2,
+            })
         })
 
-        let numberFormat1 = NumberUtils.numberFormat2(this.state.ShopPrice);
-        let numberFormat2 = NumberUtils.numberFormat2((this.state.Number)*(this.state.ShopPrice));
-        this.setState({
-            ShopPrice:numberFormat1,
-            numberFormat2:numberFormat2,
-        })
+
     }
 // 失焦时触发事件
     inputOnBlur(){
@@ -145,31 +144,37 @@ export default class GoodsDetails extends Component {
         });
     }
     subtraction(){
-        var Number1=this.state.Number;
-        this.setState({
-            Number:parseInt(Number1)-1,
-        });
-        let numberFormat2 = NumberUtils.numberFormat2((parseInt(Number1)-1)*(this.state.ShopPrice));
-        this.setState({
-            numberFormat2:numberFormat2,
-        });
-        if(Number1 == 0){
+        if(this.state.Number >0){
+            var Number1=this.state.Number;
+            this.setState({
+                Number:parseInt(Number1)-1,
+            });
+            let numberFormat2 = NumberUtils.numberFormat2((parseInt(Number1)-1)*(this.state.ShopPrice));
+            this.setState({
+                numberFormat2:numberFormat2,
+            });
+        }
+        if(this.state.Number == 0){
             ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
             this.setState({
-               Number:0
+                Number:0
             });
         }
     }
+
     clear(){
-        var Number1=this.state.Number;
+        let numberFormat2 = NumberUtils.numberFormat2((0)*(this.state.ShopPrice));
         this.setState({
-           Number:0
-        });
+            Number:0,
+            numberFormat2:numberFormat2,
+        })
     }
     pressPop(){
         if(this.state.name==null) {
             alert("请选择单据")
-        }else {
+        }else if(this.state.Number==0){
+            ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
+        }else{
             var shopInfoData = [];
             var shopInfo = {};
             shopInfo.Pid = this.state.Pid;
@@ -185,7 +190,15 @@ export default class GoodsDetails extends Component {
             shopInfoData.push(shopInfo);
             //调用插入表方法
             dbAdapter.insertShopInfo(shopInfoData);
-            this.props.navigator.pop();
+            // this.props.navigator.pop();
+            var nextRoute={
+                name:"主页",
+                component:Search,
+                params:{
+                    DepCode:this.state.DepCode,
+                }
+            };
+            this.props.navigator.push(nextRoute);
         }
     }
 
@@ -275,8 +288,8 @@ export default class GoodsDetails extends Component {
                             onChangeText={(value)=>{this.setState({Remark:value})}}/>
                     </View>
                 </View>
-                <TouchableOpacity style={styles.button}>
-                    <Text style={styles.ButtonText} onPress={this.pressPop.bind(this)}>确定</Text>
+                <TouchableOpacity style={styles.button} onPress={this.pressPop.bind(this)}>
+                    <Text style={styles.ButtonText}>确定</Text>
                 </TouchableOpacity>
             </View>
         </ScrollView>

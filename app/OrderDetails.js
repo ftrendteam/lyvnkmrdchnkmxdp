@@ -4,29 +4,13 @@
  * @flow
  */
 
-import React, { Component } from 'react';
-import {
-  AppRegistry,
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  Button,
-  ListView,
-  ScrollView,
-  TextInput,
-  ToastAndroid,
-  TouchableOpacity,
-  DeviceEventEmitter,
-} from 'react-native';
-
-import Code from "./Code";
-import home from "./Home";
+import React, {Component} from 'react';
+import {Image, ScrollView, StyleSheet, Text, TextInput, ToastAndroid, TouchableOpacity, View,} from 'react-native';
 import Index from "./Index";
 import Search from "./Search";
 import NumberUtils from "../utils/NumberUtils";
 import Storage from "../utils/Storage";
-import OrderDetails from "./OrderDetails";
+
 import DBAdapter from "../adapter/DBAdapter";
 
 let dbAdapter = new DBAdapter();
@@ -45,6 +29,7 @@ export default class GoodsDetails extends Component {
             Remark:this.props.Remark ? this.props.Remark : "",
             prototal:this.props.prototal ? this.props.prototal : "",
             Number:this.props.countm ? this.props.countm : "1",
+            isFrist:this.props.countm ? true : false,
             DepCode:this.props.DepCode ? this.props.DepCode : "",
             ydcountm:this.props.ydcountm ? this.props.ydcountm : "",
             SuppCode:this.props.SuppCode ? this.props.SuppCode : "",
@@ -58,7 +43,11 @@ export default class GoodsDetails extends Component {
     }
 
     GoodsDetails(){
-        this.props.navigator.pop();
+        var nextRoute={
+            name:"主页",
+            component:Index,
+        };
+        this.props.navigator.push(nextRoute);
     }
 
     pressPush(){
@@ -69,39 +58,6 @@ export default class GoodsDetails extends Component {
        this.props.navigator.push(nextRoute)
     }
 
-    Code(){
-        RNScannerAndroid.openScanner();
-        DeviceEventEmitter.addListener("code", (reminder) => {
-            dbAdapter.selectAidCode(reminder,1).then((rows)=>{
-                if(rows.length==0){
-                    alert("该商品不存在")
-                }else{
-                    var ShopCar = rows.item(0).ProdName;
-                    var nextRoute={
-                        name:"主页",
-                        component:OrderDetails,
-                        params:{
-                            ProdName:rows.item(0).ProdName,
-                            ShopPrice:rows.item(0).ShopPrice,
-                            Pid:rows.item(0).Pid,
-                            countm:rows.item(0).ShopNumber,
-                            promemo:rows.item(0).promemo,
-                            prototal:rows.item(0).prototal,
-                            ProdCode:rows.item(0).ProdCode,
-                            DepCode:rows.item(0).DepCode1,
-                        }
-                    };
-                    this.props.navigator.push(nextRoute);
-                }
-            })
-        })
-        //二维码扫描商品
-       //var nextRoute={
-            //name:"主页",
-            //component:Code
-       //};
-       //this.props.navigator.push(nextRoute)
-    }
 
     componentDidMount(){
         Storage.get('Name').then((tags) => {
@@ -115,22 +71,23 @@ export default class GoodsDetails extends Component {
                 YdCountm:tags
             })
         })
-
         Storage.get('YuanDan').then((tags)=>{
             if(tags==1){
-                if(this.state.Number == "1"){
+
+                if(this.state.Number == "1"&&!this.state.isFrist){
                     this.setState({
                         Number:this.state.ydcountm
                     })
+                }else{
+
                 }
             }
-        })
-
-        let numberFormat1 = NumberUtils.numberFormat2(this.state.ShopPrice);
-        let numberFormat2 = NumberUtils.numberFormat2((this.state.Number)*(this.state.ShopPrice));
-        this.setState({
-            ShopPrice:numberFormat1,
-            numberFormat2:numberFormat2,
+            let numberFormat1 = NumberUtils.numberFormat2(this.state.ShopPrice);
+            let numberFormat2 = NumberUtils.numberFormat2((this.state.Number)*(this.state.ShopPrice));
+            this.setState({
+                ShopPrice:numberFormat1,
+                numberFormat2:numberFormat2,
+            })
         })
 
     }
@@ -157,15 +114,17 @@ export default class GoodsDetails extends Component {
     }
 
     subtraction(){
-        var Number1=this.state.Number;
-        this.setState({
-           Number:parseInt(Number1)-1,
-        });
-        let numberFormat2 = NumberUtils.numberFormat2((parseInt(Number1)-1)*(this.state.ShopPrice));
-        this.setState({
-            numberFormat2:numberFormat2,
-        });
-        if(Number1 == 0){
+        if(this.state.Number >0){
+            var Number1=this.state.Number;
+            this.setState({
+                Number:parseInt(Number1)-1,
+            });
+            let numberFormat2 = NumberUtils.numberFormat2((parseInt(Number1)-1)*(this.state.ShopPrice));
+            this.setState({
+                numberFormat2:numberFormat2,
+            });
+        }
+        if(this.state.Number == 0){
             ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
             this.setState({
                Number:0
@@ -174,15 +133,18 @@ export default class GoodsDetails extends Component {
     }
 
     clear(){
-        var Number1=this.state.Number;
+        let numberFormat2 = NumberUtils.numberFormat2((0)*(this.state.ShopPrice));
         this.setState({
-           Number:0
-        });
+            Number:0,
+            numberFormat2:numberFormat2,
+        })
     }
 
     pressPop(){
         if(this.state.name==null) {
             alert("请选择单据")
+        }else if(this.state.Number==0){
+            ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
         }else{
             var shopInfoData = [];
             var shopInfo = {};
@@ -296,8 +258,8 @@ export default class GoodsDetails extends Component {
                      onChangeText={(value)=>{this.setState({Remark:value})}}/>
                 </View>
             </View>
-            <TouchableOpacity style={styles.button}>
-                <Text style={styles.ButtonText} onPress={this.pressPop.bind(this)}>确定</Text>
+            <TouchableOpacity style={styles.button} onPress={this.pressPop.bind(this)}>
+                <Text style={styles.ButtonText}>确定</Text>
             </TouchableOpacity>
         </View>
         </ScrollView>

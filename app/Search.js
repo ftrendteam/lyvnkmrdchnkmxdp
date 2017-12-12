@@ -233,11 +233,13 @@ export default class Search extends Component {
   }
 
   pressPop(){
+      DeviceEventEmitter.removeAllListeners();
       var nextRoute={
          name:"主页",
          component:Index,
       };
       this.props.navigator.push(nextRoute);
+
   }
 
   inputOnBlur(value){

@@ -50,7 +50,11 @@ export default class Distrition extends Component {
 
     //返回前一页面
     Return(){
-        this.props.navigator.pop();
+        var nextRoute={
+            name:"Index",
+            component:Index
+        };
+        this.props.navigator.push(nextRoute)
     }
 
     _reloadView(sCode) {

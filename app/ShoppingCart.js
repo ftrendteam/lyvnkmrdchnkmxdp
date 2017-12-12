@@ -922,7 +922,7 @@ export default class ShoppingCart extends Component {
                             </View>
                             <TextInput
                                 multiline={true}
-                                maxLength={250}
+                                maxLength={25}
                                 placeholder="请填写单据备注信息"
                                 underlineColorAndroid='transparent'
                                 placeholderTextColor="#888888"

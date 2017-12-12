@@ -49,7 +49,11 @@ export default class ProductCG extends Component {
     }
 
     Return(){
-        this.props.navigator.pop();
+        var nextRoute={
+            name:"Index",
+            component:Index
+        };
+        this.props.navigator.push(nextRoute)
     }
 
     onclick(){
@@ -132,7 +136,7 @@ export default class ProductCG extends Component {
                 Storage.save('FormType','YSYW');
                 Storage.save('valueOf','App_Client_ProYS');
                 Storage.save('history','App_Client_ProYSQ');
-                Storage.save('historyClass','App_Client_ProCGDetailQ');
+                Storage.save('historyClass','App_Client_ProYSDetailQ');
                 Storage.save('ProYH','ProCG');
                 Storage.save('YuanDan','1');
                 Storage.save('Screen','1');

@@ -255,6 +255,7 @@ export default class Index extends Component {
                                     var countm=JSON.stringify(data.countm);
                                     var ShopPrice=JSON.stringify(data.ShopPrice);
                                     if(data.retcode == 1){
+                                        console.log("wtgffffffffff");
                                         var ShopCar = rows.item(0).ProdName;
                                         this.props.navigator.push({
                                             component:OrderDetails,
@@ -1077,8 +1078,8 @@ export default class Index extends Component {
         Storage.save('Name','销售');
         var nextRoute = {
             name: "销售",
-            component: Pay
-            //Sell
+            component: Sell
+            //Sell/Pay
         };
         this.props.navigator.push(nextRoute);
         this._setModalVisible();
@@ -1369,7 +1370,9 @@ export default class Index extends Component {
         })
     }
 
-    Sell1(){}
+    Sell1(){
+
+    }
     //单据功能分类结束
 
     //FlatList加入kay值
@@ -1737,7 +1740,14 @@ export default class Index extends Component {
                                 <Image source={require("../images/1_48.png")} style={styles.ModalImageLine} />
                             </View>
                             <View style={[styles.ModalHead,{marginBottom:10}]}>
-
+                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.Sell.bind(this)}>
+                                    <Text style={styles.ModalHeadImage1}>
+                                        <Image source={require("../images/1_57.png")} />
+                                    </Text>
+                                    <Text style={styles.ModalHeadText}>
+                                        销售
+                                    </Text>
+                                </TouchableOpacity>
                                 <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.StateMent.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_56.png")} />
@@ -1746,7 +1756,7 @@ export default class Index extends Component {
                                         报表
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.pullOut.bind(this)}>
+                                <TouchableOpacity style={styles.ModalHeadImage} onPress={this.pullOut.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_56.png")} />
                                     </Text>
@@ -1754,6 +1764,11 @@ export default class Index extends Component {
                                         退出账号
                                     </Text>
                                 </TouchableOpacity>
+                            </View>
+                            <View style={styles.ModalLine}>
+                                <Image source={require("../images/1_48.png")} style={styles.ModalImageLine} />
+                            </View>
+                            <View style={[styles.ModalHead,{marginBottom:10}]}>
                                 <TouchableOpacity onPress={this.UpData.bind(this)} style={styles.ModalHeadImage}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_59.png")} />
@@ -1762,6 +1777,8 @@ export default class Index extends Component {
                                         数据更新
                                     </Text>
                                 </TouchableOpacity>
+                                <TouchableOpacity style={styles.ModalHeadImage}></TouchableOpacity>
+                                <TouchableOpacity style={styles.ModalHeadImage}></TouchableOpacity>
                             </View>
                         </ScrollView>
                     </View>
@@ -1893,6 +1910,14 @@ export default class Index extends Component {
                                 <Image source={require("../images/1_48.png")} style={styles.ModalImageLine} />
                             </View>
                             <View style={[styles.ModalHead,{marginBottom:10}]}>
+                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.Sell1.bind(this)}>
+                                    <Text style={styles.ModalHeadImage1}>
+                                        <Image source={require("../images/1_57.png")} />
+                                    </Text>
+                                    <Text style={styles.ModalHeadText}>
+                                        销售
+                                    </Text>
+                                </TouchableOpacity>
                                 <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.pullOut1.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_56.png")} />
@@ -1901,7 +1926,6 @@ export default class Index extends Component {
                                         退出账号
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.ModalHeadImage}></TouchableOpacity>
                                 <TouchableOpacity style={styles.ModalHeadImage}></TouchableOpacity>
                             </View>
                         </ScrollView>

@@ -48,7 +48,11 @@ export default class Query extends Component {
     }
 
     Return(){
-        this.props.navigator.pop();
+        var nextRoute={
+            name:"Index",
+            component:Index
+        };
+        this.props.navigator.push(nextRoute)
     }
 
     _reloadView(sCode) {
