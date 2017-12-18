@@ -136,7 +136,7 @@ export default class Distrition_list extends Component {
         this.setState({
             dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
         })
-    }l
+    }
 
     pressPop(rowData){
         if(this.props.reloadView){

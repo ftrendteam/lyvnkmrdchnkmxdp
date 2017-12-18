@@ -53,50 +53,15 @@ export default class GoodsDetails extends Component {
             numberFormat2:""
         }
     }
-    GoodsDetails(){
-        var nextRoute={
-            name:"主页",
-            component:Search
-        };
-        this.props.navigator.push(nextRoute)
-    }
-    Code(){
-        RNScannerAndroid.openScanner();
-        DeviceEventEmitter.addListener("code", (reminder) => {
-            dbAdapter.selectAidCode(reminder,1).then((rows)=>{
-                if(rows.length==0){
-                    alert("该商品不存在")
-                }else{
-                    var ShopCar = rows.item(0).ProdName;
-                    var nextRoute={
-                        name:"主页",
-                        component:OrderDetails2,
-                        params:{
-                            ProdName:rows.item(0).ProdName,
-                            ShopPrice:rows.item(0).ShopPrice,
-                            Pid:rows.item(0).Pid,
-                            countm:rows.item(0).ShopNumber,
-                            promemo:rows.item(0).promemo,
-                            prototal:rows.item(0).prototal,
-                            ProdCode:rows.item(0).ProdCode,
-                            DepCode:rows.item(0).DepCode1,
-                        }
-                    };
-                    this.props.navigator.push(nextRoute);
-                }
-            })
-        })
-        //二维码扫描商品
-       //var nextRoute={
-            //name:"主页",
-            //component:Code
-       //};
-       //this.props.navigator.push(nextRoute)
-    }
+
     componentDidMount(){
+        this.setState({
+            focus:true
+        })
+
         Storage.get('Name').then((tags) => {
             this.setState({
-                 name: tags
+                name: tags
             });
         });
 
@@ -124,6 +89,15 @@ export default class GoodsDetails extends Component {
 
 
     }
+
+    GoodsDetails(){
+        var nextRoute={
+            name:"主页",
+            component:Search
+        };
+        this.props.navigator.push(nextRoute)
+    }
+
 // 失焦时触发事件
     inputOnBlur(){
        var Number=this.state.Number;
@@ -133,6 +107,7 @@ export default class GoodsDetails extends Component {
            totalPrice: this.state.totalPrice
        });
     }
+
     add(){
         var Number1=this.state.Number;
         this.setState({
@@ -169,6 +144,7 @@ export default class GoodsDetails extends Component {
             numberFormat2:numberFormat2,
         })
     }
+
     pressPop(){
         if(this.state.name==null) {
             alert("请选择单据")
@@ -204,7 +180,7 @@ export default class GoodsDetails extends Component {
 
   render() {
     return (
-      <View style={styles.container}>
+      <ScrollView style={styles.container}>
         <ScrollView style={styles.ScrollView} scrollEnabled={false}>
             <View style={styles.header}>
                 <View style={styles.cont}>
@@ -223,13 +199,15 @@ export default class GoodsDetails extends Component {
                 <View style={[styles.List,{paddingTop:12}]}>
                     <View style={styles.left1}>
                         <Text style={[styles.left,{marginTop:4}]}>数量</Text>
-                        <TextInput style={styles.Number}
-                                   underlineColorAndroid='transparent'
-                                   keyboardType="numeric"
-                                   value={this.state.Number.toString()}
-                                   placeholderTextColor="#333333"
-                                   onBlur={this.inputOnBlur.bind(this)}
-                                   onChangeText={(value)=>{this.setState({Number:value})}}/>
+                        <TextInput
+                           style={styles.Number}
+                           autoFocus={true}
+                           underlineColorAndroid='transparent'
+                           keyboardType="numeric"
+                           value={this.state.Number.toString()}
+                           placeholderTextColor="#333333"
+                           onBlur={this.inputOnBlur.bind(this)}
+                           onChangeText={(value)=>{this.setState({Number:value})}}/>
                     </View>
                     <View style={styles.right1}>
                         <TouchableOpacity style={styles.sublime} onPress={this.clear.bind(this)}><Image source={require("../images/1_09.png")}/></TouchableOpacity>
@@ -293,7 +271,7 @@ export default class GoodsDetails extends Component {
                 </TouchableOpacity>
             </View>
         </ScrollView>
-      </View>
+      </ScrollView>
     );
   }
 }

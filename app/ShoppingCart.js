@@ -911,7 +911,7 @@ export default class ShoppingCart extends Component {
                     visible={this.state.show}
                     onShow={() => {}}
                     onRequestClose={() => {}} >
-                    <View style={[styles.modalStyle,{justifyContent: 'center',alignItems: 'center',}]}>
+                    <TouchableOpacity  onPress={this._setModalVisible.bind(this)} style={[styles.modalStyle,{justifyContent: 'center',alignItems: 'center',}]}>
                         <View style={[styles.ModalView,{borderRadius:5,paddingBottom:20,width:300,
                             height:330,backgroundColor:"#ffffff"}]}>
                             <View style={styles.DanJu}>
@@ -939,7 +939,7 @@ export default class ShoppingCart extends Component {
                                 </Text>
                             </TouchableOpacity>
                         </View>
-                    </View>
+                    </TouchableOpacity>
                 </Modal>
                 <Modal
                     animationType='fade'
@@ -1418,7 +1418,7 @@ const styles = StyleSheet.create({
     },
     DeterMine:{
         position:"absolute",
-        bottom:40,
+        bottom:20,
         paddingTop:15,
         paddingBottom:15,
         borderRadius:25,

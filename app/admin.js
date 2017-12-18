@@ -77,7 +77,10 @@ export default class admin extends Component {
 
     //初始化render之后只执行一次
     componentDidMount(){
-
+        //textinput自动获取焦点
+        this.setState({
+            focus:true
+        })
         //获取数据库url地址
         Storage.get('LinkUrl').then((tags) => {
             this.setState({
@@ -205,7 +208,7 @@ export default class admin extends Component {
         }
         if(this.state.UserPwd == ""){
             ToastAndroid.show('请输入密码', ToastAndroid.SHORT)
-            // return;
+            return;
         }
         if(this.state.sCode1 == ""){
             ToastAndroid.show('请选择机构信息', ToastAndroid.SHORT)
@@ -274,6 +277,7 @@ export default class admin extends Component {
     }
 
     inputOnBlur(){
+        this.setState({ focus: false });
         if(this.state.Usercode){
             this.setState({
                 sCode1:""
@@ -307,7 +311,14 @@ export default class admin extends Component {
         }
 
     }
-  render() {
+
+    _onSubmitEditing(){
+        this._textInput.blur();
+    }
+    _onPressSearch(event){
+        this.pressPush()
+    }
+    render() {
     return (
         <ScrollView  style={styles.Container}>
             <Image source={require("../images/bj.png")} style={styles.container}>
@@ -317,7 +328,9 @@ export default class admin extends Component {
                     </View>
                     <View style={styles.TextInput}>
                         <TextInput
-                            autofocus={true}
+                            ref={component => this._textInput = component}
+                            returnKeyType='search'
+                            autoFocus={true}
                             numberoflines={1}
                             keyboardType="numeric"
                             placeholder="请输入用户编码"
@@ -335,6 +348,7 @@ export default class admin extends Component {
                     </View>
                     <View style={[styles.TextInput,{marginTop:15}]}>
                         <TextInput
+                            returnKeyType='search'
                             autofocus={true}
                             secureTextEntry={true}
                             numberoflines={1}

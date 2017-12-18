@@ -383,6 +383,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
           //   "prodname":"海鲜菇","countm":1.0000,"kccount":0.0,"prototal":1.0000,"unit":"kg  ","promemo":""
           let sql = " replace INTO shopInfo(pid,ProdCode,prodname,countm,ShopPrice,prototal,promemo,DepCode,ydcountm,SuppCode)" +
             "values(?,?,?,?,?,?,?,?,?,?)";
+          console.log("sql",sql,"=",ShopRemark);
           tx.executeSql(sql, [Pid, ProdCode, shopName, ShopNumber, ShopPrice, ShopAmount, ShopRemark, DepCode, ydcountm,suppCode], () => {
               resolve(true);
             }, (err) => {
@@ -868,23 +869,23 @@ export default class DBAdapter extends SQLiteOpenHelper {
      * @param DepLevel   当前默认传1
      * @returns {Promise}
      */
-    selectProdCode(prodCode, DepLevel) {
-        return new Promise((resolve, reject) => {
-            db.transaction((tx) => {
-                let ssql = "select a.*,ifNull(b.countm,0) as ShopNumber,ifNull(b.ShopPrice,a.StdPrice) as ShopPrice ,ifNull(b.prototal,0) as ShopAmount   " +
-                    ",ifNull(b.promemo,'') as ShopRemark,c.depcode" + DepLevel + " as DepCode1 " +
-                    " from product a left join shopInfo b on a.Pid=b.Pid  ";
-                ssql = ssql + " left join  tdepset c on c.IsDel='0' and a.depcode=c.depcode where a.IsDel='0' and prodtype<>'1'";
-                ssql = ssql + "  and  a.prodcode ='" + prodCode + "'";
-                tx.executeSql(ssql, [], (tx, results) => {
-                    resolve(results.rows);
-
-                });
-            }, (error) => {
-                this._errorCB('transaction', error);
-            });
-        })
-    }
+    // selectProdCode(prodCode, DepLevel) {
+    //     return new Promise((resolve, reject) => {
+    //         db.transaction((tx) => {
+    //             let ssql = "select a.*,ifNull(b.countm,0) as ShopNumber,ifNull(b.ShopPrice,a.StdPrice) as ShopPrice ,ifNull(b.prototal,0) as ShopAmount   " +
+    //                 ",ifNull(b.promemo,'') as ShopRemark,c.depcode" + DepLevel + " as DepCode1 " +
+    //                 " from product a left join shopInfo b on a.Pid=b.Pid  ";
+    //             ssql = ssql + " left join  tdepset c on c.IsDel='0' and a.depcode=c.depcode where a.IsDel='0' and prodtype<>'1'";
+    //             ssql = ssql + "  and  a.prodcode ='" + prodCode + "'";
+    //             tx.executeSql(ssql, [], (tx, results) => {
+    //                 resolve(results.rows);
+    //
+    //             });
+    //         }, (error) => {
+    //             this._errorCB('transaction', error);
+    //         });
+    //     })
+    // }
 
   /***
    * 助记码查询商品

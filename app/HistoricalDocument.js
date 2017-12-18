@@ -239,7 +239,7 @@ export default class HistoricalDocument extends Component {
               <TouchableOpacity  onPress={()=>this.GoodsDetails(rowData)}>
                   <View style={styles.ContList}>
                       <Text style={styles.List}>
-                          <Text style={styles.ListLeft}>要货单：</Text>
+                          <Text style={styles.ListLeft}>单号：</Text>
                           <Text style={styles.ListRight}>{rowData.Formno}</Text>
                       </Text>
                       {

@@ -38,6 +38,11 @@ export default class  login extends Component{
         };
     }
 
+    componentDidMount() {
+        this.setState({
+            focus: true
+        })
+    }
     pressPush(){
         if(this.state.ClientCode == ""){
             ToastAndroid.show('请输入商户号', ToastAndroid.SHORT)
@@ -116,90 +121,99 @@ export default class  login extends Component{
 
     render(){
         return (
-            <Image source={require("../images/bj.png")} style={styles.container}>
-                <ScrollView style={styles.ScrollView} scrollEnabled={false}>
-                    <View style={styles.Image}>
-                        <Image source={require("../images/logo.png")}></Image>
-                    </View>
-                    <View style={styles.TextInput}>
-                        <TextInput
-                            autofocus="{true}"
-                            numberoflines="{1}"
-                            keyboardType="numeric"
-                            placeholder="请输入商户号"
-                            textalign="center"
-                            underlineColorAndroid='transparent'
-                            placeholderTextColor="#bcbdc1"
-                            style={styles.admin}
-                            onChangeText={(value)=>{
-                                this.setState({
-                                    ClientCode:value
-                                })
-                            }}/>
-                        <Image source={require("../images/1_11.png")} style={styles.TextImage1}></Image>
-                    </View>
-                    <View style={styles.TextInput}>
-                        <TextInput
-                            autofocus="{true}"
-                            secureTextEntry={true}
-                            numberoflines="{1}"
-                            keyboardType="numeric"
-                            placeholder="请输入商户密码"
-                            textalign="center"
-                            underlineColorAndroid='transparent'
-                            placeholderTextColor="#bcbdc1"
-                            style={styles.pass}
-                            onChangeText={(value)=>{
-                                this.setState({
-                                    Pwd:value
-                                })
-                            }}
-                        />
-                        <Image source={require("../images/1_04.png")} style={styles.TextImage1}></Image>
-                    </View>
-                    <TouchableOpacity onPress={this.pressPush.bind(this)}>
-                        <Text style={styles.login}>确定</Text>
-                    </TouchableOpacity>
-                    <Modal
-                        animationType='fade'
-                        transparent={true}
-                        visible={this.state.show}
-                        onShow={() => {}}
-                        onRequestClose={() => {}} >
-                        <View style={styles.LoadCenter}>
-                            <View style={styles.loading}>
-                                <ActivityIndicator key="1" color="#414240" size="large" style={styles.activity}></ActivityIndicator>
-                                <Text style={styles.TextLoading}>登录中</Text>
-                            </View>
+            <ScrollView  style={styles.Container}>
+                <Image source={require("../images/bj.png")} style={styles.container}>
+                    <ScrollView style={styles.ScrollView} scrollEnabled={false}>
+                        <View style={styles.Image}>
+                            <Image source={require("../images/logo.png")}></Image>
                         </View>
-                    </Modal>
-                    <Modal
-                        animationType='fade'
-                        transparent={true}
-                        visible={this.state.ErrorShow}
-                        onShow={() => {}}
-                        onRequestClose={() => {}} >
-                        <View style={styles.Error}>
-                            <View style={styles.ErrorCont}>
-                                <View style={styles.LoginError}>
-                                    <Text style={styles.ErrorText}>
-                                        登录失败：商户号或密码错误
-                                    </Text>
+                        <View style={styles.TextInput}>
+                            <TextInput
+                                autoFocus={true}
+                                returnKeyType='search'
+                                numberoflines={1}
+                                keyboardType="numeric"
+                                placeholder="请输入商户号"
+                                textalign="center"
+                                underlineColorAndroid='transparent'
+                                placeholderTextColor="#bcbdc1"
+                                style={styles.admin}
+                                onChangeText={(value)=>{
+                                    this.setState({
+                                        ClientCode:value
+                                    })
+                                }}/>
+                            <Image source={require("../images/1_11.png")} style={styles.TextImage1}></Image>
+                        </View>
+                        <View style={styles.TextInput}>
+                            <TextInput
+                                autofocus="{true}"
+                                returnKeyType='search'
+                                secureTextEntry={true}
+                                numberoflines="{1}"
+                                keyboardType="numeric"
+                                placeholder="请输入商户密码"
+                                textalign="center"
+                                underlineColorAndroid='transparent'
+                                placeholderTextColor="#bcbdc1"
+                                style={styles.pass}
+                                onChangeText={(value)=>{
+                                    this.setState({
+                                        Pwd:value
+                                    })
+                                }}
+                            />
+                            <Image source={require("../images/1_04.png")} style={styles.TextImage1}></Image>
+                        </View>
+                        <TouchableOpacity onPress={this.pressPush.bind(this)}>
+                            <Text style={styles.login}>确定</Text>
+                        </TouchableOpacity>
+                        <Modal
+                            animationType='fade'
+                            transparent={true}
+                            visible={this.state.show}
+                            onShow={() => {}}
+                            onRequestClose={() => {}} >
+                            <View style={styles.LoadCenter}>
+                                <View style={styles.loading}>
+                                    <ActivityIndicator key="1" color="#414240" size="large" style={styles.activity}></ActivityIndicator>
+                                    <Text style={styles.TextLoading}>登录中</Text>
                                 </View>
-                                <TouchableOpacity style={styles.LoginOk} onPress={this.LoginError.bind(this)}>
-                                    <Text style={styles.ErrorText}>
-                                        好的
-                                    </Text>
-                                </TouchableOpacity>
                             </View>
-                        </View>
-                    </Modal>
-                </ScrollView>
-        </Image>
+                        </Modal>
+                        <Modal
+                            animationType='fade'
+                            transparent={true}
+                            visible={this.state.ErrorShow}
+                            onShow={() => {}}
+                            onRequestClose={() => {}} >
+                            <View style={styles.Error}>
+                                <View style={styles.ErrorCont}>
+                                    <View style={styles.LoginError}>
+                                        <Text style={styles.ErrorText}>
+                                            登录失败：商户号或密码错误
+                                        </Text>
+                                    </View>
+                                    <TouchableOpacity style={styles.LoginOk} onPress={this.LoginError.bind(this)}>
+                                        <Text style={styles.ErrorText}>
+                                            好的
+                                        </Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </Modal>
+                    </ScrollView>
+                </Image>
+        </ScrollView>
+
         );
     }
 }
 const styles = StyleSheet.create({
+    Container:{
+        flex:1,
+        backgroundColor:"#ff5263"
+    },
     container:{
         flex:1,
         paddingTop:20,

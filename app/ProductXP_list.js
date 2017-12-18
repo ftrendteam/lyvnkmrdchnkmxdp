@@ -133,6 +133,7 @@ export default class ProductXP_list extends Component {
                         <View style={styles.name}>
                             <Text style={styles.codingText}>名称</Text>
                         </View>
+
                     </View>
                     <ListView
                         style={styles.scrollview}

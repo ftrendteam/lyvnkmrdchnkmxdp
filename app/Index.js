@@ -42,6 +42,7 @@ import ProductXP from "./ProductXP";
 import ProductSH from "./ProductSH";
 import Sell from "./Sell";
 import Pay from "./Pay";
+import StockEnquiries from "./StockEnquiries";
 import NetUtils from "../utils/NetUtils";
 import FetchUtil from "../utils/FetchUtils";
 import UpData from "../utils/UpData";
@@ -49,7 +50,6 @@ import DBAdapter from "../adapter/DBAdapter";
 import Storage from '../utils/Storage';
 import DeCodePrePrint18 from "../utils/DeCodePrePrint18";
 import SideMenu from 'react-native-side-menu';
-
 var {NativeModules} = require('react-native');
 var RNScannerAndroid = NativeModules.RNScannerAndroid;
 
@@ -1085,6 +1085,15 @@ export default class Index extends Component {
         this._setModalVisible();
     }
 
+    StockEnquiries(){
+        var nextRoute = {
+            name: "库存查询",
+            component: StockEnquiries
+        };
+        this.props.navigator.push(nextRoute);
+        this._setModalVisible();
+    }
+
     pullOut(){
         this._setModalVisible();
         if(this.state.ShopCar1>0){
@@ -1619,7 +1628,7 @@ export default class Index extends Component {
                     visible={this.state.show}
                     onShow={() => {}}
                     onRequestClose={() => {}} >
-                    <View style={styles.modalStyle}>
+                    <ScrollView style={styles.modalStyle}>
                         <View style={styles.ModalTitle}>
                             <TouchableOpacity style={styles.ModalLeft} onPress={this.ChuMo.bind(this)}>
                                 <View>
@@ -1651,7 +1660,7 @@ export default class Index extends Component {
                                 </View>
                             </TouchableOpacity>
                         </View>
-                        <ScrollView style={styles.ModalCont}>
+                        <View style={styles.ModalCont}>
                             <View style={styles.ModalHead}>
                                 <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.YaoHuo.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
@@ -1756,12 +1765,12 @@ export default class Index extends Component {
                                         报表
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.ModalHeadImage} onPress={this.pullOut.bind(this)}>
+                                <TouchableOpacity style={styles.ModalHeadImage} onPress={this.StockEnquiries.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_56.png")} />
                                     </Text>
                                     <Text style={styles.ModalHeadText}>
-                                        退出账号
+                                        库存查询
                                     </Text>
                                 </TouchableOpacity>
                             </View>
@@ -1769,6 +1778,14 @@ export default class Index extends Component {
                                 <Image source={require("../images/1_48.png")} style={styles.ModalImageLine} />
                             </View>
                             <View style={[styles.ModalHead,{marginBottom:10}]}>
+                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.pullOut.bind(this)}>
+                                    <Text style={styles.ModalHeadImage1}>
+                                        <Image source={require("../images/1_56.png")} />
+                                    </Text>
+                                    <Text style={styles.ModalHeadText}>
+                                        退出账号
+                                    </Text>
+                                </TouchableOpacity>
                                 <TouchableOpacity onPress={this.UpData.bind(this)} style={styles.ModalHeadImage}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_59.png")} />
@@ -1778,10 +1795,9 @@ export default class Index extends Component {
                                     </Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity style={styles.ModalHeadImage}></TouchableOpacity>
-                                <TouchableOpacity style={styles.ModalHeadImage}></TouchableOpacity>
                             </View>
-                        </ScrollView>
-                    </View>
+                        </View>
+                    </ScrollView>
                 </Modal>
                 <Modal
                     animationType='fade'//业务
@@ -1789,7 +1805,7 @@ export default class Index extends Component {
                     visible={this.state.statement}
                     onShow={() => {}}
                     onRequestClose={() => {}} >
-                    <View style={styles.modalStyle}>
+                    <ScrollView style={styles.modalStyle}>
                         <View style={styles.ModalTitle}>
                             <TouchableOpacity style={styles.ModalLeft} onPress={this.YeWu.bind(this)}>
                                 <View>
@@ -1821,7 +1837,7 @@ export default class Index extends Component {
                                 </View>
                             </TouchableOpacity>
                         </View>
-                        <ScrollView style={styles.ModalCont}>
+                        <View style={styles.ModalCont}>
                             <View style={styles.ModalHead}>
                                 <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.YaoHuo1.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
@@ -1928,8 +1944,8 @@ export default class Index extends Component {
                                 </TouchableOpacity>
                                 <TouchableOpacity style={styles.ModalHeadImage}></TouchableOpacity>
                             </View>
-                        </ScrollView>
-                    </View>
+                        </View>
+                    </ScrollView>
                 </Modal>
                 <Modal
                     animationType='fade'//收银
@@ -1937,7 +1953,7 @@ export default class Index extends Component {
                     visible={this.state.receiving}
                     onShow={() => {}}
                     onRequestClose={() => {}} >
-                    <View style={styles.modalStyle}>
+                    <ScrollView style={styles.modalStyle}>
                         <View style={styles.ModalTitle}>
                             <TouchableOpacity style={styles.ModalLeft} onPress={this.YeWu1.bind(this)}>
                                 <View>
@@ -1969,15 +1985,15 @@ export default class Index extends Component {
                                 </View>
                             </TouchableOpacity>
                         </View>
-                        <ScrollView style={styles.ModalCont}>
+                        <View style={styles.ModalCont}>
                             <View style={styles.ModalHead}>
                                 <Text>
                                     敬请期待~~~
                                 </Text>
                             </View>
 
-                        </ScrollView>
-                    </View>
+                        </View>
+                    </ScrollView>
                 </Modal>
                 <Modal
                     transparent={true}

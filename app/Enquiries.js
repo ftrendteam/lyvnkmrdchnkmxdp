@@ -109,7 +109,7 @@ export default class Enquiries extends Component {
 
   render() {
     return (
-      <View style={styles.container}>
+      <ScrollView style={styles.container}>
           <ScrollView style={styles.ScrollView} scrollEnabled={false}>
               <View style={styles.header}>
                   <View style={styles.cont}>
@@ -186,7 +186,7 @@ export default class Enquiries extends Component {
                 </TouchableOpacity>
             </View>
           </ScrollView>
-      </View>
+      </ScrollView>
     );
   }
 }
