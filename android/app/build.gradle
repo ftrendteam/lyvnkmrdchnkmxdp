@@ -141,8 +141,6 @@ android {
             }
         }
     }
-
-
 }
 
 dependencies {
@@ -157,6 +155,7 @@ dependencies {
     compile 'com.squareup.okhttp3:okhttp:3.9.0'
     compile 'com.squareup.okio:okio:1.13.0'
     compile 'com.acker:simplezxing:1.5'
+    compile files('libs/platform_sdk_v2.3.706.jar')
 
 }
 
