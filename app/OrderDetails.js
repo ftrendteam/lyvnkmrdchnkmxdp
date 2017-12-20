@@ -28,7 +28,7 @@ export default class GoodsDetails extends Component {
             ShopPrice:this.props.ShopPrice ? this.props.ShopPrice : "",
             Remark:this.props.Remark ? this.props.Remark : "",
             prototal:this.props.prototal ? this.props.prototal : "",
-            Number:this.props.countm ? this.props.countm : "1",
+            Number:this.props.countm ? this.props.countm : "",
             isFrist:this.props.countm ? true : false,
             DepCode:this.props.DepCode ? this.props.DepCode : "",
             ydcountm:this.props.ydcountm ? this.props.ydcountm : "",
@@ -61,7 +61,7 @@ export default class GoodsDetails extends Component {
         Storage.get('YuanDan').then((tags)=>{
             if(tags==1){
 
-                if(this.state.Number == "1"&&!this.state.isFrist){
+                if(this.state.Number == ""&&!this.state.isFrist){
                     this.setState({
                         Number:this.state.ydcountm
                     })
@@ -98,14 +98,19 @@ export default class GoodsDetails extends Component {
     }
 
     add(){
-        var Number1=this.state.Number;
-        this.setState({
-           Number:parseInt(Number1)+1,
-        });
-        let numberFormat2 = NumberUtils.numberFormat2((parseInt(Number1)+1)*(this.state.ShopPrice));
-        this.setState({
-            numberFormat2:numberFormat2,
-        });
+        // var Number1=this.state.Number;
+        if(this.state.Number==""){
+            this.setState({
+                Number:1,
+                numberFormat2:this.state.ShopPrice,
+            });
+        }else{
+            let numberFormat2 = NumberUtils.numberFormat2((parseInt(this.state.Number)+1)*(this.state.ShopPrice));
+            this.setState({
+                Number:parseInt(this.state.Number)+1,
+                numberFormat2:numberFormat2,
+            });
+        }
     }
 
     subtraction(){
@@ -119,8 +124,8 @@ export default class GoodsDetails extends Component {
                 numberFormat2:numberFormat2,
             });
         }
-        if(this.state.Number == 0){
-            ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
+        if(this.state.Number == 0||this.state.Number == ""){
+            ToastAndroid.show('商品数量不能为空', ToastAndroid.SHORT);
             this.setState({
                Number:0
             });
@@ -138,8 +143,8 @@ export default class GoodsDetails extends Component {
     pressPop(){
         if(this.state.name==null) {
             alert("请选择单据")
-        }else if(this.state.Number==0){
-            ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
+        }else if(this.state.Number==0||this.state.Number == ""){
+            ToastAndroid.show('商品数量不能为空', ToastAndroid.SHORT);
         }else{
             var shopInfoData = [];
             var shopInfo = {};

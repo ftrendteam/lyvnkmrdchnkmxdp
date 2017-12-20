@@ -226,7 +226,6 @@ export default class admin extends Component {
                     str2 = str1[1];
                     this._setModalVisible();
                     dbAdapter.isLogin(Usercode, this.state.UserPwd, str2).then((isLogin)=>{
-
                         if(isLogin){
                             var strin = this.state.sCode1;
                             strjj = ""+strin;
@@ -250,7 +249,6 @@ export default class admin extends Component {
                         }
                     },(err)=>{
                         this._setModalVisible();
-                        alert("cuowu");
                     });
                 }else{
                     alert("当前商户名不同，该机器无法运行")

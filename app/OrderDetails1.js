@@ -42,7 +42,7 @@ export default class GoodsDetails extends Component {
             ShopPrice:this.props.ShopPrice ? this.props.ShopPrice : "",
             Remark:this.props.Remark ? this.props.Remark : "",
             prototal:this.props.prototal ? this.props.prototal : "",
-            Number:this.props.countm ? this.props.countm : "1",
+            Number:this.props.countm ? this.props.countm : "",
             DepCode:this.props.DepCode ? this.props.DepCode : "",
             ydcountm:this.props.ydcountm ? this.props.ydcountm : "",
             SuppCode:this.props.SuppCode ? this.props.SuppCode : "",
@@ -143,14 +143,18 @@ export default class GoodsDetails extends Component {
     }
 
     add(){
-        var Number1=this.state.Number;
-        this.setState({
-            Number:parseInt(Number1)+1,
-        });
-        let numberFormat2 = NumberUtils.numberFormat2((parseInt(Number1)+1)*(this.state.ShopPrice));
-        this.setState({
-            numberFormat2:numberFormat2,
-        });
+        if(this.state.Number==""){
+            this.setState({
+                Number:1,
+                numberFormat2:this.state.ShopPrice,
+            });
+        }else{
+            let numberFormat2 = NumberUtils.numberFormat2((parseInt(this.state.Number)+1)*(this.state.ShopPrice));
+            this.setState({
+                Number:parseInt(this.state.Number)+1,
+                numberFormat2:numberFormat2,
+            });
+        }
     }
 
     subtraction(){

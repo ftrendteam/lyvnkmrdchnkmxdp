@@ -282,7 +282,6 @@ export default class ShoppingCart extends Component {
                                 LinkUrl:tags
                             })
                         })
-                        alert(this.state.LinkUrl)
                         //商品查询
                         Storage.get('userName').then((tags)=>{
                             let params = {

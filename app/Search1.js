@@ -178,7 +178,6 @@ export default class Search extends Component {
                                 FetchUtil.post(this.state.LinkUrl, JSON.stringify(params)).then((data) => {
                                     var countm = JSON.stringify(data.countm);
                                     var ShopPrice = JSON.stringify(data.ShopPrice);
-                                    // alert(JSON.stringify(data))
                                     if (data.retcode == 1) {
                                         var ShopCar = rows.item(0).ProdName;
                                         this.setState({
