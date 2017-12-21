@@ -227,6 +227,6 @@ const styles = StyleSheet.create({
         flex:1,
     },
     scrollview:{
-        marginBottom:140
+        marginBottom:120
     }
 });

@@ -68,32 +68,6 @@ export default class Sell extends Component {
                     </View>
                     <View style={styles.TitleCont}>
                         <View style={styles.FristList}>
-                            <View style={styles.List}>
-                                <View style={styles.ListView1}>
-                                    <Text style={[styles.ListText,{textAlign:"center"}]}>店号：</Text>
-                                </View>
-                                <View style={styles.ListView}>
-                                    <Text style={styles.ListText}>0001</Text>
-                                </View>
-                            </View>
-                            <View style={styles.List}>
-                                <View style={styles.ListView1}>
-                                    <Text style={[styles.ListText,{textAlign:"center"}]}>收款员：</Text>
-                                </View>
-                                <View style={styles.ListView}>
-                                    <Text style={styles.ListText}>0001</Text>
-                                </View>
-                            </View>
-                            <View style={styles.List}>
-                                <View style={styles.ListView1}>
-                                    <Text style={[styles.ListText,{textAlign:"center"}]}>pos号：</Text>
-                                </View>
-                                <View style={styles.ListView}>
-                                    <Text style={styles.ListText}>0001</Text>
-                                </View>
-                            </View>
-                        </View>
-                        <View style={styles.FristList}>
                             <View style={[styles.List,{flex:2}]}>
                                 <View style={styles.ListView1}>
                                     <Text style={[styles.ListText,{textAlign:"center"}]}>流水号：</Text>
@@ -102,20 +76,7 @@ export default class Sell extends Component {
                                     <Text style={styles.ListText}>0001</Text>
                                 </View>
                             </View>
-                            <View style={[styles.List,{flex:1}]}>
-                                <TouchableOpacity style={[{backgroundColor:"#ffffff",
-                                    paddingBottom:2,paddingLeft:5,paddingRight:5,borderRadius:5,paddingTop:5,}]}>
-                                    <Text style={[{color:"#9a0000",fontSize:16,textAlign:"center"}]}>收款员</Text>
-                                </TouchableOpacity>
-                            </View>
-                            <View style={[styles.List,{flex:2}]}>
-                                <View style={styles.ListView1}>
-                                    <Text style={[styles.ListText,{textAlign:"center"}]}>版本：</Text>
-                                </View>
-                                <View style={styles.ListView}>
-                                    <Text style={styles.ListText}>0001</Text>
-                                </View>
-                            </View>
+
                         </View>
                     </View>
                     <View style={styles.ShopCont}>
@@ -163,8 +124,8 @@ export default class Sell extends Component {
                         </View>
                         <View style={[styles.Prece,{height:28,marginTop:16,backgroundColor:"#f2f2f2"}]}>
                             <View style={styles.Inputing}>
-                                <View style={[styles.Inputingleft,{width:90}]}>
-                                    <Text style={[styles.InputingText,{fontWeight:"bold"}]}>合计金额:</Text>
+                                <View style={[styles.Inputingleft,{width:50}]}>
+                                    <Text style={[styles.InputingText,{fontWeight:"bold"}]}>金额:</Text>
                                 </View>
                                 <View style={styles.Inputingright}>
                                     <Text style={[styles.InputingText,{fontWeight:"bold",fontSize:20,color:"red"}]}>33</Text>
@@ -181,8 +142,8 @@ export default class Sell extends Component {
                         </View>
                         <View style={[styles.Prece,{height:28,marginTop:16,backgroundColor:"#f2f2f2"}]}>
                             <View style={styles.Inputing}>
-                                <View style={[styles.Inputingleft,{width:90}]}>
-                                    <Text style={[styles.InputingText,{fontWeight:"bold"}]}>合计数量:</Text>
+                                <View style={[styles.Inputingleft,{width:50}]}>
+                                    <Text style={[styles.InputingText,{fontWeight:"bold"}]}>数量:</Text>
                                 </View>
                                 <View style={styles.Inputingright}>
                                     <Text style={[styles.InputingText,{fontWeight:"bold",fontSize:20,color:"red"}]}>22</Text>
@@ -352,6 +313,36 @@ export default class Sell extends Component {
                             </View>
                         </Swiper>
                     </View>
+                    <View style={[styles.Prece,{height:28,marginTop:10,backgroundColor:"#f2f2f2"}]}>
+                        <View style={styles.Inputing}>
+                            <View style={[styles.Inputingleft,{width:60}]}>
+                                <Text style={[{color:"#333333",fontSize:16,textAlign:"right"}]}>店号:</Text>
+                            </View>
+                            <View style={[styles.Inputingright,{marginLeft:5,}]}>
+                                <Text style={[{fontSize:16,color:"red"}]}>0001</Text>
+                            </View>
+                        </View>
+                    </View>
+                    <View style={[styles.Prece,{height:28,backgroundColor:"#f2f2f2"}]}>
+                        <View style={styles.Inputing}>
+                            <View style={[styles.Inputingleft,{width:60}]}>
+                                <Text style={[{color:"#333333",fontSize:16,textAlign:"right"}]}>收款员:</Text>
+                            </View>
+                            <View style={[styles.Inputingright,{marginLeft:5,}]}>
+                                <Text style={[{fontSize:16,color:"red"}]}>0001</Text>
+                            </View>
+                        </View>
+                    </View>
+                    <View style={[styles.Prece,{height:28,backgroundColor:"#f2f2f2"}]}>
+                        <View style={styles.Inputing}>
+                            <View style={[styles.Inputingleft,{width:60}]}>
+                                <Text style={[{color:"#333333",fontSize:16,textAlign:"right"}]}>pos号:</Text>
+                            </View>
+                            <View style={[styles.Inputingright,{marginLeft:5,}]}>
+                                <Text style={[{fontSize:16,color:"red"}]}>0001</Text>
+                            </View>
+                        </View>
+                    </View>
                 </ScrollView>
             </View>
         );
@@ -383,12 +374,18 @@ const styles = StyleSheet.create({
         marginTop:3,
     },
     TitleCont:{
-        height:90,
+        height:40,
         backgroundColor:"#ff4e4e",
         paddingLeft:20,
         paddingRight:20,
     },
     FristList:{
+        height:38,
+        paddingTop:6,
+        paddingBottom:6,
+        flexDirection:"row",
+    },
+    FristList1:{
         height:38,
         paddingTop:12,
         flexDirection:"row",

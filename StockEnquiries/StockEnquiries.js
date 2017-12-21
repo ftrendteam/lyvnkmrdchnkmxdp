@@ -19,11 +19,12 @@ import {
     InteractionManager,
     DeviceEventEmitter,
 } from 'react-native';
-import Index from "./Index";
+import Index from "../app/Index";
 import DBAdapter from "../adapter/DBAdapter";
 import Storage from '../utils/Storage';
 import FetchUtil from "../utils/FetchUtils";
-
+var {NativeModules} = require('react-native');
+var RNScannerAndroid = NativeModules.RNScannerAndroid;
 let dbAdapter = new DBAdapter();
 let db;
 export default class StockEnquiries extends Component {
@@ -49,7 +50,9 @@ export default class StockEnquiries extends Component {
             this.Device();
         });
     }
-
+    Code(){
+        RNScannerAndroid.openScanner();
+    }
     Device() {
         DeviceEventEmitter.addListener("code", (reminder) => {
             this.setState({
@@ -128,6 +131,9 @@ export default class StockEnquiries extends Component {
                             <Image source={require("../images/2_01.png")} style={styles.HeaderImage}></Image>
                         </TouchableOpacity>
                         <Text style={styles.HeaderList}>库存查询</Text>
+                        <TouchableOpacity onPress={this.Code.bind(this)} style={styles.onclick}>
+                            <Image source={require("../images/1_05.png")} style={styles.HeaderImage}></Image>
+                        </TouchableOpacity>
                     </View>
                 </View>
                 <View style={styles.ContList}>

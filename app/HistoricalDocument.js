@@ -155,7 +155,6 @@ export default class HistoricalDocument extends Component {
 
       //reqDetailCode获取
       Storage.get('history').then((tags) => {
-          //alert(tags)
           this.setState({
               reqDetailCode: tags
           });
