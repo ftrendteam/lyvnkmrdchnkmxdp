@@ -78,10 +78,10 @@ export default class DBAdapter extends SQLiteOpenHelper {
         let PSShop = tShopItem.PSShop;
         let isdel = tShopItem.isdel;
         let FCanCG = tShopItem.FCanCG;
-      
+        
         let sql = "INSERT INTO tshopitem(pid,shopcode,shopname,UniqueCode,shoplevel,subcode,FNeedPS,FCanPH,PSShop,isdel,FCanCG)" +
           "values(?,?,?,?,?,?,?,?,?,?,?)";
-        tx.executeSql(sql, [pid, shopcode, shopname, UniqueCode, shoplevel, subcode, FNeedPS, FCanPH,PSShop,isdel,FCanCG], () => {
+        tx.executeSql(sql, [pid, shopcode, shopname, UniqueCode, shoplevel, subcode, FNeedPS, FCanPH, PSShop, isdel, FCanCG], () => {
           
           }, (err) => {
             console.log(err);
@@ -383,8 +383,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
           //   "prodname":"海鲜菇","countm":1.0000,"kccount":0.0,"prototal":1.0000,"unit":"kg  ","promemo":""
           let sql = " replace INTO shopInfo(pid,ProdCode,prodname,countm,ShopPrice,prototal,promemo,DepCode,ydcountm,SuppCode)" +
             "values(?,?,?,?,?,?,?,?,?,?)";
-          console.log("sql",sql,"=",ShopRemark);
-          tx.executeSql(sql, [Pid, ProdCode, shopName, ShopNumber, ShopPrice, ShopAmount, ShopRemark, DepCode, ydcountm,suppCode], () => {
+          tx.executeSql(sql, [Pid, ProdCode, shopName, ShopNumber, ShopPrice, ShopAmount, ShopRemark, DepCode, ydcountm, suppCode], () => {
               resolve(true);
             }, (err) => {
               reject(false);
@@ -453,7 +452,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
    * 修改某个商品的数量-1
    */
   upDataShopInfoCountmSub(ProdCode) {
-    console.log("a",ProdCode);
+    console.log("a", ProdCode);
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
         tx.executeSql("update shopInfo set countm=countm-1 where ProdCode='" + ProdCode + "'", [], (tx, results) => {
@@ -591,10 +590,10 @@ export default class DBAdapter extends SQLiteOpenHelper {
   selectTUserShopData(Usercode) {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
-        tx.executeSql("select b.ShopCode,b.ShopName from tUserShop a inner join tshopitem b on b.SubCode+rtrim(b.shopcode)+';' like '%;'+rtrim(a.shopcode)+';%' or rtrim(a.shopcode)='0'  where a.UserCode='" + Usercode + "'" , [], (tx, results) => {
+        tx.executeSql("select b.ShopCode,b.ShopName from tUserShop a inner join tshopitem b on b.SubCode+rtrim(b.shopcode)+';' like '%;'+rtrim(a.shopcode)+';%' or rtrim(a.shopcode)='0'  where a.UserCode='" + Usercode + "'", [], (tx, results) => {
           resolve(results.rows);
         });
-
+        
       }, (error) => {
         this._errorCB('transaction', error);
       });
@@ -671,7 +670,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
   isCGYS(shopCode) {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
-        let ssql = "select FCanCG  from tShopItem  where isdel='0' and ((ShopCode='" + shopCode + "'  and FCanCG='1') or '"+shopCode+"'='0')";
+        let ssql = "select FCanCG  from tShopItem  where isdel='0' and ((ShopCode='" + shopCode + "'  and FCanCG='1') or '" + shopCode + "'='0')";
         tx.executeSql(ssql, [], (tx, results) => {
           resolve(results.rows);
         });
@@ -727,8 +726,8 @@ export default class DBAdapter extends SQLiteOpenHelper {
                     console.log("本地没有保存机构号,根据当前的机构号下载商品和品类");
                     resolve(result);
                     //}
-                  },(err)=>{
-                      reject(false);
+                  }, (err) => {
+                    reject(false);
                   });
                   resolve(true);
                 } else if (shopCode == '') {//本地没有保存机构号,根据当前的机构号下载商品和品类
@@ -738,8 +737,8 @@ export default class DBAdapter extends SQLiteOpenHelper {
                     console.log("本地没有保存机构号,根据当前的机构号下载商品和品类");
                     resolve(result);
                     //}
-                  },(err)=>{
-                      reject(false);
+                  }, (err) => {
+                    reject(false);
                   });
                 } else {//当前登录的机构号和本地保存的机构号不同.重新保存并下载新的品类和商品信息
                   DataUtils.save('shopCode', currShopCode);
@@ -753,17 +752,17 @@ export default class DBAdapter extends SQLiteOpenHelper {
                     //if (result) {
                     resolve(result);
                     //}
-                  },(err)=>{
-                      reject(false);
+                  }, (err) => {
+                    reject(false);
                   });
                 }
               });
               
             } else {
-                reject(false);
+              reject(false);
             }
           } else {
-              reject(false);
+            reject(false);
           }
           
           //}
@@ -794,15 +793,15 @@ export default class DBAdapter extends SQLiteOpenHelper {
                   DownLoadBasicData.downLoadKgtOpt(urlData, currShopCode, this)
                   resolve(true);
                 });
-              },(err)=>{
-                  reject(false);
+              }, (err) => {
+                reject(false);
               })
             });
-          },(err)=>{
-              reject(false);
-          });
-        },(err)=>{
+          }, (err) => {
             reject(false);
+          });
+        }, (err) => {
+          reject(false);
         });
       });
     });
@@ -862,31 +861,31 @@ export default class DBAdapter extends SQLiteOpenHelper {
       });
     })
   }
-
-    /***
-     * 根据解析出来的prodCode 查询商品
-     * @param prodCode
-     * @param DepLevel   当前默认传1
-     * @returns {Promise}
-     */
-    // selectProdCode(prodCode, DepLevel) {
-    //     return new Promise((resolve, reject) => {
-    //         db.transaction((tx) => {
-    //             let ssql = "select a.*,ifNull(b.countm,0) as ShopNumber,ifNull(b.ShopPrice,a.StdPrice) as ShopPrice ,ifNull(b.prototal,0) as ShopAmount   " +
-    //                 ",ifNull(b.promemo,'') as ShopRemark,c.depcode" + DepLevel + " as DepCode1 " +
-    //                 " from product a left join shopInfo b on a.Pid=b.Pid  ";
-    //             ssql = ssql + " left join  tdepset c on c.IsDel='0' and a.depcode=c.depcode where a.IsDel='0' and prodtype<>'1'";
-    //             ssql = ssql + "  and  a.prodcode ='" + prodCode + "'";
-    //             tx.executeSql(ssql, [], (tx, results) => {
-    //                 resolve(results.rows);
-    //
-    //             });
-    //         }, (error) => {
-    //             this._errorCB('transaction', error);
-    //         });
-    //     })
-    // }
-
+  
+  /***
+   * 根据解析出来的prodCode 查询商品
+   * @param prodCode
+   * @param DepLevel   当前默认传1
+   * @returns {Promise}
+   */
+  selectProdCode(prodCode, DepLevel) {
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        let ssql = "select a.*,ifNull(b.countm,0) as ShopNumber,ifNull(b.ShopPrice,a.StdPrice) as ShopPrice ,ifNull(b.prototal,0) as ShopAmount   " +
+          ",ifNull(b.promemo,'') as ShopRemark,c.depcode" + DepLevel + " as DepCode1 " +
+          " from product a left join shopInfo b on a.Pid=b.Pid  ";
+        ssql = ssql + " left join  tdepset c on c.IsDel='0' and a.depcode=c.depcode where a.IsDel='0' and prodtype<>'1'";
+        ssql = ssql + "  and  a.prodcode ='" + prodCode + "'";
+        tx.executeSql(ssql, [], (tx, results) => {
+          resolve(results.rows);
+          
+        });
+      }, (error) => {
+        this._errorCB('transaction', error);
+      });
+    })
+  }
+  
   /***
    * 助记码查询商品
    */
@@ -1014,11 +1013,10 @@ export default class DBAdapter extends SQLiteOpenHelper {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
         let sql = "select * from " + dbName;
-        if (dbName=="tsuppset")
-        {
-            sql=sql+" where supptype<>'1'";
+        if (dbName == "tsuppset") {
+          sql = sql + " where supptype<>'1'";
         }
-
+        
         tx.executeSql(sql, [], (tx, results) => {
             resolve((results.rows));
           }, (error) => {
@@ -1029,26 +1027,218 @@ export default class DBAdapter extends SQLiteOpenHelper {
     });
     
   }
-
-    /***
-     * 查询协配采购单中的机构号
-     * @param dbName 表明
-     * @return {Promise}
-     */
-    selectXPShopCode = (shopCode) => {
-        return new Promise((resolve, reject) => {
-            db.transaction((tx) => {
-                let sql = "select * from tshopitem where isdel='0' and PSShop='"+shopCode+"'";
-                tx.executeSql(sql, [], (tx, results) => {
-                        resolve((results.rows));
-                    }, (error) => {
-                        console.log("err===", error);
-                    }
-                );
-            });
-        });
-
-    }
+  
+  /***
+   * 查询协配采购单中的机构号
+   * @param dbName 表明
+   * @return {Promise}
+   */
+  selectXPShopCode = (shopCode) => {
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        let sql = "select * from tshopitem where isdel='0' and PSShop='" + shopCode + "'";
+        tx.executeSql(sql, [], (tx, results) => {
+            resolve((results.rows));
+          }, (error) => {
+            console.log("err===", error);
+          }
+        );
+      });
+    });
+    
+  }
+  
+  /***
+   *保存流水表Sum
+   */
+  insertSum(sumDatas) {
+    db.transaction((tx) => {
+      for (let i = 0; i < sumDatas.length; i++) {
+        let sum = sumDatas[i];
+        let lsNo = sum.LsNo;
+        let sDateTime = sum.sDateTime;
+        let tradeFlag = sum.TradeFlag;
+        let cashierId = sum.CashierId;
+        let cashierCode = sum.CashierCode;
+        let ino = sum.ino;
+        let cashierName = sum.CashierName;
+        let dscTotal = sum.DscTotal;
+        let autoDscTotal = sum.AutoDscTotal;
+        let total = sum.Total;
+        let totalPay = sum.TotalPay;
+        let change = sum.Change;
+        let custType = sum.CustType;
+        let custCode = sum.CustCode;
+        let invCode = sum.InvCode;
+        let payId = sum.PayId;
+        let payCode = sum.PayCode;
+        let amount = sum.Amount;
+        let oldAmount = sum.OldAmount;
+        let tendPayCode = sum.TendPayCode;
+        let vipTotal = sum.VipTotal;
+        let tScore = sum.TScore;
+        let vipSCore = sum.VipSCore;
+        let innerNo = sum.InnerNo;
+        let transFlag = sum.TransFlag;
+        let transDateTime = sum.TransDateTime;
+        let ywDate = sum.YWDate;
+        let sql = "insert into Sum(LsNo,sDateTime,TradeFlag,CashierId,CashierCode,ino,CashierName,DscTotal,AutoDscTotal,Total,TotalPay,Change,CustType,CustCode,InvCode," +
+          "PayId,PayCode,Amount,OldAmount,TendPayCode,VipTotal,TScore,VipSCore,InnerNo,TransFlag,TransDateTime,YWDate) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        tx.executeSql(sql, [lsNo,sDateTime,tradeFlag,cashierId,cashierCode,ino,cashierName,dscTotal,autoDscTotal,total,totalPay,change,custType,custCode,
+          invCode,payId,payCode,amount,oldAmount,tendPayCode,vipTotal,tScore,vipSCore,innerNo,transFlag,transDateTime,ywDate], (tx, results) => {
+            //resolve((results.rows));
+          }, (error) => {
+            console.log("err===", error);
+          }
+        );
+      }
+      
+    });
+   
+  }
+  
+  /***
+   * 保存流水表Deatil
+   */
+  insertDetail(detailDatas) {
+    db.transaction((tx) => {
+      for (let i = 0;i<detailDatas.length;i++){
+        let detail = detailDatas[i];
+        let lsNo = detail.LsNo;
+        let sDateTime = detail.sDateTime;
+        let tradeFlag = detail.TradeFlag;
+        let cashierId = detail.CashierId;
+        let cashierCode = detail.CashierCode;
+        let cashierName = detail.CashierName;
+        let clerkId = detail.ClerkId;
+        let clerkCode = detail.ClerkCode;
+        let pid = detail.Pid;
+        let barCode = detail.BarCode;
+        let clerkName = detail.ClerkName;
+        let prodCode = detail.ProdCode;
+        let prodName = detail.ProdName;
+        let depCode = detail.DepCode;
+        let price = detail.Price;
+        let amount = detail.Amount;
+        let dscTotal = detail.DscTotal;
+        let total = detail.Total;
+        let autoDscTotal = detail.AutoDscTotal;
+        let handDsc = detail.HandDsc;
+        let cxDsc = detail.CxDsc;
+        let evenDsc = detail.EvenDsc;
+        let mljDsc = detail.MljDsc;
+        let overDsc = detail.OverDsc;
+        let otherDsc = detail.OtherDsc;
+        let tranDsc = detail.TranDsc;
+        let vipDsc = detail.VipDsc;
+        let innerNo = detail.InnerNo;
+        let orderNo = detail.OrderNo;
+        let transFlag = detail.TransFlag;
+        let transDateTime = detail.TransDateTime;
+        let brandDsc = detail.BrandDsc;
+        let subProd = detail.isSubProd;
+        let minus = detail.isMinus;
+        let buyPresentCode = detail.BuyPresentCode;
+        let buyPresentGroupNo = detail.BuyPresentGroupNo;
+        let bpUsedCountN = detail.BPUsedCountN;
+        let dscFormNo = detail.DscFormNo;
+        let dscMJFormNo = detail.DscMJFormNo;
+        let ssid = detail.SSID;
+        let dscMZFormNo = detail.DscMZFormNo;
+        let dscGSFormNo = detail.DscGSFormNo;
+        let gsUsedCountN = detail.GSUsedCountN;
+        let ywDate = detail.YWDate;
+        let sql = "insert into Detail(LsNo,sDateTime,TradeFlag,CashierId,CashierCode,CashierName,ClerkId,ClerkCode,Pid," +
+          "BarCode,ClerkName,ProdCode,ProdName,DepCode,Price,Amount,DscTotal,Total,AutoDscTotal,HandDsc,CxDsc,EvenDsc,MljDsc," +
+          "OverDsc,OtherDsc,TranDsc,VipDsc,InnerNo,OrderNo,TransFlag,TransDateTime,BrandDsc,isSubProd,isMinus,BuyPresentCode," +
+          "BuyPresentGroupNo,BPUsedCountN,DscFormNo,DscMJFormNo,SSID,DscMZFormNo,DscGSFormNo,GSUsedCountN,YWDate) values(" +
+          "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        tx.executeSql(sql, [lsNo , sDateTime , tradeFlag , cashierId , cashierCode , cashierName , clerkId , clerkCode ,
+          pid , barCode , clerkName , prodCode , prodName , depCode , price , amount , dscTotal , total , autoDscTotal ,
+          handDsc , cxDsc , evenDsc , mljDsc , overDsc , otherDsc , tranDsc , vipDsc , innerNo , orderNo , transFlag ,
+          transDateTime , brandDsc , subProd , minus , buyPresentCode , buyPresentGroupNo , bpUsedCountN , dscFormNo ,
+          dscMJFormNo , ssid , dscMZFormNo , dscGSFormNo , gsUsedCountN , ywDate], (tx, results) => {
+            //resolve((results.rows));
+          }, (error) => {
+            console.log("err===", error);
+          }
+        );
+      }
+      
+    });
+  }
+  
+  
+  /***
+   * 保存挂单数据
+   */
+  insertRDetail(rdetailDatas) {
+    db.transaction((tx) => {
+      for (let i = 0;i<rdetailDatas.length;i++){
+        let detail = rdetailDatas[i];
+        let lsNo = detail.LsNo;
+        let sDateTime = detail.sDateTime;
+        let tradeFlag = detail.TradeFlag;
+        let cashierId = detail.CashierId;
+        let cashierCode = detail.CashierCode;
+        let cashierName = detail.CashierName;
+        let clerkId = detail.ClerkId;
+        let clerkCode = detail.ClerkCode;
+        let pid = detail.Pid;
+        let barCode = detail.BarCode;
+        let clerkName = detail.ClerkName;
+        let prodCode = detail.ProdCode;
+        let prodName = detail.ProdName;
+        let depCode = detail.DepCode;
+        let price = detail.Price;
+        let amount = detail.Amount;
+        let dscTotal = detail.DscTotal;
+        let total = detail.Total;
+        let autoDscTotal = detail.AutoDscTotal;
+        let handDsc = detail.HandDsc;
+        let cxDsc = detail.CxDsc;
+        let evenDsc = detail.EvenDsc;
+        let mljDsc = detail.MljDsc;
+        let overDsc = detail.OverDsc;
+        let otherDsc = detail.OtherDsc;
+        let tranDsc = detail.TranDsc;
+        let vipDsc = detail.VipDsc;
+        let innerNo = detail.InnerNo;
+        let orderNo = detail.OrderNo;
+        let transFlag = detail.TransFlag;
+        let transDateTime = detail.TransDateTime;
+        let brandDsc = detail.BrandDsc;
+        let subProd = detail.isSubProd;
+        let minus = detail.isMinus;
+        let buyPresentCode = detail.BuyPresentCode;
+        let buyPresentGroupNo = detail.BuyPresentGroupNo;
+        let bpUsedCountN = detail.BPUsedCountN;
+        let dscFormNo = detail.DscFormNo;
+        let dscMJFormNo = detail.DscMJFormNo;
+        let ssid = detail.SSID;
+        let dscMZFormNo = detail.DscMZFormNo;
+        let dscGSFormNo = detail.DscGSFormNo;
+        let gsUsedCountN = detail.GSUsedCountN;
+        let ywDate = detail.YWDate;
+        let sql = "insert into Detail(LsNo,sDateTime,TradeFlag,CashierId,CashierCode,CashierName,ClerkId,ClerkCode,Pid," +
+          "BarCode,ClerkName,ProdCode,ProdName,DepCode,Price,Amount,DscTotal,Total,AutoDscTotal,HandDsc,CxDsc,EvenDsc,MljDsc," +
+          "OverDsc,OtherDsc,TranDsc,VipDsc,InnerNo,OrderNo,TransFlag,TransDateTime,BrandDsc,isSubProd,isMinus,BuyPresentCode," +
+          "BuyPresentGroupNo,BPUsedCountN,DscFormNo,DscMJFormNo,SSID,DscMZFormNo,DscGSFormNo,GSUsedCountN,YWDate) values(" +
+          "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        tx.executeSql(sql, [lsNo , sDateTime , tradeFlag , cashierId , cashierCode , cashierName , clerkId , clerkCode ,
+            pid , barCode , clerkName , prodCode , prodName , depCode , price , amount , dscTotal , total , autoDscTotal ,
+            handDsc , cxDsc , evenDsc , mljDsc , overDsc , otherDsc , tranDsc , vipDsc , innerNo , orderNo , transFlag ,
+            transDateTime , brandDsc , subProd , minus , buyPresentCode , buyPresentGroupNo , bpUsedCountN , dscFormNo ,
+            dscMJFormNo , ssid , dscMZFormNo , dscGSFormNo , gsUsedCountN , ywDate], (tx, results) => {
+            //resolve((results.rows));
+          }, (error) => {
+            console.log("err===", error);
+          }
+        );
+      }
+      
+    });
+  }
   
   /***
    * 关闭表

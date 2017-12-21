@@ -164,6 +164,39 @@ export default class SQLiteOpenHelper {
         }, (err) => {
           console.log(err);
         });
+      tx.executeSql("CREATE TABLE IF NOT EXISTS Sum(LsNo varchar(12) not null,sDateTime varchar(19) not null,TradeFlag varchar(1) null," +
+        "CashierId int(4) null,CashierCode varchar(12) null,ino int(4) null,CashierName varchar(20) null,DscTotal float(8) null,AutoDscTotal float(8) null," +
+        "Total float(8) null, TotalPay float(8) null,Change float(8) null,CustType varchar(1) null, CustCode varchar(20) null," +
+        "InvCode varchar(12) null,PayId int(4) null,PayCode varchar(2) null,Amount float(8) null,OldAmount float(8) null," +
+        "TendPayCode varchar(30) null,VipTotal float(8) null,TScore float(8) null,VipSCore float(8) null, InnerNo varchar(12) null,TrandsFlag varchar(19) null,YWDate varchar(10) null)",
+        [],() => {
+        },
+        (err) => {
+          console.log(err);
+        });
+      tx.executeSql("CREATE TABLE IF NOT EXISTS Detail(LsNo varchar(12) not null,sDateTime varchar(19) not null,TradeFlag varchar(1) null," +
+        "CashierId int(4) null,CashierCode varchar(12) null,CashierName varchar(20) null,ClerkId int(4) null,ClerkCode varchar(12) null,Pid int(4) not null,BarCode varchar(18) null," +
+        "ClerkName  varchar(20) null,ProdCode varchar(13) null,ProdName varchar(40) null,DepCode varchar(12) null,Price float(8) null,Amount float(8) null," +
+        "DscTotal float(8) null,AutoDscTotal float(8) null," +
+        "Total float(8) null,HandDscTotal float(8) null,CxDsc float(8) null,EvenDsc float(8) null,MljDsc float(8) null, OverDsc float(8) null,OtherDsc float(8) null,TranDsc float(1) null, VipDsc float(20) null," +
+        "InnerNo varchar(12) null,OrderNo varchar(3) null,TransFlag varchar(1) null,TransDateTime varchar(19) null,BrandDsc float(8) null," +
+        "isSubProd varchar(1) null,isMinus varchar(1) null,BuyPresentCode varchar(20) null,BuyPresentGroupNo varchar(20) null, BPUsedCountN float(8) null,DscFormNo varchar(20) null,DscMJFormNo varchar(20) null,SSID varchar(32) null," +
+        "DscMZFormNo varchar(20) null,DscGSFormNo varchar(20) null,GSUsedCountN float(8) null,YWDate varchar(10))", [],() => {
+      }, (err) => {
+        console.log(err);
+      });
+      //挂单表
+      tx.executeSql("CREATE TABLE IF NOT EXISTS RDetail(LsNo varchar(12) not null,sDateTime varchar(19) not null,TradeFlag varchar(1) null," +
+        "CashierId int(4) null,CashierCode varchar(12) null,CashierName varchar(20) null,ClerkId int(4) null,ClerkCode varchar(12) null,Pid int(4) not null,BarCode varchar(18) null," +
+        "ClerkName  varchar(20) null,ProdCode varchar(13) null,ProdName varchar(40) null,DepCode varchar(12) null,Price float(8) null,Amount float(8) null," +
+        "DscTotal float(8) null,AutoDscTotal float(8) null," +
+        "Total float(8) null,HandDscTotal float(8) null,CxDsc float(8) null,EvenDsc float(8) null,MljDsc float(8) null, OverDsc float(8) null,OtherDsc float(8) null,TranDsc float(1) null, VipDsc float(20) null," +
+        "InnerNo varchar(12) null,OrderNo varchar(3) null,TransFlag varchar(1) null,TransDateTime varchar(19) null,BrandDsc float(8) null," +
+        "isSubProd varchar(1) null,isMinus varchar(1) null,BuyPresentCode varchar(20) null,BuyPresentGroupNo varchar(20) null, BPUsedCountN float(8) null,DscFormNo varchar(20) null,DscMJFormNo varchar(20) null,SSID varchar(32) null," +
+        "DscMZFormNo varchar(20) null,DscGSFormNo varchar(20) null,GSUsedCountN float(8) null,YWDate varchar(10))", [],() => {
+      }, (err) => {
+        console.log(err);
+      });
     }, (err) => {
       this._errorCB('transaction', err);
     }, () => {
