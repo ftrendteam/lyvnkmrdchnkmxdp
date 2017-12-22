@@ -114,6 +114,7 @@ export default class Search extends Component {
                                 };
                                 FetchUtil.post(this.state.LinkUrl, JSON.stringify(params)).then((data) => {
                                     var countm = JSON.stringify(data.countm);
+                                    alert(countm);
                                     var ShopPrice = JSON.stringify(data.ShopPrice);
                                     if (data.retcode == 1) {
                                         var ShopCar = rows.item(0).ProdName;
@@ -121,16 +122,48 @@ export default class Search extends Component {
                                             ProdName: rows.item(0).ProdName,
                                             ShopPrice: rows.item(0).ShopPrice,
                                             Pid: rows.item(0).Pid,
-                                            countm: rows.item(0).ShopNumber,
-                                            Remark: rows.item(0).promemo,
+                                            Number1:"",
+                                            Remark: rows.item(0).ShopRemark,
                                             prototal: rows.item(0).prototal,
                                             ProdCode: rows.item(0).ProdCode,
                                             DepCode: rows.item(0).DepCode1,
                                             SuppCode: rows.item(0).SuppCode,
                                             ydcountm: countm,
-                                            Number1: rows.item(0).countm,
+                                            focus:true,
+                                            Search:"",
                                         })
-                                        // DeviceEventEmitter.removeAllListeners();
+                                        Storage.get('YdCountm').then((ydcountm) => {
+                                            if (ydcountm == 2 && countm != 0) {//原单数量
+                                                if (this.state.Number1 == 0) {
+                                                    this.setState({
+                                                        Number1:countm
+                                                    })
+                                                }
+                                            }else if(this.state.Number1 == 0){
+                                                this.setState({
+                                                    Number1:""
+                                                })
+                                            }
+                                            this.setState({
+                                                YdCountm: ydcountm
+                                            })
+                                        });
+
+                                        Storage.get('YuanDan').then((tags) => {
+                                            if (tags == "1") {
+                                                if (this.state.Number == "1" && !this.state.isFrist) {
+                                                    this.setState({
+                                                        Number: this.state.ydcountm
+                                                    })
+                                                }
+                                            }
+                                            let numberFormat1 = NumberUtils.numberFormat2(this.state.ShopPrice);
+                                            let numberFormat2 = NumberUtils.numberFormat2((this.state.Number1) * (this.state.ShopPrice));
+                                            this.setState({
+                                                ShopPrice: numberFormat1,
+                                                numberFormat2: numberFormat2,
+                                            })
+                                        })
                                     } else {
                                         alert(JSON.stringify(data))
                                     }
@@ -182,14 +215,15 @@ export default class Search extends Component {
                                             ProdName: rows.item(0).ProdName,
                                             ShopPrice: rows.item(0).ShopPrice,
                                             Pid: rows.item(0).Pid,
-                                            Number1: rows.item(0).ShopNumber,
+                                            Number1:"",
                                             Remark: rows.item(0).ShopRemark,
                                             prototal: rows.item(0).prototal,
                                             ProdCode: rows.item(0).ProdCode,
                                             DepCode: rows.item(0).DepCode1,
                                             SuppCode: rows.item(0).SuppCode,
                                             ydcountm: countm,
-                                            focus:true
+                                            focus:true,
+                                            Search:"",
                                         })
                                         Storage.get('YdCountm').then((ydcountm) => {
                                             if (ydcountm == 2 && countm != 0) {//原单数量
@@ -200,7 +234,7 @@ export default class Search extends Component {
                                                 }
                                             }else if(this.state.Number1 == 0){
                                                 this.setState({
-                                                    Number1:1
+                                                    Number1:""
                                                 })
                                             }
                                             this.setState({
@@ -349,8 +383,6 @@ export default class Search extends Component {
                 var countm = JSON.stringify(data.countm);
                 var ShopPrice = JSON.stringify(data.ShopPrice);
                 if (data.retcode == 1) {
-                    // if(data.isFond==1){
-
                     this.setState({
                         ProdName: rowData.ProdName,
                         ShopPrice: rowData.StdPrice,
@@ -362,11 +394,10 @@ export default class Search extends Component {
                         DepCode: rowData.DepCode1,
                         SuppCode: rowData.SuppCode,
                         ydcountm: countm,
+                        Search:"",
+                        Number1:""
                     })
                     this.Modal();
-                    // }else{
-                    //     // alert('该商品暂时无法购买')
-                    // }
                 } else {
                     alert(JSON.stringify(data))
                 }
@@ -386,21 +417,25 @@ export default class Search extends Component {
     inputOnBlur1() {
         var Number = this.state.Number1;
         var ShopPrice = this.state.ShopPrice;
-        this.state.totalPrice = Number * ShopPrice;
+        var Price = Number * ShopPrice;
         this.setState({
-            totalPrice: this.state.totalPrice
+            totalPrice: Price
         });
     }
 
     add() {
-        var Number1 = this.state.Number1;
-        this.setState({
-            Number1: parseInt(Number1) + 1,
-        });
-        let numberFormat2 = NumberUtils.numberFormat2((parseInt(Number1) + 1) * (this.state.ShopPrice));
-        this.setState({
-            numberFormat2: numberFormat2,
-        });
+        if(this.state.Number1==""){
+            this.setState({
+                Number1:1,
+                numberFormat2:this.state.ShopPrice,
+            });
+        }else{
+            let numberFormat2 = NumberUtils.numberFormat2((parseInt(this.state.Number1)+1)*(this.state.ShopPrice));
+            this.setState({
+                Number1:parseInt(this.state.Number1)+1,
+                numberFormat2:numberFormat2,
+            });
+        }
     }
 
     subtraction() {
@@ -414,10 +449,10 @@ export default class Search extends Component {
                 numberFormat2: numberFormat2,
             });
         }
-        if (this.state.Number1 == 0) {
-            ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
+        if (this.state.Number1 == 0||this.state.Number1 == "") {
+            ToastAndroid.show('商品数量不能为空', ToastAndroid.SHORT);
             this.setState({
-                Number1: 0
+                Number1: ""
             });
         }
     }
@@ -425,7 +460,7 @@ export default class Search extends Component {
     clear() {
         let numberFormat2 = NumberUtils.numberFormat2((0) * (this.state.ShopPrice));
         this.setState({
-            Number1: 0,
+            Number1: "",
             numberFormat2: numberFormat2,
         })
     }
@@ -480,11 +515,11 @@ export default class Search extends Component {
                     <TextInput
                         autofocus={true}
                         style={styles.Search}
-                        value={this.state.Number}
                         returnKeyType="search"
                         placeholder="请输入搜索商品名称"
                         placeholderColor="#999999"
                         underlineColorAndroid='transparent'
+                        value = {this.state.Search}
                         onChangeText={(value) => {
                             this.setState({
                                 Search: value

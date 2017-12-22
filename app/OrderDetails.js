@@ -29,7 +29,7 @@ export default class GoodsDetails extends Component {
             Remark:this.props.Remark ? this.props.Remark : "",
             prototal:this.props.prototal ? this.props.prototal : "",
             Number:this.props.countm ? this.props.countm : "",
-            isFrist:this.props.countm ? true : false,
+            // isFrist:this.props.countm ? true : false,
             DepCode:this.props.DepCode ? this.props.DepCode : "",
             ydcountm:this.props.ydcountm ? this.props.ydcountm : "",
             SuppCode:this.props.SuppCode ? this.props.SuppCode : "",
@@ -60,13 +60,10 @@ export default class GoodsDetails extends Component {
         })
         Storage.get('YuanDan').then((tags)=>{
             if(tags==1){
-
-                if(this.state.Number == ""&&!this.state.isFrist){
+                if(this.state.ydcountm>0){
                     this.setState({
                         Number:this.state.ydcountm
                     })
-                }else{
-
                 }
             }
             let numberFormat1 = NumberUtils.numberFormat2(this.state.ShopPrice);

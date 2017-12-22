@@ -123,16 +123,48 @@ export default class Search extends Component {
                                             ProdName: rows.item(0).ProdName,
                                             ShopPrice: rows.item(0).ShopPrice,
                                             Pid: rows.item(0).Pid,
-                                            countm: rows.item(0).ShopNumber,
-                                            Remark: rows.item(0).promemo,
+                                            Number1:"",
+                                            Remark: rows.item(0).ShopRemark,
                                             prototal: rows.item(0).prototal,
                                             ProdCode: rows.item(0).ProdCode,
                                             DepCode: rows.item(0).DepCode1,
                                             SuppCode: rows.item(0).SuppCode,
                                             ydcountm: countm,
-                                            Number1: rows.item(0).countm,
+                                            focus:true,
+                                            Search:"",
                                         })
-                                        // DeviceEventEmitter.removeAllListeners();
+                                        Storage.get('YdCountm').then((ydcountm) => {
+                                            if (ydcountm == 2 && countm != 0) {//原单数量
+                                                if (this.state.Number1 == 0) {
+                                                    this.setState({
+                                                        Number1:countm
+                                                    })
+                                                }
+                                            }else if(this.state.Number1 == 0){
+                                                this.setState({
+                                                    Number1:1
+                                                })
+                                            }
+                                            this.setState({
+                                                YdCountm: ydcountm
+                                            })
+                                        });
+
+                                        Storage.get('YuanDan').then((tags) => {
+                                            if (tags == "1") {
+                                                if (this.state.Number == "1" && !this.state.isFrist) {
+                                                    this.setState({
+                                                        Number: this.state.ydcountm
+                                                    })
+                                                }
+                                            }
+                                            let numberFormat1 = NumberUtils.numberFormat2(this.state.ShopPrice);
+                                            let numberFormat2 = NumberUtils.numberFormat2((this.state.Number1) * (this.state.ShopPrice));
+                                            this.setState({
+                                                ShopPrice: numberFormat1,
+                                                numberFormat2: numberFormat2,
+                                            })
+                                        })
                                     } else {
                                         alert(JSON.stringify(data))
                                     }
@@ -184,14 +216,15 @@ export default class Search extends Component {
                                             ProdName: rows.item(0).ProdName,
                                             ShopPrice: rows.item(0).ShopPrice,
                                             Pid: rows.item(0).Pid,
-                                            Number1: rows.item(0).ShopNumber,
+                                            Number1:"",
                                             Remark: rows.item(0).ShopRemark,
                                             prototal: rows.item(0).prototal,
                                             ProdCode: rows.item(0).ProdCode,
                                             DepCode: rows.item(0).DepCode1,
                                             SuppCode: rows.item(0).SuppCode,
                                             ydcountm: countm,
-                                            focus:true
+                                            focus:true,
+                                            Search:"",
                                         })
                                         Storage.get('YdCountm').then((ydcountm) => {
                                             if (ydcountm == 2 && countm != 0) {//原单数量
@@ -351,8 +384,6 @@ export default class Search extends Component {
                 var countm = JSON.stringify(data.countm);
                 var ShopPrice = JSON.stringify(data.ShopPrice);
                 if (data.retcode == 1) {
-                    // if(data.isFond==1){
-
                     this.setState({
                         ProdName: rowData.ProdName,
                         ShopPrice: rowData.StdPrice,
@@ -364,11 +395,10 @@ export default class Search extends Component {
                         DepCode: rowData.DepCode1,
                         SuppCode: rowData.SuppCode,
                         ydcountm: countm,
+                        Search:"",
+                        Number1:""
                     })
                     this.Modal();
-                    // }else{
-                    //     // alert('该商品暂时无法购买')
-                    // }
                 } else {
                     alert(JSON.stringify(data))
                 }
@@ -482,11 +512,11 @@ export default class Search extends Component {
                     <TextInput
                         autofocus={true}
                         style={styles.Search}
-                        value={this.state.Number}
                         returnKeyType="search"
                         placeholder="请输入搜索商品名称"
                         placeholderColor="#999999"
                         underlineColorAndroid='transparent'
+                        value = {this.state.Search}
                         onChangeText={(value) => {
                             this.setState({
                                 Search: value

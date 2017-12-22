@@ -42,7 +42,6 @@ import ProductXP from "./ProductXP";
 import ProductSH from "./ProductSH";
 import SellData from "../Sell/Sell_Data";
 import Sell from "../Sell/Sell";
-import Pay from "../Sell/Pay";
 import StockEnquiries from "../StockEnquiries/StockEnquiries";
 import NetUtils from "../utils/NetUtils";
 import FetchUtil from "../utils/FetchUtils";
@@ -131,11 +130,22 @@ export default class Index extends Component {
     }
 
     ShopList(){
-        var nextRoute={
-            name:"主页",
-            component:ShoppingCart
-        };
-        this.props.navigator.push(nextRoute)
+        Storage.get('Name').then((tags)=>{
+            if(tags=="销售"){
+                var nextRoute={
+                    name:"Sell",
+                    component:Sell
+                };
+                this.props.navigator.push(nextRoute)
+            }else{
+                var nextRoute={
+                    name:"主页",
+                    component:ShoppingCart
+                };
+                this.props.navigator.push(nextRoute)
+            }
+        })
+
     }
 
     pressPush(){
@@ -1074,34 +1084,57 @@ export default class Index extends Component {
     }
 
     Sell(){
-        Storage.get('Bind').then((tags)=>{
-            Storage.save("invoice", "销售");
-            if(tags=="bindsucceed"){
-                var nextRoute = {
-                    name: "销售",
-                    component: SellData,
-                };
-                this.props.navigator.push(nextRoute);
-                this._setModalVisible();
-                Storage.get('ShopCode').then((ShopCode)=>{
-                    alert()
-                    Storage.get('PosCode').then((PosCode)=>{
-                        let params={
-                            TblName:"ChkPosShopBind",
-
-                        }
-                    })
+        if(this.state.ShopCar1>0){
+            this._setModalVisible();
+            alert("商品未提交")
+        }else if(this.state.username==null){
+            this._setModalVisible();
+        }else {
+            NativeModules.AndroidDeviceInfo.getIMEI((IMEI) => {
+                Storage.get('Bind').then((tags) => {
+                    Storage.save("invoice", "销售");
+                    if (tags == "bindsucceed") {
+                        Storage.get('ShopCode').then((ShopCode) => {
+                            Storage.get('PosCode').then((PosCode) => {
+                                let params = {
+                                    TblName: "ChkPosShopBind",
+                                    ShopCode: ShopCode,
+                                    PosCode: PosCode,
+                                    BindMAC: "",
+                                    SysGuid: IMEI,
+                                }
+                                Storage.get('LinkUrl').then((linkurl) => {
+                                    FetchUtil.post(linkurl, JSON.stringify(params)).then((data) => {
+                                        if (data.retcode == 1) {
+                                            Storage.save('Name', '销售');
+                                            var invoice = "销售";
+                                            this.setState({
+                                                head: invoice,
+                                            });
+                                            this._setModalVisible();
+                                        } else {
+                                            var nextRoute = {
+                                                name: "销售",
+                                                component: SellData,
+                                            };
+                                            this.props.navigator.push(nextRoute);
+                                            this._setModalVisible();
+                                        }
+                                    })
+                                })
+                            })
+                        })
+                    } else {
+                        var nextRoute = {
+                            name: "销售",
+                            component: SellData,
+                        };
+                        this.props.navigator.push(nextRoute);
+                        this._setModalVisible();
+                    }
                 })
-                // this._setModalVisible();
-            }else{
-                var nextRoute = {
-                    name: "销售",
-                    component: SellData,
-                };
-                this.props.navigator.push(nextRoute);
-                this._setModalVisible();
-            }
-        })
+            })
+        }
     }
 
     StockEnquiries(){
@@ -1768,7 +1801,14 @@ export default class Index extends Component {
                                 <Image source={require("../images/1_48.png")} style={styles.ModalImageLine} />
                             </View>
                             <View style={[styles.ModalHead,{marginBottom:10}]}>
-
+                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.Sell.bind(this)}>
+                                    <Text style={styles.ModalHeadImage1}>
+                                        <Image source={require("../images/1_57.png")} />
+                                    </Text>
+                                    <Text style={styles.ModalHeadText}>
+                                        销售
+                                    </Text>
+                                </TouchableOpacity>
                                 <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.StateMent.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1-60.png")} />
@@ -1777,7 +1817,7 @@ export default class Index extends Component {
                                         报表
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.StockEnquiries.bind(this)}>
+                                <TouchableOpacity style={styles.ModalHeadImage} onPress={this.StockEnquiries.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_58.png")} />
                                     </Text>
@@ -1785,7 +1825,12 @@ export default class Index extends Component {
                                         库存查询
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.ModalHeadImage} onPress={this.pullOut.bind(this)}>
+                            </View>
+                            <View style={styles.ModalLine}>
+                                <Image source={require("../images/1_48.png")} style={styles.ModalImageLine} />
+                            </View>
+                            <View style={[styles.ModalHead,{marginBottom:10}]}>
+                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.pullOut.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_56.png")} />
                                     </Text>
@@ -1793,12 +1838,7 @@ export default class Index extends Component {
                                         退出账号
                                     </Text>
                                 </TouchableOpacity>
-                            </View>
-                            <View style={styles.ModalLine}>
-                                <Image source={require("../images/1_48.png")} style={styles.ModalImageLine} />
-                            </View>
-                            <View style={[styles.ModalHead,{marginBottom:10}]}>
-                                <TouchableOpacity onPress={this.UpData.bind(this)} style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]}>
+                                <TouchableOpacity onPress={this.UpData.bind(this)} style={styles.ModalHeadImage}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_59.png")} />
                                     </Text>
@@ -1806,7 +1846,6 @@ export default class Index extends Component {
                                         数据更新
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.ModalHeadImage}></TouchableOpacity>
                                 <TouchableOpacity style={styles.ModalHeadImage}></TouchableOpacity>
                             </View>
                         </View>

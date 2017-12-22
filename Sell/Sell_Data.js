@@ -133,8 +133,6 @@ export default class SellData extends Component {
                         Storage.save("Bind","bindsucceed");
                         Storage.save("ShopCode",this.state.ShopCode);
                         Storage.save("PosCode",this.state.PosCode);
-                    }else if(data.retcode == 1004){
-                        alert("已经绑定，请重新选择")
                     }else{
                         alert(JSON.stringify(data))
                     }

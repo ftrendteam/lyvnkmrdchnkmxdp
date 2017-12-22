@@ -21,6 +21,7 @@ import {
   ActivityIndicator
 } from 'react-native';
 import Index from "./Index";
+import Sell from "../Sell/Sell";
 import ShoppingCart from "./ShoppingCart";
 import GoodsDetails from "./GoodsDetails";
 import Enquiries from "./Enquiries";
@@ -69,6 +70,21 @@ export default class HistoricalDocument extends Component {
             component:ShoppingCart
         };
         this.props.navigator.push(nextRoute)
+        // Storage.get('Name').then((tags)=>{
+        //     if(tags=="销售"){
+        //         var nextRoute={
+        //             name:"Sell",
+        //             component:Sell
+        //         };
+        //         this.props.navigator.push(nextRoute)
+        //     }else{
+        //         var nextRoute={
+        //             name:"主页",
+        //             component:ShoppingCart
+        //         };
+        //         this.props.navigator.push(nextRoute)
+        //     }
+        // })
     }
 
   pressPush(){

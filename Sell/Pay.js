@@ -25,12 +25,14 @@ export default class Pay extends Component {
         super(props);
         this.state = {
             name:"",
+            JfBal:this.props.JfBal ? this.props.JfBal : "",
+            BalanceTotal:this.props.BalanceTotal ? this.props.BalanceTotal : "",
+            ShopAmount:this.props.ShopAmount ? this.props.ShopAmount : "",
             dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
         }
     }
 
     componentDidMount(){
-
         Storage.get('Name').then((tags) => {
             this.setState({
                 name: tags
@@ -45,11 +47,14 @@ export default class Pay extends Component {
 
     _renderRow(rowData, sectionID, rowID){
         return (
-            <View style={styles.BankList}>
-                <View style={styles.FirstBankList}>
-                    <Text style={styles.FirstBankText}></Text>
+            <TouchableOpacity style={styles.ShopList1} onPress={()=>this.OrderDetails(rowData)}>
+                <View style={styles.ShopTop}>
+                    <Text style={[styles.Name,styles.Name1]}>1</Text>
+                    <Text style={[styles.Number,styles.Name1]}>.00 (件)</Text>
+                    <Text style={[styles.Price,styles.Name1]}>3</Text>
+                    <Text style={[styles.SmallScale,styles.Name1]}>4</Text>
                 </View>
-            </View>
+            </TouchableOpacity>
         );
     }
 
@@ -70,50 +75,34 @@ export default class Pay extends Component {
                         <View style={styles.FristList}>
                             <View style={styles.List}>
                                 <View style={styles.ListView1}>
-                                    <Text style={[styles.ListText,{textAlign:"center"}]}>店号：</Text>
-                                </View>
-                                <View style={styles.ListView}>
-                                    <Text style={styles.ListText}>0001</Text>
+                                    <Text style={[styles.ListText,{textAlign:"center"}]}>应付金额</Text>
                                 </View>
                             </View>
                             <View style={styles.List}>
                                 <View style={styles.ListView1}>
-                                    <Text style={[styles.ListText,{textAlign:"center"}]}>收款员：</Text>
-                                </View>
-                                <View style={styles.ListView}>
-                                    <Text style={styles.ListText}>0001</Text>
+                                    <Text style={[styles.ListText,{textAlign:"center"}]}>支付金额</Text>
                                 </View>
                             </View>
                             <View style={styles.List}>
                                 <View style={styles.ListView1}>
-                                    <Text style={[styles.ListText,{textAlign:"center"}]}>pos号：</Text>
-                                </View>
-                                <View style={styles.ListView}>
-                                    <Text style={styles.ListText}>0001</Text>
+                                    <Text style={[styles.ListText,{textAlign:"center"}]}>剩余金额</Text>
                                 </View>
                             </View>
                         </View>
                         <View style={styles.FristList}>
-                            <View style={[styles.List,{flex:2}]}>
+                            <View style={styles.List}>
                                 <View style={styles.ListView1}>
-                                    <Text style={[styles.ListText,{textAlign:"center"}]}>流水号：</Text>
-                                </View>
-                                <View style={styles.ListView}>
-                                    <Text style={styles.ListText}>0001</Text>
+                                    <Text style={[styles.ListText,{textAlign:"center"}]}>{this.state.ShopAmount}</Text>
                                 </View>
                             </View>
-                            <View style={[styles.List,{flex:1}]}>
-                                <TouchableOpacity style={[{backgroundColor:"#ffffff",paddingTop:2,
-                                    paddingBottom:2,paddingLeft:5,paddingRight:5,borderRadius:5,paddingTop:5,}]}>
-                                    <Text style={[{color:"#9a0000",fontSize:16,textAlign:"center"}]}>收款员</Text>
-                                </TouchableOpacity>
-                            </View>
-                            <View style={[styles.List,{flex:2}]}>
+                            <View style={styles.List}>
                                 <View style={styles.ListView1}>
-                                    <Text style={[styles.ListText,{textAlign:"center"}]}>版本：</Text>
+                                    <Text style={[styles.ListText,{textAlign:"center"}]}>0.00</Text>
                                 </View>
-                                <View style={styles.ListView}>
-                                    <Text style={styles.ListText}>0001</Text>
+                            </View>
+                            <View style={styles.List}>
+                                <View style={styles.ListView1}>
+                                    <Text style={[styles.ListText,{textAlign:"center"}]}>5987.00</Text>
                                 </View>
                             </View>
                         </View>
@@ -124,19 +113,22 @@ export default class Pay extends Component {
                         <View style={styles.ShopList}>
                             <View style={styles.ListTitle}>
                                 <View style={styles.ListClass}>
-                                    <Text style={styles.ListClassText}>商品编码</Text>
+                                    <Text style={styles.ListClassText}>付款方式</Text>
+                                </View>
+                                <View style={styles.ListClass1}>
+                                    <Text style={styles.ListClassText}>卡号</Text>
+                                </View>
+                                <View style={styles.ListClass1}>
+                                    <Text style={styles.ListClassText}>金额</Text>
+                                </View>
+                                <View style={styles.ListClass1}>
+                                    <Text style={styles.ListClassText}>余额</Text>
+                                </View>
+                                <View style={styles.ListClass1}>
+                                    <Text style={styles.ListClassText}>折扣</Text>
                                 </View>
                                 <View style={styles.ListClass}>
-                                    <Text style={styles.ListClassText}>商品名称</Text>
-                                </View>
-                                <View style={styles.ListClass1}>
-                                    <Text style={styles.ListClassText}>零售价</Text>
-                                </View>
-                                <View style={styles.ListClass1}>
-                                    <Text style={styles.ListClassText}>数量</Text>
-                                </View>
-                                <View style={styles.ListClass1}>
-                                    <Text style={styles.ListClassText}>小计</Text>
+                                    <Text style={styles.ListClassText}>交易号</Text>
                                 </View>
                             </View>
                             <ListView
@@ -146,6 +138,47 @@ export default class Pay extends Component {
                                 renderRow={this._renderRow.bind(this)}
                             />
                         </View>
+                    </View>
+                    <View style={styles.MemberMent}>
+                        <View style={styles.Member}>
+                            <View style={styles.MemberLeft}>
+                                <Text style={styles.MemberText}>积分：</Text>
+                            </View>
+                            <View style={styles.MemberRight}>
+                                <Text style={styles.MemberText}>{this.state.JfBal}</Text>
+                            </View>
+                        </View>
+                        <View style={styles.Member}>
+                            <View style={styles.MemberLeft}>
+                                <Text style={styles.MemberText}>余额：</Text>
+                            </View>
+                            <View style={styles.MemberRight}>
+                                <Text style={styles.MemberText}>{this.state.BalanceTotal}</Text>
+                            </View>
+                        </View>
+                    </View>
+                    <View style={styles.PayMent}>
+                        <View style={styles.FirstMent}>
+                            <View style={styles.paymentleft}>
+                                <Text style={styles.InpuTingText}>付款额：</Text>
+                            </View>
+                            <View style={styles.paymentright}>
+                              <TextInput
+                                  autofocus={true}
+                                  numberoflines={1}
+                                  keyboardType="numeric"
+                                  textalign="center"
+                                  underlineColorAndroid='transparent'
+                                  style={styles.paymentinput}
+                              />
+                            </View>
+                        </View>
+                        <TouchableOpacity style={styles.FirstMent1}>
+                            <Text style={styles.FirstMentText}>整单销售</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.FirstMent1}>
+                            <Text style={styles.FirstMentText}>继续交易</Text>
+                        </TouchableOpacity>
                     </View>
                     <View style={styles.Swiper}>
                         <Swiper
@@ -177,64 +210,28 @@ export default class Pay extends Component {
                                 marginTop: 9,
                                 marginBottom: 9,
                             }}/>}
-
                         >
                             <View style={styles.FristPage}>
-                               <View style={styles.PageRow}>
-                                   <TouchableOpacity style={[styles.PageRowButton,{marginRight:5}]}>
-                                       <Text style={styles.PageRowText}>
-                                           键盘
-                                       </Text>
-                                   </TouchableOpacity>
-                                   <TouchableOpacity style={[styles.PageRowButton,{marginRight:5}]}>
-                                       <Text style={styles.PageRowText}>
-                                           A会员
-                                       </Text>
-                                   </TouchableOpacity>
-                                   <TouchableOpacity style={[styles.PageRowButton,{marginRight:5}]}>
-                                       <Text style={styles.PageRowText}>
-                                           C付款
-                                       </Text>
-                                   </TouchableOpacity>
-                               </View>
-                                <View style={[styles.PageRow,{marginTop:10,}]}>
+                                <View style={styles.PageRow}>
                                     <TouchableOpacity style={[styles.PageRowButton,{marginRight:5}]}>
                                         <Text style={styles.PageRowText}>
-                                            D交易重打
+                                            代金券
                                         </Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity style={[styles.PageRowButton,{marginRight:5}]}>
                                         <Text style={styles.PageRowText}>
-                                            E取消交易
+                                            储值卡
                                         </Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity style={[styles.PageRowButton,{marginRight:5}]}>
                                         <Text style={styles.PageRowText}>
-                                            F删除末品
+                                            活动券
                                         </Text>
                                     </TouchableOpacity>
                                 </View>
                             </View>
-
                             <View style={styles.FristPage}>
                                 <View style={styles.PageRow}>
-                                    <TouchableOpacity style={[styles.PageRowButton,{marginRight:5}]}>
-                                        <Text style={styles.PageRowText}>
-                                            1
-                                        </Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={[styles.PageRowButton,{marginRight:5}]}>
-                                        <Text style={styles.PageRowText}>
-                                            2
-                                        </Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={[styles.PageRowButton,{marginRight:5}]}>
-                                        <Text style={styles.PageRowText}>
-                                            3
-                                        </Text>
-                                    </TouchableOpacity>
-                                </View>
-                                <View style={[styles.PageRow,{marginTop:10,}]}>
                                     <TouchableOpacity style={[styles.PageRowButton,{marginRight:5}]}>
                                         <Text style={styles.PageRowText}>
                                             1
@@ -255,23 +252,6 @@ export default class Pay extends Component {
 
                             <View style={styles.FristPage}>
                                 <View style={styles.PageRow}>
-                                    <TouchableOpacity style={[styles.PageRowButton,{marginRight:5}]}>
-                                        <Text style={styles.PageRowText}>
-                                            1
-                                        </Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={[styles.PageRowButton,{marginRight:5}]}>
-                                        <Text style={styles.PageRowText}>
-                                            2
-                                        </Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={[styles.PageRowButton,{marginRight:5}]}>
-                                        <Text style={styles.PageRowText}>
-                                            3
-                                        </Text>
-                                    </TouchableOpacity>
-                                </View>
-                                <View style={[styles.PageRow,{marginTop:10,}]}>
                                     <TouchableOpacity style={[styles.PageRowButton,{marginRight:5}]}>
                                         <Text style={styles.PageRowText}>
                                             1
@@ -290,70 +270,6 @@ export default class Pay extends Component {
                                 </View>
                             </View>
                         </Swiper>
-                    </View>
-                    <View style={styles.ShopCont}>
-                        <View style={[styles.Prece,{marginTop:20,}]}>
-                            <View style={styles.InputingLeft}>
-                                <Text style={styles.InpuTingText}>卡号：</Text>
-                            </View>
-                            <View style={styles.InputingRight}>
-                                <TextInput
-                                    autofocus={true}
-                                    numberoflines={1}
-                                    keyboardType="numeric"
-                                    textalign="center"
-                                    underlineColorAndroid='transparent'
-                                    style={styles.TextInput}
-                                />
-                            </View>
-                        </View>
-                    </View>
-                    <View style={styles.PayMent}>
-                        <View style={styles.FirstMent}>
-                            <View style={styles.paymentleft}>
-                                <Text style={styles.InpuTingText}>付款额：</Text>
-                            </View>
-                            <View style={styles.paymentright}>
-                              <TextInput
-                                  autofocus={true}
-                                  numberoflines={1}
-                                  keyboardType="numeric"
-                                  textalign="center"
-                                  underlineColorAndroid='transparent'
-                                  style={styles.paymentinput}
-                              />
-                            </View>
-                        </View>
-                        <View style={styles.FirstMent}>
-                            <View style={styles.paymentleft}>
-                                <Text style={styles.InpuTingText}>折扣率：</Text>
-                            </View>
-                            <View style={styles.paymentright}>
-                                <TextInput
-                                    autofocus={true}
-                                    numberoflines={1}
-                                    keyboardType="numeric"
-                                    textalign="center"
-                                    underlineColorAndroid='transparent'
-                                    style={styles.paymentinput}
-                                />
-                            </View>
-                        </View>
-                        <View style={styles.FirstMent}>
-                            <View style={styles.paymentleft}>
-                                <Text style={styles.InpuTingText}>抵用额：</Text>
-                            </View>
-                            <View style={styles.paymentright}>
-                                <TextInput
-                                    autofocus={true}
-                                    numberoflines={1}
-                                    keyboardType="numeric"
-                                    textalign="center"
-                                    underlineColorAndroid='transparent'
-                                    style={styles.paymentinput}
-                                />
-                            </View>
-                        </View>
                     </View>
                 </ScrollView>
             </View>
@@ -386,28 +302,28 @@ const styles = StyleSheet.create({
         marginTop:3,
     },
     TitleCont:{
-        height:90,
+        height:74,
         backgroundColor:"#ff4e4e",
-        paddingLeft:20,
-        paddingRight:20,
+        paddingLeft:10,
+        paddingRight:10,
     },
     FristList:{
-        height:38,
-        paddingTop:10,
+        height:30,
+        paddingTop:5,
         flexDirection:"row",
     },
     List:{
         flex:1,
         flexDirection:"row",
     },
-    ListView1:{
-        width:70,
-    },
     ListView:{
         flex:1,
         height:20,
         overflow:"hidden",
         backgroundColor:"#ff4e4e"
+    },
+    ListView1:{
+        flex:1
     },
     ListText:{
         color:"#ffffff",
@@ -418,7 +334,7 @@ const styles = StyleSheet.create({
         paddingRight:10,
     },
     ShopList:{
-        height:150,
+        height:180,
         borderRadius:5,
         backgroundColor:"#ffffff",
     },
@@ -488,7 +404,7 @@ const styles = StyleSheet.create({
         flexDirection:"row"
     },
     Swiper:{
-        height:110,
+        height:50,
         marginTop:16,
     },
     FristPage:{
@@ -510,9 +426,30 @@ const styles = StyleSheet.create({
         fontSize:16,
         textAlign:"center"
     },
+    MemberMent:{
+        height:35,
+        marginTop:10,
+        marginLeft:10,
+        marginRight:10,
+        flexDirection:"row"
+    },
+    MemberText:{
+    color:"#333333",
+        fontSize:16,
+    },
+    Member:{
+        flex:1,
+        flexDirection:"row",
+    },
+    MemberLeft:{
+        width:50,
+    },
+    MemberRight:{
+        flex:1
+    },
     PayMent:{
-        height:54,
-        marginTop:16,
+        height:45,
+        marginTop:10,
         marginLeft:10,
         marginRight:10,
         flexDirection:"row"
@@ -521,18 +458,73 @@ const styles = StyleSheet.create({
         flex:1,
         flexDirection:"row"
     },
+    FirstMent1:{
+        width:70,
+        marginLeft:3,
+        marginRight:3,
+        backgroundColor:"#ff4e4e",
+        borderRadius:5,
+        paddingTop:6,
+        height:35
+    },
+    FirstMentText:{
+        color:"#ffffff",
+        fontSize:16,
+        textAlign:"center",
+    },
     paymentleft:{
         width:65,
-        paddingTop:14,
+        paddingTop:7,
     },
     paymentright:{
         flex:1,
-        height:54,
-        paddingTop:6,
+        height:35,
         backgroundColor:"#ffffff",
         borderRadius:5,
     },
     paymentinput:{
         flex:1,
-    }
+    },
+    ShopList1:{
+        paddingLeft:25,
+        paddingRight:25,
+        height:40,
+        paddingTop:10,
+        paddingBottom:10,
+        backgroundColor:"#ffffff",
+        borderBottomWidth:1,
+        borderBottomColor:"#f2f2f2"
+    },
+    ShopTop:{
+        flexDirection:"row",
+    },
+    Name:{
+        flex:2,
+        fontSize:18,
+        color:"#333333",
+    },
+    Number:{
+        flex:1,
+        textAlign:"right",
+        fontSize:18,
+        color:"#333333",
+    },
+    Name1:{
+        color:"#333333",
+        fontSize:16,
+        height:22,
+        overflow:"hidden",
+    },
+    Price:{
+        flex:1,
+        textAlign:"right",
+        fontSize:18,
+        color:"#333333",
+    },
+    SmallScale:{
+        flex:1,
+        textAlign:"right",
+        fontSize:18,
+        color:"#333333",
+    },
 });

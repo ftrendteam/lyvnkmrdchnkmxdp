@@ -115,7 +115,7 @@ export default class GoodsDetails extends Component {
 
         Storage.get('YuanDan').then((tags)=>{
             if(tags==1){
-                if(this.state.Number == "1"){
+                if(this.state.ydcountm>0){
                     this.setState({
                         Number:this.state.ydcountm
                     })

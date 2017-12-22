@@ -100,12 +100,6 @@ export default class ShoppingCart extends Component {
             })
         });
 
-        Storage.get('procode').then((tags) => {
-            this.setState({
-                procode: tags
-            });
-        });
-
         //username获取
         Storage.get('username').then((tags) => {
             this.setState({
@@ -910,7 +904,7 @@ export default class ShoppingCart extends Component {
                     visible={this.state.show}
                     onShow={() => {}}
                     onRequestClose={() => {}} >
-                    <TouchableOpacity  onPress={this._setModalVisible.bind(this)} style={[styles.modalStyle,{justifyContent: 'center',alignItems: 'center',}]}>
+                    <View style={[styles.modalStyle,{justifyContent: 'center',alignItems: 'center',}]}>
                         <View style={[styles.ModalView,{borderRadius:5,paddingBottom:20,width:300,
                             height:330,backgroundColor:"#ffffff"}]}>
                             <View style={styles.DanJu}>
@@ -938,7 +932,7 @@ export default class ShoppingCart extends Component {
                                 </Text>
                             </TouchableOpacity>
                         </View>
-                    </TouchableOpacity>
+                    </View>
                 </Modal>
                 <Modal
                     animationType='fade'
@@ -1173,10 +1167,6 @@ const styles = StyleSheet.create({
     ClientType:{
         fontSize:16,
         color:"#666666",
-    },
-    DanJU:{
-        flex:5,
-        flexDirection:"row",
     },
     DocumentsNote:{
         width:95,
