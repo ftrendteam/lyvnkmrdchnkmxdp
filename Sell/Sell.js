@@ -4,7 +4,7 @@
  * @flow
  */
 
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import {
     AppRegistry,
     StyleSheet,
@@ -23,21 +23,26 @@ import Storage from "../utils/Storage";
 import Swiper from 'react-native-swiper';
 import DBAdapter from "../adapter/DBAdapter";
 import FetchUtil from "../utils/FetchUtils";
+import NumFormatUtils from "../utils/NumFormatUtils";
 
 let dbAdapter = new DBAdapter();
+
+let numnormatntils = new NumFormatUtils();
+
 export default class Sell extends Component {
 
-    constructor(props){
+    constructor(props) {
         super(props);
         this.state = {
-            name:"",
-            VipCardNo:"",
-            ShopNumber:"",
-            BalanceTotal:"",
-            JfBal:"",
-            MemberTextInput:"",
-            Show:false,
-            Member:false,
+            name: "",
+            VipCardNo: "",
+            ShopNumber: "",
+            BalanceTotal: "",
+            JfBal: "",
+            numform:"",
+            MemberTextInput: "",
+            Show: false,
+            Member: false,
             dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
         }
     }
@@ -45,18 +50,25 @@ export default class Sell extends Component {
     modal() {
         let isShow = this.state.Show;
         this.setState({
-            Show:!isShow,
+            Show: !isShow,
         });
     }
 
-    Member(){
+    Member() {
         let isShow = this.state.Member;
         this.setState({
-            Member:!isShow,
+            Member: !isShow,
         });
     }
 
-    componentDidMount(){
+    componentDidMount() {
+        NumFormatUtils.createLsNo().then((data) => {
+            this.setState({
+                numform:data
+            })
+            Storage.save("LsNo",this.state.numform);
+        });
+
         Storage.get('Name').then((tags) => {
             this.setState({
                 name: tags
@@ -65,61 +77,49 @@ export default class Sell extends Component {
 
         Storage.get('VipCardNo').then((tags) => {
             this.setState({
-                VipCardNo:tags
-            })
-        })
-
-        Storage.get('BalanceTotal').then((tags) => {
-            this.setState({
-                BalanceTotal:tags
-            })
-        })
-
-        Storage.get('JfBal').then((tags) => {
-            this.setState({
-                JfBal:tags
+                VipCardNo: tags
             })
         })
         this._dbSearch();
 
     }
 
-    _dbSearch(){
+    _dbSearch() {
         this.modal();
-        dbAdapter.selectShopInfo().then((rows)=>{
+        dbAdapter.selectShopInfo().then((rows) => {
             //this._ModalVisible();
             var shopnumber = 0;
             var shopAmount = 0;
-            this.dataRows=[];
-            for(let i =0;i<rows.length;i++){
+            this.dataRows = [];
+            for (let i = 0; i < rows.length; i++) {
                 var row = rows.item(i);
                 var number = row.countm;
                 shopAmount += parseInt(row.prototal);
                 shopnumber += parseInt(row.countm);
-                if(number!==0){
+                if (number !== 0) {
                     this.dataRows.push(row);
                 }
             }
-            if(this.dataRows==0){
+            if (this.dataRows == 0) {
                 this.modal();
                 return;
-            }else{
+            } else {
                 this.setState({
-                    number1:number,
-                    ShopNumber:shopnumber,//数量
-                    ShopAmount:shopAmount,//总金额
-                    dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
+                    number1: number,
+                    ShopNumber: shopnumber,//数量
+                    ShopAmount: shopAmount,//总金额
+                    dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
                 })
                 this.modal();
             }
         });
     }
 
-    Return(){
+    Return() {
         this.props.navigator.pop();
     }
 
-    _renderRow(rowData, sectionID, rowID){
+    _renderRow(rowData, sectionID, rowID) {
         return (
             <View style={styles.ShopList1}>
                 <Text style={styles.Name}>{rowData.ProdCode}</Text>
@@ -131,50 +131,51 @@ export default class Sell extends Component {
         );
     }
 
-    MemberButton(){
+    MemberButton() {
         this.Member();
     }
 
-    CloseButton(){
+    CloseButton() {
         this.Member();
     }
 
-    Button(){
+    Button() {
         this.modal();
         Storage.get('ShopCode').then((ShopCode) => {
             Storage.get('PosCode').then((PosCode) => {
                 let params = {
-                    TblName:"ReadVipInfo",
-                    CardFaceNo:this.state.CardNumber,
-                    Mobile:"",
-                    ShopCode:ShopCode,
-                    PosCode:PosCode,
-                    IsChuZhi:"",
+                    TblName: "ReadVipInfo",
+                    CardFaceNo: this.state.CardNumber,
+                    Mobile: "",
+                    ShopCode: ShopCode,
+                    PosCode: PosCode,
+                    IsChuZhi: "",
                 };
                 Storage.get('LinkUrl').then((tags) => {
                     FetchUtil.post(tags, JSON.stringify(params)).then((data) => {
-                        if(data.retcode==1){
+                        if (data.retcode == 1) {
                             var TblRow = data.TblRow;
                             var VipCardNo;
                             var BalanceTotal;
                             var JfBal;
-                            for(let i =0;i<TblRow.length;i++){
+                            for (let i = 0; i < TblRow.length; i++) {
                                 var row = TblRow[i];
                                 VipCardNo = row.VipCardNo;//卡号
                                 BalanceTotal = row.BalanceTotal;//余额
                                 JfBal = row.JfBal;//积分
-                            };
+                            }
+                            ;
                             this.modal();
                             this.Member();
-                            Storage.save("VipCardNo",VipCardNo);
-                            Storage.save("BalanceTotal",BalanceTotal);
-                            Storage.save("JfBal",JfBal);
+                            Storage.save("VipCardNo", VipCardNo);
+                            Storage.save("BalanceTotal", BalanceTotal);
+                            Storage.save("JfBal", JfBal);
                             this.setState({
-                                VipCardNo:VipCardNo,
-                                BalanceTotal:BalanceTotal,
-                                JfBal:JfBal,
+                                VipCardNo: VipCardNo,
+                                BalanceTotal: BalanceTotal,
+                                JfBal: JfBal,
                             });
-                        }else{
+                        } else {
                             alert(JSON.stringify(data));
                         }
                     })
@@ -183,14 +184,14 @@ export default class Sell extends Component {
         })
     }
 
-    PayButton(){
-        var nextRoute={
-            name:"Pay",
-            component:Pay,
-            params:{
-                JfBal:this.state.JfBal,
-                BalanceTotal:this.state.BalanceTotal,
-                ShopAmount:this.state.ShopAmount,
+    PayButton() {
+        var nextRoute = {
+            name: "Pay",
+            component: Pay,
+            params: {
+                JfBal: this.state.JfBal,
+                BalanceTotal: this.state.BalanceTotal,
+                ShopAmount: this.state.ShopAmount,
             }
         };
         this.props.navigator.push(nextRoute);
@@ -207,53 +208,65 @@ export default class Sell extends Component {
                         <Text style={styles.HeaderList}>{this.state.name}</Text>
                     </View>
                 </View>
-                    <View style={styles.TitleCont}>
-                        <View style={styles.FristList}>
-                            <View style={[styles.List,{flex:2}]}>
-                                <View style={styles.ListView1}>
-                                    <Text style={[styles.ListText,{textAlign:"center"}]}>流水号：</Text>
-                                </View>
-                                <View style={styles.ListView}>
-                                    <Text style={styles.ListText}>0001</Text>
-                                </View>
+                <View style={styles.TitleCont}>
+                    <View style={styles.FristList}>
+                        <View style={[styles.List, {flex: 2}]}>
+                            <View style={styles.ListView1}>
+                                <Text style={[styles.ListText, {textAlign: "center"}]}>流水号：</Text>
                             </View>
+                            <View style={styles.ListView}>
+                                <Text style={styles.ListText}>{this.state.numform}</Text>
+                            </View>
+                        </View>
 
-                        </View>
                     </View>
-                    <View style={styles.ShopCont}>
-                        <View style={[{backgroundColor:"#ff4e4e",width:10,height:60,position:"absolute",left:0,}]}></View>
-                        <View style={[{backgroundColor:"#ff4e4e",width:10,height:60,position:"absolute",right:0,}]}></View>
-                        <View style={styles.ShopList}>
-                            <View style={styles.ListTitle}>
-                                <View style={styles.ListClass}>
-                                    <Text style={styles.ListClassText}>商品编码</Text>
-                                </View>
-                                <View style={styles.ListClass}>
-                                    <Text style={styles.ListClassText}>商品名称</Text>
-                                </View>
-                                <View style={styles.ListClass1}>
-                                    <Text style={styles.ListClassText}>零售价</Text>
-                                </View>
-                                <View style={styles.ListClass1}>
-                                    <Text style={styles.ListClassText}>数量</Text>
-                                </View>
-                                <View style={styles.ListClass1}>
-                                    <Text style={styles.ListClassText}>小计</Text>
-                                </View>
+                </View>
+                <View style={styles.ShopCont}>
+                    <View style={[{
+                        backgroundColor: "#ff4e4e",
+                        width: 10,
+                        height: 60,
+                        position: "absolute",
+                        left: 0,
+                    }]}></View>
+                    <View style={[{
+                        backgroundColor: "#ff4e4e",
+                        width: 10,
+                        height: 60,
+                        position: "absolute",
+                        right: 0,
+                    }]}></View>
+                    <View style={styles.ShopList}>
+                        <View style={styles.ListTitle}>
+                            <View style={styles.ListClass}>
+                                <Text style={styles.ListClassText}>商品编码</Text>
                             </View>
-                            <ListView
-                                style={styles.scrollview}
-                                dataSource={this.state.dataSource}
-                                showsVerticalScrollIndicator={true}
-                                renderRow={this._renderRow.bind(this)}
-                            />
+                            <View style={styles.ListClass}>
+                                <Text style={styles.ListClassText}>商品名称</Text>
+                            </View>
+                            <View style={styles.ListClass1}>
+                                <Text style={styles.ListClassText}>零售价</Text>
+                            </View>
+                            <View style={styles.ListClass1}>
+                                <Text style={styles.ListClassText}>数量</Text>
+                            </View>
+                            <View style={styles.ListClass1}>
+                                <Text style={styles.ListClassText}>小计</Text>
+                            </View>
                         </View>
+                        <ListView
+                            style={styles.scrollview}
+                            dataSource={this.state.dataSource}
+                            showsVerticalScrollIndicator={true}
+                            renderRow={this._renderRow.bind(this)}
+                        />
                     </View>
+                </View>
                 <ScrollView>
                     <View style={styles.ShopCont}>
                         <View style={styles.Prece}>
                             <View style={styles.InputingLeft}>
-                                <Text style={[styles.InpuTingText,{width:60,marginTop:10,}]}>请输入:</Text>
+                                <Text style={[styles.InpuTingText, {width: 60, marginTop: 10,}]}>请输入:</Text>
                             </View>
                             <View style={styles.InputingRight}>
                                 <TextInput
@@ -266,13 +279,17 @@ export default class Sell extends Component {
                                 />
                             </View>
                         </View>
-                        <View style={[styles.Prece,{height:28,marginTop:16,backgroundColor:"#f2f2f2"}]}>
+                        <View style={[styles.Prece, {height: 28, marginTop: 16, backgroundColor: "#f2f2f2"}]}>
                             <View style={styles.Inputing}>
                                 <View style={styles.Inputingleft}>
-                                    <Text style={[styles.InputingText,{fontWeight:"bold"}]}>金额:</Text>
+                                    <Text style={[styles.InputingText, {fontWeight: "bold"}]}>金额:</Text>
                                 </View>
                                 <View style={styles.Inputingright}>
-                                    <Text style={[styles.InputingText,{fontWeight:"bold",fontSize:20,color:"red"}]}>{this.state.ShopAmount}</Text>
+                                    <Text style={[styles.InputingText, {
+                                        fontWeight: "bold",
+                                        fontSize: 20,
+                                        color: "red"
+                                    }]}>{this.state.ShopAmount}</Text>
                                 </View>
                             </View>
                             <View style={styles.Inputing1}>
@@ -284,17 +301,21 @@ export default class Sell extends Component {
                                 </View>
                             </View>
                         </View>
-                        <View style={[styles.Prece,{height:28,marginTop:16,backgroundColor:"#f2f2f2"}]}>
+                        <View style={[styles.Prece, {height: 28, marginTop: 16, backgroundColor: "#f2f2f2"}]}>
                             <View style={styles.Inputing}>
                                 <View style={styles.Inputingleft}>
-                                    <Text style={[styles.InputingText,{fontWeight:"bold"}]}>数量:</Text>
+                                    <Text style={[styles.InputingText, {fontWeight: "bold"}]}>数量:</Text>
                                 </View>
                                 <View style={styles.Inputingright}>
-                                    <Text style={[styles.InputingText,{fontWeight:"bold",fontSize:20,color:"red"}]}>{this.state.ShopNumber}</Text>
+                                    <Text style={[styles.InputingText, {
+                                        fontWeight: "bold",
+                                        fontSize: 20,
+                                        color: "red"
+                                    }]}>{this.state.ShopNumber}</Text>
                                 </View>
                             </View>
                             <View style={styles.Inputing1}>
-                                <View style={[styles.Inputingright,styles.Inputing1Left]}>
+                                <View style={[styles.Inputingright, styles.Inputing1Left]}>
                                     <View style={styles.Inputingleft}>
                                         <Text style={styles.InputingText}>积分:</Text>
                                     </View>
@@ -302,7 +323,7 @@ export default class Sell extends Component {
                                         <Text style={styles.InputingText}>{this.state.JfBal}</Text>
                                     </View>
                                 </View>
-                                <View style={[styles.Inputingright,styles.Inputing1Left]}>
+                                <View style={[styles.Inputingright, styles.Inputing1Left]}>
                                     <View style={styles.Inputingleft}>
                                         <Text style={styles.InputingText}>余额:</Text>
                                     </View>
@@ -346,37 +367,39 @@ export default class Sell extends Component {
 
                         >
                             <View style={styles.FristPage}>
-                               <View style={styles.PageRow}>
-                                   <TouchableOpacity style={[styles.PageRowButton,{marginRight:5}]}>
-                                       <Text style={styles.PageRowText}>
-                                           键盘
-                                       </Text>
-                                   </TouchableOpacity>
-                                   <TouchableOpacity onPress={this.MemberButton.bind(this)} style={[styles.PageRowButton,{marginRight:5}]}>
-                                       <Text style={styles.PageRowText}>
-                                           会员
-                                       </Text>
-                                   </TouchableOpacity>
-                                   <TouchableOpacity onPress={this.PayButton.bind(this)} style={[styles.PageRowButton,{marginRight:5}]}>
-                                       <Text style={styles.PageRowText}>
-                                           付款
-                                       </Text>
-                                   </TouchableOpacity>
-                               </View>
+                                <View style={styles.PageRow}>
+                                    <TouchableOpacity style={[styles.PageRowButton, {marginRight: 5}]}>
+                                        <Text style={styles.PageRowText}>
+                                            键盘
+                                        </Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={this.MemberButton.bind(this)}
+                                                      style={[styles.PageRowButton, {marginRight: 5}]}>
+                                        <Text style={styles.PageRowText}>
+                                            会员
+                                        </Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={this.PayButton.bind(this)}
+                                                      style={[styles.PageRowButton, {marginRight: 5}]}>
+                                        <Text style={styles.PageRowText}>
+                                            付款
+                                        </Text>
+                                    </TouchableOpacity>
+                                </View>
                             </View>
                             <View style={styles.FristPage}>
                                 <View style={styles.PageRow}>
-                                    <TouchableOpacity style={[styles.PageRowButton,{marginRight:5}]}>
+                                    <TouchableOpacity style={[styles.PageRowButton, {marginRight: 5}]}>
                                         <Text style={styles.PageRowText}>
                                             1
                                         </Text>
                                     </TouchableOpacity>
-                                    <TouchableOpacity style={[styles.PageRowButton,{marginRight:5}]}>
+                                    <TouchableOpacity style={[styles.PageRowButton, {marginRight: 5}]}>
                                         <Text style={styles.PageRowText}>
                                             2
                                         </Text>
                                     </TouchableOpacity>
-                                    <TouchableOpacity style={[styles.PageRowButton,{marginRight:5}]}>
+                                    <TouchableOpacity style={[styles.PageRowButton, {marginRight: 5}]}>
                                         <Text style={styles.PageRowText}>
                                             3
                                         </Text>
@@ -386,17 +409,17 @@ export default class Sell extends Component {
 
                             <View style={styles.FristPage}>
                                 <View style={styles.PageRow}>
-                                    <TouchableOpacity style={[styles.PageRowButton,{marginRight:5}]}>
+                                    <TouchableOpacity style={[styles.PageRowButton, {marginRight: 5}]}>
                                         <Text style={styles.PageRowText}>
                                             1
                                         </Text>
                                     </TouchableOpacity>
-                                    <TouchableOpacity style={[styles.PageRowButton,{marginRight:5}]}>
+                                    <TouchableOpacity style={[styles.PageRowButton, {marginRight: 5}]}>
                                         <Text style={styles.PageRowText}>
                                             2
                                         </Text>
                                     </TouchableOpacity>
-                                    <TouchableOpacity style={[styles.PageRowButton,{marginRight:5}]}>
+                                    <TouchableOpacity style={[styles.PageRowButton, {marginRight: 5}]}>
                                         <Text style={styles.PageRowText}>
                                             3
                                         </Text>
@@ -405,33 +428,33 @@ export default class Sell extends Component {
                             </View>
                         </Swiper>
                     </View>
-                    <View style={[styles.Prece,{height:28,marginTop:10,backgroundColor:"#f2f2f2"}]}>
+                    <View style={[styles.Prece, {height: 28, marginTop: 10, backgroundColor: "#f2f2f2"}]}>
                         <View style={styles.Inputing}>
-                            <View style={[styles.Inputingleft,{width:60}]}>
-                                <Text style={[{color:"#333333",fontSize:16,textAlign:"right"}]}>店号:</Text>
+                            <View style={[styles.Inputingleft, {width: 60}]}>
+                                <Text style={[{color: "#333333", fontSize: 16, textAlign: "right"}]}>店号:</Text>
                             </View>
-                            <View style={[styles.Inputingright,{marginLeft:5,}]}>
-                                <Text style={[{fontSize:16,color:"red"}]}>0001</Text>
+                            <View style={[styles.Inputingright, {marginLeft: 5,}]}>
+                                <Text style={[{fontSize: 16, color: "red"}]}>0001</Text>
                             </View>
                         </View>
                     </View>
-                    <View style={[styles.Prece,{height:28,backgroundColor:"#f2f2f2"}]}>
+                    <View style={[styles.Prece, {height: 28, backgroundColor: "#f2f2f2"}]}>
                         <View style={styles.Inputing}>
-                            <View style={[styles.Inputingleft,{width:60}]}>
-                                <Text style={[{color:"#333333",fontSize:16,textAlign:"right"}]}>收款员:</Text>
+                            <View style={[styles.Inputingleft, {width: 60}]}>
+                                <Text style={[{color: "#333333", fontSize: 16, textAlign: "right"}]}>收款员:</Text>
                             </View>
-                            <View style={[styles.Inputingright,{marginLeft:5,}]}>
-                                <Text style={[{fontSize:16,color:"red"}]}>0001</Text>
+                            <View style={[styles.Inputingright, {marginLeft: 5,}]}>
+                                <Text style={[{fontSize: 16, color: "red"}]}>0001</Text>
                             </View>
                         </View>
                     </View>
-                    <View style={[styles.Prece,{height:28,backgroundColor:"#f2f2f2"}]}>
+                    <View style={[styles.Prece, {height: 28, backgroundColor: "#f2f2f2"}]}>
                         <View style={styles.Inputing}>
-                            <View style={[styles.Inputingleft,{width:60}]}>
-                                <Text style={[{color:"#333333",fontSize:16,textAlign:"right"}]}>pos号:</Text>
+                            <View style={[styles.Inputingleft, {width: 60}]}>
+                                <Text style={[{color: "#333333", fontSize: 16, textAlign: "right"}]}>pos号:</Text>
                             </View>
-                            <View style={[styles.Inputingright,{marginLeft:5,}]}>
-                                <Text style={[{fontSize:16,color:"red"}]}>0001</Text>
+                            <View style={[styles.Inputingright, {marginLeft: 5,}]}>
+                                <Text style={[{fontSize: 16, color: "red"}]}>0001</Text>
                             </View>
                         </View>
                     </View>
@@ -440,11 +463,14 @@ export default class Sell extends Component {
                     animationType='fade'
                     transparent={true}
                     visible={this.state.Show}
-                    onShow={() => {}}
-                    onRequestClose={() => {}} >
+                    onShow={() => {
+                    }}
+                    onRequestClose={() => {
+                    }}>
                     <View style={styles.LoadCenter}>
                         <View style={styles.loading}>
-                            <ActivityIndicator key="1" color="#ffffff" size="large" style={styles.activity}></ActivityIndicator>
+                            <ActivityIndicator key="1" color="#ffffff" size="large"
+                                               style={styles.activity}></ActivityIndicator>
                             <Text style={styles.TextLoading}>加载中</Text>
                         </View>
                     </View>
@@ -452,12 +478,14 @@ export default class Sell extends Component {
                 <Modal
                     transparent={true}
                     visible={this.state.Member}
-                    onShow={() => {}}
-                    onRequestClose={() => {}} >
+                    onShow={() => {
+                    }}
+                    onRequestClose={() => {
+                    }}>
                     <View style={styles.MemberBounces}>
                         <View style={styles.Cont}>
                             <View style={styles.BouncesTitle}>
-                                <Text style={[styles.TitleText,{fontSize:18}]}>会员</Text>
+                                <Text style={[styles.TitleText, {fontSize: 18}]}>会员</Text>
                             </View>
                             <View style={styles.MemberCont}>
                                 <View style={styles.MemberView}>
@@ -473,16 +501,17 @@ export default class Sell extends Component {
                                             underlineColorAndroid='transparent'
                                             placeholderTextColor="#bcbdc1"
                                             style={styles.CardTextInput}
-                                            onChangeText={(value)=>{
+                                            onChangeText={(value) => {
                                                 this.setState({
-                                                    CardNumber:value
+                                                    CardNumber: value
                                                 })
                                             }}
                                         />
                                     </View>
                                 </View>
                                 <View style={styles.MemberButton}>
-                                    <TouchableOpacity onPress={this.CloseButton.bind(this)} style={[styles.MemberClose,{marginRight:15,}]}>
+                                    <TouchableOpacity onPress={this.CloseButton.bind(this)}
+                                                      style={[styles.MemberClose, {marginRight: 15,}]}>
                                         <Text style={styles.TitleText}>取消</Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity onPress={this.Button.bind(this)} style={styles.MemberClose}>
@@ -500,270 +529,266 @@ export default class Sell extends Component {
 
 const styles = StyleSheet.create({
     MemberBounces: {
-        backgroundColor:"#3e3d3d",
-        opacity:0.9,
-        flex:1,
+        backgroundColor: "#3e3d3d",
+        opacity: 0.9,
+        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
     },
-    Cont:{
-        width:280,
-        borderRadius:5,
-        paddingBottom:20,
-        backgroundColor:"#f2f2f2",
+    Cont: {
+        width: 280,
+        borderRadius: 5,
+        paddingBottom: 20,
+        backgroundColor: "#f2f2f2",
     },
-    BouncesTitle:{
-        paddingTop:13,
-        paddingBottom:13,
-        backgroundColor:"#ff4e4e",
-        borderTopLeftRadius:5,
-        borderTopRightRadius:5,
-        flexDirection:'row',
+    BouncesTitle: {
+        paddingTop: 13,
+        paddingBottom: 13,
+        backgroundColor: "#ff4e4e",
+        borderTopLeftRadius: 5,
+        borderTopRightRadius: 5,
+        flexDirection: 'row',
     },
-    TitleText:{
-        flex:1,
-        textAlign:"center",
-        color:"#ffffff",
-        fontSize:16,
+    TitleText: {
+        flex: 1,
+        textAlign: "center",
+        color: "#ffffff",
+        fontSize: 16,
     },
-    MemberCont:{
-        height:150,
-        paddingLeft:15,
-        paddingRight:15,
+    MemberCont: {
+        height: 150,
+        paddingLeft: 15,
+        paddingRight: 15,
     },
-    MemberView:{
-        flexDirection:"row",
-        marginTop:20,
+    MemberView: {
+        flexDirection: "row",
+        marginTop: 20,
     },
-    Card:{
-        width:50,
-        marginTop:11,
+    Card: {
+        width: 50,
+        marginTop: 11,
     },
-    CardText:{
-        fontSize:16,
-        color:"#333333",
-    },
-    CardNumber:{
-        flex:1,
-    },
-    CardTextInput:{
-        borderRadius:5,
-        backgroundColor:"#ffffff",
+    CardText: {
+        fontSize: 16,
         color: "#333333",
-        paddingTop:10,
-        paddingBottom:10,
-        paddingLeft:5,
-        fontSize:16,
     },
-    MemberButton:{
-        marginTop:20,
-        flexDirection:"row"
+    CardNumber: {
+        flex: 1,
     },
-    MemberClose:{
-        flex:1,
-        backgroundColor:"#ff4e4e",
-        height:34,
-        paddingTop:6,
-        paddingBottom:6,
-        borderRadius:5,
+    CardTextInput: {
+        borderRadius: 5,
+        backgroundColor: "#ffffff",
+        color: "#333333",
+        paddingTop: 10,
+        paddingBottom: 10,
+        paddingLeft: 5,
+        fontSize: 16,
     },
-
-
-
-
+    MemberButton: {
+        marginTop: 20,
+        flexDirection: "row"
+    },
+    MemberClose: {
+        flex: 1,
+        backgroundColor: "#ff4e4e",
+        height: 34,
+        paddingTop: 6,
+        paddingBottom: 6,
+        borderRadius: 5,
+    },
 
 
     container: {
         flex: 1,
         backgroundColor: '#f2f2f2',
-        paddingBottom:10,
+        paddingBottom: 10,
     },
-    header:{
-        height:60,
-        backgroundColor:"#ff4e4e",
-        paddingTop:10,
+    header: {
+        height: 60,
+        backgroundColor: "#ff4e4e",
+        paddingTop: 10,
     },
-    cont:{
-        flexDirection:"row",
-        paddingLeft:16,
-        paddingRight:16,
+    cont: {
+        flexDirection: "row",
+        paddingLeft: 16,
+        paddingRight: 16,
     },
-    HeaderList:{
-        flex:6,
-        textAlign:"center",
-        paddingRight:56,
-        color:"#ffffff",
-        fontSize:22,
-        marginTop:3,
+    HeaderList: {
+        flex: 6,
+        textAlign: "center",
+        paddingRight: 56,
+        color: "#ffffff",
+        fontSize: 22,
+        marginTop: 3,
     },
-    TitleCont:{
-        height:40,
-        backgroundColor:"#ff4e4e",
-        paddingLeft:20,
-        paddingRight:20,
+    TitleCont: {
+        height: 40,
+        backgroundColor: "#ff4e4e",
+        paddingLeft: 20,
+        paddingRight: 20,
     },
-    FristList:{
-        height:38,
-        paddingTop:6,
-        paddingBottom:6,
-        flexDirection:"row",
+    FristList: {
+        height: 38,
+        paddingTop: 6,
+        paddingBottom: 6,
+        flexDirection: "row",
     },
-    FristList1:{
-        height:38,
-        paddingTop:12,
-        flexDirection:"row",
+    FristList1: {
+        height: 38,
+        paddingTop: 12,
+        flexDirection: "row",
     },
-    List:{
-        flex:1,
-        flexDirection:"row",
+    List: {
+        flex: 1,
+        flexDirection: "row",
     },
-    ListView1:{
-        width:70,
+    ListView1: {
+        width: 70,
     },
-    ListView:{
-        flex:1,
-        height:20,
-        overflow:"hidden",
-        backgroundColor:"#ff4e4e"
+    ListView: {
+        flex: 1,
+        height: 20,
+        overflow: "hidden",
+        backgroundColor: "#ff4e4e"
     },
-    ListText:{
-        color:"#ffffff",
-        fontSize:16,
+    ListText: {
+        color: "#ffffff",
+        fontSize: 16,
     },
-    ShopCont:{
-        paddingLeft:10,
-        paddingRight:10,
+    ShopCont: {
+        paddingLeft: 10,
+        paddingRight: 10,
     },
-    ShopList:{
-        maxHeight:180,
-        borderRadius:5,
-        backgroundColor:"#ffffff",
+    ShopList: {
+        maxHeight: 180,
+        borderRadius: 5,
+        backgroundColor: "#ffffff",
     },
-    ListTitle:{
-        height:54,
-        paddingTop:16,
-        flexDirection:"row",
-        backgroundColor:"#f2f2f2",
-        borderTopLeftRadius:5,
-        borderTopRightRadius:5,
+    ListTitle: {
+        height: 54,
+        paddingTop: 16,
+        flexDirection: "row",
+        backgroundColor: "#f2f2f2",
+        borderTopLeftRadius: 5,
+        borderTopRightRadius: 5,
     },
-    ListClass:{
-        flex:3
+    ListClass: {
+        flex: 3
     },
-    ListClass1:{
-        flex:2
+    ListClass1: {
+        flex: 2
     },
-    ListClassText:{
-        color:"#666666",
-        fontSize:16,
-        textAlign:"center"
+    ListClassText: {
+        color: "#666666",
+        fontSize: 16,
+        textAlign: "center"
     },
-    Prece:{
-        height:45,
-        marginTop:10,
-        marginLeft:20,
-        marginRight:20,
-        flexDirection:"row"
+    Prece: {
+        height: 45,
+        marginTop: 10,
+        marginLeft: 20,
+        marginRight: 20,
+        flexDirection: "row"
     },
-    InpuTingText:{
-        color:"#333333",
-        fontSize:16,
+    InpuTingText: {
+        color: "#333333",
+        fontSize: 16,
     },
-    InputingRight:{
-        flex:1,
-        height:45,
-        backgroundColor:"#ffffff",
-        borderRadius:5,
+    InputingRight: {
+        flex: 1,
+        height: 45,
+        backgroundColor: "#ffffff",
+        borderRadius: 5,
     },
-    Inputing:{
-        flex:2,
-        flexDirection:"row"
+    Inputing: {
+        flex: 2,
+        flexDirection: "row"
     },
-    Inputing1:{
-        flex:3,
-        flexDirection:"row"
+    Inputing1: {
+        flex: 3,
+        flexDirection: "row"
     },
-    Inputingleft:{
-        width:50,
-        height:20,
+    Inputingleft: {
+        width: 50,
+        height: 20,
     },
-    Inputingright:{
-        flex:1,
-        height:20,
-        overflow:"hidden",
+    Inputingright: {
+        flex: 1,
+        height: 20,
+        overflow: "hidden",
     },
-    InputingText:{
-        fontSize:18,
-        color:"#333333",
+    InputingText: {
+        fontSize: 18,
+        color: "#333333",
     },
-    Inputing1Left:{
-        flexDirection:"row"
+    Inputing1Left: {
+        flexDirection: "row"
     },
-    Swiper:{
-        height:50,
-        marginTop:16,
+    Swiper: {
+        height: 50,
+        marginTop: 16,
     },
-    FristPage:{
-        marginLeft:44,
-        marginRight:44,
+    FristPage: {
+        marginLeft: 44,
+        marginRight: 44,
     },
-    PageRow:{
-        height:50,
-        flexDirection:"row"
+    PageRow: {
+        height: 50,
+        flexDirection: "row"
     },
-    PageRowButton:{
-        flex:1,
-        backgroundColor:"#ff4e4e",
-        borderRadius:5,
-        paddingTop:14,
+    PageRowButton: {
+        flex: 1,
+        backgroundColor: "#ff4e4e",
+        borderRadius: 5,
+        paddingTop: 14,
     },
-    PageRowText:{
-        color:"#ffffff",
-        fontSize:16,
-        textAlign:"center"
+    PageRowText: {
+        color: "#ffffff",
+        fontSize: 16,
+        textAlign: "center"
     },
-    ShopList1:{
-        paddingLeft:5,
-        paddingRight:5,
-        paddingTop:10,
-        paddingBottom:10,
-        backgroundColor:"#ffffff",
-        borderBottomWidth:1,
-        borderBottomColor:"#f2f2f2",
-        flexDirection:"row",
+    ShopList1: {
+        paddingLeft: 5,
+        paddingRight: 5,
+        paddingTop: 10,
+        paddingBottom: 10,
+        backgroundColor: "#ffffff",
+        borderBottomWidth: 1,
+        borderBottomColor: "#f2f2f2",
+        flexDirection: "row",
     },
-    Name:{
-        flex:3,
-        textAlign:"center",
-        color:"#333333",
-        fontSize:16,
-        height:22,
-        overflow:"hidden",
+    Name: {
+        flex: 3,
+        textAlign: "center",
+        color: "#333333",
+        fontSize: 16,
+        height: 22,
+        overflow: "hidden",
     },
-    Number:{
-        flex:2,
-        textAlign:"center",
-        color:"#333333",
-        fontSize:16,
-        height:22,
-        overflow:"hidden",
+    Number: {
+        flex: 2,
+        textAlign: "center",
+        color: "#333333",
+        fontSize: 16,
+        height: 22,
+        overflow: "hidden",
     },
-    LoadCenter:{
-        flex:1,
+    LoadCenter: {
+        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
     },
-    loading:{
-        paddingLeft:15,
-        paddingRight:15,
-        paddingTop:15,
-        paddingBottom:15,
-        backgroundColor:"#000000",
-        opacity:0.8,
-        borderRadius:5,
+    loading: {
+        paddingLeft: 15,
+        paddingRight: 15,
+        paddingTop: 15,
+        paddingBottom: 15,
+        backgroundColor: "#000000",
+        opacity: 0.8,
+        borderRadius: 5,
     },
-    TextLoading:{
-        fontSize:17,
-        color:"#ffffff"
+    TextLoading: {
+        fontSize: 17,
+        color: "#ffffff"
     },
 });

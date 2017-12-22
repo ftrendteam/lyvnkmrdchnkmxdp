@@ -1084,6 +1084,7 @@ export default class Index extends Component {
     }
 
     Sell(){
+        Storage.save("Num", 1);
         if(this.state.ShopCar1>0){
             this._setModalVisible();
             alert("商品未提交")
@@ -1093,6 +1094,7 @@ export default class Index extends Component {
             NativeModules.AndroidDeviceInfo.getIMEI((IMEI) => {
                 Storage.get('Bind').then((tags) => {
                     Storage.save("invoice", "销售");
+                    Storage.save("Num", 1);
                     if (tags == "bindsucceed") {
                         Storage.get('ShopCode').then((ShopCode) => {
                             Storage.get('PosCode').then((PosCode) => {
@@ -1106,7 +1108,6 @@ export default class Index extends Component {
                                 Storage.get('LinkUrl').then((linkurl) => {
                                     FetchUtil.post(linkurl, JSON.stringify(params)).then((data) => {
                                         if (data.retcode == 1) {
-                                            Storage.save('Name', '销售');
                                             var invoice = "销售";
                                             this.setState({
                                                 head: invoice,

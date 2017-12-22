@@ -1172,6 +1172,10 @@ const styles = StyleSheet.create({
         width:95,
         marginTop:14,
     },
+    DanJU:{
+        flex:5,
+        flexDirection:"row",
+    },
     Documentsnote:{
         fontSize:16,
         color:"#666666"

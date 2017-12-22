@@ -5,6 +5,7 @@ export default class DateUtil{
     static formatDate(date) {
         var month = date.getMonth() + 1;
         var day = date.getDate();
+
         return date.getFullYear() + "-" + (month < 10 ? "0" + month : month) + "-" + (day < 10 ? "0" + day : day);
     }
     static formatDateTime(date) {

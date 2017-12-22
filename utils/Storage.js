@@ -28,7 +28,9 @@ class Storage {
         try {
 
             JSON.stringify(value)
-            return AsyncStorage.setItem(key, value);
+            return AsyncStorage.setItem(key, value,(error,result)=>{
+                console.log("baocun=",error,result);
+            });
         } catch (err) {
             console.log("wtf=",err)
         }

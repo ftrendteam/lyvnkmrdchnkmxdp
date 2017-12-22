@@ -133,6 +133,7 @@ export default class SellData extends Component {
                         Storage.save("Bind","bindsucceed");
                         Storage.save("ShopCode",this.state.ShopCode);
                         Storage.save("PosCode",this.state.PosCode);
+                        Storage.save('Name', '销售');
                     }else{
                         alert(JSON.stringify(data))
                     }
