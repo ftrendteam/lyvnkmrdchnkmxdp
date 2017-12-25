@@ -169,7 +169,7 @@ export default class SQLiteOpenHelper {
         "Total float(8) null, TotalPay float(8) null,Change float(8) null,CustType varchar(1) null, CustCode varchar(20) null," +
         "InvCode varchar(12) null,PayId int(4) null,PayCode varchar(2) null,Amount float(8) null,OldAmount float(8) null," +
         "TendPayCode varchar(30) null,VipTotal float(8) null,TScore float(8) null,VipSCore float(8) null, InnerNo varchar(12) null,TrandsFlag varchar(19) null,YWDate varchar(10) null)",
-        [],() => {
+        [], () => {
         },
         (err) => {
           console.log(err);
@@ -181,7 +181,7 @@ export default class SQLiteOpenHelper {
         "Total float(8) null,HandDscTotal float(8) null,CxDsc float(8) null,EvenDsc float(8) null,MljDsc float(8) null, OverDsc float(8) null,OtherDsc float(8) null,TranDsc float(1) null, VipDsc float(20) null," +
         "InnerNo varchar(12) null,OrderNo varchar(3) null,TransFlag varchar(1) null,TransDateTime varchar(19) null,BrandDsc float(8) null," +
         "isSubProd varchar(1) null,isMinus varchar(1) null,BuyPresentCode varchar(20) null,BuyPresentGroupNo varchar(20) null, BPUsedCountN float(8) null,DscFormNo varchar(20) null,DscMJFormNo varchar(20) null,SSID varchar(32) null," +
-        "DscMZFormNo varchar(20) null,DscGSFormNo varchar(20) null,GSUsedCountN float(8) null,YWDate varchar(10))", [],() => {
+        "DscMZFormNo varchar(20) null,DscGSFormNo varchar(20) null,GSUsedCountN float(8) null,YWDate varchar(10))", [], () => {
       }, (err) => {
         console.log(err);
       });
@@ -193,10 +193,16 @@ export default class SQLiteOpenHelper {
         "Total float(8) null,HandDscTotal float(8) null,CxDsc float(8) null,EvenDsc float(8) null,MljDsc float(8) null, OverDsc float(8) null,OtherDsc float(8) null,TranDsc float(1) null, VipDsc float(20) null," +
         "InnerNo varchar(12) null,OrderNo varchar(3) null,TransFlag varchar(1) null,TransDateTime varchar(19) null,BrandDsc float(8) null," +
         "isSubProd varchar(1) null,isMinus varchar(1) null,BuyPresentCode varchar(20) null,BuyPresentGroupNo varchar(20) null, BPUsedCountN float(8) null,DscFormNo varchar(20) null,DscMJFormNo varchar(20) null,SSID varchar(32) null," +
-        "DscMZFormNo varchar(20) null,DscGSFormNo varchar(20) null,GSUsedCountN float(8) null,YWDate varchar(10))", [],() => {
+        "DscMZFormNo varchar(20) null,DscGSFormNo varchar(20) null,GSUsedCountN float(8) null,YWDate varchar(10))", [], () => {
       }, (err) => {
         console.log(err);
       });
+      tx.executeSql("CREATE TABLE IF NOT EXISTS payInfo(Pid int(4) not null,PayCode varchar(12) null,payName varchar(50) null," +
+        "ExchgRate double(8) null,IsChange varchar(8) null,IsGetCode varchar(2) null,ChangeCode varchar(2) null," +
+        "GatherRate int(4) null,IsSystem varchar(1) null,ShortCut varchar(1) null,PayMemo varchar(50)null," +
+        "IsDel varchar(1) null,NoDsc varchar(1) null)", [], () => {
+      
+      })
     }, (err) => {
       this._errorCB('transaction', err);
     }, () => {

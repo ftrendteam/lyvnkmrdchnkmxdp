@@ -1084,8 +1084,8 @@ export default class DBAdapter extends SQLiteOpenHelper {
         let ywDate = sum.YWDate;
         let sql = "insert into Sum(LsNo,sDateTime,TradeFlag,CashierId,CashierCode,ino,CashierName,DscTotal,AutoDscTotal,Total,TotalPay,Change,CustType,CustCode,InvCode," +
           "PayId,PayCode,Amount,OldAmount,TendPayCode,VipTotal,TScore,VipSCore,InnerNo,TransFlag,TransDateTime,YWDate) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-        tx.executeSql(sql, [lsNo,sDateTime,tradeFlag,cashierId,cashierCode,ino,cashierName,dscTotal,autoDscTotal,total,totalPay,change,custType,custCode,
-          invCode,payId,payCode,amount,oldAmount,tendPayCode,vipTotal,tScore,vipSCore,innerNo,transFlag,transDateTime,ywDate], (tx, results) => {
+        tx.executeSql(sql, [lsNo, sDateTime, tradeFlag, cashierId, cashierCode, ino, cashierName, dscTotal, autoDscTotal, total, totalPay, change, custType, custCode,
+            invCode, payId, payCode, amount, oldAmount, tendPayCode, vipTotal, tScore, vipSCore, innerNo, transFlag, transDateTime, ywDate], (tx, results) => {
             //resolve((results.rows));
           }, (error) => {
             console.log("err===", error);
@@ -1094,7 +1094,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
       }
       
     });
-   
+    
   }
   
   /***
@@ -1102,7 +1102,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
    */
   insertDetail(detailDatas) {
     db.transaction((tx) => {
-      for (let i = 0;i<detailDatas.length;i++){
+      for (let i = 0; i < detailDatas.length; i++) {
         let detail = detailDatas[i];
         let lsNo = detail.LsNo;
         let sDateTime = detail.sDateTime;
@@ -1153,11 +1153,11 @@ export default class DBAdapter extends SQLiteOpenHelper {
           "OverDsc,OtherDsc,TranDsc,VipDsc,InnerNo,OrderNo,TransFlag,TransDateTime,BrandDsc,isSubProd,isMinus,BuyPresentCode," +
           "BuyPresentGroupNo,BPUsedCountN,DscFormNo,DscMJFormNo,SSID,DscMZFormNo,DscGSFormNo,GSUsedCountN,YWDate) values(" +
           "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-        tx.executeSql(sql, [lsNo , sDateTime , tradeFlag , cashierId , cashierCode , cashierName , clerkId , clerkCode ,
-          pid , barCode , clerkName , prodCode , prodName , depCode , price , amount , dscTotal , total , autoDscTotal ,
-          handDsc , cxDsc , evenDsc , mljDsc , overDsc , otherDsc , tranDsc , vipDsc , innerNo , orderNo , transFlag ,
-          transDateTime , brandDsc , subProd , minus , buyPresentCode , buyPresentGroupNo , bpUsedCountN , dscFormNo ,
-          dscMJFormNo , ssid , dscMZFormNo , dscGSFormNo , gsUsedCountN , ywDate], (tx, results) => {
+        tx.executeSql(sql, [lsNo, sDateTime, tradeFlag, cashierId, cashierCode, cashierName, clerkId, clerkCode,
+            pid, barCode, clerkName, prodCode, prodName, depCode, price, amount, dscTotal, total, autoDscTotal,
+            handDsc, cxDsc, evenDsc, mljDsc, overDsc, otherDsc, tranDsc, vipDsc, innerNo, orderNo, transFlag,
+            transDateTime, brandDsc, subProd, minus, buyPresentCode, buyPresentGroupNo, bpUsedCountN, dscFormNo,
+            dscMJFormNo, ssid, dscMZFormNo, dscGSFormNo, gsUsedCountN, ywDate], (tx, results) => {
             //resolve((results.rows));
           }, (error) => {
             console.log("err===", error);
@@ -1174,7 +1174,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
    */
   insertRDetail(rdetailDatas) {
     db.transaction((tx) => {
-      for (let i = 0;i<rdetailDatas.length;i++){
+      for (let i = 0; i < rdetailDatas.length; i++) {
         let detail = rdetailDatas[i];
         let lsNo = detail.LsNo;
         let sDateTime = detail.sDateTime;
@@ -1225,11 +1225,11 @@ export default class DBAdapter extends SQLiteOpenHelper {
           "OverDsc,OtherDsc,TranDsc,VipDsc,InnerNo,OrderNo,TransFlag,TransDateTime,BrandDsc,isSubProd,isMinus,BuyPresentCode," +
           "BuyPresentGroupNo,BPUsedCountN,DscFormNo,DscMJFormNo,SSID,DscMZFormNo,DscGSFormNo,GSUsedCountN,YWDate) values(" +
           "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-        tx.executeSql(sql, [lsNo , sDateTime , tradeFlag , cashierId , cashierCode , cashierName , clerkId , clerkCode ,
-            pid , barCode , clerkName , prodCode , prodName , depCode , price , amount , dscTotal , total , autoDscTotal ,
-            handDsc , cxDsc , evenDsc , mljDsc , overDsc , otherDsc , tranDsc , vipDsc , innerNo , orderNo , transFlag ,
-            transDateTime , brandDsc , subProd , minus , buyPresentCode , buyPresentGroupNo , bpUsedCountN , dscFormNo ,
-            dscMJFormNo , ssid , dscMZFormNo , dscGSFormNo , gsUsedCountN , ywDate], (tx, results) => {
+        tx.executeSql(sql, [lsNo, sDateTime, tradeFlag, cashierId, cashierCode, cashierName, clerkId, clerkCode,
+            pid, barCode, clerkName, prodCode, prodName, depCode, price, amount, dscTotal, total, autoDscTotal,
+            handDsc, cxDsc, evenDsc, mljDsc, overDsc, otherDsc, tranDsc, vipDsc, innerNo, orderNo, transFlag,
+            transDateTime, brandDsc, subProd, minus, buyPresentCode, buyPresentGroupNo, bpUsedCountN, dscFormNo,
+            dscMJFormNo, ssid, dscMZFormNo, dscGSFormNo, gsUsedCountN, ywDate], (tx, results) => {
             //resolve((results.rows));
           }, (error) => {
             console.log("err===", error);
@@ -1238,6 +1238,40 @@ export default class DBAdapter extends SQLiteOpenHelper {
       }
       
     });
+  }
+  
+  /***
+   * 支付方式表插入
+   * @param infos
+   */
+  insertPayInfo = (infos) => {
+    this.deleteData('payInfo');
+    db.transaction((tx) => {
+      for (let i = 0; i < infos.length; i++) {
+        let info = infos[i];
+        let pid = info.pid;
+        let payCode = info.PayCode;
+        let payName = info.PayName;
+        let exchgRate = info.ExchgRate;
+        let isChange = info.IsChange;
+        let isGetCode = info.IsGetCode;
+        let changeCode = info.ChangeCode;
+        let gatherRate = info.GatherRate;
+        let isSystem = info.IsSystem;
+        let shortCut = info.ShortCut;
+        let payMemo = info.PayMemo;
+        let isDel = info.IsDel;
+        let noDsc = info.NoDsc;
+        let sql = "insert into payInfo(Pid,PayCode,payName,ExchgRate,IsChange,IsGetCode,ChangeCode,GatherRate,IsSystem,ShortCut,PayMemo,IsDel,NoDsc) values(" +
+          "?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        tx.executeSql(sql, [pid, payCode, payName, exchgRate, isChange, isGetCode, changeCode, gatherRate, isSystem, shortCut, payMemo, isDel, noDsc], (tx, results) => {
+        
+        }, (err) => {
+          console.log("payinfo=",err)
+        })
+      }
+    })
+    
   }
   
   /***

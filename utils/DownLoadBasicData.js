@@ -20,7 +20,8 @@ export default class DownLoadBasicData {
       if ((response.retcode == 1)) {
         let tblRow2 = response.TblRow2;
         dbAdapter.insertKgopt(tblRow2);
-        return this.downLoadPosOpt(url, shopCode, dbAdapter);
+          this.downLoadTshopitem(url, shopCode, dbAdapter);
+          this.downLoadPosOpt(url, shopCode, dbAdapter);
       }
     });
   }
@@ -35,7 +36,23 @@ export default class DownLoadBasicData {
       if ((response != "" && response.retcode == 1)) {
         let tblRow3 = response.TblRow3;
         dbAdapter.insertPosOpt(tblRow3);
-        return true;
+        
+        
+      }
+    });
+  }
+  
+  static async downLoadTshopitem(url, shopCode, dbAdapter) {
+    let requestBody = JSON.stringify({
+      'TblName': 'tshopitem',
+      'ShopCode': shopCode,
+      'PosCode': '0',
+    });
+    await FetchUtils.post(url, requestBody).then((response) => {
+      if ((response != "" && response.retcode == 1)) {
+        let tblRow1 = response.TblRow1;
+        dbAdapter.insertPayInfo(tblRow1);
+        
       }
     });
   }
