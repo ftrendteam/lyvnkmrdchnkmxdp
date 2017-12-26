@@ -168,7 +168,7 @@ export default class SQLiteOpenHelper {
         "CashierId int(4) null,CashierCode varchar(12) null,ino int(4) null,CashierName varchar(20) null,DscTotal float(8) null,AutoDscTotal float(8) null," +
         "Total float(8) null, TotalPay float(8) null,Change float(8) null,CustType varchar(1) null, CustCode varchar(20) null," +
         "InvCode varchar(12) null,PayId int(4) null,PayCode varchar(2) null,Amount float(8) null,OldAmount float(8) null," +
-        "TendPayCode varchar(30) null,VipTotal float(8) null,TScore float(8) null,VipSCore float(8) null, InnerNo varchar(12) null,TrandsFlag varchar(19) null,YWDate varchar(10) null)",
+        "TendPayCode varchar(30) null,VipTotal float(8) null,TScore float(8) null,VipSCore float(8) null, InnerNo varchar(12) null,TransFlag varchar(19) null,TransDateTime varchar(19) null,YWDate varchar(10) null)",
         [], () => {
         },
         (err) => {
