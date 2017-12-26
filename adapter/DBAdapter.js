@@ -1054,43 +1054,49 @@ export default class DBAdapter extends SQLiteOpenHelper {
   insertSum(sumDatas) {
     db.transaction((tx) => {
       for (let i = 0; i < sumDatas.length; i++) {
-        let sum = sumDatas[i];
-        let lsNo = sum.LsNo;
-        let sDateTime = sum.sDateTime;
-        let tradeFlag = sum.TradeFlag;
-        let cashierId = sum.CashierId;
-        let cashierCode = sum.CashierCode;
-        let ino = sum.ino;
-        let cashierName = sum.CashierName;
-        let dscTotal = sum.DscTotal;
-        let autoDscTotal = sum.AutoDscTotal;
-        let total = sum.Total;
-        let totalPay = sum.TotalPay;
-        let change = sum.Change;
-        let custType = sum.CustType;
-        let custCode = sum.CustCode;
-        let invCode = sum.InvCode;
-        let payId = sum.PayId;
-        let payCode = sum.PayCode;
-        let amount = sum.Amount;
-        let oldAmount = sum.OldAmount;
-        let tendPayCode = sum.TendPayCode;
-        let vipTotal = sum.VipTotal;
-        let tScore = sum.TScore;
-        let vipSCore = sum.VipSCore;
-        let innerNo = sum.InnerNo;
-        let transFlag = sum.TransFlag;
-        let transDateTime = sum.TransDateTime;
-        let ywDate = sum.YWDate;
-        let sql = "insert into Sum(LsNo,sDateTime,TradeFlag,CashierId,CashierCode,ino,CashierName,DscTotal,AutoDscTotal,Total,TotalPay,Change,CustType,CustCode,InvCode," +
-          "PayId,PayCode,Amount,OldAmount,TendPayCode,VipTotal,TScore,VipSCore,InnerNo,TransFlag,TransDateTime,YWDate) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-        tx.executeSql(sql, [lsNo, sDateTime, tradeFlag, cashierId, cashierCode, ino, cashierName, dscTotal, autoDscTotal, total, totalPay, change, custType, custCode,
-            invCode, payId, payCode, amount, oldAmount, tendPayCode, vipTotal, tScore, vipSCore, innerNo, transFlag, transDateTime, ywDate], (tx, results) => {
-            //resolve((results.rows));
-          }, (error) => {
-            console.log("err===", error);
-          }
-        );
+        console.log(sumDatas[i]);
+        try{
+            let sum = sumDatas[i];
+            let lsNo = sum.LsNo;
+            let sDateTime = sum.sDateTime;
+            let tradeFlag = sum.TradeFlag;
+            let cashierId = sum.CashierId;
+            let cashierCode = sum.CashierCode;
+            let ino = sum.ino;
+            let cashierName = sum.CashierName;
+            let dscTotal = sum.DscTotal;
+            let autoDscTotal = sum.AutoDscTotal;
+            let total = sum.Total;
+            let totalPay = sum.TotalPay;
+            let change = sum.Change;
+            let custType = sum.CustType;
+            let custCode = sum.CustCode;
+            let invCode = sum.InvCode;
+            let payId = sum.PayId;
+            let payCode = sum.PayCode;
+            let amount = sum.Amount;
+            let oldAmount = sum.OldAmount;
+            let tendPayCode = sum.TendPayCode;
+            let vipTotal = sum.VipTotal;
+            let tScore = sum.TScore;
+            let vipSCore = sum.VipSCore;
+            let innerNo = sum.InnerNo;
+            let transFlag = sum.TransFlag;
+            let transDateTime = sum.TransDateTime;
+            let ywDate = sum.YWDate;
+            let sql = "insert into Sum(LsNo,sDateTime,TradeFlag,CashierId,CashierCode,ino,CashierName,DscTotal,AutoDscTotal,Total,TotalPay,Change,CustType,CustCode,InvCode," +
+                "PayId,PayCode,Amount,OldAmount,TendPayCode,VipTotal,TScore,VipSCore,InnerNo,TransFlag,TransDateTime,YWDate) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+            tx.executeSql(sql, [lsNo, sDateTime, tradeFlag, cashierId, cashierCode, ino, cashierName, dscTotal, autoDscTotal, total, totalPay, change, custType, custCode,
+                    invCode, payId, payCode, amount, oldAmount, tendPayCode, vipTotal, tScore, vipSCore, innerNo, transFlag, transDateTime, ywDate], (tx, results) => {
+                    //resolve((results.rows));
+                }, (error) => {
+                    console.log("err===", error);
+                }
+            );
+        }catch (error){
+          console.log("err2==",error);
+        }
+
       }
       
     });

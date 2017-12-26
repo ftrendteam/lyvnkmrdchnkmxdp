@@ -14,18 +14,13 @@ export default class NumFormatUtils {
                 Storage.get('PosCode').then((posCode) => {
                     Storage.get('Num').then((num) => {
                         let LsNo;
+                        num = parseInt(num);
                         let strNum = this.PrefixInteger(num);
-                        console.log("1", num);
-                        console.log("2", strNum);
                         if (num > 99999999) {
                             num = 1;
-                            console.log("3");
                         } else {
-                            console.log("4");
-                            num = num++;
-
-                            console.log("wtf", num);
-                            Storage.save("Num", num);
+                            num= num+1;
+                            Storage.save("Num", num+"");
                         }
                         LsNo = posCode + strNum;
 
@@ -53,13 +48,34 @@ export default class NumFormatUtils {
     static inoNum = 1;
 
     static createInnerNo = () => {
-        let trim = DateUtils.getSystemTimeHSM().replace(":", "").replace("-", "").replace(" ",
-            "");
-        let innerNo = trim.substring(2, trim.length() - 1) + inoNum;
-        this.inoNum++;
-        if (inoNum == 9) {
-            inoNum = 1;
+        var now = new Date();
+        var year = now.getFullYear();
+        var month = now.getMonth() + 1;
+        var day = now.getDate();
+        var hh = now.getHours();
+        var mm = now.getMinutes();
+        var ss = now.getSeconds();
+        if(month >= 1 && month <= 9){
+            month = "0" + month;
         }
-        return innerNo;
+        if(day >= 1 && day <= 9){
+            day = "0" + day;
+        }
+        if(hh >= 1 && hh <= 9){
+            hh = "0" + hh;
+        }
+        if(mm >= 1 && mm <= 9){
+            mm = "0" + mm;
+        }
+        if(ss >= 1 && ss <= 9){
+            ss = "0" + ss;
+        }
+
+        var sum=year+""+month+day+hh+mm+ss+NumFormatUtils.inoNum;
+        NumFormatUtils.inoNum=NumFormatUtils.inoNum+1;
+        if (NumFormatUtils.inoNum == 9) {
+            NumFormatUtils.inoNum = 1;
+        }
+        return sum;
     }
 }

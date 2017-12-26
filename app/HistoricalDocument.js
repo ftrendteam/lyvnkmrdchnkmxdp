@@ -69,22 +69,7 @@ export default class HistoricalDocument extends Component {
             name:"主页",
             component:ShoppingCart
         };
-        this.props.navigator.push(nextRoute)
-        // Storage.get('Name').then((tags)=>{
-        //     if(tags=="销售"){
-        //         var nextRoute={
-        //             name:"Sell",
-        //             component:Sell
-        //         };
-        //         this.props.navigator.push(nextRoute)
-        //     }else{
-        //         var nextRoute={
-        //             name:"主页",
-        //             component:ShoppingCart
-        //         };
-        //         this.props.navigator.push(nextRoute)
-        //     }
-        // })
+        this.props.navigator.push(nextRoute);
     }
 
   pressPush(){

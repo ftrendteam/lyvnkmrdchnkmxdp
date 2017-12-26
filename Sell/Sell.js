@@ -18,6 +18,7 @@ import {
     TouchableOpacity,
     ActivityIndicator,
 } from 'react-native';
+import Index from "../app/Index";
 import Pay from "../Sell/Pay";
 import Storage from "../utils/Storage";
 import Swiper from 'react-native-swiper';
@@ -68,6 +69,8 @@ export default class Sell extends Component {
             })
             Storage.save("LsNo",this.state.numform);
         });
+        //获取内部号
+        let innerNo = NumFormatUtils.createInnerNo();
 
         Storage.get('Name').then((tags) => {
             this.setState({
@@ -116,7 +119,15 @@ export default class Sell extends Component {
     }
 
     Return() {
-        this.props.navigator.pop();
+        var nextRoute = {
+            name: "Index",
+            component: Index,
+        };
+        this.props.navigator.push(nextRoute);
+    }
+
+    Code(){
+
     }
 
     _renderRow(rowData, sectionID, rowID) {
@@ -158,6 +169,7 @@ export default class Sell extends Component {
                             var VipCardNo;
                             var BalanceTotal;
                             var JfBal;
+                            var CardFaceNo;
                             for (let i = 0; i < TblRow.length; i++) {
                                 var row = TblRow[i];
                                 VipCardNo = row.VipCardNo;//卡号
@@ -167,15 +179,13 @@ export default class Sell extends Component {
                             ;
                             this.modal();
                             this.Member();
-                            Storage.save("VipCardNo", VipCardNo);
-                            Storage.save("BalanceTotal", BalanceTotal);
-                            Storage.save("JfBal", JfBal);
                             this.setState({
                                 VipCardNo: VipCardNo,
                                 BalanceTotal: BalanceTotal,
                                 JfBal: JfBal,
                             });
                         } else {
+                            this.modal();
                             alert(JSON.stringify(data));
                         }
                     })
@@ -185,6 +195,9 @@ export default class Sell extends Component {
     }
 
     PayButton() {
+        // Storage.save("VipCardNo", this.state.VipCardNo);
+        // Storage.save("BalanceTotal", this.state.BalanceTotal);
+        // Storage.save("JfBal", this.state.JfBal);
         var nextRoute = {
             name: "Pay",
             component: Pay,
@@ -192,21 +205,38 @@ export default class Sell extends Component {
                 JfBal: this.state.JfBal,
                 BalanceTotal: this.state.BalanceTotal,
                 ShopAmount: this.state.ShopAmount,
+                numform:this.state.numform,
             }
         };
         this.props.navigator.push(nextRoute);
+        //界面跳转
+        // let currentRoutes = this.props.navigator.getCurrentRoutes();
+        // for (let i = 0;i<currentRoutes.length;i++){
+        //     let currentRoute = currentRoutes[i];
+        //     let name = currentRoute.name;
+        //     console.log("name=",name)
+        //     if("Pay"==name){
+        //         this.props.navigator.jumpForward();
+        //         break;
+        //     }else if(i==currentRoutes.length-1){
+        //         this.props.navigator.push(nextRoute);
+        //         break;
+        //     }
+        // }
+
     }
 
     render() {
         return (
             <View style={styles.container}>
                 <View style={styles.header}>
-                    <View style={styles.cont}>
-                        <TouchableOpacity onPress={this.Return.bind(this)}>
-                            <Image source={require("../images/2_01.png")} style={styles.HeaderImage}></Image>
-                        </TouchableOpacity>
-                        <Text style={styles.HeaderList}>{this.state.name}</Text>
-                    </View>
+                    <TouchableOpacity onPress={this.Return.bind(this)} style={styles.return}>
+                        <Image source={require("../images/2_01.png")}></Image>
+                    </TouchableOpacity>
+                    <View style={styles.HeaderList}><Text style={styles.HeaderText}>{this.state.name}</Text></View>
+                    <TouchableOpacity onPress={this.Code.bind(this)} style={styles.SearchImage}>
+                        <Image source={require("../images/1_05.png")}></Image>
+                    </TouchableOpacity>
                 </View>
                 <View style={styles.TitleCont}>
                     <View style={styles.FristList}>
@@ -528,76 +558,6 @@ export default class Sell extends Component {
 }
 
 const styles = StyleSheet.create({
-    MemberBounces: {
-        backgroundColor: "#3e3d3d",
-        opacity: 0.9,
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    Cont: {
-        width: 280,
-        borderRadius: 5,
-        paddingBottom: 20,
-        backgroundColor: "#f2f2f2",
-    },
-    BouncesTitle: {
-        paddingTop: 13,
-        paddingBottom: 13,
-        backgroundColor: "#ff4e4e",
-        borderTopLeftRadius: 5,
-        borderTopRightRadius: 5,
-        flexDirection: 'row',
-    },
-    TitleText: {
-        flex: 1,
-        textAlign: "center",
-        color: "#ffffff",
-        fontSize: 16,
-    },
-    MemberCont: {
-        height: 150,
-        paddingLeft: 15,
-        paddingRight: 15,
-    },
-    MemberView: {
-        flexDirection: "row",
-        marginTop: 20,
-    },
-    Card: {
-        width: 50,
-        marginTop: 11,
-    },
-    CardText: {
-        fontSize: 16,
-        color: "#333333",
-    },
-    CardNumber: {
-        flex: 1,
-    },
-    CardTextInput: {
-        borderRadius: 5,
-        backgroundColor: "#ffffff",
-        color: "#333333",
-        paddingTop: 10,
-        paddingBottom: 10,
-        paddingLeft: 5,
-        fontSize: 16,
-    },
-    MemberButton: {
-        marginTop: 20,
-        flexDirection: "row"
-    },
-    MemberClose: {
-        flex: 1,
-        backgroundColor: "#ff4e4e",
-        height: 34,
-        paddingTop: 6,
-        paddingBottom: 6,
-        borderRadius: 5,
-    },
-
-
     container: {
         flex: 1,
         backgroundColor: '#f2f2f2',
@@ -607,19 +567,26 @@ const styles = StyleSheet.create({
         height: 60,
         backgroundColor: "#ff4e4e",
         paddingTop: 10,
-    },
-    cont: {
-        flexDirection: "row",
         paddingLeft: 16,
         paddingRight: 16,
+        flexDirection: "row",
+    },
+    return:{
+        width:60,
     },
     HeaderList: {
-        flex: 6,
-        textAlign: "center",
+        flex: 1,
         paddingRight: 56,
+        marginTop: 3,
+    },
+    HeaderText:{
+        textAlign: "center",
         color: "#ffffff",
         fontSize: 22,
-        marginTop: 3,
+    },
+    SearchImage:{
+        width:60,
+        paddingLeft:20
     },
     TitleCont: {
         height: 40,
@@ -790,5 +757,73 @@ const styles = StyleSheet.create({
     TextLoading: {
         fontSize: 17,
         color: "#ffffff"
+    },
+    MemberBounces: {
+        backgroundColor: "#3e3d3d",
+        opacity: 0.9,
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    Cont: {
+        width: 280,
+        borderRadius: 5,
+        paddingBottom: 20,
+        backgroundColor: "#f2f2f2",
+    },
+    BouncesTitle: {
+        paddingTop: 13,
+        paddingBottom: 13,
+        backgroundColor: "#ff4e4e",
+        borderTopLeftRadius: 5,
+        borderTopRightRadius: 5,
+        flexDirection: 'row',
+    },
+    TitleText: {
+        flex: 1,
+        textAlign: "center",
+        color: "#ffffff",
+        fontSize: 16,
+    },
+    MemberCont: {
+        height: 150,
+        paddingLeft: 15,
+        paddingRight: 15,
+    },
+    MemberView: {
+        flexDirection: "row",
+        marginTop: 20,
+    },
+    Card: {
+        width: 50,
+        marginTop: 11,
+    },
+    CardText: {
+        fontSize: 16,
+        color: "#333333",
+    },
+    CardNumber: {
+        flex: 1,
+    },
+    CardTextInput: {
+        borderRadius: 5,
+        backgroundColor: "#ffffff",
+        color: "#333333",
+        paddingTop: 10,
+        paddingBottom: 10,
+        paddingLeft: 5,
+        fontSize: 16,
+    },
+    MemberButton: {
+        marginTop: 20,
+        flexDirection: "row"
+    },
+    MemberClose: {
+        flex: 1,
+        backgroundColor: "#ff4e4e",
+        height: 34,
+        paddingTop: 6,
+        paddingBottom: 6,
+        borderRadius: 5,
     },
 });

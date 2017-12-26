@@ -122,11 +122,17 @@ export default class Index extends Component {
     }
 
     History(){
-        var nextRoute={
-            name:"主页",
-            component:HistoricalDocument
-        };
-        this.props.navigator.push(nextRoute)
+        Storage.get('Name').then((tags)=>{
+            if(tags=="销售"){
+                ToastAndroid.show('暂不支持该业务', ToastAndroid.SHORT)
+            }else{
+                var nextRoute={
+                    name:"主页",
+                    component:HistoricalDocument
+                };
+                this.props.navigator.push(nextRoute)
+            }
+        })
     }
 
     ShopList(){
@@ -1084,7 +1090,6 @@ export default class Index extends Component {
     }
 
     Sell(){
-        Storage.save("Num", 1);
         if(this.state.ShopCar1>0){
             this._setModalVisible();
             alert("商品未提交")
@@ -1094,7 +1099,6 @@ export default class Index extends Component {
             NativeModules.AndroidDeviceInfo.getIMEI((IMEI) => {
                 Storage.get('Bind').then((tags) => {
                     Storage.save("invoice", "销售");
-                    Storage.save("Num", 1);
                     if (tags == "bindsucceed") {
                         Storage.get('ShopCode').then((ShopCode) => {
                             Storage.get('PosCode').then((PosCode) => {
