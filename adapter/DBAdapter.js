@@ -713,6 +713,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
             if ((md5Pwd + '') == item.UserPwd) {//密码正确
               let userName = item.UserName;
               Storage.save("userName", userName);
+              Storage.save("Pid", item.pid);
               // DataUtils.save("userCode", Usercode);
               let shopCode;
               DataUtils.get('code', '').then((data) => {
