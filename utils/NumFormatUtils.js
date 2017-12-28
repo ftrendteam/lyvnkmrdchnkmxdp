@@ -19,8 +19,8 @@ export default class NumFormatUtils {
                         if (num > 99999999) {
                             num = 1;
                         } else {
-                            num= num+1;
-                            Storage.save("Num", num+"");
+                            num= (JSON.stringify(num+1));
+                            Storage.save("Num", num);
                         }
                         LsNo = posCode + strNum;
 

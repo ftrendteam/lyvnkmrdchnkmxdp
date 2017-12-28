@@ -77,6 +77,7 @@ export default class admin extends Component {
 
     //初始化render之后只执行一次
     componentDidMount(){
+        Storage.save("ino", "1");
         //textinput自动获取焦点
         this.setState({
             focus:true

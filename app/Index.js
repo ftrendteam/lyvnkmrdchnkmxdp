@@ -1099,6 +1099,7 @@ export default class Index extends Component {
             NativeModules.AndroidDeviceInfo.getIMEI((IMEI) => {
                 Storage.get('Bind').then((tags) => {
                     Storage.save("invoice", "销售");
+                    Storage.save("Name", "销售");
                     if (tags == "bindsucceed") {
                         Storage.get('ShopCode').then((ShopCode) => {
                             Storage.get('PosCode').then((PosCode) => {

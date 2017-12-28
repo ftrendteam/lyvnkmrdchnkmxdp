@@ -71,7 +71,6 @@ export default class Sell extends Component {
         });
         //获取内部号
         let innerNo = NumFormatUtils.createInnerNo();
-        Storage.save("innerNo",innerNo);
 
         Storage.get('Name').then((tags) => {
             this.setState({
@@ -92,18 +91,17 @@ export default class Sell extends Component {
         dbAdapter.selectShopInfo().then((rows) => {
             //this._ModalVisible();
             var shopnumber = 0;
-            var shopAmount = 0.00;
+            var shopAmount = 0;
             this.dataRows = [];
             for (let i = 0; i < rows.length; i++) {
                 var row = rows.item(i);
                 var number = row.countm;
-                shopAmount += row.prototal;
+                shopAmount += parseInt(row.prototal);
                 shopnumber += parseInt(row.countm);
                 if (number !== 0) {
                     this.dataRows.push(row);
                 }
             }
-            Storage.save("ShopAmount", shopAmount);
             if (this.dataRows == 0) {
                 this.modal();
                 return;
@@ -164,7 +162,7 @@ export default class Sell extends Component {
                     IsChuZhi: "",
                 };
                 Storage.get('LinkUrl').then((tags) => {
-                    FetchUtil.post(tags,JSON.stringify(params)).then((data) => {
+                    FetchUtil.post(tags, JSON.stringify(params)).then((data) => {
                         if (data.retcode == 1) {
                             var TblRow = data.TblRow;
                             var VipCardNo;
@@ -176,10 +174,10 @@ export default class Sell extends Component {
                                 VipCardNo = row.VipCardNo;//卡号
                                 BalanceTotal = row.BalanceTotal;//余额
                                 JfBal = row.JfBal;//积分
-                            };
+                            }
+                            ;
                             this.modal();
                             this.Member();
-                            Storage.save("VipCardNo", this.state.CardNumber);
                             this.setState({
                                 VipCardNo: VipCardNo,
                                 BalanceTotal: BalanceTotal,
@@ -228,25 +226,6 @@ export default class Sell extends Component {
         //         break;
         //     }
         // }
-    }
-
-    ReturnGoods(){
-        Storage.get('ShopCode').then((ShopCode) => {
-            Storage.get('PosCode').then((PosCode) => {
-                let params = {
-                    TblName: "VipCardPay_Ret",
-                    PayOrderNo: this.state.numform,
-                    CardPwd: "",
-                    shopcode: ShopCode,
-                    poscode: PosCode,
-                    CardFaceNo: "",
-                    OrderTotal: "",
-                    SaleTotal: "",
-                    JfValue: "",
-                    TransFlag: "",
-                }
-            })
-        })
 
     }
 
@@ -272,9 +251,7 @@ export default class Sell extends Component {
                                 <Text style={styles.ListText}>{this.state.numform}</Text>
                             </View>
                         </View>
-                        <TouchableOpacity onPress={this.ReturnGoods.bind(this)} style={styles.refund}>
-                            <Text style={styles.Goods}>退货</Text>
-                        </TouchableOpacity>
+
                     </View>
                 </View>
                 <View style={styles.ShopCont}>
@@ -424,6 +401,11 @@ export default class Sell extends Component {
                         >
                             <View style={styles.FristPage}>
                                 <View style={styles.PageRow}>
+                                    <TouchableOpacity style={[styles.PageRowButton, {marginRight: 5}]}>
+                                        <Text style={styles.PageRowText}>
+                                            键盘
+                                        </Text>
+                                    </TouchableOpacity>
                                     <TouchableOpacity onPress={this.MemberButton.bind(this)}
                                                       style={[styles.PageRowButton, {marginRight: 5}]}>
                                         <Text style={styles.PageRowText}>
@@ -434,11 +416,6 @@ export default class Sell extends Component {
                                                       style={[styles.PageRowButton, {marginRight: 5}]}>
                                         <Text style={styles.PageRowText}>
                                             付款
-                                        </Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={[styles.PageRowButton, {marginRight: 5}]}>
-                                        <Text style={styles.PageRowText}>
-                                            销售
                                         </Text>
                                     </TouchableOpacity>
                                 </View>
@@ -482,6 +459,36 @@ export default class Sell extends Component {
                                 </View>
                             </View>
                         </Swiper>
+                    </View>
+                    <View style={[styles.Prece, {height: 28, marginTop: 10, backgroundColor: "#f2f2f2"}]}>
+                        <View style={styles.Inputing}>
+                            <View style={[styles.Inputingleft, {width: 60}]}>
+                                <Text style={[{color: "#333333", fontSize: 16, textAlign: "right"}]}>店号:</Text>
+                            </View>
+                            <View style={[styles.Inputingright, {marginLeft: 5,}]}>
+                                <Text style={[{fontSize: 16, color: "red"}]}>0001</Text>
+                            </View>
+                        </View>
+                    </View>
+                    <View style={[styles.Prece, {height: 28, backgroundColor: "#f2f2f2"}]}>
+                        <View style={styles.Inputing}>
+                            <View style={[styles.Inputingleft, {width: 60}]}>
+                                <Text style={[{color: "#333333", fontSize: 16, textAlign: "right"}]}>收款员:</Text>
+                            </View>
+                            <View style={[styles.Inputingright, {marginLeft: 5,}]}>
+                                <Text style={[{fontSize: 16, color: "red"}]}>0001</Text>
+                            </View>
+                        </View>
+                    </View>
+                    <View style={[styles.Prece, {height: 28, backgroundColor: "#f2f2f2"}]}>
+                        <View style={styles.Inputing}>
+                            <View style={[styles.Inputingleft, {width: 60}]}>
+                                <Text style={[{color: "#333333", fontSize: 16, textAlign: "right"}]}>pos号:</Text>
+                            </View>
+                            <View style={[styles.Inputingright, {marginLeft: 5,}]}>
+                                <Text style={[{fontSize: 16, color: "red"}]}>0001</Text>
+                            </View>
+                        </View>
                     </View>
                 </ScrollView>
                 <Modal
@@ -591,6 +598,7 @@ const styles = StyleSheet.create({
     },
     FristList: {
         height: 38,
+        paddingTop: 6,
         paddingBottom: 6,
         flexDirection: "row",
     },
@@ -602,20 +610,6 @@ const styles = StyleSheet.create({
     List: {
         flex: 1,
         flexDirection: "row",
-        marginTop:5,
-    },
-    refund:{
-        paddingTop:5,
-        paddingBottom:5,
-        paddingLeft:15,
-        paddingRight:15,
-        backgroundColor:"#ffba00",
-        borderRadius:5,
-    },
-    Goods:{
-        fontSize:16,
-        color:"#ffffff",
-        textAlign:"center"
     },
     ListView1: {
         width: 70,
@@ -635,7 +629,7 @@ const styles = StyleSheet.create({
         paddingRight: 10,
     },
     ShopList: {
-        height: 180,
+        maxHeight: 180,
         borderRadius: 5,
         backgroundColor: "#ffffff",
     },

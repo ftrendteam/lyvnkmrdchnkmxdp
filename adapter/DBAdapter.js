@@ -712,8 +712,11 @@ export default class DBAdapter extends SQLiteOpenHelper {
             let item = results.rows.item(0);
             if ((md5Pwd + '') == item.UserPwd) {//密码正确
               let userName = item.UserName;
+              let pid = (JSON.stringify(item.pid));
+              let Usercode = item.Usercode;
               Storage.save("userName", userName);
-              Storage.save("Pid", item.pid);
+              Storage.save("Pid", pid);
+              Storage.save("usercode", Usercode);
               // DataUtils.save("userCode", Usercode);
               let shopCode;
               DataUtils.get('code', '').then((data) => {
@@ -1053,9 +1056,9 @@ export default class DBAdapter extends SQLiteOpenHelper {
    *保存流水表Sum
    */
   insertSum(sumDatas) {
+      console.log("执行到了");
     db.transaction((tx) => {
       for (let i = 0; i < sumDatas.length; i++) {
-        console.log(sumDatas[i]);
         try{
             let sum = sumDatas[i];
             let lsNo = sum.LsNo;

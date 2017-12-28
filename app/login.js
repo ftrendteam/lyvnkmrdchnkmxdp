@@ -92,7 +92,7 @@ export default class  login extends Component{
                     ToastAndroid.show('登录成功', ToastAndroid.SHORT);
                 }else{
                    this._setModalVisible();
-                   // this._ErrorModalVisible()
+                   alert(JSON.stringify(data));
                 }
             },(err)=>{
                 this._setModalVisible();

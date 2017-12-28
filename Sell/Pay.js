@@ -12,6 +12,7 @@ import {
     View,
     Image,
     Modal,
+    FlatList,
     ListView,
     TextInput,
     ScrollView,
@@ -35,13 +36,20 @@ export default class Pay extends Component {
             CardPwd:"",
             name:"",
             amount:"",
-            retcurrJF:"",
+            Amount:"",
+            payments:"",
+            Payname:"",
             retZjf:"",
             ReferenceNo:"",
             retTxt:"",
             payname:"",
             Total:"",
             PayretcurrJF:"",
+            data:"",
+            innerNo:"",
+            custType:"",
+            VipCardNo:"",
+            cardfaceno:"",
             JfBal:this.props.JfBal ? this.props.JfBal : "",
             BalanceTotal:this.props.BalanceTotal ? this.props.BalanceTotal : "",
             ShopAmount:this.props.ShopAmount ? this.props.ShopAmount : "",
@@ -49,6 +57,7 @@ export default class Pay extends Component {
             dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
         }
         this.dataRows = [];
+        this.productData = [];
     }
 
     Total() {
@@ -82,6 +91,43 @@ export default class Pay extends Component {
                 name: tags
             });
         });
+
+        Storage.get('VipCardNo').then((tags) => {
+            if(tags==null){
+                alert(tags)
+                this.setState({
+                    custType:0,
+                    custCode:"",
+                })
+            }else{
+                alert(tags)
+                this.setState({
+                    custType:2,
+                    custCode:this.state.VipCardNo,
+                })
+            }
+        });
+
+        var total=0;
+        this.setState({
+            payments:total,
+        })
+        this.dbadapter();
+    }
+
+    dbadapter(){
+        dbAdapter.selectAllData("payInfo").then((rows)=>{
+            let priductData=[];
+            for(let i =0;i<rows.length;i++){
+                var row = rows.item(i);
+                // var Payname = rows.item(0).payName;
+                priductData.push(row);
+            };
+            this.productData=priductData;
+            this.setState({
+                data:priductData,
+            })
+        })
     }
 
     Return(){
@@ -94,41 +140,89 @@ export default class Pay extends Component {
 
     //继续交易
     JiaoYi(){
-        if(this.state.ShopAmount==this.state.retcurrJF){
+        if(this.state.ShopAmount==this.state.payments){
             var nextRoute = {
                 name: "Sell",
                 component: Sell,
             };
             this.props.navigator.push(nextRoute);
             dbAdapter.deleteData("shopInfo");
-            Storage.delete("")
+            Storage.delete("VipCardNo")
         }else{
             ToastAndroid.show('订单未完成', ToastAndroid.SHORT)
         }
     }
 
     _renderRow(rowData, sectionID, rowID){
-        return (
-            <View style={styles.ShopList1} onPress={()=>this.OrderDetails(rowData)}>
-                <View style={styles.Row}><Text style={styles.Name}>{this.state.payname}</Text></View>
-                <View style={styles.Row}><Text style={styles.Name}>{this.state.CardFaceNo}</Text></View>
-                <View style={styles.Row}><Text style={styles.Name}>{rowData.PayretcurrJF}</Text></View>
-                <View style={styles.Row}><Text style={styles.Name}>{rowData.retZjf}</Text></View>
-                <View style={styles.Row}><Text style={styles.Name}>{rowData.ReferenceNo}</Text></View>
-            </View>
-        );
-    }
-    //储值卡
-    Card(){
-        if(this.state.amount==""){
-            alert("请输入付款额")
-        }else{
-            this.Total();
-            this.setState({
-                payname:"储值卡",
-            })
+        if(this.state.payname=="现金"){
+            return (
+                <View style={styles.ShopList1} onPress={()=>this.OrderDetails(rowData)}>
+                    <View style={styles.Row}><Text style={styles.Name}>{this.state.payname}</Text></View>
+                    <View style={styles.Row}><Text style={styles.Name}></Text></View>
+                    <View style={styles.Row}><Text style={styles.Name}>{this.state.Amount}</Text></View>
+                    <View style={styles.Row}><Text style={styles.Name}>{rowData.retZjf}</Text></View>
+                    <View style={styles.Row}><Text style={styles.Name}>{rowData.ReferenceNo}</Text></View>
+                </View>
+            );
+        }else if(this.state.payname=="储值卡"){
+            return (
+                <View style={styles.ShopList1} onPress={()=>this.OrderDetails(rowData)}>
+                    <View style={styles.Row}><Text style={styles.Name}>{this.state.payname}</Text></View>
+                    <View style={styles.Row}><Text style={styles.Name}>{this.state.CardFaceNo}</Text></View>
+                    <View style={styles.Row}><Text style={styles.Name}>{rowData.retcurrJF}</Text></View>
+                    <View style={styles.Row}><Text style={styles.Name}>{rowData.retZjf}</Text></View>
+                    <View style={styles.Row}><Text style={styles.Name}>{rowData.ReferenceNo}</Text></View>
+                </View>
+            );
         }
     }
+
+    HorButton(item){
+        if(item.item.PayCode=="01"){
+            if(this.state.amount==""){
+                alert("请输入付款额")
+            }else if(this.state.payments>this.state.ShopAmount){
+                alert("付款额不能大于应付金额");
+            }else{
+                this.Total();
+                // this.setState({
+                //     payname:"储值卡",
+                // })
+            }
+        }else if(item.item.PayCode=="00"){
+            if(this.state.amount==""){
+                alert("请输入付款额")
+            }else if(this.state.payments>this.state.ShopAmount){
+                alert("付款额不能大于应付金额");
+            }else{
+                var Amount={'payName': '', 'payTotal': '', 'payRT': ''};
+                this.dataRows = this.dataRows.concat(Amount);
+                this.state.payments+=parseInt(this.state.amount);
+                this.setState({
+                    Amount:this.state.amount,
+                    payments:this.state.payments,
+                    payname:"现金",
+                    cardfaceno:"",
+                    dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
+                })
+            }
+        }
+    }
+
+    _renderItem(item,index){
+        return(
+            <TouchableOpacity onPress={()=>this.HorButton(item)} style={[styles.PageRowButton,{marginRight:5}]}>
+                <Text style={styles.PageRowText}>
+                    {item.item.payName}
+                </Text>
+            </TouchableOpacity>
+        )
+    }
+    //FlatList加入kay值
+    keyExtractor(item: Object, index: number) {
+        return item.payName//FlatList使用json中的ProdName动态绑定key
+    }
+
     //储值卡网络请求
     Button(){
         var now = new Date();
@@ -169,7 +263,6 @@ export default class Pay extends Component {
                         JfValue:0,
                         TransFlag:sum,
                     }
-                    // alert(JSON.stringify(params));
                     Storage.get('LinkUrl').then((tags) => {
                         FetchUtil.post(tags, JSON.stringify(params)).then((data) => {
                             if(data.retcode==1){
@@ -185,28 +278,89 @@ export default class Pay extends Component {
                                     retZjf = row.retZjf;
                                     ReferenceNo = row.ReferenceNo;
                                     retTxt = row.retTxt;
-                                }
+
+                                };
+                                this.state.payments +=retcurrJF;
                                 this.dataRows = this.dataRows.concat(TblRow);
                                 var Total = this.state.ShopAmount-retcurrJF;
                                 this.setState({
-                                    retcurrJF:retcurrJF,
+                                    payments:this.state.payments,
+                                    Amount:retcurrJF,
                                     retZjf:retZjf,
                                     ReferenceNo:ReferenceNo,
                                     retTxt:retTxt,
-                                    dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
                                     CardFaceNo:this.state.CardFaceNo,
                                     Total:Total,
-                                    amount:"",
+                                    payname:"储值卡",
+                                    dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
                                 });
-                                //插入Sum表
-                                var sumDatas = [];
-                                var sum = {};
-                                sum.LsNo = this.state.numform;
-                                sum.sDateTime = "2017-10-10";
-                                sumDatas.push(sum);
-                                dbAdapter.insertSum(sumDatas);
+                                Storage.get('innerNo').then((innerNo) => {
+                                    Storage.get('VipCardNo').then((VipCardNo) => {
+                                        Storage.get('Pid').then((Pid) => {
+                                            Storage.get('usercode').then((usercode) => {
+                                                Storage.get('userName').then((userName) => {
+                                                    Storage.get('ino').then((ino) => {
+                                                        if (this.state.ShopAmount > this.state.payments) {
+                                                            var now = new Date();
+                                                            var year = now.getFullYear();
+                                                            var month = now.getMonth() + 1;
+                                                            var day = now.getDate();
+                                                            var hh = now.getHours();
+                                                            var mm = now.getMinutes();
+                                                            var ss = now.getSeconds();
+                                                            if (month >= 1 && month <= 9) {
+                                                                month = "0" + month;
+                                                            }
+                                                            if (day >= 1 && day <= 9) {
+                                                                day = "0" + day;
+                                                            }
+                                                            if (hh >= 1 && hh <= 9) {
+                                                                hh = "0" + hh;
+                                                            }
+                                                            if (mm >= 1 && mm <= 9) {
+                                                                mm = "0" + mm;
+                                                            }
+                                                            if (ss >= 1 && ss <= 9) {
+                                                                ss = "0" + ss;
+                                                            }
+                                                            var SumData = year + "-" + month + "-" + day + " " + hh + ":" + mm + ":" + ss;
+                                                            //插入Sum表
+                                                            var sumDatas = [];
+                                                            var sum = {};
+                                                            ino = parseInt(ino);
+                                                            sum.LsNo = this.state.numform;
+                                                            sum.sDateTime = SumData;
+                                                            sum.CashierId = Pid;
+                                                            sum.CashierCode = usercode;
+                                                            sum.CashierName = userName;
+                                                            sum.ino = ino+1;
+                                                            sum.DscTotal = "";
+                                                            sum.Total = this.state.ShopAmount;
+                                                            sum.TotalPay = this.state.payments;
+                                                            sum.Change = "";
+                                                            sum.TradeFlag = "";
+                                                            sum.CustType = this.state.custType;
+                                                            sum.CustCode = VipCardNo;
+                                                            sum.PayId = "";
+                                                            sum.PayCode = "";
+                                                            sum.Amount = "";
+                                                            sum.OldAmount = "";
+                                                            sum.TendPayCode = "";
+                                                            sum.InnerNo = innerNo;
+                                                            // alert(this.state.numform + "+" + SumData + "+" +Pid + "+" +usercode + "+" +userName + "+" + this.state.ShopAmount + "+" + this.state.payments + "+" + this.state.custType + "+" + VipCardNo + "+" + innerNo);
+                                                            sumDatas.push(sum);
+                                                            dbAdapter.insertSum(sumDatas);
+                                                            var abc=JSON.stringify(ino+1);
+                                                            Storage.save("ino", abc);
+                                                            // dbAdapter.deleteData("shopInfo");
+                                                        };
+                                                    });
+                                                });
+                                            });
+                                        });
+                                    });
+                                });
                                 this.Total();
-                                dbAdapter.deleteData("shopInfo");
 
                             }else{
                                 alert(JSON.stringify(data))
@@ -218,14 +372,6 @@ export default class Pay extends Component {
         })
     }
 
-    Sum(){
-        var insertSum = [];
-        var sumDatas = {};
-        sumDatas.LsNo = this.state.numform;
-        insertSum.push(sumDatas);
-        //调用插入表方法
-        dbAdapter.insertSum(sumDatas);
-    }
 
     CloseButton() {
         this.Total();
@@ -269,7 +415,7 @@ export default class Pay extends Component {
                             </View>
                             <View style={styles.List}>
                                 <View style={styles.ListView1}>
-                                    <Text style={[styles.ListText,{textAlign:"center"}]}>{this.state.retcurrJF}</Text>
+                                    <Text style={[styles.ListText,{textAlign:"center"}]}>{this.state.payments}</Text>
                                 </View>
                             </View>
                             <View style={styles.List}>
@@ -300,6 +446,7 @@ export default class Pay extends Component {
                                     <Text style={styles.ListClassText}>凭证</Text>
                                 </View>
                             </View>
+
                             <ListView
                                 style={styles.scrollview}
                                 dataSource={this.state.dataSource}
@@ -332,19 +479,19 @@ export default class Pay extends Component {
                                 <Text style={styles.InpuTingText}>付款额：</Text>
                             </View>
                             <View style={styles.paymentright}>
-                              <TextInput
-                                  autofocus={true}
-                                  numberoflines={1}
-                                  keyboardType="numeric"
-                                  textalign="center"
-                                  underlineColorAndroid='transparent'
-                                  style={styles.paymentinput}
-                                  onChangeText={(value)=>{
-                                      this.setState({
-                                          amount:value
-                                      })
-                                  }}
-                              />
+                                <TextInput
+                                    autofocus={true}
+                                    numberoflines={1}
+                                    keyboardType="numeric"
+                                    textalign="center"
+                                    underlineColorAndroid='transparent'
+                                    style={styles.paymentinput}
+                                    onChangeText={(value)=>{
+                                        this.setState({
+                                            amount:value
+                                        })
+                                    }}
+                                />
                             </View>
                         </View>
                         <TouchableOpacity style={styles.FirstMent1}>
@@ -354,97 +501,17 @@ export default class Pay extends Component {
                             <Text style={styles.FirstMentText}>继续交易</Text>
                         </TouchableOpacity>
                     </View>
-                    <View style={styles.Swiper}>
-                        <Swiper
-                            style={styles.swiper}          //样式
-                            height={200}                   //组件高度
-                            loop={true}                    //如果设置为false，那么滑动到最后一张时，再次滑动将不会滑到第一张图片。
-                            autoplayTimeout={4}                //每隔4秒切换
-                            horizontal={true}              //水平方向，为false可设置为竖直方向
-                            paginationStyle={{bottom: 10}} //小圆点的位置：距离底部10px
-                            showsButtons={true}           //为false时不显示控制按钮
-                            showsPagination={false}       //为false不显示下方圆点
-                            dot={<View style={{           //未选中的圆点样式
-                                backgroundColor: 'rgba(0,0,0,.2)',
-                                width: 18,
-                                height: 18,
-                                borderRadius: 4,
-                                marginLeft: 10,
-                                marginRight: 9,
-                                marginTop: 9,
-                                marginBottom: 9,
-                            }}/>}
-                            activeDot={<View style={{    //选中的圆点样式
-                                backgroundColor: '#007aff',
-                                width: 18,
-                                height: 18,
-                                borderRadius: 4,
-                                marginLeft: 10,
-                                marginRight: 9,
-                                marginTop: 9,
-                                marginBottom: 9,
-                            }}/>}
-                        >
-                            <View style={styles.FristPage}>
-                                <View style={styles.PageRow}>
-                                    <TouchableOpacity style={[styles.PageRowButton,{marginRight:5}]}>
-                                        <Text style={styles.PageRowText}>
-                                            代金券
-                                        </Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity onPress={this.Card.bind(this)} style={[styles.PageRowButton,{marginRight:5}]}>
-                                        <Text style={styles.PageRowText}>
-                                            储值卡
-                                        </Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={[styles.PageRowButton,{marginRight:5}]}>
-                                        <Text style={styles.PageRowText}>
-                                            活动券
-                                        </Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-                            <View style={styles.FristPage}>
-                                <View style={styles.PageRow}>
-                                    <TouchableOpacity style={[styles.PageRowButton,{marginRight:5}]}>
-                                        <Text style={styles.PageRowText}>
-                                            1
-                                        </Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={[styles.PageRowButton,{marginRight:5}]}>
-                                        <Text style={styles.PageRowText}>
-                                            2
-                                        </Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={[styles.PageRowButton,{marginRight:5}]}>
-                                        <Text style={styles.PageRowText}>
-                                            3
-                                        </Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-
-                            <View style={styles.FristPage}>
-                                <View style={styles.PageRow}>
-                                    <TouchableOpacity style={[styles.PageRowButton,{marginRight:5}]}>
-                                        <Text style={styles.PageRowText}>
-                                            1
-                                        </Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={[styles.PageRowButton,{marginRight:5}]}>
-                                        <Text style={styles.PageRowText}>
-                                            2
-                                        </Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={[styles.PageRowButton,{marginRight:5}]}>
-                                        <Text style={styles.PageRowText}>
-                                            3
-                                        </Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-                        </Swiper>
-                    </View>
+                    <FlatList
+                        horizontal = {true}
+                        key={item => item.Pid}
+                        style={styles.horizontal}
+                        renderItem={this._renderItem.bind(this)}
+                        data={this.state.data}
+                        keyExtractor={this.keyExtractor}
+                        getItemLayout={(data, index) => (
+                            {length: 50, offset: 50 * index, index}
+                        )}
+                    />
                 </ScrollView>
                 <Modal
                     transparent={true}
@@ -642,23 +709,20 @@ const styles = StyleSheet.create({
     Inputing1Left:{
         flexDirection:"row"
     },
-    Swiper:{
-        height:50,
-        marginTop:16,
-    },
-    FristPage:{
-        marginLeft:44,
-        marginRight:44,
-    },
-    PageRow:{
-        height:50,
-        flexDirection:"row"
+    horizontal:{
+        marginLeft:10,
+        marginRight:10,
+        marginTop:20,
+        paddingBottom:15,
     },
     PageRowButton:{
-        flex:1,
         backgroundColor:"#ff4e4e",
         borderRadius:5,
-        paddingTop:14,
+        paddingLeft:10,
+        paddingRight:10,
+        paddingTop:10,
+        paddingBottom:10,
+        height:46,
     },
     PageRowText:{
         color:"#ffffff",
@@ -673,7 +737,7 @@ const styles = StyleSheet.create({
         flexDirection:"row"
     },
     MemberText:{
-    color:"#333333",
+        color:"#333333",
         fontSize:16,
     },
     Member:{
