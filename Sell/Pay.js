@@ -32,6 +32,7 @@ export default class Pay extends Component {
         super(props);
         this.state = {
             total:false,
+            RefundTotal:false,
             CardFaceNo:"",
             CardPwd:"",
             name:"",
@@ -50,10 +51,14 @@ export default class Pay extends Component {
             custType:"",
             VipCardNo:"",
             cardfaceno:"",
+            DataTime:"",
+            RetSerinalNo:"",
             JfBal:this.props.JfBal ? this.props.JfBal : "",
             BalanceTotal:this.props.BalanceTotal ? this.props.BalanceTotal : "",
             ShopAmount:this.props.ShopAmount ? this.props.ShopAmount : "",
             numform:this.props.numform ? this.props.numform : "",
+            Seles:this.props.Seles ? this.props.Seles : "",
+            dataRows:this.props.dataRows ? this.props.dataRows : "",
             dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
         }
         this.dataRows = [];
@@ -66,6 +71,14 @@ export default class Pay extends Component {
             total: !isShow,
         });
     }
+
+    RefundTotal() {
+        let isShow = this.state.RefundTotal;
+        this.setState({
+            RefundTotal: !isShow,
+        });
+    }
+
     //物理键
     // componentWillMount(){
     //     if (Platform.OS === 'android') {
@@ -94,19 +107,20 @@ export default class Pay extends Component {
 
         Storage.get('VipCardNo').then((tags) => {
             if(tags==null){
-                alert(tags)
                 this.setState({
                     custType:0,
                     custCode:"",
                 })
             }else{
-                alert(tags)
                 this.setState({
                     custType:2,
                     custCode:this.state.VipCardNo,
                 })
             }
         });
+
+        Storage.save("ino","0");
+        Storage.save("Ino","0");
 
         var total=0;
         this.setState({
@@ -140,6 +154,8 @@ export default class Pay extends Component {
 
     //继续交易
     JiaoYi(){
+        dbAdapter.deleteData("Sum");
+        dbAdapter.deleteData("Detail");
         if(this.state.ShopAmount==this.state.payments){
             var nextRoute = {
                 name: "Sell",
@@ -147,6 +163,8 @@ export default class Pay extends Component {
             };
             this.props.navigator.push(nextRoute);
             dbAdapter.deleteData("shopInfo");
+            dbAdapter.deleteData("Sum");
+            dbAdapter.deleteData("Detail");
             Storage.delete("VipCardNo")
         }else{
             ToastAndroid.show('订单未完成', ToastAndroid.SHORT)
@@ -169,7 +187,7 @@ export default class Pay extends Component {
                 <View style={styles.ShopList1} onPress={()=>this.OrderDetails(rowData)}>
                     <View style={styles.Row}><Text style={styles.Name}>{this.state.payname}</Text></View>
                     <View style={styles.Row}><Text style={styles.Name}>{this.state.CardFaceNo}</Text></View>
-                    <View style={styles.Row}><Text style={styles.Name}>{rowData.retcurrJF}</Text></View>
+                    <View style={styles.Row}><Text style={styles.Name}>{this.state.Amount}</Text></View>
                     <View style={styles.Row}><Text style={styles.Name}>{rowData.retZjf}</Text></View>
                     <View style={styles.Row}><Text style={styles.Name}>{rowData.ReferenceNo}</Text></View>
                 </View>
@@ -184,30 +202,303 @@ export default class Pay extends Component {
             }else if(this.state.payments>this.state.ShopAmount){
                 alert("付款额不能大于应付金额");
             }else{
-                this.Total();
-                // this.setState({
-                //     payname:"储值卡",
-                // })
+                if(this.state.Seles=="R"){
+                    this.RefundTotal();
+                }else if(this.state.Seles=="T"){
+                    this.Total();
+                }
             }
         }else if(item.item.PayCode=="00"){
-            if(this.state.amount==""){
-                alert("请输入付款额")
-            }else if(this.state.payments>this.state.ShopAmount){
-                alert("付款额不能大于应付金额");
-            }else{
-                var Amount={'payName': '', 'payTotal': '', 'payRT': ''};
-                this.dataRows = this.dataRows.concat(Amount);
-                this.state.payments+=parseInt(this.state.amount);
-                this.setState({
-                    Amount:this.state.amount,
-                    payments:this.state.payments,
-                    payname:"现金",
-                    cardfaceno:"",
-                    dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
-                })
-            }
-        }
-    }
+            if(this.state.Seles=="R"){
+                if(this.state.amount==""){
+                    alert("请输入付款额")
+                }else if(this.state.payments>this.state.ShopAmount){
+                    alert("付款额不能大于应付金额");
+                }else{
+                    var Amount = {
+                        'payName': '现金',
+                        'Amount': this.state.amount,
+                        'payRT': '',
+                        'PayCode': item.item.PayCode,
+                        'pid': item.item.Pid,
+                    };
+                    this.dataRows = this.dataRows.concat(Amount);
+                    this.state.payments += parseInt(this.state.amount);
+                    var Total = -(this.state.ShopAmount - this.state.payments);
+                    this.setState({
+                        Amount: this.state.amount,
+                        payments: this.state.payments,
+                        payname: "现金",
+                        Total: Total,
+                        cardfaceno: "",
+                        dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
+                    });
+                    return new Promise((resolve, reject) => {
+                        Storage.get('innerNo').then((innerNo) => {
+                            Storage.get('VipCardNo').then((VipCardNo) => {
+                                Storage.get('Pid').then((Pid) => {
+                                    Storage.get('usercode').then((usercode) => {
+                                        Storage.get('userName').then((userName) => {
+                                            if (this.state.ShopAmount = this.state.payments) {
+                                                var now = new Date();
+                                                var year = now.getFullYear();
+                                                var month = now.getMonth() + 1;
+                                                var day = now.getDate();
+                                                var hh = now.getHours();
+                                                var mm = now.getMinutes();
+                                                var ss = now.getSeconds();
+                                                if (month >= 1 && month <= 9) {
+                                                    month = "0" + month;
+                                                }
+                                                if (day >= 1 && day <= 9) {
+                                                    day = "0" + day;
+                                                }
+                                                if (hh >= 1 && hh <= 9) {
+                                                    hh = "0" + hh;
+                                                }
+                                                if (mm >= 1 && mm <= 9) {
+                                                    mm = "0" + mm;
+                                                }
+                                                if (ss >= 1 && ss <= 9) {
+                                                    ss = "0" + ss;
+                                                }
+                                                for (let i = 0; i < this.dataRows.length; i++) {
+                                                    var dataRows = this.dataRows[i];
+                                                    var ino;
+                                                    ino =i+1
+                                                    var SumData = year + "-" + month + "-" + day + " " + hh + ":" + mm + ":" + ss;
+                                                    //插入Sum表
+                                                    var sumDatas = [];
+                                                    var sum = {};
+                                                    sum.LsNo = this.state.numform;
+                                                    sum.sDateTime = SumData;
+                                                    sum.CashierId = Pid;
+                                                    sum.CashierCode = usercode;
+                                                    sum.CashierName = userName;
+                                                    sum.ino = ino;
+                                                    sum.DscTotal = "";
+                                                    sum.Total = this.state.ShopAmount;
+                                                    sum.TotalPay = this.state.payments;
+                                                    sum.Change = this.state.Total;
+                                                    sum.TradeFlag = this.state.Seles;
+                                                    sum.CustType = this.state.custType;
+                                                    sum.CustCode = VipCardNo;
+                                                    sum.PayId = dataRows.pid;
+                                                    sum.PayCode = dataRows.PayCode;
+                                                    sum.Amount = dataRows.Amount;
+                                                    sum.OldAmount = dataRows.Amount;
+                                                    sum.TendPayCode = VipCardNo;
+                                                    sum.InnerNo = innerNo;
+                                                    sumDatas.push(sum);
+                                                    dbAdapter.insertSum(sumDatas);
+
+                                                    // dbAdapter.deleteData("Sum");
+                                                };
+                                                for(let i = 0;i<this.state.dataRows.length;i++){
+                                                    var DataRows = this.state.dataRows[i];
+                                                    var pid;
+                                                    var ProdCode;
+                                                    var ProdName;
+                                                    var DepCode;
+                                                    var Count;
+                                                    var ShopPrice;
+                                                    var prototal;
+                                                    var OrderNo;
+                                                    pid=DataRows.pid;
+                                                    ProdCode=DataRows.ProdCode;
+                                                    ProdName=DataRows.prodname;
+                                                    DepCode=DataRows.DepCode;
+                                                    Count=DataRows.count;
+                                                    ShopPrice=DataRows.ShopPrice;
+                                                    prototal=DataRows.prototal;
+                                                    OrderNo =i+1;
+                                                    var SumData = year + "-" + month + "-" + day + " " + hh + ":" + mm + ":" + ss;
+                                                    var detailDatas = [];
+                                                    var detail = {};
+                                                    detail.LsNo=this.state.numform;
+                                                    detail.sDateTime=SumData;
+                                                    detail.TradeFlag=this.state.Seles;
+                                                    detail.CashierId=Pid;
+                                                    detail.CashierCode=usercode;
+                                                    detail.CashierName=userName;
+                                                    detail.ClerkId=-999;
+                                                    detail.ClerkCode="";
+                                                    detail.Pid=pid;
+                                                    detail.BarCode="";
+                                                    detail.ClerkName="";
+                                                    detail.ProdCode=ProdCode;
+                                                    detail.ProdName=ProdName;
+                                                    detail.DepCode=DepCode;
+                                                    detail.Price=ShopPrice;
+                                                    detail.Amount=Count;
+                                                    detail.DscTotal="";
+                                                    detail.Total=prototal;
+                                                    detail.AutoDscTotal=ShopPrice;
+                                                    detail.HandDsc="";
+                                                    detail.InnerNo=innerNo;
+                                                    detail.OrderNo=OrderNo;
+                                                    detailDatas.push(detail);
+                                                    dbAdapter.insertDetail(detailDatas);
+                                                };
+                                                // dbAdapter.deleteData("shopInfo");
+                                            };
+                                        });
+                                    });
+                                });
+                            });
+                        });
+                    });
+                };
+            }else if(this.state.Seles=="T"){
+                if(this.state.amount==""){
+                    alert("请输入付款额")
+                }else if(this.state.payments>this.state.ShopAmount){
+                    alert("付款额不能大于应付金额");
+                }else{
+                    var Amount = {
+                        'payName': '现金',
+                        'Amount': this.state.amount,
+                        'payRT': '',
+                        'PayCode': item.item.PayCode,
+                        'pid': item.item.Pid,
+                    };
+                    this.dataRows = this.dataRows.concat(Amount);
+                    this.state.payments += parseInt(this.state.amount);
+                    if(this.state.ShopAmount==this.state.payments){
+                        var Total = 0;
+                    }else{
+                        var Total = this.state.ShopAmount - this.state.payments;
+                    }
+                    this.setState({
+                        Amount: this.state.amount,
+                        payments: this.state.payments,
+                        payname: "现金",
+                        Total: Total,
+                        cardfaceno: "",
+                        dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
+                    });
+                    return new Promise((resolve, reject) => {
+                        Storage.get('innerNo').then((innerNo) => {
+                            Storage.get('VipCardNo').then((VipCardNo) => {
+                                Storage.get('Pid').then((Pid) => {
+                                    Storage.get('usercode').then((usercode) => {
+                                        Storage.get('userName').then((userName) => {
+                                            if (this.state.ShopAmount == this.state.payments) {
+                                                var now = new Date();
+                                                var year = now.getFullYear();
+                                                var month = now.getMonth() + 1;
+                                                var day = now.getDate();
+                                                var hh = now.getHours();
+                                                var mm = now.getMinutes();
+                                                var ss = now.getSeconds();
+                                                if (month >= 1 && month <= 9) {
+                                                    month = "0" + month;
+                                                }
+                                                if (day >= 1 && day <= 9) {
+                                                    day = "0" + day;
+                                                }
+                                                if (hh >= 1 && hh <= 9) {
+                                                    hh = "0" + hh;
+                                                }
+                                                if (mm >= 1 && mm <= 9) {
+                                                    mm = "0" + mm;
+                                                }
+                                                if (ss >= 1 && ss <= 9) {
+                                                    ss = "0" + ss;
+                                                }
+                                                for (let i = 0; i < this.dataRows.length; i++) {
+                                                    var dataRows = this.dataRows[i];
+                                                    var ino;
+                                                    ino =i+1
+                                                    var SumData = year + "-" + month + "-" + day + " " + hh + ":" + mm + ":" + ss;
+                                                    //插入Sum表
+                                                    var sumDatas = [];
+                                                    var sum = {};
+                                                    sum.LsNo = this.state.numform;
+                                                    sum.sDateTime = SumData;
+                                                    sum.CashierId = Pid;
+                                                    sum.CashierCode = usercode;
+                                                    sum.CashierName = userName;
+                                                    sum.ino = ino;
+                                                    sum.DscTotal = "";
+                                                    sum.Total = this.state.ShopAmount;
+                                                    sum.TotalPay = this.state.payments;
+                                                    sum.Change = this.state.Total;
+                                                    sum.TradeFlag = this.state.Seles;
+                                                    sum.CustType = this.state.custType;
+                                                    sum.CustCode = VipCardNo;
+                                                    sum.PayId = dataRows.pid;
+                                                    sum.PayCode = dataRows.PayCode;
+                                                    sum.Amount = dataRows.Amount;
+                                                    sum.OldAmount = dataRows.Amount;
+                                                    sum.TendPayCode = VipCardNo;
+                                                    sum.InnerNo = innerNo;
+                                                    sumDatas.push(sum);
+                                                    dbAdapter.insertSum(sumDatas);
+
+                                                    // dbAdapter.deleteData("Sum");
+                                                };
+                                                for(let i = 0;i<this.state.dataRows.length;i++){
+                                                    var DataRows = this.state.dataRows[i];
+                                                    var pid;
+                                                    var ProdCode;
+                                                    var ProdName;
+                                                    var DepCode;
+                                                    var Count;
+                                                    var ShopPrice;
+                                                    var prototal;
+                                                    var OrderNo;
+                                                    pid=DataRows.pid;
+                                                    ProdCode=DataRows.ProdCode;
+                                                    ProdName=DataRows.prodname;
+                                                    DepCode=DataRows.DepCode;
+                                                    Count=DataRows.count;
+                                                    ShopPrice=DataRows.ShopPrice;
+                                                    prototal=DataRows.prototal;
+                                                    OrderNo =i+1;
+                                                    var SumData = year + "-" + month + "-" + day + " " + hh + ":" + mm + ":" + ss;
+                                                    var detailDatas = [];
+                                                    var detail = {};
+                                                    detail.LsNo=this.state.numform;
+                                                    detail.sDateTime=SumData;
+                                                    detail.TradeFlag=this.state.Seles;
+                                                    detail.CashierId=Pid;
+                                                    detail.CashierCode=usercode;
+                                                    detail.CashierName=userName;
+                                                    detail.ClerkId=-999;
+                                                    detail.ClerkCode="";
+                                                    detail.Pid=pid;
+                                                    detail.BarCode="";
+                                                    detail.ClerkName="";
+                                                    detail.ProdCode=ProdCode;
+                                                    detail.ProdName=ProdName;
+                                                    detail.DepCode=DepCode;
+                                                    detail.Price=ShopPrice;
+                                                    detail.Amount=Count;
+                                                    detail.DscTotal="";
+                                                    detail.Total=prototal;
+                                                    detail.AutoDscTotal=ShopPrice;
+                                                    detail.HandDsc="";
+                                                    detail.InnerNo=innerNo;
+                                                    detail.OrderNo=OrderNo;
+                                                    detailDatas.push(detail);
+                                                    dbAdapter.insertDetail(detailDatas);
+                                                };
+                                                Storage.delete("VipCardNo");
+                                                Storage.delete("BalanceTotal");
+                                                Storage.delete("JfBal");
+                                                // dbAdapter.deleteData("shopInfo");
+                                            };
+                                        });
+                                    });
+                                });
+                            });
+                        });
+                    });
+                };
+            };
+        };
+    };
 
     _renderItem(item,index){
         return(
@@ -272,6 +563,7 @@ export default class Pay extends Component {
                                 var ReferenceNo;
                                 var retTxt;
                                 var PayretcurrJF;
+                                //付款方式
                                 for (let i = 0; i < TblRow.length; i++) {
                                     var row = TblRow[i];
                                     retcurrJF = row.retcurrJF;
@@ -280,26 +572,282 @@ export default class Pay extends Component {
                                     retTxt = row.retTxt;
 
                                 };
-                                this.state.payments +=retcurrJF;
-                                this.dataRows = this.dataRows.concat(TblRow);
-                                var Total = this.state.ShopAmount-retcurrJF;
+                                //支付方式
+                                for(let i = 0;i<this.productData.length;i++){
+                                    var Pid;
+                                    var PayCode;
+                                    var productData = this.productData[i];
+                                    if(productData.payName=="储值卡"){
+                                        Pid=productData.Pid;
+                                        PayCode=productData.PayCode;
+                                    }
+                                };
+                                var TblRowconcat = {
+                                    'Amount': retcurrJF,
+                                    'retZjf': retZjf,
+                                    'ReferenceNo': ReferenceNo,
+                                    'PayretcurrJF': PayretcurrJF,
+                                    'pid': Pid,
+                                    'PayCode': PayCode,
+                                };
+                                this.dataRows = this.dataRows.concat(TblRowconcat);
+                                this.state.payments += retcurrJF;
+                                if(this.state.ShopAmount==this.state.payments){
+                                    var Total = 0;
+                                }else{
+                                    var Total = this.state.ShopAmount - this.state.payments;
+                                }
                                 this.setState({
-                                    payments:this.state.payments,
-                                    Amount:retcurrJF,
-                                    retZjf:retZjf,
-                                    ReferenceNo:ReferenceNo,
-                                    retTxt:retTxt,
-                                    CardFaceNo:this.state.CardFaceNo,
-                                    Total:Total,
-                                    payname:"储值卡",
-                                    dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
+                                    payments: this.state.payments,
+                                    Amount: retcurrJF,
+                                    retZjf: retZjf,
+                                    ReferenceNo: ReferenceNo,
+                                    retTxt: retTxt,
+                                    CardFaceNo: this.state.CardFaceNo,
+                                    Total: Total,
+                                    payname: "储值卡",
+                                    dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
                                 });
+
                                 Storage.get('innerNo').then((innerNo) => {
                                     Storage.get('VipCardNo').then((VipCardNo) => {
                                         Storage.get('Pid').then((Pid) => {
                                             Storage.get('usercode').then((usercode) => {
                                                 Storage.get('userName').then((userName) => {
-                                                    Storage.get('ino').then((ino) => {
+                                                    if (this.state.ShopAmount = this.state.payments) {
+                                                        var now = new Date();
+                                                        var year = now.getFullYear();
+                                                        var month = now.getMonth() + 1;
+                                                        var day = now.getDate();
+                                                        var hh = now.getHours();
+                                                        var mm = now.getMinutes();
+                                                        var ss = now.getSeconds();
+                                                        if (month >= 1 && month <= 9) {
+                                                            month = "0" + month;
+                                                        }
+                                                        if (day >= 1 && day <= 9) {
+                                                            day = "0" + day;
+                                                        }
+                                                        if (hh >= 1 && hh <= 9) {
+                                                            hh = "0" + hh;
+                                                        }
+                                                        if (mm >= 1 && mm <= 9) {
+                                                            mm = "0" + mm;
+                                                        }
+                                                        if (ss >= 1 && ss <= 9) {
+                                                            ss = "0" + ss;
+                                                        }
+                                                        for (let i = 0; i < this.dataRows.length; i++) {
+                                                            var dataRows = this.dataRows[i];
+                                                            var ino;
+                                                            ino =i+1
+                                                            var SumData = year + "-" + month + "-" + day + " " + hh + ":" + mm + ":" + ss;
+                                                            //插入Sum表
+                                                            var sumDatas = [];
+                                                            var sum = {};
+                                                            sum.LsNo = this.state.numform;
+                                                            sum.sDateTime = SumData;
+                                                            sum.CashierId = Pid;
+                                                            sum.CashierCode = usercode;
+                                                            sum.CashierName = userName;
+                                                            sum.ino = ino;
+                                                            sum.DscTotal = "";
+                                                            sum.Total = this.state.ShopAmount;
+                                                            sum.TotalPay = this.state.payments;
+                                                            sum.Change = this.state.Total;
+                                                            sum.TradeFlag = this.state.Seles;
+                                                            sum.CustType = this.state.custType;
+                                                            sum.CustCode = VipCardNo;
+                                                            sum.PayId = dataRows.pid;
+                                                            sum.PayCode = dataRows.PayCode;
+                                                            sum.Amount = dataRows.Amount;
+                                                            sum.OldAmount = dataRows.Amount;
+                                                            sum.TendPayCode = VipCardNo;
+                                                            sum.InnerNo = innerNo;
+                                                            sumDatas.push(sum);
+                                                            dbAdapter.insertSum(sumDatas);
+
+                                                            // dbAdapter.deleteData("Sum");
+                                                        };
+                                                        for(let i = 0;i<this.state.dataRows.length;i++){
+                                                            var DataRows = this.state.dataRows[i];
+                                                            var pid;
+                                                            var ProdCode;
+                                                            var ProdName;
+                                                            var DepCode;
+                                                            var Count;
+                                                            var ShopPrice;
+                                                            var prototal;
+                                                            var OrderNo;
+                                                            pid=DataRows.pid;
+                                                            ProdCode=DataRows.ProdCode;
+                                                            ProdName=DataRows.prodname;
+                                                            DepCode=DataRows.DepCode;
+                                                            Count=DataRows.countm;
+                                                            ShopPrice=DataRows.ShopPrice;
+                                                            prototal=DataRows.prototal;
+                                                            OrderNo =i+1;
+                                                            var SumData = year + "-" + month + "-" + day + " " + hh + ":" + mm + ":" + ss;
+                                                            var detailDatas = [];
+                                                            var detail = {};
+                                                            detail.LsNo=this.state.numform;
+                                                            detail.sDateTime=SumData;
+                                                            detail.TradeFlag=this.state.Seles;
+                                                            detail.CashierId=Pid;
+                                                            detail.CashierCode=usercode;
+                                                            detail.CashierName=userName;
+                                                            detail.ClerkId=-999;
+                                                            detail.ClerkCode="";
+                                                            detail.Pid=pid;
+                                                            detail.BarCode="";
+                                                            detail.ClerkName="";
+                                                            detail.ProdCode=ProdCode;
+                                                            detail.ProdName=ProdName;
+                                                            detail.DepCode=DepCode;
+                                                            detail.Price=ShopPrice;
+                                                            detail.Amount=Count;
+                                                            detail.DscTotal="";
+                                                            detail.Total=prototal;
+                                                            detail.AutoDscTotal=ShopPrice;
+                                                            detail.HandDsc="";
+                                                            detail.InnerNo=innerNo;
+                                                            detail.OrderNo=OrderNo;
+                                                            detailDatas.push(detail);
+                                                            dbAdapter.insertDetail(detailDatas);
+                                                        };
+                                                        Storage.delete("VipCardNo");
+                                                        Storage.delete("BalanceTotal");
+                                                        Storage.delete("JfBal");
+                                                        // dbAdapter.deleteData("shopInfo");
+                                                    };
+                                                });
+                                            });
+                                        });
+                                    });
+                                });
+                                this.Total();
+
+                            }else{
+                                alert(JSON.stringify(data))
+                            }
+                        })
+                    })
+                })
+            })
+        })
+    }
+
+    CloseButton() {
+        this.Total();
+    }
+
+    RetButton(){
+        var now = new Date();
+        var year = now.getFullYear();
+        var month = now.getMonth() + 1;
+        var day = now.getDate();
+        var hh = now.getHours();
+        var mm = now.getMinutes();
+        var ss = now.getSeconds();
+        if(month >= 1 && month <= 9){
+            month = "0" + month;
+        }
+        if(day >= 1 && day <= 9){
+            day = "0" + day;
+        }
+        if(hh >= 1 && hh <= 9){
+            hh = "0" + hh;
+        }
+        if(mm >= 1 && mm <= 9){
+            mm = "0" + mm;
+        }
+        if(ss >= 1 && ss <= 9){
+            ss = "0" + ss;
+        }
+        var sum=year+"-"+month+"-"+day+" "+hh+":"+mm+":"+ss;
+        var Datatime=this.state.DataTime;
+        if(this.state.DataTime.length==8){
+            var reg = /(.{4})(.*)/;
+            Datatime = Datatime.replace(reg, "$1-$2");
+            var Reg = /(.{7})(.*)/;
+            Datatime = Datatime.replace(Reg, "$1-$2");
+            return new Promise((resolve, reject) => {
+                Storage.get('ShopCode').then((ShopCode) => {
+                    Storage.get('PosCode').then((PosCode) => {
+                        let params = {
+                            TblName: "VipCardPay_Ret",
+                            PayOrderNo: this.state.numform,
+                            CardPwd: this.state.CardPwd,
+                            shopcode: ShopCode,
+                            poscode: PosCode,
+                            CardFaceNo: this.state.CardFaceNo,
+                            OrderTotal: this.state.amount,
+                            SaleTotal: this.state.ShopAmount,
+                            JfValue: 0,
+                            TransFlag: sum,
+                            OldSaleDate: Datatime,
+                            RetSerinalNo: this.state.RetSerinalNo,
+
+                        };
+                        Storage.get('LinkUrl').then((tags) => {
+                            FetchUtil.post(tags, JSON.stringify(params)).then((data) => {
+                                if(data.retcode==1) {
+                                    var TblRow = data.TblRow;
+                                    var retcurrJF;
+                                    var retZjf;
+                                    var ReferenceNo;
+                                    var retTxt;
+                                    var PayretcurrJF;
+                                    //付款方式
+                                    for (let i = 0; i < TblRow.length; i++) {
+                                        var row = TblRow[i];
+                                        retcurrJF = row.retcurrJF;
+                                        retZjf = row.retZjf;
+                                        ReferenceNo = row.ReferenceNo;
+                                        retTxt = row.retTxt;
+
+                                    };
+                                    //支付方式
+                                    for(let i = 0;i<this.productData.length;i++){
+                                        var Pid;
+                                        var PayCode;
+                                        var productData = this.productData[i];
+                                        if(productData.payName=="储值卡"){
+                                            Pid=productData.Pid;
+                                            PayCode=productData.PayCode;
+                                        }
+                                    };
+                                    var TblRowconcat = {
+                                        'Amount': retcurrJF,
+                                        'retZjf': retZjf,
+                                        'ReferenceNo': ReferenceNo,
+                                        'PayretcurrJF': PayretcurrJF,
+                                        'pid': Pid,
+                                        'PayCode': PayCode,
+                                    };
+                                    this.dataRows = this.dataRows.concat(TblRowconcat);
+                                    this.state.payments += retcurrJF;
+                                    if(this.state.ShopAmount==this.state.payments){
+                                        var Total = 0;
+                                    }else{
+                                        var Total = -(this.state.ShopAmount - this.state.payments);
+                                    }
+                                    this.setState({
+                                        payments: this.state.payments,
+                                        Amount: retcurrJF,
+                                        retZjf: retZjf,
+                                        ReferenceNo: ReferenceNo,
+                                        retTxt: retTxt,
+                                        CardFaceNo: this.state.CardFaceNo,
+                                        Total: Total,
+                                        payname: "储值卡",
+                                        dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
+                                    });
+                                    Storage.get('innerNo').then((innerNo) => {
+                                        Storage.get('VipCardNo').then((VipCardNo) => {
+                                            Storage.get('Pid').then((Pid) => {
+                                                Storage.get('usercode').then((usercode) => {
+                                                    Storage.get('userName').then((userName) => {
                                                         if (this.state.ShopAmount > this.state.payments) {
                                                             var now = new Date();
                                                             var year = now.getFullYear();
@@ -323,35 +871,87 @@ export default class Pay extends Component {
                                                             if (ss >= 1 && ss <= 9) {
                                                                 ss = "0" + ss;
                                                             }
-                                                            var SumData = year + "-" + month + "-" + day + " " + hh + ":" + mm + ":" + ss;
-                                                            //插入Sum表
-                                                            var sumDatas = [];
-                                                            var sum = {};
-                                                            ino = parseInt(ino);
-                                                            sum.LsNo = this.state.numform;
-                                                            sum.sDateTime = SumData;
-                                                            sum.CashierId = Pid;
-                                                            sum.CashierCode = usercode;
-                                                            sum.CashierName = userName;
-                                                            sum.ino = ino+1;
-                                                            sum.DscTotal = "";
-                                                            sum.Total = this.state.ShopAmount;
-                                                            sum.TotalPay = this.state.payments;
-                                                            sum.Change = "";
-                                                            sum.TradeFlag = "";
-                                                            sum.CustType = this.state.custType;
-                                                            sum.CustCode = VipCardNo;
-                                                            sum.PayId = "";
-                                                            sum.PayCode = "";
-                                                            sum.Amount = "";
-                                                            sum.OldAmount = "";
-                                                            sum.TendPayCode = "";
-                                                            sum.InnerNo = innerNo;
-                                                            // alert(this.state.numform + "+" + SumData + "+" +Pid + "+" +usercode + "+" +userName + "+" + this.state.ShopAmount + "+" + this.state.payments + "+" + this.state.custType + "+" + VipCardNo + "+" + innerNo);
-                                                            sumDatas.push(sum);
-                                                            dbAdapter.insertSum(sumDatas);
-                                                            var abc=JSON.stringify(ino+1);
-                                                            Storage.save("ino", abc);
+                                                            for (let i = 0; i < this.dataRows.length; i++) {
+                                                                var dataRows = this.dataRows[i];
+                                                                var ino;
+                                                                ino =i+1
+                                                                var SumData = year + "-" + month + "-" + day + " " + hh + ":" + mm + ":" + ss;
+                                                                //插入Sum表
+                                                                var sumDatas = [];
+                                                                var sum = {};
+                                                                sum.LsNo = this.state.numform;
+                                                                sum.sDateTime = SumData;
+                                                                sum.CashierId = Pid;
+                                                                sum.CashierCode = usercode;
+                                                                sum.CashierName = userName;
+                                                                sum.ino = ino;
+                                                                sum.DscTotal = "";
+                                                                sum.Total = this.state.ShopAmount;
+                                                                sum.TotalPay = this.state.payments;
+                                                                sum.Change = this.state.Total;
+                                                                sum.TradeFlag = this.state.Seles;
+                                                                sum.CustType = this.state.custType;
+                                                                sum.CustCode = VipCardNo;
+                                                                sum.PayId = dataRows.pid;
+                                                                sum.PayCode = dataRows.PayCode;
+                                                                sum.Amount = dataRows.Amount;
+                                                                sum.OldAmount = dataRows.Amount;
+                                                                sum.TendPayCode = VipCardNo;
+                                                                sum.InnerNo = innerNo;
+                                                                sumDatas.push(sum);
+                                                                dbAdapter.insertSum(sumDatas);
+
+                                                                // dbAdapter.deleteData("Sum");
+                                                            };
+                                                            for(let i = 0;i<this.state.dataRows.length;i++){
+                                                                var DataRows = this.state.dataRows[i];
+                                                                var pid;
+                                                                var ProdCode;
+                                                                var ProdName;
+                                                                var DepCode;
+                                                                var Count;
+                                                                var ShopPrice;
+                                                                var prototal;
+                                                                var OrderNo;
+                                                                pid=DataRows.pid;
+                                                                ProdCode=DataRows.ProdCode;
+                                                                ProdName=DataRows.prodname;
+                                                                DepCode=DataRows.DepCode;
+                                                                Count=DataRows.countm;
+                                                                ShopPrice=DataRows.ShopPrice;
+                                                                prototal=DataRows.prototal;
+                                                                OrderNo =i+1;
+                                                                var SumData = year + "-" + month + "-" + day + " " + hh + ":" + mm + ":" + ss;
+                                                                var detailDatas = [];
+                                                                var detail = {};
+                                                                detail.LsNo=this.state.numform;
+                                                                detail.sDateTime=SumData;
+                                                                detail.TradeFlag=this.state.Seles;
+                                                                detail.CashierId=Pid;
+                                                                detail.CashierCode=usercode;
+                                                                detail.CashierName=userName;
+                                                                detail.ClerkId=-999;
+                                                                detail.ClerkCode="";
+                                                                detail.Pid=pid;
+                                                                detail.BarCode="";
+                                                                detail.ClerkName="";
+                                                                detail.ProdCode=ProdCode;
+                                                                detail.ProdName=ProdName;
+                                                                detail.DepCode=DepCode;
+                                                                detail.Price=ShopPrice;
+                                                                detail.Amount=Count;
+                                                                detail.DscTotal="";
+                                                                detail.Total=prototal;
+                                                                detail.AutoDscTotal=ShopPrice;
+                                                                detail.HandDsc="";
+                                                                detail.InnerNo=innerNo;
+                                                                detail.OrderNo=OrderNo;
+                                                                detailDatas.push(detail);
+                                                                dbAdapter.insertDetail(detailDatas);
+                                                            };
+                                                            // Storage.delete("VipCardNo");
+                                                            // Storage.delete("BalanceTotal");
+                                                            // Storage.delete("JfBal");
                                                             // dbAdapter.deleteData("shopInfo");
                                                         };
                                                     });
@@ -359,24 +959,21 @@ export default class Pay extends Component {
                                             });
                                         });
                                     });
-                                });
-                                this.Total();
-
-                            }else{
-                                alert(JSON.stringify(data))
-                            }
-                        })
-                    })
-                })
-            })
-        })
+                                    this.RefundTotal();
+                                };
+                            });
+                        });
+                    });
+                });
+            });
+        }else{
+            alert("请输入正确的时间")
+        }
     }
 
-
-    CloseButton() {
-        this.Total();
+    CloseRetButton(){
+        this.RefundTotal();
     }
-
     render() {
         return (
             <View style={styles.container}>
@@ -574,6 +1171,116 @@ export default class Pay extends Component {
                                         <Text style={styles.TitleText}>取消</Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity onPress={this.Button.bind(this)} style={styles.MemberClose}>
+                                        <Text style={styles.TitleText}>确定</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </View>
+                    </View>
+                </Modal>
+                <Modal
+                    transparent={true}
+                    visible={this.state.RefundTotal}
+                    onShow={() => {
+                    }}
+                    onRequestClose={() => {
+                    }}>
+                    <View style={styles.MemberBounces}>
+                        <View style={styles.Cont}>
+                            <View style={styles.BouncesTitle}>
+                                <Text style={[styles.TitleText, {fontSize: 18}]}>储值卡</Text>
+                            </View>
+                            <View style={styles.MemberCont1}>
+                                <View style={styles.MemberView}>
+                                    <View style={styles.Card}>
+                                        <Text style={styles.CardText}>卡号：</Text>
+                                    </View>
+                                    <View style={styles.CardNumber}>
+                                        <TextInput
+                                            returnKeyType='search'
+                                            autofocus={true}
+                                            keyboardType="numeric"
+                                            textalign="center"
+                                            underlineColorAndroid='transparent'
+                                            placeholderTextColor="#bcbdc1"
+                                            style={styles.CardTextInput}
+                                            onChangeText={(value) => {
+                                                this.setState({
+                                                    CardFaceNo: value
+                                                })
+                                            }}
+                                        />
+                                    </View>
+                                </View>
+                                <View style={styles.MemberView}>
+                                    <View style={styles.Card}>
+                                        <Text style={styles.CardText}>密码：</Text>
+                                    </View>
+                                    <View style={styles.CardNumber}>
+                                        <TextInput
+                                            returnKeyType='search'
+                                            autofocus={true}
+                                            keyboardType="numeric"
+                                            textalign="center"
+                                            underlineColorAndroid='transparent'
+                                            placeholderTextColor="#bcbdc1"
+                                            style={styles.CardTextInput}
+                                            onChangeText={(value) => {
+                                                this.setState({
+                                                    CardPwd: value
+                                                })
+                                            }}
+                                        />
+                                    </View>
+                                </View>
+                                <View style={styles.MemberView}>
+                                    <View style={styles.Card}>
+                                        <Text style={styles.CardText}>时间：</Text>
+                                    </View>
+                                    <View style={styles.CardNumber}>
+                                        <TextInput
+                                            returnKeyType='search'
+                                            autofocus={true}
+                                            keyboardType="numeric"
+                                            textalign="center"
+                                            underlineColorAndroid='transparent'
+                                            placeholderTextColor="#bcbdc1"
+                                            style={styles.CardTextInput}
+                                            onChangeText={(value) => {
+                                                this.setState({
+                                                    DataTime: value
+                                                })
+                                            }}
+                                        />
+                                    </View>
+                                </View>
+                                <View style={styles.MemberView}>
+                                    <View style={styles.Card}>
+                                        <Text style={styles.CardText}>退货凭证：</Text>
+                                    </View>
+                                    <View style={styles.CardNumber}>
+                                        <TextInput
+                                            returnKeyType='search'
+                                            autofocus={true}
+                                            keyboardType="numeric"
+                                            textalign="center"
+                                            underlineColorAndroid='transparent'
+                                            placeholderTextColor="#bcbdc1"
+                                            style={styles.CardTextInput}
+                                            onChangeText={(value) => {
+                                                this.setState({
+                                                    RetSerinalNo: value
+                                                })
+                                            }}
+                                        />
+                                    </View>
+                                </View>
+                                <View style={styles.MemberButton}>
+                                    <TouchableOpacity onPress={this.CloseRetButton.bind(this)}
+                                                      style={[styles.MemberClose, {marginRight: 15,}]}>
+                                        <Text style={styles.TitleText}>取消</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={this.RetButton.bind(this)} style={styles.MemberClose}>
                                         <Text style={styles.TitleText}>确定</Text>
                                     </TouchableOpacity>
                                 </View>
@@ -798,7 +1505,6 @@ const styles = StyleSheet.create({
     },
     Row:{
         flex:1,
-        height:22,
     },
     Name:{
         fontSize:16,
@@ -835,6 +1541,11 @@ const styles = StyleSheet.create({
     },
     MemberCont: {
         height: 200,
+        paddingLeft: 15,
+        paddingRight: 15,
+    },
+    MemberCont1: {
+        height: 350,
         paddingLeft: 15,
         paddingRight: 15,
     },

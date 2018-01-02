@@ -63,6 +63,8 @@ export default class Sell extends Component {
     }
 
     componentDidMount() {
+
+        //获取流水号
         NumFormatUtils.createLsNo().then((data) => {
             this.setState({
                 numform:data
@@ -71,6 +73,7 @@ export default class Sell extends Component {
         });
         //获取内部号
         let innerNo = NumFormatUtils.createInnerNo();
+        innerNo = innerNo.slice(2, innerNo.length);
         Storage.save("innerNo",innerNo);
 
         Storage.get('Name').then((tags) => {
@@ -83,7 +86,17 @@ export default class Sell extends Component {
             this.setState({
                 VipCardNo: tags
             })
-        })
+        });
+        Storage.get('BalanceTotal').then((tags) => {
+            this.setState({
+                BalanceTotal: tags
+            })
+        });
+        Storage.get('JfBal').then((tags) => {
+            this.setState({
+                JfBal: tags
+            })
+        });
         this._dbSearch();
     }
 
@@ -92,27 +105,29 @@ export default class Sell extends Component {
         dbAdapter.selectShopInfo().then((rows) => {
             //this._ModalVisible();
             var shopnumber = 0;
-            var shopAmount = 0.00;
-            this.dataRows = [];
+            var shopAmount = 0;
+            var ShopPrice=0;
+            this.dataRow = [];
             for (let i = 0; i < rows.length; i++) {
                 var row = rows.item(i);
+                // alert(JSON.stringify(row));
+                ShopPrice = (row.countm * row.ShopPrice);
+                shopAmount +=ShopPrice;
                 var number = row.countm;
-                shopAmount += row.prototal;
                 shopnumber += parseInt(row.countm);
                 if (number !== 0) {
-                    this.dataRows.push(row);
+                    this.dataRow.push(row);
                 }
             }
-            Storage.save("ShopAmount", shopAmount);
-            if (this.dataRows == 0) {
+            if (this.dataRow == 0) {
                 this.modal();
                 return;
             } else {
                 this.setState({
                     number1: number,
                     ShopNumber: shopnumber,//数量
-                    ShopAmount: shopAmount,//总金额
-                    dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
+                    ShopAmount: shopAmount,//总金额this.dataRow
+                    dataSource: this.state.dataSource.cloneWithRows(this.dataRow),
                 })
                 this.modal();
             }
@@ -127,9 +142,7 @@ export default class Sell extends Component {
         this.props.navigator.push(nextRoute);
     }
 
-    Code(){
-
-    }
+    Code(){}
 
     _renderRow(rowData, sectionID, rowID) {
         return (
@@ -174,12 +187,14 @@ export default class Sell extends Component {
                             for (let i = 0; i < TblRow.length; i++) {
                                 var row = TblRow[i];
                                 VipCardNo = row.VipCardNo;//卡号
-                                BalanceTotal = row.BalanceTotal;//余额
-                                JfBal = row.JfBal;//积分
+                                BalanceTotal = JSON.stringify(row.BalanceTotal);//余额
+                                JfBal = JSON.stringify(row.JfBal);//积分
                             };
                             this.modal();
                             this.Member();
                             Storage.save("VipCardNo", this.state.CardNumber);
+                            Storage.save("BalanceTotal", BalanceTotal);
+                            Storage.save("JfBal", JfBal);
                             this.setState({
                                 VipCardNo: VipCardNo,
                                 BalanceTotal: BalanceTotal,
@@ -196,23 +211,41 @@ export default class Sell extends Component {
     }
 
     PayButton() {
-        // Storage.save("VipCardNo", this.state.VipCardNo);
-        // Storage.save("BalanceTotal", this.state.BalanceTotal);
-        // Storage.save("JfBal", this.state.JfBal);
-        if(this.dataRows==""){
+        if(this.dataRow==""){
             alert("请添加商品");
         }else{
-            var nextRoute = {
-                name: "Pay",
-                component: Pay,
-                params: {
-                    JfBal: this.state.JfBal,
-                    BalanceTotal: this.state.BalanceTotal,
-                    ShopAmount: this.state.ShopAmount,
-                    numform:this.state.numform,
-                }
+            if(this.state.name=="退货"){
+                var dataRows=this.dataRow;
+                var nextRoute = {
+                    name: "Pay",
+                    component: Pay,
+                    params: {
+                        JfBal: this.state.JfBal,
+                        BalanceTotal: this.state.BalanceTotal,
+                        ShopAmount: this.state.ShopAmount,
+                        numform:this.state.numform,
+                        Seles:"R",
+                        dataRows:dataRows,
+                    }
+                };
+                this.props.navigator.push(nextRoute);
+            }else if(this.state.name=="销售"){
+                var dataRows=this.dataRow;
+                var nextRoute = {
+                    name: "Pay",
+                    component: Pay,
+                    params: {
+                        JfBal: this.state.JfBal,
+                        BalanceTotal: this.state.BalanceTotal,
+                        ShopAmount: this.state.ShopAmount,
+                        numform:this.state.numform,
+                        Seles:"T",
+                        dataRows:dataRows,
+                    }
+                };
+                this.props.navigator.push(nextRoute);
             };
-            this.props.navigator.push(nextRoute);
+
         }
         //界面跳转
         // let currentRoutes = this.props.navigator.getCurrentRoutes();
@@ -231,22 +264,25 @@ export default class Sell extends Component {
     }
 
     ReturnGoods(){
-        Storage.get('ShopCode').then((ShopCode) => {
-            Storage.get('PosCode').then((PosCode) => {
-                let params = {
-                    TblName: "VipCardPay_Ret",
-                    PayOrderNo: this.state.numform,
-                    CardPwd: "",
-                    shopcode: ShopCode,
-                    poscode: PosCode,
-                    CardFaceNo: "",
-                    OrderTotal: "",
-                    SaleTotal: "",
-                    JfValue: "",
-                    TransFlag: "",
-                }
-            })
-        })
+        // Storage.get('ShopCode').then((ShopCode) => {
+        //     Storage.get('PosCode').then((PosCode) => {
+        //         let params = {
+        //             TblName: "VipCardPay_Ret",
+        //             PayOrderNo: this.state.numform,
+        //             CardPwd: "",
+        //             shopcode: ShopCode,
+        //             poscode: PosCode,
+        //             CardFaceNo: "",
+        //             OrderTotal: "",
+        //             SaleTotal: "",
+        //             JfValue: "",
+        //             TransFlag: "",
+        //         }
+        //     })
+        // })
+        this.setState({
+            name:"退货"
+        });
 
     }
 

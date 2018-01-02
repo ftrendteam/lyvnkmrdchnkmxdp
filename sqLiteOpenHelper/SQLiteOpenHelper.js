@@ -178,7 +178,7 @@ export default class SQLiteOpenHelper {
         "CashierId int(4) null,CashierCode varchar(12) null,CashierName varchar(20) null,ClerkId int(4) null,ClerkCode varchar(12) null,Pid int(4) not null,BarCode varchar(18) null," +
         "ClerkName  varchar(20) null,ProdCode varchar(13) null,ProdName varchar(40) null,DepCode varchar(12) null,Price float(8) null,Amount float(8) null," +
         "DscTotal float(8) null,AutoDscTotal float(8) null," +
-        "Total float(8) null,HandDscTotal float(8) null,CxDsc float(8) null,EvenDsc float(8) null,MljDsc float(8) null, OverDsc float(8) null,OtherDsc float(8) null,TranDsc float(1) null, VipDsc float(20) null," +
+        "Total float(8) null,HandDsc float(8) null,CxDsc float(8) null,EvenDsc float(8) null,MljDsc float(8) null, OverDsc float(8) null,OtherDsc float(8) null,TranDsc float(1) null, VipDsc float(20) null," +
         "InnerNo varchar(12) null,OrderNo varchar(3) null,TransFlag varchar(1) null,TransDateTime varchar(19) null,BrandDsc float(8) null," +
         "isSubProd varchar(1) null,isMinus varchar(1) null,BuyPresentCode varchar(20) null,BuyPresentGroupNo varchar(20) null, BPUsedCountN float(8) null,DscFormNo varchar(20) null,DscMJFormNo varchar(20) null,SSID varchar(32) null," +
         "DscMZFormNo varchar(20) null,DscGSFormNo varchar(20) null,GSUsedCountN float(8) null,YWDate varchar(10))", [], () => {
