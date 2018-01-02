@@ -380,10 +380,11 @@ export default class DBAdapter extends SQLiteOpenHelper {
           let DepCode = shopInfo.DepCode;
           let ydcountm = shopInfo.ydcountm;
           let suppCode = shopInfo.SuppCode;
+          let BarCode = shopInfo.BarCode;
           //   "prodname":"海鲜菇","countm":1.0000,"kccount":0.0,"prototal":1.0000,"unit":"kg  ","promemo":""
-          let sql = " replace INTO shopInfo(pid,ProdCode,prodname,countm,ShopPrice,prototal,promemo,DepCode,ydcountm,SuppCode)" +
-            "values(?,?,?,?,?,?,?,?,?,?)";
-          tx.executeSql(sql, [Pid, ProdCode, shopName, ShopNumber, ShopPrice, ShopAmount, ShopRemark, DepCode, ydcountm, suppCode], () => {
+          let sql = " replace INTO shopInfo(pid,ProdCode,prodname,countm,ShopPrice,prototal,promemo,DepCode,ydcountm,SuppCode,BarCode)" +
+            "values(?,?,?,?,?,?,?,?,?,?,?)";
+          tx.executeSql(sql, [Pid, ProdCode, shopName, ShopNumber, ShopPrice, ShopAmount, ShopRemark, DepCode, ydcountm, suppCode,BarCode], () => {
               resolve(true);
             }, (err) => {
               reject(false);

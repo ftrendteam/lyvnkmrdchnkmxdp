@@ -4,7 +4,7 @@
 import SQLiteStorage from 'react-native-sqlite-storage';
 SQLiteStorage.DEBUG(false);
 let database_name = "PosBasicItem.db";//数据库文件
-let database_version = "1.0";//版本号
+let database_version = "2.0";//版本号
 let database_displayname = "MySQLite";
 let database_size = -1;//-1应该是表示无限制
 let db;
@@ -139,7 +139,8 @@ export default class SQLiteOpenHelper {
         });
       //Pid,ProdCode,prodname,countm,ShopPrice,prototal,promemo,kccount
       tx.executeSql("CREATE TABLE IF NOT EXISTS shopInfo(pid int not null Primary Key,ProdCode varchar(20) null,prodname varchar(255) null,countm float(8) null," +
-        "ShopPrice float(8) null,prototal float(8) null,promemo varchar(50) null,DepCode varchar(20) null,ydcountm int(255) null,SuppCode varchar(50) null)", [],
+        "ShopPrice float(8) null,prototal float(8) null,promemo varchar(50) null,DepCode varchar(20) null,ydcountm int(255) null,SuppCode varchar(50) null" +
+        ",BarCode varchar(20) null)", [],
         () => {
         
         }, (err) => {
