@@ -46,6 +46,7 @@ export default class GoodsDetails extends Component {
             DepCode:this.props.DepCode ? this.props.DepCode : "",
             ydcountm:this.props.ydcountm ? this.props.ydcountm : "",
             SuppCode:this.props.SuppCode ? this.props.SuppCode : "",
+            BarCode:this.props.BarCode ? this.props.BarCode : "",
             Price:"",
             totalPrice:"",
             name:"",
@@ -197,6 +198,7 @@ export default class GoodsDetails extends Component {
             shopInfo.DepCode = this.state.DepCode;
             shopInfo.ydcountm = this.state.ydcountm;
             shopInfo.SuppCode = this.state.SuppCode;
+            shopInfo.BarCode = this.state.BarCode;
             shopInfoData.push(shopInfo);
             //调用插入表方法
             dbAdapter.insertShopInfo(shopInfoData);

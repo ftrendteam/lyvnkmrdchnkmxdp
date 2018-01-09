@@ -59,6 +59,7 @@ export default class Search extends Component {
             ydcountm: "",
             Number1: "",
             Remark: "",
+            BarCode:"",
             Show: false,
             emptydata:false,
             dataRows: "1",
@@ -114,7 +115,6 @@ export default class Search extends Component {
                                 };
                                 FetchUtil.post(this.state.LinkUrl, JSON.stringify(params)).then((data) => {
                                     var countm = JSON.stringify(data.countm);
-                                    alert(countm);
                                     var ShopPrice = JSON.stringify(data.ShopPrice);
                                     if (data.retcode == 1) {
                                         var ShopCar = rows.item(0).ProdName;
@@ -128,6 +128,7 @@ export default class Search extends Component {
                                             ProdCode: rows.item(0).ProdCode,
                                             DepCode: rows.item(0).DepCode1,
                                             SuppCode: rows.item(0).SuppCode,
+                                            BarCode: rows.item(0).BarCode,
                                             ydcountm: countm,
                                             focus:true,
                                             Search:"",
@@ -221,6 +222,7 @@ export default class Search extends Component {
                                             ProdCode: rows.item(0).ProdCode,
                                             DepCode: rows.item(0).DepCode1,
                                             SuppCode: rows.item(0).SuppCode,
+                                            BarCode: rows.item(0).BarCode,
                                             ydcountm: countm,
                                             focus:true,
                                             Search:"",
@@ -393,6 +395,7 @@ export default class Search extends Component {
                         ProdCode: rowData.ProdCode,
                         DepCode: rowData.DepCode1,
                         SuppCode: rowData.SuppCode,
+                        BarCode: rowData.BarCode,
                         ydcountm: countm,
                         Search:"",
                         Number1:""
@@ -484,6 +487,7 @@ export default class Search extends Component {
             shopInfo.DepCode = this.state.DepCode;
             shopInfo.ydcountm = this.state.ydcountm;
             shopInfo.SuppCode = this.state.SuppCode;
+            shopInfo.BarCode = this.state.BarCode;
             shopInfoData.push(shopInfo);
             //调用插入表方法
             dbAdapter.insertShopInfo(shopInfoData);
@@ -535,7 +539,7 @@ export default class Search extends Component {
 
                 {
                     (this.state.Search=="")?
-                        <ScrollView style={styles.ScrollView} scrollEnabled={false}>
+                        <ScrollView style={styles.ScrollView}>
                             <View style={styles.Cont}>
                                 <View style={styles.List}>
                                     <Text style={styles.left}>名称</Text>
@@ -842,6 +846,7 @@ const styles = StyleSheet.create({
     },
     button: {
         marginTop: 30,
+        marginBottom:15,
         flex: 1,
         marginLeft: 25,
         marginRight: 25,

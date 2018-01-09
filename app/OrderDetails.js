@@ -33,6 +33,7 @@ export default class GoodsDetails extends Component {
             DepCode:this.props.DepCode ? this.props.DepCode : "",
             ydcountm:this.props.ydcountm ? this.props.ydcountm : "",
             SuppCode:this.props.SuppCode ? this.props.SuppCode : "",
+            BarCode:this.props.BarCode ? this.props.BarCode : "",
             Price:"",
             totalPrice:"",
             name:"",
@@ -155,6 +156,7 @@ export default class GoodsDetails extends Component {
             shopInfo.DepCode = this.state.DepCode;
             shopInfo.ydcountm = this.state.ydcountm;
             shopInfo.SuppCode = this.state.SuppCode;
+            shopInfo.BarCode = this.state.BarCode;
             shopInfoData.push(shopInfo);
             //调用插入表方法
             dbAdapter.insertShopInfo(shopInfoData);
@@ -179,7 +181,6 @@ export default class GoodsDetails extends Component {
                           <Image source={require("../images/2_01.png")} style={styles.HeaderImage}></Image>
                     </TouchableOpacity>
                     <Text style={styles.HeaderList}>{this.state.name}</Text>
-
               </View>
             </View>
             <View style={styles.Cont}>
@@ -201,7 +202,7 @@ export default class GoodsDetails extends Component {
                             onChangeText={(value)=>{this.setState({Number:value})}}/>
                     </View>
                     <View style={styles.right1}>
-                        <TouchableOpacity style={styles.sublime} onPress={this.clear.bind(this)}><Image source={require("../images/1_09.png")}/></TouchableOpacity>
+                        <TouchableOpacity style={[styles.sublime,{marginLeft:0,}]} onPress={this.clear.bind(this)}><Image source={require("../images/1_09.png")}/></TouchableOpacity>
                         <TouchableOpacity style={styles.sublime} onPress={this.add.bind(this)}><Image source={require("../images/1_15.png")}/></TouchableOpacity>
                         <TouchableOpacity style={styles.sublime} onPress={this.subtraction.bind(this)}><Image source={require("../images/1_13.png")}/></TouchableOpacity>
                     </View>
@@ -325,13 +326,10 @@ const styles = StyleSheet.create({
   left1:{
       flexDirection:"row",
       flex:1,
-      marginRight:160,
   },
   right1:{
       flexDirection:"row",
-      position:"absolute",
-      right:15,
-      top:5,
+      flex:1,
   },
   left2:{
     flexDirection:"row",
@@ -353,7 +351,8 @@ const styles = StyleSheet.create({
     fontSize:16,
     color:"#333333",
     fontWeight:"200",
-    flex:3,
+    paddingLeft:5,
+    flex:1,
     marginLeft:5,
     marginBottom:4,
   },

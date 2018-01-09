@@ -49,7 +49,7 @@ export default class file extends Component {
                 }else if(tags == 1){
                     var nextRoute={
                         name:"主页",
-                        component:admin
+                        component:login
                     };
                     this.props.navigator.push(nextRoute);
                 }else{

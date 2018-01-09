@@ -326,9 +326,8 @@ export default class admin extends Component {
                     </View>
                     <View style={styles.TextInput}>
                         <TextInput
-                            ref={component => this._textInput = component}
-                            returnKeyType='search'
                             autoFocus={true}
+                            returnKeyType='search'
                             numberoflines={1}
                             keyboardType="numeric"
                             placeholder="请输入用户编码"

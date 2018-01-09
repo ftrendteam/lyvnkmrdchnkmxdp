@@ -17,6 +17,7 @@ import {
     ScrollView,
     TouchableOpacity,
     ActivityIndicator,
+    InteractionManager,
 } from 'react-native';
 import Index from "../app/Index";
 import Pay from "../Sell/Pay";
@@ -28,7 +29,7 @@ import NumFormatUtils from "../utils/NumFormatUtils";
 
 let dbAdapter = new DBAdapter();
 
-let numnormatntils = new NumFormatUtils();
+// let numnormatntils = new NumFormatUtils();
 
 export default class Sell extends Component {
 
@@ -63,41 +64,38 @@ export default class Sell extends Component {
     }
 
     componentDidMount() {
-
-        //获取流水号
-        NumFormatUtils.createLsNo().then((data) => {
-            this.setState({
-                numform:data
-            })
-            Storage.save("LsNo",this.state.numform);
-        });
-        //获取内部号
-        let innerNo = NumFormatUtils.createInnerNo();
-        innerNo = innerNo.slice(2, innerNo.length);
-        Storage.save("innerNo",innerNo);
-
-        Storage.get('Name').then((tags) => {
-            this.setState({
-                name: tags
+        InteractionManager.runAfterInteractions(() => {
+            //获取流水号
+            NumFormatUtils.createLsNo().then((data) => {
+                this.setState({
+                    numform:data
+                })
+                Storage.save("LsNo",this.state.numform);
             });
-        });
 
-        Storage.get('VipCardNo').then((tags) => {
-            this.setState({
-                VipCardNo: tags
-            })
-        });
-        Storage.get('BalanceTotal').then((tags) => {
-            this.setState({
-                BalanceTotal: tags
-            })
-        });
-        Storage.get('JfBal').then((tags) => {
-            this.setState({
-                JfBal: tags
-            })
-        });
-        this._dbSearch();
+            Storage.get('Name').then((tags) => {
+                this.setState({
+                    name: tags
+                });
+            });
+
+            Storage.get('VipCardNo').then((tags) => {
+                this.setState({
+                    VipCardNo: tags
+                })
+            });
+            Storage.get('BalanceTotal').then((tags) => {
+                this.setState({
+                    BalanceTotal: tags
+                })
+            });
+            Storage.get('JfBal').then((tags) => {
+                this.setState({
+                    JfBal: tags
+                })
+            });
+            this._dbSearch();
+        })
     }
 
     _dbSearch() {
@@ -110,7 +108,6 @@ export default class Sell extends Component {
             this.dataRow = [];
             for (let i = 0; i < rows.length; i++) {
                 var row = rows.item(i);
-                // alert(JSON.stringify(row));
                 ShopPrice = (row.countm * row.ShopPrice);
                 shopAmount +=ShopPrice;
                 var number = row.countm;
@@ -186,13 +183,13 @@ export default class Sell extends Component {
                             var CardFaceNo;
                             for (let i = 0; i < TblRow.length; i++) {
                                 var row = TblRow[i];
-                                VipCardNo = row.VipCardNo;//卡号
+                                VipCardNo =  JSON.stringify(row.VipCardNo);//卡号
                                 BalanceTotal = JSON.stringify(row.BalanceTotal);//余额
                                 JfBal = JSON.stringify(row.JfBal);//积分
                             };
                             this.modal();
                             this.Member();
-                            Storage.save("VipCardNo", this.state.CardNumber);
+                            Storage.save("VipCardNo", VipCardNo);
                             Storage.save("BalanceTotal", BalanceTotal);
                             Storage.save("JfBal", JfBal);
                             this.setState({

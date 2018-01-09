@@ -619,7 +619,6 @@ export default class Index extends Component {
                     var countm=JSON.stringify(data.countm);
                     var ShopPrice=JSON.stringify(data.ShopPrice);
                     if(data.retcode == 1){
-                        // if(data.isFond==1){
                         this.props.navigator.push({
                             component:OrderDetails,
                             params:{
@@ -633,11 +632,9 @@ export default class Index extends Component {
                                 DepCode:item.item.DepCode1,
                                 SuppCode:item.item.SuppCode,
                                 ydcountm:countm,
+                                BarCode:item.item.BarCode,
                             }
                         })
-                        // }else{
-                        //     // alert('该商品暂时无法购买')
-                        // }
                     }else{
                         alert(JSON.stringify(data))
                     }
@@ -2543,8 +2540,8 @@ const styles = StyleSheet.create({
     },
     ModalStyleTitle:{
         height:40,
-        paddingLeft:100,
-        paddingRight:100,
+        paddingLeft:50,
+        paddingRight:50,
         borderBottomWidth:1,
         borderBottomColor:"#f5f5f5",
     },

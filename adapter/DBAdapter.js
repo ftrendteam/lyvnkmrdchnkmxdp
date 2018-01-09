@@ -1057,7 +1057,6 @@ export default class DBAdapter extends SQLiteOpenHelper {
    *保存流水表Sum
    */
   insertSum(sumDatas) {
-      console.log("执行到了");
     db.transaction((tx) => {
       for (let i = 0; i < sumDatas.length; i++) {
         try{

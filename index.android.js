@@ -17,6 +17,7 @@ import admin from "./app/admin";
 import File from "./app/file";
 import Storage from "./utils/Storage";
 import Navigator from "react-native-deprecated-custom-components";
+
 export default class MainView extends Component{
     constructor(props){
         super(props);
