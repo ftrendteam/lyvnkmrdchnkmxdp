@@ -2,7 +2,7 @@
  * Created by admin on 2017/11/23.
  */
 import FetchUtils from './FetchUtils';
-
+import Storage from './Storage';
 export default class DownLoadBasicData {
   static async downLoadKgtOpt(url, shopCode, dbAdapter) {
     let requestBody = JSON.stringify({
@@ -18,26 +18,24 @@ export default class DownLoadBasicData {
     });
     await FetchUtils.post(url, requestBody).then((response) => {
       if ((response.retcode == 1)) {
-        let tblRow2 = response.TblRow2;
-        dbAdapter.insertKgopt(tblRow2);
-          this.downLoadTshopitem(url, shopCode, dbAdapter);
-          this.downLoadPosOpt(url, shopCode, dbAdapter);
+          let tblRow2 = response.TblRow2;
+          dbAdapter.insertKgopt(tblRow2);
       }
     });
+    DownLoadBasicData.downLoadTshopitem(url, shopCode, dbAdapter);
+    DownLoadBasicData.downLoadPosOpt(url, shopCode, dbAdapter);
   }
   
   static async downLoadPosOpt(url, shopCode, dbAdapter) {
     let requestBody = JSON.stringify({
       'TblName': 'positem',
-      'ShopCode': shopCode,
-      'PosCode': '0001',
+      'shopcode': shopCode,
+      'poscode': '0001',
     });
     await FetchUtils.post(url, requestBody).then((response) => {
       if ((response != "" && response.retcode == 1)) {
         let tblRow3 = response.TblRow3;
         dbAdapter.insertPosOpt(tblRow3);
-        
-        
       }
     });
   }
