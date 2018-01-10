@@ -19,6 +19,7 @@ import {
     ToastAndroid,
     TouchableOpacity
 } from 'react-native';
+import Index from "../app/Index";
 import Sell from "../Sell/Sell";
 import NetUtils from "../utils/NetUtils";
 import FetchUtil from "../utils/FetchUtils";
@@ -154,18 +155,18 @@ export default class Pay extends Component {
 
     //继续交易
     JiaoYi(){
-        dbAdapter.deleteData("Sum");
-        dbAdapter.deleteData("Detail");
-        // if(this.state.Total=="0"){
-        //     var nextRoute = {
-        //         name: "Sell",
-        //         component: Sell,
-        //     };
-        //     this.props.navigator.push(nextRoute);
-        //     dbAdapter.deleteData("shopInfo");
-        // }else{
-        //     ToastAndroid.show('订单未完成', ToastAndroid.SHORT)
-        // }
+        // dbAdapter.deleteData("shopInfo");
+        // dbAdapter.deleteData("Sum");
+        // dbAdapter.deleteData("Detail");
+        if(this.dataRows==''){
+            var nextRoute = {
+                name: "Sell",
+                component: Sell,
+            };
+            this.props.navigator.push(nextRoute);
+        }else{
+            ToastAndroid.show('订单未完成', ToastAndroid.SHORT)
+        }
     }
 
     _renderRow(rowData, sectionID, rowID){
@@ -474,10 +475,14 @@ export default class Pay extends Component {
                                         Total: 0,
                                     });
                                 }
-                                // Storage.delete("VipCardNo");
-                                // Storage.delete("BalanceTotal");
-                                // Storage.delete("JfBal");
-                                // dbAdapter.deleteData("shopInfo");
+                                var nextRoute = {
+                                    name: "Index",
+                                    component: Index,
+                                };
+                                this.props.navigator.push(nextRoute);
+                                Storage.delete("VipCardNo");
+                                Storage.delete("BalanceTotal");
+                                Storage.delete("JfBal");
                             };
                         });
                     });
@@ -600,10 +605,14 @@ export default class Pay extends Component {
                                             Total: 0,
                                         });
                                     }
-                                    // Storage.delete("VipCardNo");
-                                    // Storage.delete("BalanceTotal");
-                                    // Storage.delete("JfBal");
-                                    // dbAdapter.deleteData("shopInfo");
+                                    var nextRoute = {
+                                        name: "Index",
+                                        component: Index,
+                                    };
+                                    this.props.navigator.push(nextRoute);
+                                    Storage.delete("VipCardNo");
+                                    Storage.delete("BalanceTotal");
+                                    Storage.delete("JfBal");
                                 };
                             });
                         });

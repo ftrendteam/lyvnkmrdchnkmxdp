@@ -18,18 +18,24 @@ import {
     TouchableOpacity,
     ActivityIndicator,
     InteractionManager,
+    DeviceEventEmitter,
 } from 'react-native';
 import Index from "../app/Index";
 import Pay from "../Sell/Pay";
+import GoodsDetails from "../app/OrderDetails";
+import NetUtils from "../utils/NetUtils";
 import Storage from "../utils/Storage";
 import Swiper from 'react-native-swiper';
 import DBAdapter from "../adapter/DBAdapter";
+import DeCodePrePrint18 from "../utils/DeCodePrePrint18";
 import FetchUtil from "../utils/FetchUtils";
 import NumFormatUtils from "../utils/NumFormatUtils";
 
+let decodepreprint = new DeCodePrePrint18();
 let dbAdapter = new DBAdapter();
 
-// let numnormatntils = new NumFormatUtils();
+var {NativeModules} = require('react-native');
+var RNScannerAndroid = NativeModules.RNScannerAndroid;
 
 export default class Sell extends Component {
 
@@ -43,10 +49,14 @@ export default class Sell extends Component {
             JfBal: "",
             numform:"",
             MemberTextInput: "",
+            promemo:"",
+            ydcountm:"",
+            Countm:1,
             Show: false,
             Member: false,
             dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
         }
+        this.dataRow = [];
     }
 
     modal() {
@@ -95,6 +105,7 @@ export default class Sell extends Component {
                 })
             });
             this._dbSearch();
+            this.Device();
         })
     }
 
@@ -105,7 +116,6 @@ export default class Sell extends Component {
             var shopnumber = 0;
             var shopAmount = 0;
             var ShopPrice=0;
-            this.dataRow = [];
             for (let i = 0; i < rows.length; i++) {
                 var row = rows.item(i);
                 ShopPrice = (row.countm * row.ShopPrice);
@@ -121,7 +131,6 @@ export default class Sell extends Component {
                 return;
             } else {
                 this.setState({
-                    number1: number,
                     ShopNumber: shopnumber,//数量
                     ShopAmount: shopAmount,//总金额this.dataRow
                     dataSource: this.state.dataSource.cloneWithRows(this.dataRow),
@@ -139,18 +148,138 @@ export default class Sell extends Component {
         this.props.navigator.push(nextRoute);
     }
 
-    Code(){}
+    Device(){
+        DeviceEventEmitter.addListener("code", (reminder) => {
+            decodepreprint.init(reminder,dbAdapter);
+            if(reminder.length==18&&decodepreprint.deCodePreFlag()){
+                decodepreprint.deCodeProdCode().then((datas)=>{
+                    dbAdapter.selectProdCode(datas,1).then((rows)=>{
+                        Storage.get('FormType').then((tags)=>{
+                            this.setState({
+                                FormType:tags
+                            })
+                        })
+
+                        Storage.get('LinkUrl').then((tags) => {
+                            this.setState({
+                                LinkUrl:tags
+                            })
+                        })
+                        //商品查询
+                        Storage.get('userName').then((tags)=>{
+                            let params = {
+                                reqCode:"App_PosReq",
+                                reqDetailCode:"App_Client_CurrProdQry",
+                                ClientCode:this.state.ClientCode,
+                                sDateTime:Date.parse(new Date()),
+                                Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
+                                username:tags,
+                                usercode:this.state.Usercode,
+                                SuppCode:rows.item(0).SuppCode,
+                                ShopCode:this.state.ShopCode,
+                                ChildShopCode:this.state.ChildShopCode,
+                                ProdCode:datas,
+                                OrgFormno:this.state.OrgFormno,
+                                FormType:this.state.FormType,
+                            };
+                            FetchUtil.post(this.state.LinkUrl,JSON.stringify(params)).then((data)=>{
+                                var countm=JSON.stringify(data.countm);
+                                var ShopPrice=JSON.stringify(data.ShopPrice);
+                                if(data.retcode == 1){
+                                    var ShopCar = rows.item(0).ProdName;
+
+                                    DeviceEventEmitter.removeAllListeners();
+                                }else{
+                                    alert(JSON.stringify(data))
+                                }
+                            },(err)=>{
+                                alert("网络请求失败");
+                            })
+                        })
+                    })
+                });
+            }else{
+                dbAdapter.selectAidCode(reminder,1).then((rows)=>{
+                    var shopnumber = 0;
+                    var shopAmount = 0;
+                    for (let i = 0; i < rows.length; i++) {
+                        var row = rows.item(i);
+                        var ShopPrice = row.ShopPrice;
+                        var prototal=this.state.Countm*row.ShopPrice;
+                        var number = row.countm;
+                        shopnumber = this.state.Countm+this.state.ShopNumber;
+                        var DataRows = {
+                            'ProdCode':row.ProdCode,
+                            'prodname':row.ProdName,
+                            'ShopPrice':row.ShopPrice,
+                            'countm': this.state.Countm,
+                            'prototal': prototal,
+                            'pid':row.Pid,
+                        };
+                        this.dataRow.push(DataRows);
+                    };
+                    shopAmount =ShopPrice+this.state.ShopAmount;
+                    this.setState({
+                        ShopNumber: shopnumber,
+                        ShopAmount: shopAmount,
+                        dataSource: this.state.dataSource.cloneWithRows(this.dataRow),
+                    });
+                    var shopInfoData = [];
+                    var shopInfo = {};
+                    shopInfo.Pid = row.Pid;
+                    shopInfo.ProdCode=row.ProdCode;
+                    shopInfo.prodname = row.ProdName;
+                    shopInfo.countm = this.state.Countm;
+                    shopInfo.ShopPrice = row.ShopPrice;
+                    shopInfo.prototal =(this.state.Countm)*(row.ShopPrice);
+                    shopInfo.promemo = this.state.promemo;
+                    shopInfo.DepCode = row.DepCode;
+                    shopInfo.ydcountm = this.state.ydcountm;
+                    shopInfo.SuppCode = row.SuppCode;
+                    shopInfo.BarCode = row.BarCode;
+                    shopInfoData.push(shopInfo);
+                    //调用插入表方法
+                    dbAdapter.insertShopInfo(shopInfoData);
+                })
+            }
+        })
+    }
+
+    Code(){
+        RNScannerAndroid.openScanner();
+    }
 
     _renderRow(rowData, sectionID, rowID) {
         return (
-            <View style={styles.ShopList1}>
+            <TouchableOpacity  onPress={()=>this.ListButton(rowData)} style={styles.ShopList1}>
                 <Text style={styles.Name}>{rowData.ProdCode}</Text>
                 <Text style={styles.Name}>{rowData.prodname}</Text>
                 <Text style={styles.Number}>{rowData.ShopPrice}</Text>
                 <Text style={styles.Number}>{rowData.countm}</Text>
                 <Text style={styles.Number}>{rowData.prototal}</Text>
-            </View>
+            </TouchableOpacity>
         );
+    }
+
+    ListButton(rowData){
+        // alert(JSON.stringify(rowData.countm));
+        this.props.navigator.push({
+            component:GoodsDetails,
+            params:{
+                ProdCode:rowData.ProdCode,
+                ProdName:rowData.prodname,
+                Pid:rowData.pid,
+                ShopPrice:rowData.ShopPrice,
+                Remark:this.state.promemo,
+                prototal:(this.state.Countm)*(rowData.ShopPrice),
+                countm:rowData.countm,
+                DepCode:rowData.DepCode,
+                ydcountm:this.state.ydcountm,
+                SuppCode:rowData.SuppCode,
+                BarCode:rowData.BarCode,
+                DataName:'销售',
+            }
+        })
     }
 
     MemberButton() {
