@@ -80,7 +80,6 @@ export default class FormatPrice {
         }
       }
     }
-    console.log("round=",rounding.toFixed(3));
     return rounding.toFixed(3);
   }
   
