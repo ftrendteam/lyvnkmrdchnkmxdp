@@ -142,6 +142,7 @@ export default class Index extends Component {
                     name:"Sell",
                     component:Sell
                 };
+                DeviceEventEmitter.removeAllListeners();
                 this.props.navigator.push(nextRoute)
             }else{
                 var nextRoute={
@@ -272,7 +273,6 @@ export default class Index extends Component {
                                     var countm=JSON.stringify(data.countm);
                                     var ShopPrice=JSON.stringify(data.ShopPrice);
                                     if(data.retcode == 1){
-                                        console.log("wtgffffffffff");
                                         var ShopCar = rows.item(0).ProdName;
                                         this.props.navigator.push({
                                             component:OrderDetails,

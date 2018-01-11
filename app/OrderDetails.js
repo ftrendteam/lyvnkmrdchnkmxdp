@@ -8,9 +8,9 @@ import React, {Component} from 'react';
 import {Image, ScrollView, StyleSheet, Text, TextInput, ToastAndroid, TouchableOpacity, View,} from 'react-native';
 import Index from "./Index";
 import Search from "./Search";
+import Sell from "../Sell/Sell";
 import NumberUtils from "../utils/NumberUtils";
 import Storage from "../utils/Storage";
-
 import DBAdapter from "../adapter/DBAdapter";
 
 let dbAdapter = new DBAdapter();
@@ -29,11 +29,11 @@ export default class GoodsDetails extends Component {
             Remark:this.props.Remark ? this.props.Remark : "",
             prototal:this.props.prototal ? this.props.prototal : "",
             Number:this.props.countm ? this.props.countm : "",
-            // isFrist:this.props.countm ? true : false,
             DepCode:this.props.DepCode ? this.props.DepCode : "",
             ydcountm:this.props.ydcountm ? this.props.ydcountm : "",
             SuppCode:this.props.SuppCode ? this.props.SuppCode : "",
             BarCode:this.props.BarCode ? this.props.BarCode : "",
+            DataName:this.props.DataName ? this.props.DataName : "",
             Price:"",
             totalPrice:"",
             name:"",
@@ -160,14 +160,22 @@ export default class GoodsDetails extends Component {
             shopInfoData.push(shopInfo);
             //调用插入表方法
             dbAdapter.insertShopInfo(shopInfoData);
-            var nextRoute={
-               name:"主页",
-               component:Index,
-                params:{
-                   DepCode:this.state.DepCode,
-                }
-            };
-            this.props.navigator.push(nextRoute);
+            if(this.state.DataName=="销售"){
+                var nextRoute={
+                    name:"销售",
+                    component:Sell,
+                };
+                this.props.navigator.push(nextRoute);
+            }else{
+                var nextRoute={
+                    name:"主页",
+                    component:Index,
+                    params:{
+                        DepCode:this.state.DepCode,
+                    }
+                };
+                this.props.navigator.push(nextRoute);
+            }
         }
     }
 
