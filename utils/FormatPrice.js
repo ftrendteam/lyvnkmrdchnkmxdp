@@ -34,10 +34,8 @@ export default class FormatPrice {
         let multiply = BigDecimalUtils.multiply(rate, subtract, 3);//每个商品均摊的优惠金额
         product.prototal = BigDecimalUtils.add(itemTotal,
           multiply, 2);//根据计算结果重新设置商品价格
-        
         rounding = -subtract;
         disAllPrice = disAllPrice + multiply;//实际抹零
-        
         if (currentDisPrice != disAllPrice && i == products.length - 1 && products.length != 1) {
           let v = BigDecimalUtils.subtract(disAllPrice,
             currentDisPrice, 3);//抹零之差
@@ -46,31 +44,11 @@ export default class FormatPrice {
             let disItemTotal = BigDecimalUtils.subtract
             (beforeItemTotal, v, 3);
             product.prototal = disItemTotal;
-            //bean.setYDiscPrice(BigDecimalUtils.scaleAddScale2
-            //(BigDecimalUtils.scaleSubtract(BigDecimalUtils
-            //  .scaleSubtract
-            //  (beforeItemTotal,
-            //    multiply),
-            //  disItemTotal), bean
-            //.getYDiscPrice())); 将四舍五入设置为优惠价格
           } else {//实际添加价格过低 需要继续添加
             let beforeItemTotal = product.prototal;
-            let disItemTotal = BigDecimalUtils.add
-            (beforeItemTotal, v, 2);
+            let disItemTotal = BigDecimalUtils.add(beforeItemTotal, v, 2);
             product.prototal = disItemTotal;
-            //bean.setYDiscPrice(BigDecimalUtils.scaleAddScale2
-            //(BigDecimalUtils.scaleSubtract(BigDecimalUtils
-            //  .scaleSubtract
-            //  (beforeItemTotal,
-            //    multiply),
-            //  disItemTotal), bean
-            //.getYDiscPrice()));  将四舍五入设置为优惠价格
           }
-          console.log("c=", product.prototal);
-        } else {
-          //bean.setYDiscPrice(BigDecimalUtils.scaleAddScale2
-          //(multiply * -1, bean
-          //.getYDiscPrice()));将四舍五入设置为优惠价格
         }
       }
     } else if (subtract < 0) {//价格降低 为舍去
@@ -92,35 +70,18 @@ export default class FormatPrice {
             currentDisPrice, 3);//抹零之差
           if (v >= 0) {//实际抹零过高 需要加上多抹去的金额
             let beforeItemTotal = product.prototal;
-            let disItemTotal = BigDecimalUtils.add
-            (beforeItemTotal, v, 2);
+            let disItemTotal = BigDecimalUtils.add(beforeItemTotal, v, 2);
             product.prototal = disItemTotal;
-            //bean.setYDiscPrice(BigDecimalUtils.scaleAddScale2
-            //(BigDecimalUtils.scaleSubtract(BigDecimalUtils
-            //  .scaleAdd(beforeItemTotal,
-            //  multiply),
-            //  disItemTotal), bean
-            //.getYDiscPrice()));  将四舍五入设置为优惠价格
           } else if (v < 0) {//实际抹零过低 (少抹了 继续抹)
             let beforeItemTotal = product.prototal;
             let disItemTotal = BigDecimalUtils.subtract(beforeItemTotal, -v, 3);
             product.prototal = disItemTotal;
-            //bean.setYDiscPrice(BigDecimalUtils.scaleAddScale2
-            //(BigDecimalUtils.scaleSubtract(BigDecimalUtils
-            //  .scaleAdd(beforeItemTotal,
-            //  multiply),
-            //  disItemTotal), bean
-            //.getYDiscPrice()));将四舍五入设置为优惠价格
           }
-        } else {
-          //bean.setYDiscPrice(BigDecimalUtils.scaleAddScale2
-          //(multiply * 1, bean
-          //.getYDiscPrice()));  将四舍五入设置为优惠价格
         }
       }
     }
-    //console.log("disAllPrice=" + disAllPrice);
-    return disAllPrice;
+    console.log("round=",rounding.toFixed(3));
+    return rounding.toFixed(3);
   }
   
   /***
