@@ -18,9 +18,11 @@ import {
 } from 'react-native';
 import Index from "../app/Index";
 import Sell_Data_List from "../Sell/Sell_Data_List";
+import DBAdapter from "../adapter/DBAdapter";
 import Storage from '../utils/Storage';
 import FetchUtil from "../utils/FetchUtils";
-
+import DownLoadBasicData from '../utils/DownLoadBasicData';
+let dbAdapter = new DBAdapter();
 var {NativeModules} = require('react-native');
 var RNAndroidIMEI = NativeModules.RNAndroidIMEI;
 
@@ -116,30 +118,36 @@ export default class SellData extends Component {
             }else if(this.state.PosCode==""){
                 alert("请选择pos号")
             }else{
-                let params = {
-                    TblName:"PosShopBind",
-                    poscode:this.state.PosCode,
-                    shopcode:this.state.ShopCode,
-                    BindMAC:"",
-                    SysGuid:IMEI,
-                };
-                FetchUtil.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
-                    if(data.retcode == 1){
-                        var nextRoute={
-                            name:"Index",
-                            component:Index
+                DownLoadBasicData.downLoadPosOpt(this.state.linkurl, this.state.ShopCode, dbAdapter,this.state.PosCode).then((response)=>{
+                    if(response = true){
+                        let params = {
+                            TblName:"PosShopBind",
+                            poscode:this.state.PosCode,
+                            shopcode:this.state.ShopCode,
+                            BindMAC:"",
+                            SysGuid:IMEI,
                         };
-                        this.props.navigator.push(nextRoute);
-                        Storage.save("Bind","bindsucceed");
-                        Storage.save("ShopCode",this.state.ShopCode);
-                        Storage.save("PosCode",this.state.PosCode);
-                        Storage.save('Name', '销售');
-                        Storage.save("Num", "1");
+                        FetchUtil.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
+                            if(data.retcode == 1){
+                                var nextRoute={
+                                    name:"Index",
+                                    component:Index
+                                };
+                                this.props.navigator.push(nextRoute);
+                                Storage.save("Bind","bindsucceed");
+                                Storage.save("ShopCode",this.state.ShopCode);
+                                Storage.save("PosCode",this.state.PosCode);
+                                Storage.save('Name', '销售');
+                                Storage.save("Num", "1");
+                            }else{
+                                alert(JSON.stringify(data))
+                            }
+                        },(err)=>{
+                            alert("网络请求失败");
+                        })
                     }else{
-                        alert(JSON.stringify(data))
+                        alert(JSON.stringify(response));
                     }
-                },(err)=>{
-                    alert("网络请求失败");
                 })
             }
         })

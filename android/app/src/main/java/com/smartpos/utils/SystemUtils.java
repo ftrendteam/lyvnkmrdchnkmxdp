@@ -36,7 +36,7 @@ public class SystemUtils{
      /**
      * 获取设备的IMEI
      */
-    public  static String getIMEI(Context context) {
+    public static String getIMEI(Context context) {
         String imei = null;
         try {
             TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);

@@ -1114,6 +1114,11 @@ export default class Index extends Component {
                                             this.setState({
                                                 head: invoice,
                                             });
+                                            var nextRoute = {
+                                                name: "销售",
+                                                component: SellData,
+                                            };
+                                            this.props.navigator.push(nextRoute);
                                             this._setModalVisible();
                                         } else {
                                             var nextRoute = {

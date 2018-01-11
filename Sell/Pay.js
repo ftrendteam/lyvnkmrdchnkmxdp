@@ -24,9 +24,10 @@ import Sell from "../Sell/Sell";
 import NetUtils from "../utils/NetUtils";
 import FetchUtil from "../utils/FetchUtils";
 import Storage from "../utils/Storage";
+import NumFormatUtils from "../utils/NumFormatUtils";
+import FormatPrice from "../utils/FormatPrice";
 import Swiper from 'react-native-swiper';
 import DBAdapter from "../adapter/DBAdapter";
-import NumFormatUtils from "../utils/NumFormatUtils";
 let dbAdapter = new DBAdapter();
 export default class Pay extends Component {
     constructor(props){
@@ -67,19 +68,19 @@ export default class Pay extends Component {
         let isShow = this.state.total;
         this.setState({
             total: !isShow,
-        });
+        })
     }
     RefundTotal() {
         let isShow = this.state.RefundTotal;
         this.setState({
             RefundTotal: !isShow,
-        });
+        })
     }
     LayerShow(){
         let isShow = this.state.LayerShow;
         this.setState({
             LayerShow: !isShow,
-        });
+        })
     }
     ModeButton(){
         this.LayerShow();
@@ -108,8 +109,8 @@ export default class Pay extends Component {
         Storage.get('Name').then((tags) => {
             this.setState({
                 name: tags
-            });
-        });
+            })
+        })
 
         Storage.get('VipCardNo').then((tags) => {
             if(tags==null){
@@ -123,21 +124,46 @@ export default class Pay extends Component {
                     custCode:this.state.VipCardNo,
                 })
             }
-        });
+        })
 
-        Storage.save("ino","0");
-        Storage.save("Ino","0");
+        Storage.save("ino","0")
+        Storage.save("Ino","0")
 
-        this.dbadapter();
+        this.dbadapter()
     }
-
+// ,'AUTOCUT','CUTDEGREE'
     dbadapter(){
+        dbAdapter.selectPosOpt('CUTLEVEL').then((rows)=>{
+            for(let i =0;i<rows.length;i++){
+                var row = rows.item(i);
+                var CUTLEVEL = row.OptValue;
+            }
+            if(this.state.ShopAmount>CUTLEVEL){
+                dbAdapter.selectPosOpt('AUTOCUT').then((rows)=>{
+                    for(let i =0;i<rows.length;i++){
+                        var row = rows.item(i);
+                        var AUTOCUT = row.OptValue;
+                    }
+                    if(AUTOCUT=='1'){
+                        dbAdapter.selectPosOpt('CUTDEGREE').then((rows)=>{
+                            for(let i =0;i<rows.length;i++){
+                                var row = rows.item(i);
+                                var CUTDEGREE = row.OptValue;
+                            }
+                            var round =FormatPrice.round(CUTDEGREE,this.state.ShopAmount,this.state.dataRows);
+                            alert(JSON.stringify(round))
+                        })
+                    }
+                })
+            }
+        })
+
         dbAdapter.selectAllData("payInfo").then((rows)=>{
             let priductData=[];
             for(let i =0;i<rows.length;i++){
                 var row = rows.item(i);
                 priductData.push(row);
-            };
+            }
             this.productData=priductData;
             this.setState({
                 data:priductData,
@@ -201,19 +227,19 @@ export default class Pay extends Component {
                         if (this.state.Seles == "R") {
                             this.RefundTotal();
                         } else if (this.state.Seles == "T") {
-                            this.Total();
+                            this.Total()
                         }
                     }
                 }else {
                     if (this.state.amount == "") {
                         alert("请输入付款额")
                     } else if (this.state.payments > this.state.ShopAmount) {
-                        alert("付款额不能大于应付金额");
+                        alert("付款额不能大于应付金额")
                     } else {
                         if (this.state.Seles == "R") {
-                            this.RefundTotal();
+                            this.RefundTotal()
                         } else if (this.state.Seles == "T") {
-                            this.Total();
+                            this.Total()
                         }
                     }
                 }
@@ -236,7 +262,7 @@ export default class Pay extends Component {
                                 'payRT': '',
                                 'PayCode': item.item.PayCode,
                                 'pid': item.item.Pid,
-                            };
+                            }
                         }else{
                             var Amount = {
                                 'payName': '现金',
@@ -246,7 +272,7 @@ export default class Pay extends Component {
                                 'payRT': '',
                                 'PayCode': item.item.PayCode,
                                 'pid': item.item.Pid,
-                            };
+                            }
                         }
                         if (this.dataRows.length == 0) {
                             this.dataRows.push(Amount);
@@ -257,7 +283,7 @@ export default class Pay extends Component {
                                 Total: Total,
                                 cardfaceno: "",
                                 dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
-                            });
+                            })
                         } else {
                             for (let i = 0; i < this.dataRows.length; i++) {
                                 let RowsList = this.dataRows[i];
@@ -280,12 +306,12 @@ export default class Pay extends Component {
                                         Total: Total,
                                         cardfaceno: "",
                                         dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
-                                    });
-                                };
-                            };
-                        };
-                        this.restorage1();
-                    };
+                                    })
+                                }
+                            }
+                        }
+                        this.restorage1()
+                    }
                 }
                 else if(this.state.Seles=="T"){
                     if(this.state.amount==""){
@@ -305,7 +331,7 @@ export default class Pay extends Component {
                                 'payRT': '',
                                 'PayCode': item.item.PayCode,
                                 'pid': item.item.Pid,
-                            };
+                            }
                         }else{
                             var Amount = {
                                 'payName': '现金',
@@ -315,7 +341,7 @@ export default class Pay extends Component {
                                 'payRT': '',
                                 'PayCode': item.item.PayCode,
                                 'pid': item.item.Pid,
-                            };
+                            }
                         }
                         if (this.dataRows.length == 0) {
                             this.dataRows.push(Amount);
@@ -325,7 +351,7 @@ export default class Pay extends Component {
                                 Total: Total,
                                 cardfaceno: "",
                                 dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
-                            });
+                            })
                         } else {
                             for (let i = 0; i < this.dataRows.length; i++) {
                                 let RowsList = this.dataRows[i];
@@ -349,10 +375,10 @@ export default class Pay extends Component {
                                         Total: Total,
                                         cardfaceno: "",
                                         dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
-                                    });
-                                };
-                            };
-                        };
+                                    })
+                                }
+                            }
+                        }
                         this.restorage();
                     };
                 };

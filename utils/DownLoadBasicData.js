@@ -23,21 +23,38 @@ export default class DownLoadBasicData {
       }
     });
     DownLoadBasicData.downLoadTshopitem(url, shopCode, dbAdapter);
-    DownLoadBasicData.downLoadPosOpt(url, shopCode, dbAdapter);
+    // DownLoadBasicData.downLoadPosOpt(url, shopCode, dbAdapter);
   }
   
-  static async downLoadPosOpt(url, shopCode, dbAdapter) {
-    let requestBody = JSON.stringify({
-      'TblName': 'positem',
-      'shopcode': shopCode,
-      'poscode': '0001',
-    });
-    await FetchUtils.post(url, requestBody).then((response) => {
-      if ((response != "" && response.retcode == 1)) {
-        let tblRow3 = response.TblRow3;
-        dbAdapter.insertPosOpt(tblRow3);
+  static downLoadPosOpt(url, shopCode, dbAdapter,posCode) {
+    return new Promise((resolve, reject)=>{
+      try {
+          Storage.get('ShopCode').then((ShopCode) => {
+              Storage.get('PosCode').then((PosCode) => {
+                  Storage.get('LinkUrl').then((tags) => {
+                        let requestBody = JSON.stringify({
+                            'TblName': 'positem',
+                            'shopcode': ShopCode,
+                            'poscode': PosCode,
+                        });
+                        FetchUtils.post(tags, requestBody).then((response) => {
+                            if ((response != "" && response.retcode == 1)) {
+                                let tblRow3 = response.TblRow3;
+                                dbAdapter.insertPosOpt(tblRow3);
+                                resolve(true);
+                            }else{
+                                reject(false);
+                            }
+                        });
+                  })
+              })
+          })
+      }catch (err){
+          reject(false);
       }
+
     });
+
   }
   
   static async downLoadTshopitem(url, shopCode, dbAdapter) {

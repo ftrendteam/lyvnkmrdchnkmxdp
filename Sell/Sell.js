@@ -154,48 +154,90 @@ export default class Sell extends Component {
             if(reminder.length==18&&decodepreprint.deCodePreFlag()){
                 decodepreprint.deCodeProdCode().then((datas)=>{
                     dbAdapter.selectProdCode(datas,1).then((rows)=>{
-                        Storage.get('FormType').then((tags)=>{
-                            this.setState({
-                                FormType:tags
-                            })
-                        })
-
-                        Storage.get('LinkUrl').then((tags) => {
-                            this.setState({
-                                LinkUrl:tags
-                            })
-                        })
-                        //商品查询
-                        Storage.get('userName').then((tags)=>{
-                            let params = {
-                                reqCode:"App_PosReq",
-                                reqDetailCode:"App_Client_CurrProdQry",
-                                ClientCode:this.state.ClientCode,
-                                sDateTime:Date.parse(new Date()),
-                                Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
-                                username:tags,
-                                usercode:this.state.Usercode,
-                                SuppCode:rows.item(0).SuppCode,
-                                ShopCode:this.state.ShopCode,
-                                ChildShopCode:this.state.ChildShopCode,
-                                ProdCode:datas,
-                                OrgFormno:this.state.OrgFormno,
-                                FormType:this.state.FormType,
+                        dbAdapter.selectAidCode(reminder,1).then((rows)=>{
+                            var shopnumber = 0;
+                            var shopAmount = 0;
+                            for (let i = 0; i < rows.length; i++) {
+                                var row = rows.item(i);
+                                var ShopPrice = row.ShopPrice;
+                                var prototal=this.state.Countm*row.ShopPrice;
+                                var number = row.countm;
+                                shopnumber = this.state.Countm+this.state.ShopNumber;
+                                var DataRows = {
+                                    'ProdCode':row.ProdCode,
+                                    'prodname':row.ProdName,
+                                    'ShopPrice':row.ShopPrice,
+                                    'countm': this.state.Countm,
+                                    'prototal': prototal,
+                                    'pid':row.Pid,
+                                };
+                                this.dataRow.push(DataRows);
                             };
-                            FetchUtil.post(this.state.LinkUrl,JSON.stringify(params)).then((data)=>{
-                                var countm=JSON.stringify(data.countm);
-                                var ShopPrice=JSON.stringify(data.ShopPrice);
-                                if(data.retcode == 1){
-                                    var ShopCar = rows.item(0).ProdName;
-
-                                    DeviceEventEmitter.removeAllListeners();
-                                }else{
-                                    alert(JSON.stringify(data))
-                                }
-                            },(err)=>{
-                                alert("网络请求失败");
-                            })
+                            shopAmount =ShopPrice+this.state.ShopAmount;
+                            this.setState({
+                                ShopNumber: shopnumber,
+                                ShopAmount: shopAmount,
+                                dataSource: this.state.dataSource.cloneWithRows(this.dataRow),
+                            });
+                            var shopInfoData = [];
+                            var shopInfo = {};
+                            shopInfo.Pid = row.Pid;
+                            shopInfo.ProdCode=row.ProdCode;
+                            shopInfo.prodname = row.ProdName;
+                            shopInfo.countm = this.state.Countm;
+                            shopInfo.ShopPrice = row.ShopPrice;
+                            shopInfo.prototal =(this.state.Countm)*(row.ShopPrice);
+                            shopInfo.promemo = this.state.promemo;
+                            shopInfo.DepCode = row.DepCode;
+                            shopInfo.ydcountm = this.state.ydcountm;
+                            shopInfo.SuppCode = row.SuppCode;
+                            shopInfo.BarCode = row.BarCode;
+                            shopInfoData.push(shopInfo);
+                            //调用插入表方法
+                            dbAdapter.insertShopInfo(shopInfoData);
                         })
+                        // Storage.get('FormType').then((tags)=>{
+                        //     this.setState({
+                        //         FormType:tags
+                        //     })
+                        // })
+                        //
+                        // Storage.get('LinkUrl').then((tags) => {
+                        //     this.setState({
+                        //         LinkUrl:tags
+                        //     })
+                        // })
+                        // //商品查询
+                        // Storage.get('userName').then((tags)=>{
+                        //     let params = {
+                        //         reqCode:"App_PosReq",
+                        //         reqDetailCode:"App_Client_CurrProdQry",
+                        //         ClientCode:this.state.ClientCode,
+                        //         sDateTime:Date.parse(new Date()),
+                        //         Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
+                        //         username:tags,
+                        //         usercode:this.state.Usercode,
+                        //         SuppCode:rows.item(0).SuppCode,
+                        //         ShopCode:this.state.ShopCode,
+                        //         ChildShopCode:this.state.ChildShopCode,
+                        //         ProdCode:datas,
+                        //         OrgFormno:this.state.OrgFormno,
+                        //         FormType:this.state.FormType,
+                        //     };
+                        //     FetchUtil.post(this.state.LinkUrl,JSON.stringify(params)).then((data)=>{
+                        //         var countm=JSON.stringify(data.countm);
+                        //         var ShopPrice=JSON.stringify(data.ShopPrice);
+                        //         if(data.retcode == 1){
+                        //             var ShopCar = rows.item(0).ProdName;
+                        //
+                        //             DeviceEventEmitter.removeAllListeners();
+                        //         }else{
+                        //             alert(JSON.stringify(data))
+                        //         }
+                        //     },(err)=>{
+                        //         alert("网络请求失败");
+                        //     })
+                        // })
                     })
                 });
             }else{

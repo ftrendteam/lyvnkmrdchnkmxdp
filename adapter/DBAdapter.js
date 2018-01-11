@@ -789,7 +789,6 @@ export default class DBAdapter extends SQLiteOpenHelper {
     return new Promise((resolve, reject) => {
       DataUtils.get("LinkUrl", '').then((urlData) => {
         RequestBodyUtils.requestProduct(urlData, currShopCode, this).then((prodResult) => {
-          console.log("prodResult", prodResult);
           FetchUtils.post(urlData, categoryBody).then((datas) => {
             this.insertTDepSetData(datas.TblRow).then((result) => {
               let suppset = RequestBodyUtils.createSuppset(currShopCode);

@@ -12,7 +12,7 @@ import android.content.Context;
 import com.smartpos.utils.SystemUtils;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.smartpos.scanner.ScannerMainActivity;
-import com.smartpos.model.Scanner;
+
 import android.device.ScanManager;
 import android.device.scanner.configuration.PropertyID;
 public class RNScannerActivity extends ReactContextBaseJavaModule{
