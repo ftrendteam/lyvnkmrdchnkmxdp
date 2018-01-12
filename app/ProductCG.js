@@ -16,7 +16,6 @@ import {
 } from 'react-native';
 
 import Index from "./Index";
-import Home from "./Home";
 import Search from "./Search";
 import ProductCG_list from "./ProductCG_list";
 import NetUtils from "../utils/NetUtils";

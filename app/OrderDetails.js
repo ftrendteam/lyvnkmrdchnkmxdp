@@ -78,11 +78,22 @@ export default class GoodsDetails extends Component {
     }
 
     GoodsDetails(){
-        var nextRoute={
-            name:"主页",
-            component:Index,
-        };
-        this.props.navigator.push(nextRoute);
+        if(this.state.DataName=="销售"){
+            var nextRoute={
+                name:"销售",
+                component:Sell,
+            };
+            this.props.navigator.push(nextRoute);
+        }else{
+            var nextRoute={
+                name:"主页",
+                component:Index,
+                params:{
+                    DepCode:this.state.DepCode,
+                }
+            };
+            this.props.navigator.push(nextRoute);
+        }
     }
 
     //失焦时触发事件

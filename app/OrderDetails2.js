@@ -19,8 +19,6 @@ import {
   DeviceEventEmitter,
   ToastAndroid
 } from 'react-native';
-import Code from "./Code";
-import home from "./Home";
 import Index from "./Index";
 import OrderDetails from "./OrderDetails2";
 import Search from "./Search";

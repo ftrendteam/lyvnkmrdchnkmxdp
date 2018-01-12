@@ -14,8 +14,6 @@ import {
     TextInput,
     TouchableOpacity,
 } from 'react-native';
-
-import Home from "./Home";
 import Index from "./Index";
 import Search from "./Search";
 import Distrition_list from "./Distrition_list";

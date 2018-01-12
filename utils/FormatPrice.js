@@ -24,7 +24,7 @@ export default class FormatPrice {
             formatPrice = FormatPrice.round0(price);
         }
         //四舍五入价格差距
-        let subtract = formatPrice - price;
+        let subtract = BigDecimalUtils.subtract(formatPrice,price,3);
         if (subtract > 0) {//价格提高 为入
             for (let i = 0; i < products.length; i++) {
                 let product = products[i];
@@ -35,7 +35,7 @@ export default class FormatPrice {
                 product.prototal = BigDecimalUtils.add(itemTotal,
                     multiply, 2);//根据计算结果重新设置商品价格
                 rounding = -subtract;
-                disAllPrice = disAllPrice + multiply;//实际抹零
+                disAllPrice = BigDecimalUtils.add(disAllPrice ,multiply,3);//实际抹零
                 if (currentDisPrice != disAllPrice && i == products.length - 1 && products.length != 1) {
                     let v = BigDecimalUtils.subtract(disAllPrice,
                         currentDisPrice, 3);//抹零之差
@@ -80,8 +80,7 @@ export default class FormatPrice {
                 }
             }
         }
-        console.log("round=",rounding.toFixed(3));
-        return rounding.toFixed(3);
+        return formatPrice;
     }
 
     /***

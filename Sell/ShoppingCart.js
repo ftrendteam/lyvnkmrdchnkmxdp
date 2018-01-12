@@ -23,8 +23,8 @@ import {
     DeviceEventEmitter,
     InteractionManager
 } from 'react-native';
-
-import Index from "./Index";
+import Index from "../Src/home/Index";
+// import Index from "./Index";
 import HistoricalDocument from "./HistoricalDocument";
 import Search from "./Search1";
 import OrderDetails from "./OrderDetails3";

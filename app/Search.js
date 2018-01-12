@@ -22,7 +22,6 @@ import {
 } from 'react-native';
 
 import Index from "./Index";
-import Code from "./Code";
 import OrderDetails from "./OrderDetails2";
 import NetUtils from "../utils/NetUtils";
 import NumberUtils from "../utils/NumberUtils";

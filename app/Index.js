@@ -29,7 +29,6 @@ import {
 } from 'react-native';
 import HistoricalDocument from "./HistoricalDocument";
 import ShoppingCart from "./ShoppingCart";
-import Code from "./Code";
 import admin from "./admin";
 import OrderDetails from "./OrderDetails";
 import SunYi from "./SunYi";
@@ -1093,55 +1092,62 @@ export default class Index extends Component {
         }else if(this.state.username==null){
             this._setModalVisible();
         }else {
-            NativeModules.AndroidDeviceInfo.getIMEI((IMEI) => {
-                Storage.get('Bind').then((tags) => {
-                    Storage.save("invoice", "销售");
-                    Storage.save("Name", "销售");
-                    if (tags == "bindsucceed") {
-                        Storage.get('ShopCode').then((ShopCode) => {
-                            Storage.get('PosCode').then((PosCode) => {
-                                let params = {
-                                    TblName: "ChkPosShopBind",
-                                    ShopCode: ShopCode,
-                                    PosCode: PosCode,
-                                    BindMAC: "",
-                                    SysGuid: IMEI,
-                                }
-                                Storage.get('LinkUrl').then((linkurl) => {
-                                    FetchUtil.post(linkurl, JSON.stringify(params)).then((data) => {
-                                        if (data.retcode == 1) {
-                                            var invoice = "销售";
-                                            this.setState({
-                                                head: invoice,
-                                            });
-                                            var nextRoute = {
-                                                name: "销售",
-                                                component: SellData,
-                                            };
-                                            this.props.navigator.push(nextRoute);
-                                            this._setModalVisible();
-                                        } else {
-                                            var nextRoute = {
-                                                name: "销售",
-                                                component: SellData,
-                                            };
-                                            this.props.navigator.push(nextRoute);
-                                            this._setModalVisible();
-                                        }
+            if(this.state.Disting=="0"||this.state.Disting=="1") {
+                NativeModules.AndroidDeviceInfo.getIMEI((IMEI) => {
+                    Storage.get('Bind').then((tags) => {
+                        Storage.save("invoice", "销售");
+                        Storage.save("Name", "销售");
+                        if (tags == "bindsucceed") {
+                            Storage.get('ShopCode').then((ShopCode) => {
+                                Storage.get('PosCode').then((PosCode) => {
+                                    let params = {
+                                        TblName: "ChkPosShopBind",
+                                        ShopCode: ShopCode,
+                                        PosCode: PosCode,
+                                        BindMAC: "",
+                                        SysGuid: IMEI,
+                                    }
+                                    Storage.get('LinkUrl').then((linkurl) => {
+                                        FetchUtil.post(linkurl, JSON.stringify(params)).then((data) => {
+                                            if (data.retcode == 1) {
+                                                var invoice = "销售";
+                                                this.setState({
+                                                    head: invoice,
+                                                });
+                                                var nextRoute = {
+                                                    name: "销售",
+                                                    component: SellData,
+                                                };
+                                                this.props.navigator.push(nextRoute);
+                                                this._setModalVisible();
+                                            } else {
+                                                var nextRoute = {
+                                                    name: "销售",
+                                                    component: SellData,
+                                                };
+                                                this.props.navigator.push(nextRoute);
+                                                this._setModalVisible();
+                                            }
+                                        })
                                     })
                                 })
                             })
-                        })
-                    } else {
-                        var nextRoute = {
-                            name: "销售",
-                            component: SellData,
-                        };
-                        this.props.navigator.push(nextRoute);
-                        this._setModalVisible();
-                    }
+                        } else {
+                            var nextRoute = {
+                                name: "销售",
+                                component: SellData,
+                            };
+                            this.props.navigator.push(nextRoute);
+                            this._setModalVisible();
+                        }
+                    })
                 })
-            })
+                if(this.state.Disting=="1"){
+                    DeviceEventEmitter.removeAllListeners();
+                }
+            }else{
+                this.Promp();
+            }
         }
     }
 

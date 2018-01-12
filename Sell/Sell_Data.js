@@ -17,6 +17,7 @@ import {
     TouchableOpacity
 } from 'react-native';
 import Index from "../app/Index";
+import Search from "../app/Search";
 import Sell_Data_List from "../Sell/Sell_Data_List";
 import DBAdapter from "../adapter/DBAdapter";
 import Storage from '../utils/Storage';
@@ -112,45 +113,92 @@ export default class SellData extends Component {
     }
 
     Button(){
-        NativeModules.AndroidDeviceInfo.getIMEI((IMEI)=>{
-            if(this.state.ShopCode==""){
-                alert("请选择机构号")
-            }else if(this.state.PosCode==""){
-                alert("请选择pos号")
-            }else{
-                DownLoadBasicData.downLoadPosOpt(this.state.linkurl, this.state.ShopCode, dbAdapter,this.state.PosCode).then((response)=>{
-                    if(response = true){
-                        let params = {
-                            TblName:"PosShopBind",
-                            poscode:this.state.PosCode,
-                            shopcode:this.state.ShopCode,
-                            BindMAC:"",
-                            SysGuid:IMEI,
-                        };
-                        FetchUtil.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
-                            if(data.retcode == 1){
-                                var nextRoute={
-                                    name:"Index",
-                                    component:Index
-                                };
-                                this.props.navigator.push(nextRoute);
-                                Storage.save("Bind","bindsucceed");
-                                Storage.save("ShopCode",this.state.ShopCode);
-                                Storage.save("PosCode",this.state.PosCode);
-                                Storage.save('Name', '销售');
-                                Storage.save("Num", "1");
-                            }else{
-                                alert(JSON.stringify(data))
-                            }
-                        },(err)=>{
-                            alert("网络请求失败");
-                        })
-                    }else{
-                        alert(JSON.stringify(response));
-                    }
-                })
-            }
-        })
+        if(this.state.Disting=="0") {
+            NativeModules.AndroidDeviceInfo.getIMEI((IMEI)=>{
+                if(this.state.ShopCode==""){
+                    alert("请选择机构号")
+                }else if(this.state.PosCode==""){
+                    alert("请选择pos号")
+                }else {
+                    let params = {
+                        TblName: "PosShopBind",
+                        poscode: this.state.PosCode,
+                        shopcode: this.state.ShopCode,
+                        BindMAC: "",
+                        SysGuid: IMEI,
+                    };
+                    FetchUtil.post(this.state.linkurl, JSON.stringify(params)).then((data) => {
+                        if (data.retcode == 1) {
+                            DownLoadBasicData.downLoadPosOpt(this.state.linkurl, this.state.ShopCode, dbAdapter, this.state.PosCode).then((response) => {
+                                if (response = true) {
+                                    var nextRoute = {
+                                        name: "Index",
+                                        component: Index
+                                    };
+                                    this.props.navigator.push(nextRoute);
+                                    Storage.save("Bind", "bindsucceed");
+                                    Storage.save("ShopCode", this.state.ShopCode);
+                                    Storage.save("PosCode", this.state.PosCode);
+                                    Storage.save('Name', '销售');
+                                    Storage.save("Num", "1");
+                                } else {
+                                    alert(JSON.stringify(response));
+                                }
+                            })
+
+                        } else {
+                            alert(JSON.stringify(data))
+                        }
+
+                    }, (err) => {
+                        alert("网络请求失败");
+                    })
+                }
+            })
+
+        }else if(this.state.Disting=="1") {
+            NativeModules.AndroidDeviceInfo.getIMEI((IMEI)=>{
+                if(this.state.ShopCode==""){
+                    alert("请选择机构号")
+                }else if(this.state.PosCode==""){
+                    alert("请选择pos号")
+                }else {
+                    let params = {
+                        TblName: "PosShopBind",
+                        poscode: this.state.PosCode,
+                        shopcode: this.state.ShopCode,
+                        BindMAC: "",
+                        SysGuid: IMEI,
+                    };
+                    FetchUtil.post(this.state.linkurl, JSON.stringify(params)).then((data) => {
+                        if (data.retcode == 1) {
+                            DownLoadBasicData.downLoadPosOpt(this.state.linkurl, this.state.ShopCode, dbAdapter, this.state.PosCode).then((response) => {
+                                if (response = true) {
+                                    var nextRoute={
+                                        name:"Search",
+                                        component:Search,
+                                    };
+                                    this.props.navigator.push(nextRoute);
+                                    Storage.save("Bind", "bindsucceed");
+                                    Storage.save("ShopCode", this.state.ShopCode);
+                                    Storage.save("PosCode", this.state.PosCode);
+                                    Storage.save('Name', '销售');
+                                    Storage.save("Num", "1");
+                                } else {
+                                    alert(JSON.stringify(response));
+                                }
+                            })
+
+                        } else {
+                            alert(JSON.stringify(data))
+                        }
+
+                    }, (err) => {
+                        alert("网络请求失败");
+                    })
+                }
+            })
+        }
     }
 
     render() {

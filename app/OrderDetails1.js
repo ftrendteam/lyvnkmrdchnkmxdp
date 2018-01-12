@@ -15,12 +15,10 @@ import {
   ListView,
   TextInput,
   ScrollView,
-  ToastAndroid，
+  ToastAndroid,
   TouchableOpacity,
   DeviceEventEmitter,
 } from 'react-native';
-import Code from "./Code";
-import home from "./Home";
 import Index from "./Index";
 import Search from "./Search";
 import NumberUtils from "../utils/NumberUtils";

@@ -15,7 +15,6 @@ import {
     Image
 } from 'react-native';
 import Index from "./Index";
-import Home from "./Home";
 import Search from "./Search";
 import ProductCG_list from "./ProductCG_list";
 import ProductXP_list from "./ProductXP_list";

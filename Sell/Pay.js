@@ -26,6 +26,7 @@ import FetchUtil from "../utils/FetchUtils";
 import Storage from "../utils/Storage";
 import NumFormatUtils from "../utils/NumFormatUtils";
 import FormatPrice from "../utils/FormatPrice";
+import BigDecimalUtils from "../utils/BigDecimalUtils";
 import Swiper from 'react-native-swiper';
 import DBAdapter from "../adapter/DBAdapter";
 let dbAdapter = new DBAdapter();
@@ -36,6 +37,7 @@ export default class Pay extends Component {
             total:false,
             RefundTotal:false,
             LayerShow:false,
+            ModalShow:false,
             CardFaceNo:"",
             CardPwd:"",
             name:"",
@@ -49,20 +51,19 @@ export default class Pay extends Component {
             cardfaceno:"",
             DataTime:"",
             RetSerinalNo:"",
+            subtract:"",
             JfBal:this.props.JfBal ? this.props.JfBal : "",
             BalanceTotal:this.props.BalanceTotal ? this.props.BalanceTotal : "",
             ShopAmount:this.props.ShopAmount ? this.props.ShopAmount : "",
             numform:this.props.numform ? this.props.numform : "",
             Seles:this.props.Seles ? this.props.Seles : "",
             dataRows:this.props.dataRows ? this.props.dataRows : "",
-            // dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
             dataSource: new ListView.DataSource({rowHasChanged: (r1, r2) => true}),
 
         }
         this.dataRows = [];
         this.productData = [];
     }
-
     //弹框
     Total() {
         let isShow = this.state.total;
@@ -70,20 +71,34 @@ export default class Pay extends Component {
             total: !isShow,
         })
     }
+
     RefundTotal() {
         let isShow = this.state.RefundTotal;
         this.setState({
             RefundTotal: !isShow,
         })
     }
+
     LayerShow(){
         let isShow = this.state.LayerShow;
         this.setState({
             LayerShow: !isShow,
         })
     }
+
     ModeButton(){
         this.LayerShow();
+    }
+
+    ModalShow(){
+        let isShow = this.state.ModalShow;
+        this.setState({
+            ModalShow: !isShow,
+        })
+    }
+
+    ModalButton(){
+        this.ModalShow();
     }
 
     //物理键
@@ -126,12 +141,12 @@ export default class Pay extends Component {
             }
         })
 
-        Storage.save("ino","0")
-        Storage.save("Ino","0")
+        Storage.save("ino","0");
+        Storage.save("Ino","0");
 
-        this.dbadapter()
+        this.dbadapter();
     }
-// ,'AUTOCUT','CUTDEGREE'
+
     dbadapter(){
         dbAdapter.selectPosOpt('CUTLEVEL').then((rows)=>{
             for(let i =0;i<rows.length;i++){
@@ -146,12 +161,19 @@ export default class Pay extends Component {
                     }
                     if(AUTOCUT=='1'){
                         dbAdapter.selectPosOpt('CUTDEGREE').then((rows)=>{
+                            var round;
+                            var RoundPrice;
+                            var subtract;
                             for(let i =0;i<rows.length;i++){
                                 var row = rows.item(i);
                                 var CUTDEGREE = row.OptValue;
                             }
-                            var round =FormatPrice.round(CUTDEGREE,this.state.ShopAmount,this.state.dataRows);
-                            alert(JSON.stringify(round))
+                            round =FormatPrice.round(CUTDEGREE,this.state.ShopAmount,this.state.dataRows);
+                            subtract = BigDecimalUtils.subtract(this.state.ShopAmount,round,2);
+                            this.setState({
+                                ShopAmount:round,
+                                subtract:subtract,
+                            })
                         })
                     }
                 })
@@ -181,9 +203,8 @@ export default class Pay extends Component {
 
     //继续交易
     JiaoYi(){
-        // dbAdapter.deleteData("shopInfo");
-        // dbAdapter.deleteData("Sum");
-        // dbAdapter.deleteData("Detail");
+        dbAdapter.deleteData("Sum");
+        dbAdapter.deleteData("Detail");
         if(this.dataRows==''){
             var nextRoute = {
                 name: "Sell",
@@ -213,174 +234,152 @@ export default class Pay extends Component {
     }
 
     HorButton(item){
-        if(this.state.Total=="0"){
+        if(this.state.amount==""){
             this.LayerShow();
         }else{
             if(item.item.PayCode=="01"){
-                if(this.state.amount>this.state.Total){
-                    // alert("付款额不能大于剩余金额")
-                    if (this.state.amount == "") {
-                        alert("请输入付款额")
-                    } else if (this.state.payments > this.state.ShopAmount) {
-                        alert("付款额不能大于应付金额");
-                    } else {
-                        if (this.state.Seles == "R") {
-                            this.RefundTotal();
-                        } else if (this.state.Seles == "T") {
-                            this.Total()
-                        }
-                    }
-                }else {
-                    if (this.state.amount == "") {
-                        alert("请输入付款额")
-                    } else if (this.state.payments > this.state.ShopAmount) {
-                        alert("付款额不能大于应付金额")
-                    } else {
-                        if (this.state.Seles == "R") {
+                    if (this.state.Seles == "R") {
+                        if(this.state.amount>Number(this.state.Total)&&this.state.Total<0){
+                            this.ModalShow()
+                        }else {
                             this.RefundTotal()
-                        } else if (this.state.Seles == "T") {
+                        }
+                    } else if (this.state.Seles == "T") {
+                        if(this.state.amount>Number(this.state.Total)&&this.state.Total>0){
+                            this.ModalShow()
+                        }else {
                             this.Total()
                         }
                     }
-                }
             }else if(item.item.PayCode=="00"){
                 if(this.state.Seles=="R"){
-                    if(this.state.amount==""){
-                        alert("请输入付款额")
+                    var payTotal=Number(this.state.amount)+Number(this.state.payments);
+                    this.state.payments += -(Number(this.state.amount));
+                    var payamount =Number(this.state.AMount)-Number(this.state.amount);
+                    var Total = -(BigDecimalUtils.add(this.state.ShopAmount,this.state.payments,2));
+                    var aptotal = BigDecimalUtils.add(payamount,Total,2);
+                    if(this.state.ShopAmount<payTotal){
+                        var Amount = {
+                            'payName': '现金',
+                            'CardFaceNo':'',
+                            'Total':payamount,
+                            'total':aptotal,
+                            'payRT': '',
+                            'PayCode': item.item.PayCode,
+                            'pid': item.item.Pid,
+                        }
                     }else{
-                        var payTotal=parseInt(this.state.amount)+parseInt(this.state.payments);
-                        this.state.payments += -(parseInt(this.state.amount));
-                        var payamount =parseInt(this.state.AMount)-parseInt(this.state.amount);
-                        var Total = -(this.state.ShopAmount + this.state.payments);
-                        var aptotal = parseInt(payamount)+Total;
-                        if(this.state.ShopAmount<payTotal){
-                            var Amount = {
-                                'payName': '现金',
-                                'CardFaceNo':'',
-                                'Total':payamount,
-                                'total':aptotal,
-                                'payRT': '',
-                                'PayCode': item.item.PayCode,
-                                'pid': item.item.Pid,
-                            }
-                        }else{
-                            var Amount = {
-                                'payName': '现金',
-                                'CardFaceNo':'',
-                                'Total':payamount,
-                                'total':payamount,
-                                'payRT': '',
-                                'PayCode': item.item.PayCode,
-                                'pid': item.item.Pid,
-                            }
+                        var Amount = {
+                            'payName': '现金',
+                            'CardFaceNo':'',
+                            'Total':payamount,
+                            'total':payamount,
+                            'payRT': '',
+                            'PayCode': item.item.PayCode,
+                            'pid': item.item.Pid,
                         }
-                        if (this.dataRows.length == 0) {
-                            this.dataRows.push(Amount);
-                            this.setState({
-                                AMount: payamount,
-                                payments: this.state.payments,
-                                payname: "现金",
-                                Total: Total,
-                                cardfaceno: "",
-                                dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
-                            })
-                        } else {
-                            for (let i = 0; i < this.dataRows.length; i++) {
-                                let RowsList = this.dataRows[i];
-                                if (RowsList.payName == "现金") {
-                                    RowsList.Total =payamount;
-                                    RowsList.total =aptotal;
-                                    this.setState({
-                                        AMount: payamount,
-                                        payments: this.state.payments,
-                                        Total: Total,
-                                        cardfaceno: "",
-                                        dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
-                                    });
-                                    break
-                                } else if (i == this.dataRows.length - 1) {
-                                    this.dataRows.push(Amount);
-                                    this.setState({
-                                        AMount: payamount,
-                                        payments: this.state.payments,
-                                        Total: Total,
-                                        cardfaceno: "",
-                                        dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
-                                    })
-                                }
-                            }
-                        }
-                        this.restorage1()
                     }
-                }
-                else if(this.state.Seles=="T"){
-                    if(this.state.amount==""){
-                        alert("请输入付款额")
-                    }else{
-                        var payTotal=parseInt(this.state.amount)+parseInt(this.state.payments);
-                        this.state.payments += parseInt(this.state.amount);
-                        var Total = this.state.ShopAmount - this.state.payments;
-                        var payamount =parseInt(this.state.AMount)+parseInt(this.state.amount);
-                        var aptotal = parseInt(payamount)+Total;
-                        if(this.state.ShopAmount<payTotal){
-                            var Amount = {
-                                'payName': '现金',
-                                'CardFaceNo':'',
-                                'Total':payamount,
-                                'total':aptotal,
-                                'payRT': '',
-                                'PayCode': item.item.PayCode,
-                                'pid': item.item.Pid,
-                            }
-                        }else{
-                            var Amount = {
-                                'payName': '现金',
-                                'CardFaceNo':'',
-                                'Total':payamount,
-                                'total':payamount,
-                                'payRT': '',
-                                'PayCode': item.item.PayCode,
-                                'pid': item.item.Pid,
-                            }
-                        }
-                        if (this.dataRows.length == 0) {
-                            this.dataRows.push(Amount);
-                            this.setState({
-                                AMount: payamount,
-                                payments: this.state.payments,
-                                Total: Total,
-                                cardfaceno: "",
-                                dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
-                            })
-                        } else {
-                            for (let i = 0; i < this.dataRows.length; i++) {
-                                let RowsList = this.dataRows[i];
+                    if (this.dataRows.length == 0) {
+                        this.dataRows.push(Amount);
+                        this.setState({
+                            AMount: payamount,
+                            payments: this.state.payments,
+                            payname: "现金",
+                            Total: Total,
+                            cardfaceno: "",
+                            dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
+                        })
+                    } else {
+                        for (let i = 0; i < this.dataRows.length; i++) {
+                            let RowsList = this.dataRows[i];
+                            if (RowsList.payName == "现金") {
                                 RowsList.Total =payamount;
-                                if (RowsList.payName == "现金") {
-                                    RowsList.total =aptotal;
-                                    this.setState({
-                                        AMount: payamount,
-                                        payments: this.state.payments,
-                                        Total: Total,
-                                        cardfaceno: "",
-                                        dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
-                                    });
-                                    break
-                                } else if (i == this.dataRows.length - 1) {
-                                    this.dataRows.push(Amount);
-                                    this.setState({
-                                        AMount: payamount,
-                                        payments: this.state.payments,
-                                        payname: "现金",
-                                        Total: Total,
-                                        cardfaceno: "",
-                                        dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
-                                    })
-                                }
+                                RowsList.total =aptotal;
+                                this.setState({
+                                    AMount: payamount,
+                                    payments: this.state.payments,
+                                    Total: Total,
+                                    cardfaceno: "",
+                                    dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
+                                });
+                                break
+                            } else if (i == this.dataRows.length - 1) {
+                                this.dataRows.push(Amount);
+                                this.setState({
+                                    AMount: payamount,
+                                    payments: this.state.payments,
+                                    Total: Total,
+                                    cardfaceno: "",
+                                    dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
+                                })
                             }
                         }
-                        this.restorage();
-                    };
+                    }
+                    this.restorage1()
+                } else if(this.state.Seles=="T"){
+                    var payTotal=Number(this.state.amount)+Number(this.state.payments);
+                    this.state.payments += Number(this.state.amount);
+                    var Total = BigDecimalUtils.subtract(this.state.ShopAmount,this.state.payments,2)
+                    var payamount =Number(this.state.AMount)+Number(this.state.amount);
+                    var aptotal = BigDecimalUtils.add(payamount,Total,2);
+                    if(this.state.ShopAmount<payTotal){
+                        var Amount = {
+                            'payName': '现金',
+                            'CardFaceNo':'',
+                            'Total':payamount,
+                            'total':aptotal,
+                            'payRT': '',
+                            'PayCode': item.item.PayCode,
+                            'pid': item.item.Pid,
+                        }
+                    }else{
+                        var Amount = {
+                            'payName': '现金',
+                            'CardFaceNo':'',
+                            'Total':payamount,
+                            'total':payamount,
+                            'payRT': '',
+                            'PayCode': item.item.PayCode,
+                            'pid': item.item.Pid,
+                        }
+                    }
+                    if (this.dataRows.length == 0) {
+                        this.dataRows.push(Amount);
+                        this.setState({
+                            AMount: payamount,
+                            payments: this.state.payments,
+                            Total: Total,
+                            cardfaceno: "",
+                            dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
+                        })
+                    } else {
+                        for (let i = 0; i < this.dataRows.length; i++) {
+                            let RowsList = this.dataRows[i];
+                            RowsList.Total =payamount;
+                            if (RowsList.payName == "现金") {
+                                RowsList.total =aptotal;
+                                this.setState({
+                                    AMount: payamount,
+                                    payments: this.state.payments,
+                                    Total: Total,
+                                    cardfaceno: "",
+                                    dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
+                                });
+                                break
+                            } else if (i == this.dataRows.length - 1) {
+                                this.dataRows.push(Amount);
+                                this.setState({
+                                    AMount: payamount,
+                                    payments: this.state.payments,
+                                    payname: "现金",
+                                    Total: Total,
+                                    cardfaceno: "",
+                                    dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
+                                })
+                            }
+                        }
+                    }
+                    this.restorage();
                 };
             };
         };
@@ -393,7 +392,7 @@ export default class Pay extends Component {
                 Storage.get('Pid').then((Pid) => {
                     Storage.get('usercode').then((usercode) => {
                         Storage.get('userName').then((userName) => {
-                            if (this.state.ShopAmount < this.state.payments) {
+                            if (this.state.ShopAmount == this.state.payments||this.state.ShopAmount < this.state.payments) {
                                 var now = new Date();
                                 var year = now.getFullYear();
                                 var month = now.getMonth() + 1;
@@ -472,40 +471,62 @@ export default class Pay extends Component {
                                     var detailDatas = [];
                                     var detail = {};
                                     detail.LsNo=this.state.numform;
-                                    detail.sDateTime=SumData;
-                                    detail.TradeFlag=this.state.Seles;
-                                    detail.CashierId=Pid;
-                                    detail.CashierCode=usercode;
-                                    detail.CashierName=userName;
-                                    detail.ClerkId=-999;
-                                    detail.ClerkCode="";
-                                    detail.Pid=pid;
-                                    detail.BarCode=BarCode;
-                                    detail.ClerkName="";
-                                    detail.ProdCode=ProdCode;
-                                    detail.ProdName=ProdName;
-                                    detail.DepCode=DepCode;
-                                    detail.Price=ShopPrice;
-                                    detail.Amount=Count;
-                                    detail.DscTotal="";
-                                    detail.Total=prototal;
-                                    detail.AutoDscTotal=ShopPrice;
-                                    detail.HandDsc="";
-                                    detail.InnerNo=InnerNo;
-                                    detail.OrderNo=OrderNo;
-                                    detailDatas.push(detail);
-                                    dbAdapter.insertDetail(detailDatas);
+                                    if(i==0){
+                                        detail.sDateTime=SumData;
+                                        detail.TradeFlag=this.state.Seles;
+                                        detail.CashierId=Pid;
+                                        detail.CashierCode=usercode;
+                                        detail.CashierName=userName;
+                                        detail.ClerkId=-999;
+                                        detail.ClerkCode="";
+                                        detail.Pid=pid;
+                                        detail.BarCode=BarCode;
+                                        detail.ClerkName="";
+                                        detail.ProdCode=ProdCode;
+                                        detail.ProdName=ProdName;
+                                        detail.DepCode=DepCode;
+                                        detail.Price=ShopPrice;
+                                        detail.Amount=Count;
+                                        detail.DscTotal="";
+                                        detail.Total=prototal;
+                                        detail.HandDsc="";
+                                        detail.AutoDscTotal=this.state.subtract;
+                                        detail.InnerNo=InnerNo;
+                                        detail.OrderNo=OrderNo;
+                                        detailDatas.push(detail);
+                                        dbAdapter.insertDetail(detailDatas);
+                                    }else{
+                                        detail.sDateTime=SumData;
+                                        detail.TradeFlag=this.state.Seles;
+                                        detail.CashierId=Pid;
+                                        detail.CashierCode=usercode;
+                                        detail.CashierName=userName;
+                                        detail.ClerkId=-999;
+                                        detail.ClerkCode="";
+                                        detail.Pid=pid;
+                                        detail.BarCode=BarCode;
+                                        detail.ClerkName="";
+                                        detail.ProdCode=ProdCode;
+                                        detail.ProdName=ProdName;
+                                        detail.DepCode=DepCode;
+                                        detail.Price=ShopPrice;
+                                        detail.Amount=Count;
+                                        detail.DscTotal="";
+                                        detail.Total=prototal;
+                                        detail.HandDsc="";
+                                        detail.AutoDscTotal="";
+                                        detail.InnerNo=InnerNo;
+                                        detail.OrderNo=OrderNo;
+                                        detailDatas.push(detail);
+                                        dbAdapter.insertDetail(detailDatas);
+                                    }
                                 };
-                                if(this.state.ShopAmount==this.state.payments||this.state.ShopAmount<this.state.payments){
-                                    this.setState({
-                                        Total: 0,
-                                    });
-                                }
                                 var nextRoute = {
                                     name: "Index",
                                     component: Index,
                                 };
                                 this.props.navigator.push(nextRoute);
+                                // dbAdapter.deleteData("shopInfo");
                                 Storage.delete("VipCardNo");
                                 Storage.delete("BalanceTotal");
                                 Storage.delete("JfBal");
@@ -523,7 +544,7 @@ export default class Pay extends Component {
                     Storage.get('Pid').then((Pid) => {
                         Storage.get('usercode').then((usercode) => {
                             Storage.get('userName').then((userName) => {
-                                if (-this.state.ShopAmount > this.state.payments) {
+                                if (-this.state.ShopAmount == this.state.payments||-this.state.ShopAmount > this.state.payments) {
                                     var now = new Date();
                                     var year = now.getFullYear();
                                     var month = now.getMonth() + 1;
@@ -602,40 +623,62 @@ export default class Pay extends Component {
                                         var detailDatas = [];
                                         var detail = {};
                                         detail.LsNo=this.state.numform;
-                                        detail.sDateTime=SumData;
-                                        detail.TradeFlag=this.state.Seles;
-                                        detail.CashierId=Pid;
-                                        detail.CashierCode=usercode;
-                                        detail.CashierName=userName;
-                                        detail.ClerkId=-999;
-                                        detail.ClerkCode="";
-                                        detail.Pid=pid;
-                                        detail.BarCode=BarCode;
-                                        detail.ClerkName="";
-                                        detail.ProdCode=ProdCode;
-                                        detail.ProdName=ProdName;
-                                        detail.DepCode=DepCode;
-                                        detail.Price=ShopPrice;
-                                        detail.Amount=Count;
-                                        detail.DscTotal="";
-                                        detail.Total=prototal;
-                                        detail.AutoDscTotal=ShopPrice;
-                                        detail.HandDsc="";
-                                        detail.InnerNo=innerno;
-                                        detail.OrderNo=OrderNo;
-                                        detailDatas.push(detail);
-                                        dbAdapter.insertDetail(detailDatas);
+                                        if(i==0){
+                                            detail.sDateTime=SumData;
+                                            detail.TradeFlag=this.state.Seles;
+                                            detail.CashierId=Pid;
+                                            detail.CashierCode=usercode;
+                                            detail.CashierName=userName;
+                                            detail.ClerkId=-999;
+                                            detail.ClerkCode="";
+                                            detail.Pid=pid;
+                                            detail.BarCode=BarCode;
+                                            detail.ClerkName="";
+                                            detail.ProdCode=ProdCode;
+                                            detail.ProdName=ProdName;
+                                            detail.DepCode=DepCode;
+                                            detail.Price=ShopPrice;
+                                            detail.Amount=Count;
+                                            detail.DscTotal="";
+                                            detail.Total=prototal;
+                                            detail.AutoDscTotal=this.state.subtract;
+                                            detail.HandDsc="";
+                                            detail.InnerNo=innerno;
+                                            detail.OrderNo=OrderNo;
+                                            detailDatas.push(detail);
+                                            dbAdapter.insertDetail(detailDatas);
+                                        }else {
+                                            detail.sDateTime=SumData;
+                                            detail.TradeFlag=this.state.Seles;
+                                            detail.CashierId=Pid;
+                                            detail.CashierCode=usercode;
+                                            detail.CashierName=userName;
+                                            detail.ClerkId=-999;
+                                            detail.ClerkCode="";
+                                            detail.Pid=pid;
+                                            detail.BarCode=BarCode;
+                                            detail.ClerkName="";
+                                            detail.ProdCode=ProdCode;
+                                            detail.ProdName=ProdName;
+                                            detail.DepCode=DepCode;
+                                            detail.Price=ShopPrice;
+                                            detail.Amount=Count;
+                                            detail.DscTotal="";
+                                            detail.Total=prototal;
+                                            detail.AutoDscTotal="";
+                                            detail.HandDsc="";
+                                            detail.InnerNo=innerno;
+                                            detail.OrderNo=OrderNo;
+                                            detailDatas.push(detail);
+                                            dbAdapter.insertDetail(detailDatas);
+                                        }
                                     };
-                                    if(-this.state.ShopAmount==this.state.payments||-this.state.ShopAmount>this.state.payments){
-                                        this.setState({
-                                            Total: 0,
-                                        });
-                                    }
                                     var nextRoute = {
                                         name: "Index",
                                         component: Index,
                                     };
                                     this.props.navigator.push(nextRoute);
+                                    // dbAdapter.deleteData("shopInfo");
                                     Storage.delete("VipCardNo");
                                     Storage.delete("BalanceTotal");
                                     Storage.delete("JfBal");
@@ -741,7 +784,7 @@ export default class Pay extends Component {
                                 };
                                 this.dataRows.push(TblRowconcat);
                                 this.state.payments += retcurrJF;
-                                var Total = this.state.ShopAmount - this.state.payments;
+                                var Total = BigDecimalUtils.subtract(this.state.ShopAmount,this.state.payments,2)
                                 this.setState({
                                     payments: this.state.payments,
                                     Amount: retcurrJF,
@@ -856,7 +899,7 @@ export default class Pay extends Component {
                                     };
                                     this.dataRows.push(TblRowconcat);
                                     this.state.payments -= retcurrJF;
-                                    var Total = -this.state.ShopAmount - this.state.payments;
+                                    var Total = -(BigDecimalUtils.add(this.state.ShopAmount,this.state.payments,2));
                                     this.setState({
                                         payments: this.state.payments,
                                         Amount: retcurrJF,
@@ -891,89 +934,88 @@ export default class Pay extends Component {
     render() {
         return (
             <View style={styles.container}>
-                <ScrollView style={styles.ScrollView}>
-                    <View style={styles.header}>
-                        <View style={styles.cont}>
-                            <TouchableOpacity onPress={this.Return.bind(this)}>
-                                <Image source={require("../images/2_01.png")} style={styles.HeaderImage}></Image>
-                            </TouchableOpacity>
-                            <Text style={styles.HeaderList}>付款</Text>
+                <View style={styles.header}>
+                    <View style={styles.cont}>
+                        <TouchableOpacity onPress={this.Return.bind(this)}>
+                            <Image source={require("../images/2_01.png")} style={styles.HeaderImage}></Image>
+                        </TouchableOpacity>
+                        <Text style={styles.HeaderList}>付款</Text>
+                    </View>
+                </View>
+                <View style={styles.TitleCont}>
+                    <View style={styles.FristList}>
+                        <View style={styles.List}>
+                            <View style={styles.ListView1}>
+                                <Text style={[styles.ListText,{textAlign:"center"}]}>应付金额</Text>
+                            </View>
+                        </View>
+                        <View style={styles.List}>
+                            <View style={styles.ListView1}>
+                                <Text style={[styles.ListText,{textAlign:"center"}]}>支付金额</Text>
+                            </View>
+                        </View>
+                        <View style={styles.List}>
+                            <View style={styles.ListView1}>
+                                <Text style={[styles.ListText,{textAlign:"center"}]}>剩余金额</Text>
+                            </View>
                         </View>
                     </View>
-                    <View style={styles.TitleCont}>
-                        <View style={styles.FristList}>
-                            <View style={styles.List}>
-                                <View style={styles.ListView1}>
-                                    <Text style={[styles.ListText,{textAlign:"center"}]}>应付金额</Text>
-                                </View>
-                            </View>
-                            <View style={styles.List}>
-                                <View style={styles.ListView1}>
-                                    <Text style={[styles.ListText,{textAlign:"center"}]}>支付金额</Text>
-                                </View>
-                            </View>
-                            <View style={styles.List}>
-                                <View style={styles.ListView1}>
-                                    <Text style={[styles.ListText,{textAlign:"center"}]}>剩余金额</Text>
-                                </View>
-                            </View>
-                        </View>
-                        <View style={styles.FristList}>
-                            {
-                                (this.state.Seles=="T")?
-                                    <View style={styles.List}>
-                                        <View style={styles.ListView1}>
-                                            <Text style={[styles.ListText,{textAlign:"center"}]}>{this.state.ShopAmount}</Text>
-                                        </View>
-                                    </View>:
-                                    <View style={styles.List}>
-                                        <View style={styles.ListView1}>
-                                            <Text style={[styles.ListText,{textAlign:"center"}]}>-{this.state.ShopAmount}</Text>
-                                        </View>
+                    <View style={styles.FristList}>
+                        {
+                            (this.state.Seles=="T")?
+                                <View style={styles.List}>
+                                    <View style={styles.ListView1}>
+                                        <Text style={[styles.ListText,{textAlign:"center"}]}>{this.state.ShopAmount}</Text>
                                     </View>
-                            }
-                            <View style={styles.List}>
-                                <View style={styles.ListView1}>
-                                    <Text style={[styles.ListText,{textAlign:"center"}]}>{this.state.payments}</Text>
+                                </View>:
+                                <View style={styles.List}>
+                                    <View style={styles.ListView1}>
+                                        <Text style={[styles.ListText,{textAlign:"center"}]}>-{this.state.ShopAmount}</Text>
+                                    </View>
                                 </View>
+                        }
+                        <View style={styles.List}>
+                            <View style={styles.ListView1}>
+                                <Text style={[styles.ListText,{textAlign:"center"}]}>{this.state.payments}</Text>
                             </View>
-                            <View style={styles.List}>
-                                <View style={styles.ListView1}>
-                                    <Text style={[styles.ListText,{textAlign:"center"}]}>{this.state.Total}</Text>
-                                </View>
+                        </View>
+                        <View style={styles.List}>
+                            <View style={styles.ListView1}>
+                                <Text style={[styles.ListText,{textAlign:"center"}]}>{this.state.Total}</Text>
                             </View>
                         </View>
                     </View>
-                    <View style={styles.ShopCont}>
-                        <View style={[{backgroundColor:"#ff4e4e",width:10,height:60,position:"absolute",left:0,}]}></View>
-                        <View style={[{backgroundColor:"#ff4e4e",width:10,height:60,position:"absolute",right:0,}]}></View>
-                        <View style={styles.ShopList}>
-                            <View style={styles.ListTitle}>
-                                <View style={styles.ListClass}>
-                                    <Text style={styles.ListClassText}>付款方式</Text>
-                                </View>
-                                <View style={styles.ListClass}>
-                                    <Text style={styles.ListClassText}>卡号</Text>
-                                </View>
-                                <View style={styles.ListClass}>
-                                    <Text style={styles.ListClassText}>金额</Text>
-                                </View>
-                                <View style={styles.ListClass}>
-                                    <Text style={styles.ListClassText}>余额</Text>
-                                </View>
-                                <View style={styles.ListClass}>
-                                    <Text style={styles.ListClassText}>凭证</Text>
-                                </View>
+                </View>
+                <View style={styles.ShopCont}>
+                    <View style={[{backgroundColor:"#ff4e4e",width:10,height:60,position:"absolute",left:0,}]}></View>
+                    <View style={[{backgroundColor:"#ff4e4e",width:10,height:60,position:"absolute",right:0,}]}></View>
+                    <View style={styles.ShopList}>
+                        <View style={styles.ListTitle}>
+                            <View style={styles.ListClass}>
+                                <Text style={styles.ListClassText}>付款方式</Text>
                             </View>
-
-                            <ListView
-                                style={styles.scrollview}
-                                dataSource={this.state.dataSource}
-                                showsVerticalScrollIndicator={true}
-                                renderRow={this._renderRow.bind(this)}
-                            />
+                            <View style={styles.ListClass}>
+                                <Text style={styles.ListClassText}>卡号</Text>
+                            </View>
+                            <View style={styles.ListClass}>
+                                <Text style={styles.ListClassText}>金额</Text>
+                            </View>
+                            <View style={styles.ListClass}>
+                                <Text style={styles.ListClassText}>余额</Text>
+                            </View>
+                            <View style={styles.ListClass}>
+                                <Text style={styles.ListClassText}>凭证</Text>
+                            </View>
                         </View>
+                        <ListView
+                            style={styles.scrollview}
+                            dataSource={this.state.dataSource}
+                            showsVerticalScrollIndicator={true}
+                            renderRow={this._renderRow.bind(this)}
+                        />
                     </View>
+                </View>
+                <ScrollView style={styles.ScrollView}>
                     <View style={styles.MemberMent}>
                         <View style={styles.Member}>
                             <View style={styles.MemberLeft}>
@@ -1031,205 +1073,225 @@ export default class Pay extends Component {
                             {length: 50, offset: 50 * index, index}
                         )}
                     />
+                    <Modal
+                        transparent={true}
+                        visible={this.state.total}
+                        onShow={() => {
+                        }}
+                        onRequestClose={() => {
+                        }}>
+                        <View style={styles.MemberBounces}>
+                            <View style={styles.Cont}>
+                                <View style={styles.BouncesTitle}>
+                                    <Text style={[styles.TitleText, {fontSize: 18}]}>储值卡</Text>
+                                </View>
+                                <View style={styles.MemberCont}>
+                                    <View style={styles.MemberView}>
+                                        <View style={styles.Card}>
+                                            <Text style={styles.CardText}>卡号：</Text>
+                                        </View>
+                                        <View style={styles.CardNumber}>
+                                            <TextInput
+                                                returnKeyType='search'
+                                                autofocus={true}
+                                                keyboardType="numeric"
+                                                textalign="center"
+                                                underlineColorAndroid='transparent'
+                                                placeholderTextColor="#bcbdc1"
+                                                style={styles.CardTextInput}
+                                                onChangeText={(value) => {
+                                                    this.setState({
+                                                        CardFaceNo: value
+                                                    })
+                                                }}
+                                            />
+                                        </View>
+                                    </View>
+                                    <View style={styles.MemberView}>
+                                        <View style={styles.Card}>
+                                            <Text style={styles.CardText}>密码：</Text>
+                                        </View>
+                                        <View style={styles.CardNumber}>
+                                            <TextInput
+                                                returnKeyType='search'
+                                                autofocus={true}
+                                                keyboardType="numeric"
+                                                textalign="center"
+                                                underlineColorAndroid='transparent'
+                                                placeholderTextColor="#bcbdc1"
+                                                style={styles.CardTextInput}
+                                                onChangeText={(value) => {
+                                                    this.setState({
+                                                        CardPwd: value
+                                                    })
+                                                }}
+                                            />
+                                        </View>
+                                    </View>
+                                    <View style={styles.MemberButton}>
+                                        <TouchableOpacity onPress={this.CloseButton.bind(this)}
+                                                          style={[styles.MemberClose, {marginRight: 15,}]}>
+                                            <Text style={styles.TitleText}>取消</Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity onPress={this.Button.bind(this)} style={styles.MemberClose}>
+                                            <Text style={styles.TitleText}>确定</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
+                            </View>
+                        </View>
+                    </Modal>
+                    <Modal
+                        transparent={true}
+                        visible={this.state.RefundTotal}
+                        onShow={() => {
+                        }}
+                        onRequestClose={() => {
+                        }}>
+                        <View style={styles.MemberBounces}>
+                            <View style={styles.Cont}>
+                                <View style={styles.BouncesTitle}>
+                                    <Text style={[styles.TitleText, {fontSize: 18}]}>储值卡</Text>
+                                </View>
+                                <View style={styles.MemberCont1}>
+                                    <View style={styles.MemberView}>
+                                        <View style={styles.Card}>
+                                            <Text style={styles.CardText}>卡号：</Text>
+                                        </View>
+                                        <View style={styles.CardNumber}>
+                                            <TextInput
+                                                returnKeyType='search'
+                                                autofocus={true}
+                                                keyboardType="numeric"
+                                                textalign="center"
+                                                underlineColorAndroid='transparent'
+                                                placeholderTextColor="#bcbdc1"
+                                                style={styles.CardTextInput}
+                                                onChangeText={(value) => {
+                                                    this.setState({
+                                                        CardFaceNo: value
+                                                    })
+                                                }}
+                                            />
+                                        </View>
+                                    </View>
+                                    <View style={styles.MemberView}>
+                                        <View style={styles.Card}>
+                                            <Text style={styles.CardText}>密码：</Text>
+                                        </View>
+                                        <View style={styles.CardNumber}>
+                                            <TextInput
+                                                returnKeyType='search'
+                                                autofocus={true}
+                                                keyboardType="numeric"
+                                                textalign="center"
+                                                underlineColorAndroid='transparent'
+                                                placeholderTextColor="#bcbdc1"
+                                                style={styles.CardTextInput}
+                                                onChangeText={(value) => {
+                                                    this.setState({
+                                                        CardPwd: value
+                                                    })
+                                                }}
+                                            />
+                                        </View>
+                                    </View>
+                                    <View style={styles.MemberView}>
+                                        <View style={styles.Card}>
+                                            <Text style={styles.CardText}>时间：</Text>
+                                        </View>
+                                        <View style={styles.CardNumber}>
+                                            <TextInput
+                                                returnKeyType='search'
+                                                autofocus={true}
+                                                keyboardType="numeric"
+                                                textalign="center"
+                                                underlineColorAndroid='transparent'
+                                                placeholderTextColor="#bcbdc1"
+                                                style={styles.CardTextInput}
+                                                onChangeText={(value) => {
+                                                    this.setState({
+                                                        DataTime: value
+                                                    })
+                                                }}
+                                            />
+                                        </View>
+                                    </View>
+                                    <View style={styles.MemberView}>
+                                        <View style={styles.Card}>
+                                            <Text style={styles.CardText}>退货凭证：</Text>
+                                        </View>
+                                        <View style={styles.CardNumber}>
+                                            <TextInput
+                                                returnKeyType='search'
+                                                autofocus={true}
+                                                keyboardType="numeric"
+                                                textalign="center"
+                                                underlineColorAndroid='transparent'
+                                                placeholderTextColor="#bcbdc1"
+                                                style={styles.CardTextInput}
+                                                onChangeText={(value) => {
+                                                    this.setState({
+                                                        RetSerinalNo: value
+                                                    })
+                                                }}
+                                            />
+                                        </View>
+                                    </View>
+                                    <View style={styles.MemberButton}>
+                                        <TouchableOpacity onPress={this.CloseRetButton.bind(this)}
+                                                          style={[styles.MemberClose, {marginRight: 15,}]}>
+                                            <Text style={styles.TitleText}>取消</Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity onPress={this.RetButton.bind(this)} style={styles.MemberClose}>
+                                            <Text style={styles.TitleText}>确定</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
+                            </View>
+                        </View>
+                    </Modal>
+                    <Modal
+                        transparent={true}
+                        visible={this.state.LayerShow}
+                        onShow={() => {}}
+                        onRequestClose={() => {}} >
+                        <Image source={require("../images/background.png")} style={styles.ModalStyle}>
+                            <View style={styles.ModalStyleCont}>
+                                <View style={styles.ModalStyleTitle}>
+                                    <Text style={styles.ModalTitleText}>
+                                        请输入付款额
+                                    </Text>
+                                </View>
+                                <TouchableOpacity onPress={this.ModeButton.bind(this)} style={styles.Button}>
+                                    <Text style={styles.ModalTitleText}>
+                                        好的
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                        </Image>
+                    </Modal>
+                    <Modal
+                        transparent={true}
+                        visible={this.state.ModalShow}
+                        onShow={() => {}}
+                        onRequestClose={() => {}} >
+                        <Image source={require("../images/background.png")} style={styles.ModalStyle}>
+                            <View style={styles.ModalStyleCont}>
+                                <View style={styles.ModalStyleTitle}>
+                                    <Text style={styles.ModalTitleText}>
+                                        付款额不能大于剩余金额
+                                    </Text>
+                                </View>
+                                <TouchableOpacity onPress={this.ModalButton.bind(this)} style={styles.Button}>
+                                    <Text style={styles.ModalTitleText}>
+                                        好的
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                        </Image>
+                    </Modal>
                 </ScrollView>
-                <Modal
-                    transparent={true}
-                    visible={this.state.total}
-                    onShow={() => {
-                    }}
-                    onRequestClose={() => {
-                    }}>
-                    <View style={styles.MemberBounces}>
-                        <View style={styles.Cont}>
-                            <View style={styles.BouncesTitle}>
-                                <Text style={[styles.TitleText, {fontSize: 18}]}>储值卡</Text>
-                            </View>
-                            <View style={styles.MemberCont}>
-                                <View style={styles.MemberView}>
-                                    <View style={styles.Card}>
-                                        <Text style={styles.CardText}>卡号：</Text>
-                                    </View>
-                                    <View style={styles.CardNumber}>
-                                        <TextInput
-                                            returnKeyType='search'
-                                            autofocus={true}
-                                            keyboardType="numeric"
-                                            textalign="center"
-                                            underlineColorAndroid='transparent'
-                                            placeholderTextColor="#bcbdc1"
-                                            style={styles.CardTextInput}
-                                            onChangeText={(value) => {
-                                                this.setState({
-                                                    CardFaceNo: value
-                                                })
-                                            }}
-                                        />
-                                    </View>
-                                </View>
-                                <View style={styles.MemberView}>
-                                    <View style={styles.Card}>
-                                        <Text style={styles.CardText}>密码：</Text>
-                                    </View>
-                                    <View style={styles.CardNumber}>
-                                        <TextInput
-                                            returnKeyType='search'
-                                            autofocus={true}
-                                            keyboardType="numeric"
-                                            textalign="center"
-                                            underlineColorAndroid='transparent'
-                                            placeholderTextColor="#bcbdc1"
-                                            style={styles.CardTextInput}
-                                            onChangeText={(value) => {
-                                                this.setState({
-                                                    CardPwd: value
-                                                })
-                                            }}
-                                        />
-                                    </View>
-                                </View>
-                                <View style={styles.MemberButton}>
-                                    <TouchableOpacity onPress={this.CloseButton.bind(this)}
-                                                      style={[styles.MemberClose, {marginRight: 15,}]}>
-                                        <Text style={styles.TitleText}>取消</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity onPress={this.Button.bind(this)} style={styles.MemberClose}>
-                                        <Text style={styles.TitleText}>确定</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-                        </View>
-                    </View>
-                </Modal>
-                <Modal
-                    transparent={true}
-                    visible={this.state.RefundTotal}
-                    onShow={() => {
-                    }}
-                    onRequestClose={() => {
-                    }}>
-                    <View style={styles.MemberBounces}>
-                        <View style={styles.Cont}>
-                            <View style={styles.BouncesTitle}>
-                                <Text style={[styles.TitleText, {fontSize: 18}]}>储值卡</Text>
-                            </View>
-                            <View style={styles.MemberCont1}>
-                                <View style={styles.MemberView}>
-                                    <View style={styles.Card}>
-                                        <Text style={styles.CardText}>卡号：</Text>
-                                    </View>
-                                    <View style={styles.CardNumber}>
-                                        <TextInput
-                                            returnKeyType='search'
-                                            autofocus={true}
-                                            keyboardType="numeric"
-                                            textalign="center"
-                                            underlineColorAndroid='transparent'
-                                            placeholderTextColor="#bcbdc1"
-                                            style={styles.CardTextInput}
-                                            onChangeText={(value) => {
-                                                this.setState({
-                                                    CardFaceNo: value
-                                                })
-                                            }}
-                                        />
-                                    </View>
-                                </View>
-                                <View style={styles.MemberView}>
-                                    <View style={styles.Card}>
-                                        <Text style={styles.CardText}>密码：</Text>
-                                    </View>
-                                    <View style={styles.CardNumber}>
-                                        <TextInput
-                                            returnKeyType='search'
-                                            autofocus={true}
-                                            keyboardType="numeric"
-                                            textalign="center"
-                                            underlineColorAndroid='transparent'
-                                            placeholderTextColor="#bcbdc1"
-                                            style={styles.CardTextInput}
-                                            onChangeText={(value) => {
-                                                this.setState({
-                                                    CardPwd: value
-                                                })
-                                            }}
-                                        />
-                                    </View>
-                                </View>
-                                <View style={styles.MemberView}>
-                                    <View style={styles.Card}>
-                                        <Text style={styles.CardText}>时间：</Text>
-                                    </View>
-                                    <View style={styles.CardNumber}>
-                                        <TextInput
-                                            returnKeyType='search'
-                                            autofocus={true}
-                                            keyboardType="numeric"
-                                            textalign="center"
-                                            underlineColorAndroid='transparent'
-                                            placeholderTextColor="#bcbdc1"
-                                            style={styles.CardTextInput}
-                                            onChangeText={(value) => {
-                                                this.setState({
-                                                    DataTime: value
-                                                })
-                                            }}
-                                        />
-                                    </View>
-                                </View>
-                                <View style={styles.MemberView}>
-                                    <View style={styles.Card}>
-                                        <Text style={styles.CardText}>退货凭证：</Text>
-                                    </View>
-                                    <View style={styles.CardNumber}>
-                                        <TextInput
-                                            returnKeyType='search'
-                                            autofocus={true}
-                                            keyboardType="numeric"
-                                            textalign="center"
-                                            underlineColorAndroid='transparent'
-                                            placeholderTextColor="#bcbdc1"
-                                            style={styles.CardTextInput}
-                                            onChangeText={(value) => {
-                                                this.setState({
-                                                    RetSerinalNo: value
-                                                })
-                                            }}
-                                        />
-                                    </View>
-                                </View>
-                                <View style={styles.MemberButton}>
-                                    <TouchableOpacity onPress={this.CloseRetButton.bind(this)}
-                                                      style={[styles.MemberClose, {marginRight: 15,}]}>
-                                        <Text style={styles.TitleText}>取消</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity onPress={this.RetButton.bind(this)} style={styles.MemberClose}>
-                                        <Text style={styles.TitleText}>确定</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-                        </View>
-                    </View>
-                </Modal>
-                <Modal
-                    transparent={true}
-                    visible={this.state.LayerShow}
-                    onShow={() => {}}
-                    onRequestClose={() => {}} >
-                    <Image source={require("../images/background.png")} style={styles.ModalStyle}>
-                        <View style={styles.ModalStyleCont}>
-                            <View style={styles.ModalStyleTitle}>
-                                <Text style={styles.ModalTitleText}>
-                                    交易成功，无需再次支付
-                                </Text>
-                            </View>
-                            <TouchableOpacity onPress={this.ModeButton.bind(this)} style={styles.Button}>
-                                <Text style={styles.ModalTitleText}>
-                                    好的
-                                </Text>
-                            </TouchableOpacity>
-                        </View>
-                    </Image>
-                </Modal>
             </View>
         );
     }
