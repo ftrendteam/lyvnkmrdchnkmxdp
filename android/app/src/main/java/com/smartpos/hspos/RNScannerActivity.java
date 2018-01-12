@@ -34,7 +34,14 @@ public class RNScannerActivity extends ReactContextBaseJavaModule{
             IntentFilter intentFilter = new IntentFilter(SCN_CUST_ACTION_SCODE);
             getReactApplicationContext().registerReceiver(mSamDataReceiver, intentFilter);
         if ("sq39Q".equals(android.os.Build.MODEL)) {
+               System.out.println("sq39Q".equals(android.os.Build.MODEL));
                mScanManager = new ScanManager();
+                mScanManager.openScanner();
+                       mScanManager.switchOutputMode(0);
+                      // soundpool = new SoundPool(1, AudioManager.STREAM_NOTIFICATION, 100);
+                       // MODE_RINGTONE
+                       //soundid = soundpool.load("/etc/Scan_new.ogg", 1);
+
                IntentFilter filter2 = new IntentFilter();
                int[] idbuf = new int[]{PropertyID.WEDGE_INTENT_ACTION_NAME,
                        PropertyID.WEDGE_INTENT_DATA_STRING_TAG};
@@ -46,7 +53,7 @@ public class RNScannerActivity extends ReactContextBaseJavaModule{
                    filter2.addAction(SCAN_ACTION);
                }
                reactContext.registerReceiver(mScanReceiver, filter2);
-               getReactApplicationContext().registerReceiver(mScanReceiver, intentFilter);
+               //getReactApplicationContext().registerReceiver(mScanReceiver, filter2);
                //Scanner.getInstance(reactContext).openScanner();
             }
 
@@ -69,6 +76,8 @@ public class RNScannerActivity extends ReactContextBaseJavaModule{
                 //Intent scannerIntent = new Intent(SCN_CUST_ACTION_START);
                 //reactContext.sendBroadcast(scannerIntent);
 
+            }else if("sq39Q".equals(android.os.Build.MODEL)){
+
             }else{
                 Intent startIntent = new Intent(reactContext,ScannerMainActivity.class);
                 startIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
@@ -79,6 +88,7 @@ public class RNScannerActivity extends ReactContextBaseJavaModule{
         private BroadcastReceiver mSamDataReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
+            System.out.println("wtf?");
                 if (intent.getAction().equals(SCN_CUST_ACTION_SCODE)) {
                    String message = intent.getStringExtra(SCN_CUST_EX_SCODE);
                    reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("code",message);
@@ -86,7 +96,7 @@ public class RNScannerActivity extends ReactContextBaseJavaModule{
                 }
             }
         };
-
+        //条码
         private BroadcastReceiver mScanReceiver = new BroadcastReceiver() {
 
                 @Override
@@ -96,7 +106,7 @@ public class RNScannerActivity extends ReactContextBaseJavaModule{
                     //soundpool.play(soundid, 1, 1, 0, 0, 1);
 
                     //mVibrator.vibrate(100);
-
+System.out.println("wtf2");
                     byte[] barcode = intent.getByteArrayExtra(ScanManager
                             .DECODE_DATA_TAG);
                     int barcodelen = intent.getIntExtra(ScanManager
