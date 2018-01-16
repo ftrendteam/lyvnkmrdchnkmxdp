@@ -2551,8 +2551,8 @@ const styles = StyleSheet.create({
     },
     ModalStyleTitle:{
         height:40,
-        paddingLeft:50,
-        paddingRight:50,
+        paddingLeft:80,
+        paddingRight:80,
         borderBottomWidth:1,
         borderBottomColor:"#f5f5f5",
     },

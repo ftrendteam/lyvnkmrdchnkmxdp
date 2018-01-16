@@ -516,9 +516,9 @@ export default class Search extends Component {
             <View style={styles.container}>
                 <View style={styles.Title}>
                     <TextInput
-                        autofocus={true}
-                        style={styles.Search}
+                        autoFocus={true}
                         returnKeyType="search"
+                        style={styles.Search}
                         placeholder="请输入搜索商品名称"
                         placeholderColor="#999999"
                         underlineColorAndroid='transparent'
@@ -610,7 +610,6 @@ export default class Search extends Component {
                                         <Text style={[styles.left, {marginTop: 9,}]}>备注</Text>
                                         <TextInput
                                             style={styles.Number1}
-                                            autofocus={true}
                                             underlineColorAndroid='transparent'
                                             value={this.state.Remark.toString()}
                                             onChangeText={(value) => {

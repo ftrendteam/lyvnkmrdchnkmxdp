@@ -28,6 +28,7 @@ import Index from "./Index";
 import HistoricalDocument from "./HistoricalDocument";
 import Search from "./Search1";
 import OrderDetails from "./OrderDetails3";
+import SunYi from "./SunYi";
 import Query from "./Query";
 import Distrition from "./Distrition";
 import ProductCG from "./ProductCG";
@@ -40,6 +41,7 @@ import FetchUtils from "../utils/FetchUtils";
 import DBAdapter from "../adapter/DBAdapter";
 import Storage from "../utils/Storage";
 import SideMenu from 'react-native-side-menu';
+import { SwipeListView } from 'react-native-swipe-list-view';
 
 var {NativeModules} = require('react-native');
 var RNScannerAndroid = NativeModules.RNScannerAndroid;
@@ -76,8 +78,9 @@ export default class ShoppingCart extends Component {
             LinkUrl:"",
             BeiZhu:"暂无备注",
             dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
+            ds:new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
         };
-        this.dataRows = [];
+        this.ds = [];
     }
 
     //自动跑接口
@@ -137,14 +140,14 @@ export default class ShoppingCart extends Component {
             //this._ModalVisible();
             var shopnumber = 0;
             var shopAmount = 0;
-            this.dataRows=[];
+            this.ds=[];
             for(let i =0;i<rows.length;i++){
                 var row = rows.item(i);
                 var number = row.countm;
                 shopAmount += parseInt(row.prototal);
                 shopnumber += parseInt(row.countm);
                 if(number!==0){
-                    this.dataRows.push(row);
+                    this.ds.push(row);
                 }
             }
             if(this.dataRows==0){
@@ -155,7 +158,7 @@ export default class ShoppingCart extends Component {
                     number1:number,
                     ShopNumber:shopnumber,//数量
                     ShopAmount:shopAmount,//总金额
-                    dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
+                    ds:this.state.ds.cloneWithRows(this.ds)
                 })
                 this.modal();
             }
@@ -217,7 +220,7 @@ export default class ShoppingCart extends Component {
         });
     }
 
-    _renderRow(rowData, sectionID, rowID){
+    renderRow(rowData, sectionID, rowID){
         return (
             <TouchableOpacity style={styles.ShopList} onPress={()=>this.OrderDetails(rowData)}>
                 <View style={styles.ShopTop}>
@@ -227,6 +230,14 @@ export default class ShoppingCart extends Component {
                     <Text style={[styles.SmallScale,styles.Name1]}>{rowData.prototal}</Text>
                 </View>
             </TouchableOpacity>
+        );
+    }
+
+    renderHiddenRow(rowData, sectionID, rowID){
+        return (
+            <View style={styles.rowBack}>
+                <Text style={styles.rowBackText}>删除</Text>
+            </View>
         );
     }
 
@@ -752,7 +763,16 @@ export default class ShoppingCart extends Component {
                 this.props.navigator.push(nextRoute);
                 this.DataSource();
             }
-            if(tags=="要货单"||tags=="损溢单"||tags=="实时盘点单"){
+            if(tags=="损溢单"){
+                this.Succeed();
+                var nextRoute={
+                    name:"SunYi",
+                    component:SunYi
+                };
+                this.props.navigator.push(nextRoute);
+                this.DataSource();
+            }
+            if(tags=="要货单"||tags=="实时盘点单"){
                 this.DataSource();
                 this.Succeed();
             }
@@ -808,10 +828,11 @@ export default class ShoppingCart extends Component {
                         <Text style={styles.SmallScale}>小计</Text>
                     </View>
                     <View>
-                        <ListView
-                            dataSource={this.state.dataSource}
-                            showsVerticalScrollIndicator={true}
-                            renderRow={this._renderRow.bind(this)}
+                        <SwipeListView
+                            dataSource={this.state.ds}
+                            renderRow={this.renderRow.bind(this)}
+                            renderHiddenRow={this.renderHiddenRow.bind(this)}
+                            rightOpenValue={-100}
                         />
                     </View>
                 </View>
@@ -1422,4 +1443,15 @@ const styles = StyleSheet.create({
         fontSize:16,
         textAlign:"center"
     },
+    rowBack:{
+        backgroundColor:"#ff4e4e",
+        paddingTop:18,
+        paddingBottom:18,
+        paddingRight:20
+    },
+    rowBackText:{
+        color:"#ffffff",
+        fontSize:16,
+        textAlign:"right"
+    }
 });

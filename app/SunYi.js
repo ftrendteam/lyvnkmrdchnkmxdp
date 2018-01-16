@@ -43,7 +43,11 @@ export default class SunYi extends Component {
     }
 
     Return(){
-        this.props.navigator.pop();
+        var nextRoute={
+            name:"Index",
+            component:Index
+        };
+        this.props.navigator.push(nextRoute);
     }
 
     BaoSun(){

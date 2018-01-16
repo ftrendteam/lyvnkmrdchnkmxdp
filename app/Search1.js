@@ -608,7 +608,6 @@ export default class Search extends Component {
                                         <Text style={[styles.left, {marginTop: 9,}]}>备注</Text>
                                         <TextInput
                                             style={styles.Number1}
-                                            autofocus={true}
                                             underlineColorAndroid='transparent'
                                             value={this.state.Remark.toString()}
                                             onChangeText={(value) => {

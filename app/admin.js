@@ -346,7 +346,6 @@ export default class admin extends Component {
                     <View style={[styles.TextInput,{marginTop:15}]}>
                         <TextInput
                             returnKeyType='search'
-                            autofocus={true}
                             secureTextEntry={true}
                             numberoflines={1}
                             keyboardType="numeric"
@@ -366,7 +365,6 @@ export default class admin extends Component {
                     <View style={[styles.TextInput,{marginTop:15}]}>
                         <TouchableOpacity onPress={this.PickedDate.bind(this)}>
                             <TextInput
-                                autofocus={true}
                                 editable={false}
                                 defaultValue ={this.state.sCode1}
                                 placeholder="请选择机构信息"
