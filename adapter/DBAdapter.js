@@ -33,6 +33,8 @@ export default class DBAdapter extends SQLiteOpenHelper {
     db.transaction((tx) => {
       tx.executeSql('delete from ' + dbName + '', [], () => {
       
+      }, (err) => {
+        console.log("detele=", err);
       });
     });
   }
@@ -170,24 +172,30 @@ export default class DBAdapter extends SQLiteOpenHelper {
    */
   insertPosOpt(datas) {
     let len = datas.length;
+    console.log(len);
     if (!db) {
       this.open();
     }
-    this.deleteData("PosOpt");
-    db.transaction((tx) => {
-      for (let i = 0; i < len; i++) {
-        let data = datas[i];
-        let posCode = data.PosCode;
-        let shopCode = data.ShopCode;
-        let optName = data.OptName;
-        let optValue = data.OptValue;
-        let sql = "INSERT INTO PosOpt(PosCode,ShopCode,OptName,OptValue) values(?,?,?,?)";
-        tx.executeSql(sql, [posCode, shopCode, optName, optValue], () => {
-        }, (err) => {
-          console.log(err)
-        });
-      }
-    });
+    try {
+      this.deleteData("PosOpt");
+      db.transaction((tx) => {
+        for (let i = 0; i < len; i++) {
+          let data = datas[i];
+          let posCode = data.PosCode;
+          let shopCode = data.ShopCode;
+          let optName = data.OptName;
+          let optValue = data.OptValue;
+          let sql = "INSERT INTO PosOpt(PosCode,ShopCode,OptName,OptValue) values(?,?,?,?)";
+          tx.executeSql(sql, [posCode, shopCode, optName, optValue], () => {
+          }, (err) => {
+            console.log(err)
+          });
+        }
+      });
+    } catch (err) {
+      console.log("err", err);
+    }
+    
   }
   
   /***
@@ -384,7 +392,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
           //   "prodname":"海鲜菇","countm":1.0000,"kccount":0.0,"prototal":1.0000,"unit":"kg  ","promemo":""
           let sql = " replace INTO shopInfo(pid,ProdCode,prodname,countm,ShopPrice,prototal,promemo,DepCode,ydcountm,SuppCode,BarCode)" +
             "values(?,?,?,?,?,?,?,?,?,?,?)";
-          tx.executeSql(sql, [Pid, ProdCode, shopName, ShopNumber, ShopPrice, ShopAmount, ShopRemark, DepCode, ydcountm, suppCode,BarCode], () => {
+          tx.executeSql(sql, [Pid, ProdCode, shopName, ShopNumber, ShopPrice, ShopAmount, ShopRemark, DepCode, ydcountm, suppCode, BarCode], () => {
               resolve(true);
             }, (err) => {
               reject(false);
@@ -1077,50 +1085,58 @@ export default class DBAdapter extends SQLiteOpenHelper {
    *保存流水表Sum
    */
   insertSum(sumDatas) {
+    console.log("wtfsadfas");
     db.transaction((tx) => {
       for (let i = 0; i < sumDatas.length; i++) {
-        try{
-            let sum = sumDatas[i];
-            let lsNo = sum.LsNo;
-            let sDateTime = sum.sDateTime;
-            let tradeFlag = sum.TradeFlag;
-            let cashierId = sum.CashierId;
-            let cashierCode = sum.CashierCode;
-            let ino = sum.ino;
-            let cashierName = sum.CashierName;
-            let dscTotal = sum.DscTotal;
-            let autoDscTotal = sum.AutoDscTotal;
-            let total = sum.Total;
-            let totalPay = sum.TotalPay;
-            let change = sum.Change;
-            let custType = sum.CustType;
-            let custCode = sum.CustCode;
-            let invCode = sum.InvCode;
-            let payId = sum.PayId;
-            let payCode = sum.PayCode;
-            let amount = sum.Amount;
-            let oldAmount = sum.OldAmount;
-            let tendPayCode = sum.TendPayCode;
-            let vipTotal = sum.VipTotal;
-            let tScore = sum.TScore;
-            let vipSCore = sum.VipSCore;
-            let innerNo = sum.InnerNo;
-            let transFlag = sum.TransFlag;
-            let transDateTime = sum.TransDateTime;
-            let ywDate = sum.YWDate;
-            let sql = "insert into Sum(LsNo,sDateTime,TradeFlag,CashierId,CashierCode,ino,CashierName,DscTotal,AutoDscTotal,Total,TotalPay,Change,CustType,CustCode,InvCode," +
-                "PayId,PayCode,Amount,OldAmount,TendPayCode,VipTotal,TScore,VipSCore,InnerNo,TransFlag,TransDateTime,YWDate) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        try {
+          let sum = sumDatas[i];
+          let lsNo = sum.LsNo;
+          let sDateTime = sum.sDateTime;
+          let tradeFlag = sum.TradeFlag;
+          let cashierId = sum.CashierId;
+          let cashierCode = sum.CashierCode;
+          let ino = sum.ino;
+          let cashierName = sum.CashierName;
+          let dscTotal = sum.DscTotal;
+          let autoDscTotal = sum.AutoDscTotal;
+          let total = sum.Total;
+          let totalPay = sum.TotalPay;
+          let change = sum.Change;
+          let custType = sum.CustType;
+          let custCode = sum.CustCode;
+          let invCode = sum.InvCode;
+          let payId = sum.PayId;
+          let payCode = sum.PayCode;
+          let amount = sum.Amount;
+          let oldAmount = sum.OldAmount;
+          let tendPayCode = sum.TendPayCode;
+          let vipTotal = sum.VipTotal;
+          let tScore = sum.TScore;
+          let vipSCore = sum.VipSCore;
+          let innerNo = sum.InnerNo;
+          let transFlag = sum.TransFlag;
+          let transDateTime = sum.TransDateTime;
+          let ywDate = sum.YWDate;
+          console.log(lsNo, sDateTime, tradeFlag, cashierId, cashierCode, ino, cashierName, dscTotal, autoDscTotal, total, totalPay, change, custType, custCode,
+            invCode, payId, payCode, amount, oldAmount, tendPayCode, vipTotal, tScore, vipSCore, innerNo, transFlag, transDateTime, ywDate);
+          let sql = "insert into Sum(LsNo,sDateTime,TradeFlag,CashierId,CashierCode,ino,CashierName,DscTotal,AutoDscTotal,Total,TotalPay,Change,CustType,CustCode,InvCode," +
+            "PayId,PayCode,Amount,OldAmount,TendPayCode,VipTotal,TScore,VipSCore,InnerNo,TransFlag,TransDateTime,YWDate) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+          try{
             tx.executeSql(sql, [lsNo, sDateTime, tradeFlag, cashierId, cashierCode, ino, cashierName, dscTotal, autoDscTotal, total, totalPay, change, custType, custCode,
-                    invCode, payId, payCode, amount, oldAmount, tendPayCode, vipTotal, tScore, vipSCore, innerNo, transFlag, transDateTime, ywDate], (tx, results) => {
-                    //resolve((results.rows));
-                }, (error) => {
-                    console.log("err===", error);
-                }
+                invCode, payId, payCode, amount, oldAmount, tendPayCode, vipTotal, tScore, vipSCore, innerNo, transFlag, transDateTime, ywDate], (tx, results) => {
+                //resolve((results.rows));
+              }, (err) => {
+                console.log("err===", err);
+              }
             );
-        }catch (error){
-          console.log("err2==",error);
+          }catch (err){
+            console.log(err);
+          }
+         
+        } catch (err) {
+          console.log("err2==", err);
         }
-
+        
       }
       
     });
@@ -1133,70 +1149,75 @@ export default class DBAdapter extends SQLiteOpenHelper {
   insertDetail(detailDatas) {
     db.transaction((tx) => {
       for (let i = 0; i < detailDatas.length; i++) {
-          try {
-              let detail = detailDatas[i];
-              let lsNo = detail.LsNo;
-              let sDateTime = detail.sDateTime;
-              let tradeFlag = detail.TradeFlag;
-              let cashierId = detail.CashierId;
-              let cashierCode = detail.CashierCode;
-              let cashierName = detail.CashierName;
-              let clerkId = detail.ClerkId;
-              let clerkCode = detail.ClerkCode;
-              let pid = detail.Pid;
-              let barCode = detail.BarCode;
-              let clerkName = detail.ClerkName;
-              let prodCode = detail.ProdCode;
-              let prodName = detail.ProdName;
-              let depCode = detail.DepCode;
-              let price = detail.Price;
-              let amount = detail.Amount;
-              let dscTotal = detail.DscTotal;
-              let total = detail.Total;
-              let autoDscTotal = detail.AutoDscTotal;
-              let handDsc = detail.HandDsc;
-              let cxDsc = detail.CxDsc;
-              let evenDsc = detail.EvenDsc;
-              let mljDsc = detail.MljDsc;
-              let overDsc = detail.OverDsc;
-              let otherDsc = detail.OtherDsc;
-              let tranDsc = detail.TranDsc;
-              let vipDsc = detail.VipDsc;
-              let innerNo = detail.InnerNo;
-              let orderNo = detail.OrderNo;
-              let transFlag = detail.TransFlag;
-              let transDateTime = detail.TransDateTime;
-              let brandDsc = detail.BrandDsc;
-              let subProd = detail.isSubProd;
-              let minus = detail.isMinus;
-              let buyPresentCode = detail.BuyPresentCode;
-              let buyPresentGroupNo = detail.BuyPresentGroupNo;
-              let bpUsedCountN = detail.BPUsedCountN;
-              let dscFormNo = detail.DscFormNo;
-              let dscMJFormNo = detail.DscMJFormNo;
-              let ssid = detail.SSID;
-              let dscMZFormNo = detail.DscMZFormNo;
-              let dscGSFormNo = detail.DscGSFormNo;
-              let gsUsedCountN = detail.GSUsedCountN;
-              let ywDate = detail.YWDate;
-              let sql = "insert into Detail(LsNo,sDateTime,TradeFlag,CashierId,CashierCode,CashierName,ClerkId,ClerkCode,Pid," +
-                  "BarCode,ClerkName,ProdCode,ProdName,DepCode,Price,Amount,DscTotal,Total,AutoDscTotal,HandDsc,CxDsc,EvenDsc,MljDsc," +
-                  "OverDsc,OtherDsc,TranDsc,VipDsc,InnerNo,OrderNo,TransFlag,TransDateTime,BrandDsc,isSubProd,isMinus,BuyPresentCode," +
-                  "BuyPresentGroupNo,BPUsedCountN,DscFormNo,DscMJFormNo,SSID,DscMZFormNo,DscGSFormNo,GSUsedCountN,YWDate) values(" +
-                  "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-              tx.executeSql(sql, [lsNo, sDateTime, tradeFlag, cashierId, cashierCode, cashierName, clerkId, clerkCode,
-                      pid, barCode, clerkName, prodCode, prodName, depCode, price, amount, dscTotal, total, autoDscTotal,
-                      handDsc, cxDsc, evenDsc, mljDsc, overDsc, otherDsc, tranDsc, vipDsc, innerNo, orderNo, transFlag,
-                      transDateTime, brandDsc, subProd, minus, buyPresentCode, buyPresentGroupNo, bpUsedCountN, dscFormNo,
-                      dscMJFormNo, ssid, dscMZFormNo, dscGSFormNo, gsUsedCountN, ywDate], (tx, results) => {
-                      //resolve((results.rows));
-                  }, (error) => {
-                      console.log("err===", error);
-                  }
-              );
-          }catch (error){
-              console.log("err2==",error);
-          }
+        try {
+          let detail = detailDatas[i];
+          let lsNo = detail.LsNo;
+          let sDateTime = detail.sDateTime;
+          let tradeFlag = detail.TradeFlag;
+          let cashierId = detail.CashierId;
+          let cashierCode = detail.CashierCode;
+          let cashierName = detail.CashierName;
+          let clerkId = detail.ClerkId;
+          let clerkCode = detail.ClerkCode;
+          let pid = detail.Pid;
+          let barCode = detail.BarCode;
+          let clerkName = detail.ClerkName;
+          let prodCode = detail.ProdCode;
+          let prodName = detail.ProdName;
+          let depCode = detail.DepCode;
+          let price = detail.Price;
+          let amount = detail.Amount;
+          let dscTotal = detail.DscTotal;
+          let total = detail.Total;
+          let autoDscTotal = detail.AutoDscTotal;
+          let handDsc = detail.HandDsc;
+          let cxDsc = detail.CxDsc;
+          let evenDsc = detail.EvenDsc;
+          let mljDsc = detail.MljDsc;
+          let overDsc = detail.OverDsc;
+          let otherDsc = detail.OtherDsc;
+          let tranDsc = detail.TranDsc;
+          let vipDsc = detail.VipDsc;
+          let innerNo = detail.InnerNo;
+          let orderNo = detail.OrderNo;
+          let transFlag = detail.TransFlag;
+          let transDateTime = detail.TransDateTime;
+          let brandDsc = detail.BrandDsc;
+          let subProd = detail.isSubProd;
+          let minus = detail.isMinus;
+          let buyPresentCode = detail.BuyPresentCode;
+          let buyPresentGroupNo = detail.BuyPresentGroupNo;
+          let bpUsedCountN = detail.BPUsedCountN;
+          let dscFormNo = detail.DscFormNo;
+          let dscMJFormNo = detail.DscMJFormNo;
+          let ssid = detail.SSID;
+          let dscMZFormNo = detail.DscMZFormNo;
+          let dscGSFormNo = detail.DscGSFormNo;
+          let gsUsedCountN = detail.GSUsedCountN;
+          let ywDate = detail.YWDate;
+          let sql = "insert into Detail(LsNo,sDateTime,TradeFlag,CashierId,CashierCode,CashierName,ClerkId,ClerkCode,Pid," +
+            "BarCode,ClerkName,ProdCode,ProdName,DepCode,Price,Amount,DscTotal,Total,AutoDscTotal,HandDsc,CxDsc,EvenDsc,MljDsc," +
+            "OverDsc,OtherDsc,TranDsc,VipDsc,InnerNo,OrderNo,TransFlag,TransDateTime,BrandDsc,isSubProd,isMinus,BuyPresentCode," +
+            "BuyPresentGroupNo,BPUsedCountN,DscFormNo,DscMJFormNo,SSID,DscMZFormNo,DscGSFormNo,GSUsedCountN,YWDate) values(" +
+            "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+          console.log("wtf==",lsNo, sDateTime, tradeFlag, cashierId, cashierCode, cashierName, clerkId, clerkCode,
+            pid, barCode, clerkName, prodCode, prodName, depCode, price, amount, dscTotal, total, autoDscTotal,
+            handDsc, cxDsc, evenDsc, mljDsc, overDsc, otherDsc, tranDsc, vipDsc, innerNo, orderNo, transFlag,
+            transDateTime, brandDsc, subProd, minus, buyPresentCode, buyPresentGroupNo, bpUsedCountN, dscFormNo,
+            dscMJFormNo, ssid, dscMZFormNo, dscGSFormNo, gsUsedCountN, ywDate)
+          tx.executeSql(sql, [lsNo, sDateTime, tradeFlag, cashierId, cashierCode, cashierName, clerkId, clerkCode,
+              pid, barCode, clerkName, prodCode, prodName, depCode, price, amount, dscTotal, total, autoDscTotal,
+              handDsc, cxDsc, evenDsc, mljDsc, overDsc, otherDsc, tranDsc, vipDsc, innerNo, orderNo, transFlag,
+              transDateTime, brandDsc, subProd, minus, buyPresentCode, buyPresentGroupNo, bpUsedCountN, dscFormNo,
+              dscMJFormNo, ssid, dscMZFormNo, dscGSFormNo, gsUsedCountN, ywDate], (tx, results) => {
+              //resolve((results.rows));
+            }, (error) => {
+              console.log("err===", error);
+            }
+          );
+        } catch (error) {
+          console.log("err2==", error);
+        }
       }
       
     });
@@ -1301,11 +1322,47 @@ export default class DBAdapter extends SQLiteOpenHelper {
         tx.executeSql(sql, [pid, payCode, payName, exchgRate, isChange, isGetCode, changeCode, gatherRate, isSystem, shortCut, payMemo, isDel, noDsc], (tx, results) => {
         
         }, (err) => {
-          console.log("payinfo=",err)
+          console.log("payinfo=", err)
         })
       }
     })
     
+  }
+  
+  /***
+   * 查询sum表前100条为上传的数据
+   */
+  selectSum() {
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        let sql = "select distinct lsno,innerno,sdatetime from Sum  where transflag='0' order by sdatetime,lsno,innerno limit 100";
+        tx.executeSql(sql, [], (tx, results) => {
+          resolve(results.rows);
+        }, (error) => {
+          reject("");
+        });
+      },(err)=>{
+        console.log("err=",err);
+      });
+    });
+  }
+  
+  /***
+   * 根据流水号查询detail表数据
+   * @param lsNo
+   * @return {Promise}
+   */
+  selectDetail = (lsNo) => {
+    return new Promise((resolve,reject)=>{
+      db.transaction((tx) => {
+        let sql = "select * from Detail  where lsno="+lsNo;
+        tx.executeSql(sql, [], (tx, results) => {
+          resolve(results.rows);
+        }, (error) => {
+          reject("");
+        });
+      });
+    })
   }
   
   /***
