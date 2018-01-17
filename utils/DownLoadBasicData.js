@@ -29,26 +29,20 @@ export default class DownLoadBasicData {
   static downLoadPosOpt(url, shopCode, dbAdapter,posCode) {
     return new Promise((resolve, reject)=>{
       try {
-          Storage.get('ShopCode').then((ShopCode) => {
-              Storage.get('PosCode').then((PosCode) => {
-                  Storage.get('LinkUrl').then((tags) => {
-                        let requestBody = JSON.stringify({
-                            'TblName': 'positem',
-                            'shopcode': ShopCode,
-                            'poscode': PosCode,
-                        });
-                        FetchUtils.post(tags, requestBody).then((response) => {
-                            if ((response != "" && response.retcode == 1)) {
-                                let tblRow3 = response.TblRow3;
-                                dbAdapter.insertPosOpt(tblRow3);
-                                resolve(true);
-                            }else{
-                                reject(false);
-                            }
-                        });
-                  })
-              })
-          })
+            let requestBody = JSON.stringify({
+                'TblName': 'positem',
+                'shopcode': shopCode,
+                'poscode': posCode,
+            });
+            FetchUtils.post(url, requestBody).then((response) => {
+                if ((response != "" && response.retcode == 1)) {
+                    let tblRow3 = response.TblRow3;
+                    dbAdapter.insertPosOpt(tblRow3);
+                    resolve(true);
+                }else{
+                    reject(false);
+                }
+            });
       }catch (err){
           reject(false);
       }

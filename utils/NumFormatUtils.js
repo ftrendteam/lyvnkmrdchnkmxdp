@@ -107,7 +107,6 @@ export default class NumFormatUtils {
         }
 
         var sum=year+""+month+day+hh+mm+ss+NumFormatUtils.InoNum;
-        alert(sum)
         NumFormatUtils.InoNum=NumFormatUtils.InoNum+1;
         if (NumFormatUtils.InoNum == 9) {
             NumFormatUtils.InoNum = 1;

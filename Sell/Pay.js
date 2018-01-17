@@ -471,71 +471,60 @@ export default class Pay extends Component {
                                     var detailDatas = [];
                                     var detail = {};
                                     detail.LsNo=this.state.numform;
+                                    detail.sDateTime=SumData;
+                                    detail.TradeFlag=this.state.Seles;
+                                    detail.CashierId=Pid;
+                                    detail.CashierCode=usercode;
+                                    detail.CashierName=userName;
+                                    detail.ClerkId=-999;
+                                    detail.ClerkCode="";
+                                    detail.Pid=pid;
+                                    detail.BarCode=BarCode;
+                                    detail.ClerkName="";
+                                    detail.ProdCode=ProdCode;
+                                    detail.ProdName=ProdName;
+                                    detail.DepCode=DepCode;
+                                    detail.Price=ShopPrice;
+                                    detail.Amount=Count;
+                                    detail.DscTotal="";
+                                    detail.Total=prototal;
+                                    detail.HandDsc="";
                                     if(i==0){
-                                        detail.sDateTime=SumData;
-                                        detail.TradeFlag=this.state.Seles;
-                                        detail.CashierId=Pid;
-                                        detail.CashierCode=usercode;
-                                        detail.CashierName=userName;
-                                        detail.ClerkId=-999;
-                                        detail.ClerkCode="";
-                                        detail.Pid=pid;
-                                        detail.BarCode=BarCode;
-                                        detail.ClerkName="";
-                                        detail.ProdCode=ProdCode;
-                                        detail.ProdName=ProdName;
-                                        detail.DepCode=DepCode;
-                                        detail.Price=ShopPrice;
-                                        detail.Amount=Count;
-                                        detail.DscTotal="";
-                                        detail.Total=prototal;
-                                        detail.HandDsc="";
                                         detail.AutoDscTotal=this.state.subtract;
-                                        detail.InnerNo=InnerNo;
-                                        detail.OrderNo=OrderNo;
-                                        detailDatas.push(detail);
-                                        dbAdapter.insertDetail(detailDatas);
-                                    }else{
-                                        detail.sDateTime=SumData;
-                                        detail.TradeFlag=this.state.Seles;
-                                        detail.CashierId=Pid;
-                                        detail.CashierCode=usercode;
-                                        detail.CashierName=userName;
-                                        detail.ClerkId=-999;
-                                        detail.ClerkCode="";
-                                        detail.Pid=pid;
-                                        detail.BarCode=BarCode;
-                                        detail.ClerkName="";
-                                        detail.ProdCode=ProdCode;
-                                        detail.ProdName=ProdName;
-                                        detail.DepCode=DepCode;
-                                        detail.Price=ShopPrice;
-                                        detail.Amount=Count;
-                                        detail.DscTotal="";
-                                        detail.Total=prototal;
-                                        detail.HandDsc="";
+                                    }else {
                                         detail.AutoDscTotal="";
-                                        detail.InnerNo=InnerNo;
-                                        detail.OrderNo=OrderNo;
-                                        detailDatas.push(detail);
-                                        dbAdapter.insertDetail(detailDatas);
                                     }
+                                    detail.InnerNo=InnerNo;
+                                    detail.OrderNo=OrderNo;
+                                    detailDatas.push(detail);
+                                    dbAdapter.insertDetail(detailDatas);
+
                                 };
                                 var nextRoute = {
                                     name: "Index",
                                     component: Index,
                                 };
                                 this.props.navigator.push(nextRoute);
+                                dbAdapter.selectSum().then((rows)=>{
+                                    alert(JSON.stringify(rows))
+                                    let details = [];
+                                    for(let i  = 0;i<rows.length;i++){
+                                        alert("a",rows.item(i))
+                                        dbAdapter.selectDetail(rows.item(i).LsNo).then((detail)=>{
+                                            details.push(detail);
+                                        });
+                                    }
+                                });
                                 dbAdapter.deleteData("shopInfo");
                                 Storage.delete("VipCardNo");
                                 Storage.delete("BalanceTotal");
                                 Storage.delete("JfBal");
-                            };
-                        });
-                    });
-                });
-            });
-        });
+                            }
+                        })
+                    })
+                })
+            })
+        })
     }
 
     restorage1(){
@@ -623,55 +612,33 @@ export default class Pay extends Component {
                                         var detailDatas = [];
                                         var detail = {};
                                         detail.LsNo=this.state.numform;
+                                        detail.sDateTime=SumData;
+                                        detail.TradeFlag=this.state.Seles;
+                                        detail.CashierId=Pid;
+                                        detail.CashierCode=usercode;
+                                        detail.CashierName=userName;
+                                        detail.ClerkId=-999;
+                                        detail.ClerkCode="";
+                                        detail.Pid=pid;
+                                        detail.BarCode=BarCode;
+                                        detail.ClerkName="";
+                                        detail.ProdCode=ProdCode;
+                                        detail.ProdName=ProdName;
+                                        detail.DepCode=DepCode;
+                                        detail.Price=ShopPrice;
+                                        detail.Amount=Count;
+                                        detail.DscTotal="";
+                                        detail.Total=prototal;
                                         if(i==0){
-                                            detail.sDateTime=SumData;
-                                            detail.TradeFlag=this.state.Seles;
-                                            detail.CashierId=Pid;
-                                            detail.CashierCode=usercode;
-                                            detail.CashierName=userName;
-                                            detail.ClerkId=-999;
-                                            detail.ClerkCode="";
-                                            detail.Pid=pid;
-                                            detail.BarCode=BarCode;
-                                            detail.ClerkName="";
-                                            detail.ProdCode=ProdCode;
-                                            detail.ProdName=ProdName;
-                                            detail.DepCode=DepCode;
-                                            detail.Price=ShopPrice;
-                                            detail.Amount=Count;
-                                            detail.DscTotal="";
-                                            detail.Total=prototal;
                                             detail.AutoDscTotal=this.state.subtract;
-                                            detail.HandDsc="";
-                                            detail.InnerNo=innerno;
-                                            detail.OrderNo=OrderNo;
-                                            detailDatas.push(detail);
-                                            dbAdapter.insertDetail(detailDatas);
                                         }else {
-                                            detail.sDateTime=SumData;
-                                            detail.TradeFlag=this.state.Seles;
-                                            detail.CashierId=Pid;
-                                            detail.CashierCode=usercode;
-                                            detail.CashierName=userName;
-                                            detail.ClerkId=-999;
-                                            detail.ClerkCode="";
-                                            detail.Pid=pid;
-                                            detail.BarCode=BarCode;
-                                            detail.ClerkName="";
-                                            detail.ProdCode=ProdCode;
-                                            detail.ProdName=ProdName;
-                                            detail.DepCode=DepCode;
-                                            detail.Price=ShopPrice;
-                                            detail.Amount=Count;
-                                            detail.DscTotal="";
-                                            detail.Total=prototal;
                                             detail.AutoDscTotal="";
-                                            detail.HandDsc="";
-                                            detail.InnerNo=innerno;
-                                            detail.OrderNo=OrderNo;
-                                            detailDatas.push(detail);
-                                            dbAdapter.insertDetail(detailDatas);
                                         }
+                                        detail.HandDsc="";
+                                        detail.InnerNo=innerno;
+                                        detail.OrderNo=OrderNo;
+                                        detailDatas.push(detail);
+                                        dbAdapter.insertDetail(detailDatas);
                                     };
                                     var nextRoute = {
                                         name: "Index",

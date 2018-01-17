@@ -1200,11 +1200,6 @@ export default class DBAdapter extends SQLiteOpenHelper {
             "OverDsc,OtherDsc,TranDsc,VipDsc,InnerNo,OrderNo,TransFlag,TransDateTime,BrandDsc,isSubProd,isMinus,BuyPresentCode," +
             "BuyPresentGroupNo,BPUsedCountN,DscFormNo,DscMJFormNo,SSID,DscMZFormNo,DscGSFormNo,GSUsedCountN,YWDate) values(" +
             "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-          console.log("wtf==",lsNo, sDateTime, tradeFlag, cashierId, cashierCode, cashierName, clerkId, clerkCode,
-            pid, barCode, clerkName, prodCode, prodName, depCode, price, amount, dscTotal, total, autoDscTotal,
-            handDsc, cxDsc, evenDsc, mljDsc, overDsc, otherDsc, tranDsc, vipDsc, innerNo, orderNo, transFlag,
-            transDateTime, brandDsc, subProd, minus, buyPresentCode, buyPresentGroupNo, bpUsedCountN, dscFormNo,
-            dscMJFormNo, ssid, dscMZFormNo, dscGSFormNo, gsUsedCountN, ywDate)
           tx.executeSql(sql, [lsNo, sDateTime, tradeFlag, cashierId, cashierCode, cashierName, clerkId, clerkCode,
               pid, barCode, clerkName, prodCode, prodName, depCode, price, amount, dscTotal, total, autoDscTotal,
               handDsc, cxDsc, evenDsc, mljDsc, overDsc, otherDsc, tranDsc, vipDsc, innerNo, orderNo, transFlag,
@@ -1357,7 +1352,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
       db.transaction((tx) => {
         let sql = "select * from Detail  where lsno="+lsNo;
         tx.executeSql(sql, [], (tx, results) => {
-          resolve(results.rows);
+          resolve(results.detail);
         }, (error) => {
           reject("");
         });
