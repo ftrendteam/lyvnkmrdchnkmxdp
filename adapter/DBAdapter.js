@@ -1330,7 +1330,8 @@ export default class DBAdapter extends SQLiteOpenHelper {
   selectSum() {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
-        let sql = "select distinct lsno,innerno,sdatetime from Sum  where transflag='0' order by sdatetime,lsno,innerno limit 100";
+        let sql = "select distinct lsno,innerno,sdatetime,transflag from Sum " +
+            "where transflag is null or  transflag='0' order by sdatetime,lsno,innerno limit 100";
         tx.executeSql(sql, [], (tx, results) => {
           resolve(results.rows);
         }, (error) => {
@@ -1350,9 +1351,9 @@ export default class DBAdapter extends SQLiteOpenHelper {
   selectDetail = (lsNo) => {
     return new Promise((resolve,reject)=>{
       db.transaction((tx) => {
-        let sql = "select * from Detail  where lsno="+lsNo;
+        let sql = "select * from Detail  where lsno='"+lsNo+"'";
         tx.executeSql(sql, [], (tx, results) => {
-          resolve(results.detail);
+          resolve(results.rows);
         }, (error) => {
           reject("");
         });

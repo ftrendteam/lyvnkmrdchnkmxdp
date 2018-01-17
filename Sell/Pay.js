@@ -27,9 +27,11 @@ import Storage from "../utils/Storage";
 import NumFormatUtils from "../utils/NumFormatUtils";
 import FormatPrice from "../utils/FormatPrice";
 import BigDecimalUtils from "../utils/BigDecimalUtils";
+import UpLoadData from "../utils/UpLoadData";
 import Swiper from 'react-native-swiper';
 import DBAdapter from "../adapter/DBAdapter";
 let dbAdapter = new DBAdapter();
+let uploaddata = new UpLoadData();
 export default class Pay extends Component {
     constructor(props){
         super(props);
@@ -500,22 +502,29 @@ export default class Pay extends Component {
                                     dbAdapter.insertDetail(detailDatas);
 
                                 };
-                                var nextRoute = {
-                                    name: "Index",
-                                    component: Index,
-                                };
-                                this.props.navigator.push(nextRoute);
                                 dbAdapter.selectSum().then((rows)=>{
-                                    alert(JSON.stringify(rows))
                                     let details = [];
                                     for(let i  = 0;i<rows.length;i++){
-                                        alert("a",rows.item(i))
-                                        dbAdapter.selectDetail(rows.item(i).LsNo).then((detail)=>{
-                                            details.push(detail);
+                                        dbAdapter.selectDetail(rows.item(i).LsNo).then((datas)=>{
+                                            details.push(datas);
                                         });
-                                    }
+                                    };
+                                    Storage.get('LinkUrl').then((tags) => {
+                                        Storage.get('ShopCode').then((ShopCode) => {
+                                            Storage.get('PosCode').then((PosCode) => {
+                                                var upLoadData = uploaddata.upLoadData(tags, rows, details,ShopCode,PosCode);
+                                                // alert('a'+"+"+JSON.stringify(upLoadData));
+                                                // alert(tags+"+"+ShopCode+"+"+PosCode+"+"+JSON.stringify(rows)+"+"+JSON.stringify(details));
+                                            });
+                                        });
+                                    });
                                 });
-                                dbAdapter.deleteData("shopInfo");
+                                // var nextRoute = {
+                                //     name: "Index",
+                                //     component: Index,
+                                // };
+                                // this.props.navigator.push(nextRoute);
+                                // dbAdapter.deleteData("shopInfo");
                                 Storage.delete("VipCardNo");
                                 Storage.delete("BalanceTotal");
                                 Storage.delete("JfBal");
