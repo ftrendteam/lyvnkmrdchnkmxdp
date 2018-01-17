@@ -453,7 +453,6 @@ export default class DBAdapter extends SQLiteOpenHelper {
    * 修改某个商品的数量-1
    */
   upDataShopInfoCountmSub(ProdCode) {
-    console.log("a", ProdCode);
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
         tx.executeSql("update shopInfo set countm=countm-1 where ProdCode='" + ProdCode + "'", [], (tx, results) => {
@@ -468,7 +467,29 @@ export default class DBAdapter extends SQLiteOpenHelper {
       });
     });
   }
-  
+
+    /***
+     * 删除shopInfo 表中某一条数据
+     * @param prodCode
+     * @returns {Promise}
+     */
+  deteleShopInfo(ProdCode){
+      return new Promise((resolve, reject) => {
+          db.transaction((tx) => {
+              tx.executeSql("delete from shopInfo where prodCode ='"+ProdCode+"'", [], (tx, results) => {
+                  try {
+                      resolve(true);
+                  } catch (err) {
+                      reject(false);
+                  }
+              },(err)=>{
+                alert(JSON.stringify(err));
+              });
+          }, (error) => {
+              this._errorCB('transaction', error);
+          });
+      });
+  }
   /***
    * 修改某个商品的数量+1
    */

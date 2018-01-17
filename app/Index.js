@@ -122,7 +122,7 @@ export default class Index extends Component {
 
     History(){
         Storage.get('Name').then((tags)=>{
-            if(tags=="销售"){
+            if(this.state.head=="销售"){
                 ToastAndroid.show('暂不支持该业务', ToastAndroid.SHORT)
             }else{
                 var nextRoute={
@@ -136,7 +136,7 @@ export default class Index extends Component {
 
     ShopList(){
         Storage.get('Name').then((tags)=>{
-            if(tags=="销售"){
+            if(this.state.head=="销售"){
                 var nextRoute={
                     name:"Sell",
                     component:Sell
@@ -153,20 +153,15 @@ export default class Index extends Component {
         })
 
     }
-
-    pressPush(){
-        var nextRoute={
-            name:"主页",
-            component:Search
-        };
-        this.props.navigator.push(nextRoute);
-        DeviceEventEmitter.removeAllListeners();
+    //单据onclick事件
+    _rightButtonClick() {
+        this._setModalVisible();
     }
-
+    //二维码扫描
     Code(){
         RNScannerAndroid.openScanner();
     }
-
+    //扫码方法
     Device(){
         DeviceEventEmitter.addListener("code", (reminder) => {
             var title = this.state.head;
@@ -301,12 +296,17 @@ export default class Index extends Component {
         })
     }
 
-    pressPop(){
-        this._setModalVisible()
-        this.props.navigator.pop();
+    //搜索
+    pressPush(){
+        var nextRoute={
+            name:"主页",
+            component:Search
+        };
+        this.props.navigator.push(nextRoute);
+        DeviceEventEmitter.removeAllListeners();
     }
 
-    //进入页面执行方法
+    //页面执行方法
     componentDidMount(){
         InteractionManager.runAfterInteractions(() => {
             this.Storage();
@@ -562,6 +562,9 @@ export default class Index extends Component {
                 this.dataRows[i].ShopNumber = ShopNumber - 1;
             }
         }
+        if(item.item.ShopNumber=="0"){
+            dbAdapter.deteleShopInfo(item.item.ProdCode).then((rows)=>{});
+        }
         this._fetch1();
     }
 
@@ -646,8 +649,6 @@ export default class Index extends Component {
     }
 
     //单据功能分类
-
-    //选择单据
     ChuMo(){
         Storage.save("Disting","0");
         Storage.get('Disting').then((tags)=>{
@@ -1495,10 +1496,6 @@ export default class Index extends Component {
 
     //弹层
     //单据弹层
-    _rightButtonClick() {
-        this._setModalVisible();
-    }
-
     _setModalVisible() {
         let isShow = this.state.show;
         this.setState({

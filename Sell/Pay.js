@@ -526,7 +526,7 @@ export default class Pay extends Component {
                                     component: Index,
                                 };
                                 this.props.navigator.push(nextRoute);
-                                // dbAdapter.deleteData("shopInfo");
+                                dbAdapter.deleteData("shopInfo");
                                 Storage.delete("VipCardNo");
                                 Storage.delete("BalanceTotal");
                                 Storage.delete("JfBal");
