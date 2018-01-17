@@ -77,7 +77,6 @@ export default class Sell_Data_List extends Component {
             FetchUtil.post(tags,JSON.stringify(params)).then((data)=>{
                 var TblRow = data.TblRow;
                 var TblRow1 = data.TblRow1;
-
                 if(this.state.Sell=="ShopCode"){
                     this.dataRows = this.dataRows.concat(TblRow);
                 }else if(this.state.Sell=="PosCode"){

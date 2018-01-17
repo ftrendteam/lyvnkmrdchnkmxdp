@@ -145,7 +145,6 @@ export default class SellData extends Component {
                                     alert(JSON.stringify(response));
                                 }
                             })
-
                         } else {
                             alert(JSON.stringify(data))
                         }

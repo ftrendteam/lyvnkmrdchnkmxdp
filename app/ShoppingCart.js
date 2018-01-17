@@ -150,7 +150,7 @@ export default class ShoppingCart extends Component {
                     this.ds.push(row);
                 }
             }
-            if(this.dataRows==0){
+            if(this.ds==0){
                 this.modal();
                 return;
             }else{
@@ -225,7 +225,7 @@ export default class ShoppingCart extends Component {
             <TouchableOpacity style={styles.ShopList} onPress={()=>this.OrderDetails(rowData)}>
                 <View style={styles.ShopTop}>
                     <Text style={[styles.Name,styles.Name1]}>{rowData.prodname}</Text>
-                    <Text style={[styles.Number,styles.Name1]}>{rowData.countm}.00 (件)</Text>
+                    <Text style={[styles.Number,styles.Name1]}>{rowData.countm}(件)</Text>
                     <Text style={[styles.Price,styles.Name1]}>{rowData.ShopPrice}</Text>
                     <Text style={[styles.SmallScale,styles.Name1]}>{rowData.prototal}</Text>
                 </View>
@@ -235,10 +235,40 @@ export default class ShoppingCart extends Component {
 
     renderHiddenRow(rowData, sectionID, rowID){
         return (
-            <View style={styles.rowBack}>
+            <TouchableOpacity onPress={()=>this.deteleShopInfo(rowData)} style={styles.rowBack}>
                 <Text style={styles.rowBackText}>删除</Text>
-            </View>
+            </TouchableOpacity>
         );
+    }
+
+    deteleShopInfo(rowData, sectionID, rowID){
+        dbAdapter.deteleShopInfo(rowData.ProdCode).then((rows)=>{});
+        dbAdapter.selectShopInfo().then((rows)=>{
+            var shopnumber = 0;
+            var shopAmount = 0;
+            this.ds=[];
+            for(let i =0;i<rows.length;i++){
+                var row = rows.item(i);
+                var number = row.countm;
+                shopAmount += parseInt(row.prototal);
+                shopnumber += parseInt(row.countm);
+                if(number!==0){
+                    this.ds.push(row);
+                }
+            }
+            this.setState({
+                number1:number,
+                ShopNumber:shopnumber,//数量
+                ShopAmount:shopAmount,//总金额
+                ds:this.state.ds.cloneWithRows(this.ds)
+            })
+        });
+        dbAdapter.selectShopInfoAllCountm().then((rows)=>{
+            var ShopCar = rows.item(0).countm;
+            this.setState({
+                shopcar:ShopCar
+            });
+        });
     }
 
     History(){
@@ -498,7 +528,7 @@ export default class ShoppingCart extends Component {
             })
         })
 
-        if(this.dataRows==0){
+        if(this.ds==0){
             alert("请添加商品");
         }else{
             this.Wait();
@@ -531,7 +561,7 @@ export default class ShoppingCart extends Component {
                             "pdaGuid":this.state.IMEI,
                             "pdgFormno":this.state.ProYH+this.state.Date
                         },
-                        DetailInfo2: this.dataRows,
+                        DetailInfo2: this.ds,
                     };
                     if(this.state.Screen=="1"||this.state.Screen=="2"){
                         var DetailInfo2=params.DetailInfo2;
@@ -597,7 +627,7 @@ export default class ShoppingCart extends Component {
             })
         })
 
-        if (this.dataRows == 0) {
+        if (this.ds == 0) {
             alert("请添加商品")
         } else {
             Storage.get('code').then((tags) => {
@@ -629,7 +659,7 @@ export default class ShoppingCart extends Component {
                             "pdaGuid": this.state.IMEI,
                             "pdgFormno": this.state.ProYH + this.state.Date
                         },
-                        DetailInfo2: this.dataRows,
+                        DetailInfo2: this.ds,
                     };
                     FetchUtils.post(this.state.linkurl, JSON.stringify(params)).then((data) => {
                         if (data.retcode == 1) {
@@ -670,7 +700,7 @@ export default class ShoppingCart extends Component {
 
     //单据备注对话框
     _rightButtonClick() {
-        if(this.dataRows==0){
+        if(this.ds==0){
             alert("请添加商品")
         }else{
             this._setModalVisible();
@@ -783,12 +813,12 @@ export default class ShoppingCart extends Component {
     //提交时清空数据及更新setState
     DataSource(){
         dbAdapter.deleteData("shopInfo");
-        this.dataRows=[];
+        this.ds=[];
         var price="";
         var date = new Date();
         var data=JSON.stringify(date.getTime());
         this.setState({
-            dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
+            ds:this.state.ds.cloneWithRows(this.ds),
             ShopNumber:price,
             ShopAmount:price,
             shopcar:"",
@@ -1447,7 +1477,7 @@ const styles = StyleSheet.create({
         backgroundColor:"#ff4e4e",
         paddingTop:18,
         paddingBottom:18,
-        paddingRight:20
+        paddingRight:35
     },
     rowBackText:{
         color:"#ffffff",
