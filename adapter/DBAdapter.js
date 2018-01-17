@@ -1343,7 +1343,36 @@ export default class DBAdapter extends SQLiteOpenHelper {
       });
     })
   }
-  
+  /***
+   * 修改流水上传标识
+   * @param TransDateTime
+   * @param lsNo
+   * @return {Promise}
+   */
+  upDateSum=(TransDateTime,lsNo)=>{//update product set ProdName='1' where ProdCode='102000001'
+    return new Promise((resolve,reject)=>{
+      db.transaction((tx) => {
+        let sql = "update Sum set TransFlag='1' ,TransDateTime='"+TransDateTime+"' where lsno="+lsNo;
+        tx.executeSql(sql, [], (tx, results) => {
+          resolve(true);
+        }, (error) => {
+          reject(false);
+        });
+      });
+    })
+  }
+  upDateDetail=(TransDateTime,lsNo)=>{//update product set ProdName='1' where ProdCode='102000001'
+    return new Promise((resolve,reject)=>{
+      db.transaction((tx) => {
+        let sql = "update Detail set TransFlag='1' ,TransDateTime='"+TransDateTime+"' where lsno="+lsNo;
+        tx.executeSql(sql, [], (tx, results) => {
+          resolve(true);
+        }, (error) => {
+          reject(false);
+        });
+      });
+    })
+  }
   /***
    * 关闭表
    */
