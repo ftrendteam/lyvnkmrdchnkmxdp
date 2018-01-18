@@ -1343,15 +1343,30 @@ export default class DBAdapter extends SQLiteOpenHelper {
     });
   }
   
+  selectSumAllData=(lsNo,innerno,sdatetime)=>{
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        let sql = "select * from Sum where lsno='"+lsNo+"' and transflag='0' and innerno='"+innerno+"' and sdatetime='"+sdatetime+"'";
+        tx.executeSql(sql, [], (tx, results) => {
+          resolve(results.rows);
+        }, (error) => {
+          reject("");
+        });
+      },(err)=>{
+        console.log("err=",err);
+      });
+    });
+  }
+  
   /***
    * 根据流水号查询detail表数据
    * @param lsNo
    * @return {Promise}
    */
-  selectDetail = (lsNo) => {
+  selectDetailAllData = (lsNo,innerno,sdatetime) => {
     return new Promise((resolve,reject)=>{
       db.transaction((tx) => {
-        let sql = "select * from Detail  where lsno='"+lsNo+"'";
+        let sql = "select * from Sum where lsno='"+lsNo+"' and transflag='0' and innerno='"+innerno+"' and sdatetime='"+sdatetime+"'";
         tx.executeSql(sql, [], (tx, results) => {
           resolve(results.rows);
         }, (error) => {
