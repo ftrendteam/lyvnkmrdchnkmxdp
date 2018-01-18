@@ -14,7 +14,7 @@ export default class UpLoadData {
         });
           console.log(requestBody);
         FetchUtils.post(url,requestBody).then((success)=>{
-          alert(JSON.stringify(details))
+          // alert(JSON.stringify(success))
             for(let i = 0;i<details.length;i++){
               console.log(details[i]);
             }

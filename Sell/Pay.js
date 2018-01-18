@@ -503,18 +503,19 @@ export default class Pay extends Component {
 
                                 };
                                 dbAdapter.selectSum().then((rows)=>{
-                                    let details = [];
+                                    this.details = [];
                                     for(let i  = 0;i<rows.length;i++){
                                         dbAdapter.selectDetail(rows.item(i).LsNo).then((datas)=>{
-                                            details.push(datas);
+                                            this.details.push(datas);
                                         });
                                     };
+                                    console.log('a',this.details);
                                     Storage.get('LinkUrl').then((tags) => {
                                         Storage.get('ShopCode').then((ShopCode) => {
                                             Storage.get('PosCode').then((PosCode) => {
-                                                var upLoadData = uploaddata.upLoadData(tags, rows, details,ShopCode,PosCode);
+                                                var upLoadData = uploaddata.upLoadData(tags, rows, this.details,ShopCode,PosCode);
                                                 // alert('a'+"+"+JSON.stringify(upLoadData));
-                                                // alert(tags+"+"+ShopCode+"+"+PosCode+"+"+JSON.stringify(rows)+"+"+JSON.stringify(details));
+                                                alert(tags+"+"+ShopCode+"+"+PosCode+"+"+JSON.stringify(rows)+"+"+JSON.stringify(this.details));
                                             });
                                         });
                                     });
