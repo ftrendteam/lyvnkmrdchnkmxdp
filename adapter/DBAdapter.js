@@ -1209,6 +1209,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
               //resolve((results.rows));
             }, (error) => {
               console.log("err===", error);
+              
             }
           );
         } catch (error) {

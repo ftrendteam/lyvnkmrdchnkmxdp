@@ -155,7 +155,6 @@ export default class SQLiteOpenHelper {
         });
       tx.executeSql("CREATE TABLE IF NOT EXISTS KgtOpt(OptName varchar(12) null,OptValue varchar(100) null)", [],
         () => {
-        
         }, (err) => {
           console.log(err);
         });
