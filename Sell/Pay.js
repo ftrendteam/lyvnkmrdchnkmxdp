@@ -4,7 +4,7 @@
  * @flow
  */
 
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import {
     AppRegistry,
     StyleSheet,
@@ -30,42 +30,44 @@ import BigDecimalUtils from "../utils/BigDecimalUtils";
 import UpLoadData from "../utils/UpLoadData";
 import Swiper from 'react-native-swiper';
 import DBAdapter from "../adapter/DBAdapter";
+
 let dbAdapter = new DBAdapter();
 let uploaddata = new UpLoadData();
 export default class Pay extends Component {
-    constructor(props){
+    constructor(props) {
         super(props);
         this.state = {
-            total:false,
-            RefundTotal:false,
-            LayerShow:false,
-            ModalShow:false,
-            CardFaceNo:"",
-            CardPwd:"",
-            name:"",
-            amount:"",
-            AMount:0,
-            payments:0,
-            Total:"",
-            data:"",
-            custType:"",
-            VipCardNo:"",
-            cardfaceno:"",
-            DataTime:"",
-            RetSerinalNo:"",
-            subtract:"",
-            JfBal:this.props.JfBal ? this.props.JfBal : "",
-            BalanceTotal:this.props.BalanceTotal ? this.props.BalanceTotal : "",
-            ShopAmount:this.props.ShopAmount ? this.props.ShopAmount : "",
-            numform:this.props.numform ? this.props.numform : "",
-            Seles:this.props.Seles ? this.props.Seles : "",
-            dataRows:this.props.dataRows ? this.props.dataRows : "",
+            total: false,
+            RefundTotal: false,
+            LayerShow: false,
+            ModalShow: false,
+            CardFaceNo: "",
+            CardPwd: "",
+            name: "",
+            amount: "",
+            AMount: 0,
+            payments: 0,
+            Total: "",
+            data: "",
+            custType: "",
+            VipCardNo: "",
+            cardfaceno: "",
+            DataTime: "",
+            RetSerinalNo: "",
+            subtract: "",
+            JfBal: this.props.JfBal ? this.props.JfBal : "",
+            BalanceTotal: this.props.BalanceTotal ? this.props.BalanceTotal : "",
+            ShopAmount: this.props.ShopAmount ? this.props.ShopAmount : "",
+            numform: this.props.numform ? this.props.numform : "",
+            Seles: this.props.Seles ? this.props.Seles : "",
+            dataRows: this.props.dataRows ? this.props.dataRows : "",
             dataSource: new ListView.DataSource({rowHasChanged: (r1, r2) => true}),
 
         }
         this.dataRows = [];
         this.productData = [];
     }
+
     //弹框
     Total() {
         let isShow = this.state.total;
@@ -81,25 +83,25 @@ export default class Pay extends Component {
         })
     }
 
-    LayerShow(){
+    LayerShow() {
         let isShow = this.state.LayerShow;
         this.setState({
             LayerShow: !isShow,
         })
     }
 
-    ModeButton(){
+    ModeButton() {
         this.LayerShow();
     }
 
-    ModalShow(){
+    ModalShow() {
         let isShow = this.state.ModalShow;
         this.setState({
             ModalShow: !isShow,
         })
     }
 
-    ModalButton(){
+    ModalButton() {
         this.ModalShow();
     }
 
@@ -122,7 +124,7 @@ export default class Pay extends Component {
     //     };
     // }
 
-    componentDidMount(){
+    componentDidMount() {
         Storage.get('Name').then((tags) => {
             this.setState({
                 name: tags
@@ -130,51 +132,51 @@ export default class Pay extends Component {
         })
 
         Storage.get('VipCardNo').then((tags) => {
-            if(tags==null){
+            if (tags == null) {
                 this.setState({
-                    custType:"0",
-                    custCode:"",
+                    custType: "0",
+                    custCode: "",
                 })
-            }else{
+            } else {
                 this.setState({
-                    custType:"2",
-                    custCode:this.state.VipCardNo,
+                    custType: "2",
+                    custCode: this.state.VipCardNo,
                 })
             }
         })
 
-        Storage.save("ino","0");
-        Storage.save("Ino","0");
+        Storage.save("ino", "0");
+        Storage.save("Ino", "0");
 
         this.dbadapter();
     }
 
-    dbadapter(){
-        dbAdapter.selectPosOpt('CUTLEVEL').then((rows)=>{
-            for(let i =0;i<rows.length;i++){
+    dbadapter() {
+        dbAdapter.selectPosOpt('CUTLEVEL').then((rows) => {
+            for (let i = 0; i < rows.length; i++) {
                 var row = rows.item(i);
                 var CUTLEVEL = row.OptValue;
             }
-            if(this.state.ShopAmount>CUTLEVEL){
-                dbAdapter.selectPosOpt('AUTOCUT').then((rows)=>{
-                    for(let i =0;i<rows.length;i++){
+            if (this.state.ShopAmount > CUTLEVEL) {
+                dbAdapter.selectPosOpt('AUTOCUT').then((rows) => {
+                    for (let i = 0; i < rows.length; i++) {
                         var row = rows.item(i);
                         var AUTOCUT = row.OptValue;
                     }
-                    if(AUTOCUT=='1'){
-                        dbAdapter.selectPosOpt('CUTDEGREE').then((rows)=>{
+                    if (AUTOCUT == '1') {
+                        dbAdapter.selectPosOpt('CUTDEGREE').then((rows) => {
                             var round;
                             var RoundPrice;
                             var subtract;
-                            for(let i =0;i<rows.length;i++){
+                            for (let i = 0; i < rows.length; i++) {
                                 var row = rows.item(i);
                                 var CUTDEGREE = row.OptValue;
                             }
-                            round =FormatPrice.round(CUTDEGREE,this.state.ShopAmount,this.state.dataRows);
-                            subtract = BigDecimalUtils.subtract(this.state.ShopAmount,round,2);
+                            round = FormatPrice.round(CUTDEGREE, this.state.ShopAmount, this.state.dataRows);
+                            subtract = BigDecimalUtils.subtract(this.state.ShopAmount, round, 2);
                             this.setState({
-                                ShopAmount:round,
-                                subtract:subtract,
+                                ShopAmount: round,
+                                subtract: subtract,
                             })
                         })
                     }
@@ -182,100 +184,100 @@ export default class Pay extends Component {
             }
         })
 
-        dbAdapter.selectAllData("payInfo").then((rows)=>{
-            let priductData=[];
-            for(let i =0;i<rows.length;i++){
+        dbAdapter.selectAllData("payInfo").then((rows) => {
+            let priductData = [];
+            for (let i = 0; i < rows.length; i++) {
                 var row = rows.item(i);
                 priductData.push(row);
             }
-            this.productData=priductData;
+            this.productData = priductData;
             this.setState({
-                data:priductData,
+                data: priductData,
             })
         })
     }
 
-    Return(){
-        if(this.state.CardFaceNo==""){
+    Return() {
+        if (this.state.CardFaceNo == "") {
             this.props.navigator.pop();
-        }else{
+        } else {
             ToastAndroid.show('订单未完成', ToastAndroid.SHORT)
         }
     }
 
     //继续交易
-    JiaoYi(){
+    JiaoYi() {
         dbAdapter.deleteData("Sum");
         dbAdapter.deleteData("Detail");
-        if(this.dataRows==''){
+        if (this.dataRows == '') {
             var nextRoute = {
                 name: "Sell",
                 component: Sell,
             };
             this.props.navigator.push(nextRoute);
-        }else{
+        } else {
             ToastAndroid.show('订单未完成', ToastAndroid.SHORT)
         }
     }
 
-    _renderRow(rowData, sectionID, rowID){
-            return (
-                <View style={styles.ShopList1} onPress={()=>this.OrderDetails(rowData)}>
-                    <View style={styles.Row}><Text style={styles.Name}>{rowData.payName}</Text></View>
-                    <View style={styles.Row}><Text style={styles.Name}>{rowData.CardFaceNo}</Text></View>
-                    {
-                        (rowData.payName=="现金")?
-                            <View style={styles.Row}><Text style={styles.Name}>{rowData.Total}</Text></View>
-                            :
-                            <View style={styles.Row}><Text style={styles.Name}>{rowData.total}</Text></View>
-                    }
-                    <View style={styles.Row}><Text style={styles.Name}>{rowData.retZjf}</Text></View>
-                    <View style={styles.Row}><Text style={styles.Name}>{rowData.ReferenceNo}</Text></View>
-                </View>
-            );
+    _renderRow(rowData, sectionID, rowID) {
+        return (
+            <View style={styles.ShopList1} onPress={() => this.OrderDetails(rowData)}>
+                <View style={styles.Row}><Text style={styles.Name}>{rowData.payName}</Text></View>
+                <View style={styles.Row}><Text style={styles.Name}>{rowData.CardFaceNo}</Text></View>
+                {
+                    (rowData.payName == "现金") ?
+                        <View style={styles.Row}><Text style={styles.Name}>{rowData.Total}</Text></View>
+                        :
+                        <View style={styles.Row}><Text style={styles.Name}>{rowData.total}</Text></View>
+                }
+                <View style={styles.Row}><Text style={styles.Name}>{rowData.retZjf}</Text></View>
+                <View style={styles.Row}><Text style={styles.Name}>{rowData.ReferenceNo}</Text></View>
+            </View>
+        );
     }
 
-    HorButton(item){
-        if(this.state.amount==""){
+    HorButton(item) {
+        if (this.state.amount == "") {
             this.LayerShow();
-        }else{
-            if(item.item.PayCode=="01"){
-                    if (this.state.Seles == "R") {
-                        if(this.state.amount>Number(this.state.Total)&&this.state.Total<0){
-                            this.ModalShow()
-                        }else {
-                            this.RefundTotal()
-                        }
-                    } else if (this.state.Seles == "T") {
-                        if(this.state.amount>Number(this.state.Total)&&this.state.Total>0){
-                            this.ModalShow()
-                        }else {
-                            this.Total()
-                        }
+        } else {
+            if (item.item.PayCode == "01") {
+                if (this.state.Seles == "R") {
+                    if (this.state.amount > Number(this.state.Total) && this.state.Total < 0) {
+                        this.ModalShow()
+                    } else {
+                        this.RefundTotal()
                     }
-            }else if(item.item.PayCode=="00"){
-                if(this.state.Seles=="R"){
-                    var payTotal=Number(this.state.amount)+Number(this.state.payments);
+                } else if (this.state.Seles == "T") {
+                    if (this.state.amount > Number(this.state.Total) && this.state.Total > 0) {
+                        this.ModalShow()
+                    } else {
+                        this.Total()
+                    }
+                }
+            } else if (item.item.PayCode == "00") {
+                if (this.state.Seles == "R") {
+                    var payTotal = Number(this.state.amount) + Number(this.state.payments);
                     this.state.payments += -(Number(this.state.amount));
-                    var payamount =Number(this.state.AMount)-Number(this.state.amount);
-                    var Total = -(BigDecimalUtils.add(this.state.ShopAmount,this.state.payments,2));
-                    var aptotal = BigDecimalUtils.add(payamount,Total,2);
-                    if(this.state.ShopAmount<payTotal){
+                    var payamount = Number(this.state.AMount) - Number(this.state.amount);
+                    var Total = -(BigDecimalUtils.add(this.state.ShopAmount, this.state.payments, 2));
+                    var aptotal = BigDecimalUtils.add(payamount, Total, 2);
+                    if (this.state.ShopAmount < payTotal) {
                         var Amount = {
                             'payName': '现金',
-                            'CardFaceNo':'',
-                            'Total':payamount,
-                            'total':aptotal,
+                            'CardFaceNo': '',
+                            'Total': payamount,
+                            'total': aptotal,
                             'payRT': '',
                             'PayCode': item.item.PayCode,
                             'pid': item.item.Pid,
                         }
-                    }else{
+                    } else {
                         var Amount = {
                             'payName': '现金',
-                            'CardFaceNo':'',
-                            'Total':payamount,
-                            'total':payamount,
+                            'CardFaceNo': '',
+                            'Total': payamount,
+                            'total': payamount,
                             'payRT': '',
                             'PayCode': item.item.PayCode,
                             'pid': item.item.Pid,
@@ -295,8 +297,8 @@ export default class Pay extends Component {
                         for (let i = 0; i < this.dataRows.length; i++) {
                             let RowsList = this.dataRows[i];
                             if (RowsList.payName == "现金") {
-                                RowsList.Total =payamount;
-                                RowsList.total =aptotal;
+                                RowsList.Total = payamount;
+                                RowsList.total = aptotal;
                                 this.setState({
                                     AMount: payamount,
                                     payments: this.state.payments,
@@ -318,28 +320,28 @@ export default class Pay extends Component {
                         }
                     }
                     this.restorage1()
-                } else if(this.state.Seles=="T"){
-                    var payTotal=Number(this.state.amount)+Number(this.state.payments);
+                } else if (this.state.Seles == "T") {
+                    var payTotal = Number(this.state.amount) + Number(this.state.payments);
                     this.state.payments += Number(this.state.amount);
-                    var Total = BigDecimalUtils.subtract(this.state.ShopAmount,this.state.payments,2)
-                    var payamount =Number(this.state.AMount)+Number(this.state.amount);
-                    var aptotal = BigDecimalUtils.add(payamount,Total,2);
-                    if(this.state.ShopAmount<payTotal){
+                    var Total = BigDecimalUtils.subtract(this.state.ShopAmount, this.state.payments, 2)
+                    var payamount = Number(this.state.AMount) + Number(this.state.amount);
+                    var aptotal = BigDecimalUtils.add(payamount, Total, 2);
+                    if (this.state.ShopAmount < payTotal) {
                         var Amount = {
                             'payName': '现金',
-                            'CardFaceNo':'',
-                            'Total':payamount,
-                            'total':aptotal,
+                            'CardFaceNo': '',
+                            'Total': payamount,
+                            'total': aptotal,
                             'payRT': '',
                             'PayCode': item.item.PayCode,
                             'pid': item.item.Pid,
                         }
-                    }else{
+                    } else {
                         var Amount = {
                             'payName': '现金',
-                            'CardFaceNo':'',
-                            'Total':payamount,
-                            'total':payamount,
+                            'CardFaceNo': '',
+                            'Total': payamount,
+                            'total': payamount,
                             'payRT': '',
                             'PayCode': item.item.PayCode,
                             'pid': item.item.Pid,
@@ -357,9 +359,9 @@ export default class Pay extends Component {
                     } else {
                         for (let i = 0; i < this.dataRows.length; i++) {
                             let RowsList = this.dataRows[i];
-                            RowsList.Total =payamount;
+                            RowsList.Total = payamount;
                             if (RowsList.payName == "现金") {
-                                RowsList.total =aptotal;
+                                RowsList.total = aptotal;
                                 this.setState({
                                     AMount: payamount,
                                     payments: this.state.payments,
@@ -382,19 +384,190 @@ export default class Pay extends Component {
                         }
                     }
                     this.restorage();
-                };
-            };
-        };
+                }
+                ;
+            }
+            ;
+        }
+        ;
     };
 
     //保存流水表及detail表
-    restorage(){
+    restorage() {
+        Storage.get('VipCardNo').then((VipCardNo) => {
+            Storage.get('Pid').then((Pid) => {
+                Storage.get('usercode').then((usercode) => {
+                    Storage.get('userName').then((userName) => {
+                        if (this.state.ShopAmount == this.state.payments || this.state.ShopAmount < this.state.payments) {
+                            var now = new Date();
+                            var year = now.getFullYear();
+                            var month = now.getMonth() + 1;
+                            var day = now.getDate();
+                            var hh = now.getHours();
+                            var mm = now.getMinutes();
+                            var ss = now.getSeconds();
+                            if (month >= 1 && month <= 9) {
+                                month = "0" + month;
+                            }
+                            if (day >= 1 && day <= 9) {
+                                day = "0" + day;
+                            }
+                            if (hh >= 1 && hh <= 9) {
+                                hh = "0" + hh;
+                            }
+                            if (mm >= 1 && mm <= 9) {
+                                mm = "0" + mm;
+                            }
+                            if (ss >= 1 && ss <= 9) {
+                                ss = "0" + ss;
+                            }
+                            for (let i = 0; i < this.dataRows.length; i++) {
+                                var dataRows = this.dataRows[i];
+                                var ino;
+                                ino = i + 1
+                                var InnerNo = NumFormatUtils.createInnerNo();
+                                var SumData = year + "-" + month + "-" + day + " " + hh + ":" + mm + ":" + ss;
+                                //插入Sum表
+                                var sumDatas = [];
+                                var sum = {};
+                                sum.LsNo = this.state.numform;
+                                sum.sDateTime = SumData;
+                                sum.CashierId = Pid;
+                                sum.CashierCode = usercode;
+                                sum.CashierName = userName;
+                                sum.ino = ino;
+                                sum.DscTotal = "";
+                                sum.Total = this.state.ShopAmount;
+                                sum.TotalPay = this.state.payments;
+                                sum.Change = this.state.Total;
+                                sum.TradeFlag = this.state.Seles;
+                                sum.CustType = this.state.custType;
+                                sum.CustCode = VipCardNo;
+                                sum.PayId = dataRows.pid;
+                                sum.PayCode = dataRows.PayCode;
+                                sum.Amount = dataRows.total;
+                                sum.OldAmount = dataRows.total;
+                                sum.TendPayCode = VipCardNo;
+                                sum.InnerNo = InnerNo;
+                                sumDatas.push(sum);
+                                dbAdapter.insertSum(sumDatas);
+                            }
+                            ;
+                            for (let i = 0; i < this.state.dataRows.length; i++) {
+                                var DataRows = this.state.dataRows[i];
+                                var OrderNo;
+                                OrderNo = i + 1;
+                                var InnerNo = NumFormatUtils.CreateInnerNo();
+                                var BarCode;
+                                var pid;
+                                var ProdCode;
+                                var ProdName;
+                                var DepCode;
+                                var Count;
+                                var ShopPrice;
+                                var prototal;
+                                BarCode = DataRows.BarCode;
+                                pid = DataRows.pid;
+                                ProdCode = DataRows.ProdCode;
+                                ProdName = DataRows.prodname;
+                                DepCode = DataRows.DepCode;
+                                Count = DataRows.countm;
+                                ShopPrice = DataRows.ShopPrice;
+                                prototal = DataRows.prototal;
+                                var SumData = year + "-" + month + "-" + day + " " + hh + ":" + mm + ":" + ss;
+                                var detailDatas = [];
+                                var detail = {};
+                                detail.LsNo = this.state.numform;
+                                detail.sDateTime = SumData;
+                                detail.TradeFlag = this.state.Seles;
+                                detail.CashierId = Pid;
+                                detail.CashierCode = usercode;
+                                detail.CashierName = userName;
+                                detail.ClerkId = -999;
+                                detail.ClerkCode = "";
+                                detail.Pid = pid;
+                                detail.BarCode = BarCode;
+                                detail.ClerkName = "";
+                                detail.ProdCode = ProdCode;
+                                detail.ProdName = ProdName;
+                                detail.DepCode = DepCode;
+                                detail.Price = ShopPrice;
+                                detail.Amount = Count;
+                                detail.DscTotal = "";
+                                detail.Total = prototal;
+                                detail.HandDsc = "";
+                                if (i == 0) {
+                                    detail.AutoDscTotal = this.state.subtract;
+                                } else {
+                                    detail.AutoDscTotal = "";
+                                }
+                                detail.InnerNo = InnerNo;
+                                detail.OrderNo = OrderNo;
+                                detailDatas.push(detail);
+                                dbAdapter.insertDetail(detailDatas);
+
+                            }
+                            ;
+                            dbAdapter.selectSum().then((rows) => {
+                                let sums = [];
+                                let details = [];
+                                let index = 0;
+                                for (let i = 0; i < rows.length; i++) {
+                                    // console.log(rows.item(i));
+                                    // var sum = dbAdapter.selectSumAllData(rows.item(i).LsNo,rows.item(i).InnerNo,rows.item(i).sDateTime);
+                                    //     // console.log("sum=",sum);
+                                    //     sums.push(sum);
+                                    // var detail= dbAdapter.selectDetailAllData(rows.item(i).LsNo,rows.item(i).InnerNo,rows.item(i).sDateTime);
+                                    //     // console.log("detail=",detail)
+                                    //     details.push(detail);
+                                    dbAdapter.selectSumAllData(rows.item(i).LsNo, rows.item(i).InnerNo, rows.item(i).sDateTime).then((sum) => {
+                                        for (let j =0;j<sum.length;j++){
+                                            sums.push(sum.item(j));
+                                        }
+                                    })
+                                    dbAdapter.selectDetailAllData(rows.item(i).LsNo, rows.item(i).InnerNo, rows.item(i).sDateTime).then((detail) => {
+                                        console.log('a',detail.length);
+                                        for (let j =0;j<detail.length;j++){
+                                            details.push(detail.item(j));
+                                        }
+                                        index++;
+                                        if (index == rows.length) {//此处执行流水上传操作
+                                            Storage.get('LinkUrl').then((tags) => {
+                                                Storage.get('ShopCode').then((ShopCode) => {
+                                                    Storage.get('PosCode').then((PosCode) => {
+                                                        var upLoadData = uploaddata.upLoadData(tags, details, sums, ShopCode, PosCode);
+                                                        // alert('a'+"+"+JSON.stringify(upLoadData));
+                                                        // alert(tags+"+"+ShopCode+"+"+PosCode+"+"+JSON.stringify(rows)+"+"+JSON.stringify(this.details));
+                                                    });
+                                                });
+                                            });
+                                        }
+                                    })
+                                }
+                            });
+                            // var nextRoute = {
+                            //     name: "Index",
+                            //     component: Index,
+                            // };
+                            // this.props.navigator.push(nextRoute);
+                            // dbAdapter.deleteData("shopInfo");
+                            Storage.delete("VipCardNo");
+                            Storage.delete("BalanceTotal");
+                            Storage.delete("JfBal");
+                        }
+                    })
+                })
+            })
+        })
+    }
+
+    restorage1() {
         return new Promise((resolve, reject) => {
             Storage.get('VipCardNo').then((VipCardNo) => {
                 Storage.get('Pid').then((Pid) => {
                     Storage.get('usercode').then((usercode) => {
                         Storage.get('userName').then((userName) => {
-                            if (this.state.ShopAmount == this.state.payments||this.state.ShopAmount < this.state.payments) {
+                            if (-this.state.ShopAmount == this.state.payments || -this.state.ShopAmount > this.state.payments) {
                                 var now = new Date();
                                 var year = now.getFullYear();
                                 var month = now.getMonth() + 1;
@@ -420,7 +593,7 @@ export default class Pay extends Component {
                                 for (let i = 0; i < this.dataRows.length; i++) {
                                     var dataRows = this.dataRows[i];
                                     var ino;
-                                    ino =i+1
+                                    ino = i + 1
                                     var InnerNo = NumFormatUtils.createInnerNo();
                                     var SumData = year + "-" + month + "-" + day + " " + hh + ":" + mm + ":" + ss;
                                     //插入Sum表
@@ -433,7 +606,7 @@ export default class Pay extends Component {
                                     sum.CashierName = userName;
                                     sum.ino = ino;
                                     sum.DscTotal = "";
-                                    sum.Total = this.state.ShopAmount;
+                                    sum.Total = -this.state.ShopAmount;
                                     sum.TotalPay = this.state.payments;
                                     sum.Change = this.state.Total;
                                     sum.TradeFlag = this.state.Seles;
@@ -447,12 +620,13 @@ export default class Pay extends Component {
                                     sum.InnerNo = InnerNo;
                                     sumDatas.push(sum);
                                     dbAdapter.insertSum(sumDatas);
-                                };
-                                for(let i = 0;i<this.state.dataRows.length;i++){
+                                }
+                                ;
+                                for (let i = 0; i < this.state.dataRows.length; i++) {
                                     var DataRows = this.state.dataRows[i];
                                     var OrderNo;
-                                    OrderNo =i+1;
-                                    var InnerNo = NumFormatUtils.CreateInnerNo();
+                                    OrderNo = i + 1;
+                                    var innerno = NumFormatUtils.CreateInnerNo();
                                     var BarCode;
                                     var pid;
                                     var ProdCode;
@@ -461,229 +635,83 @@ export default class Pay extends Component {
                                     var Count;
                                     var ShopPrice;
                                     var prototal;
-                                    BarCode=DataRows.BarCode;
-                                    pid=DataRows.pid;
-                                    ProdCode=DataRows.ProdCode;
-                                    ProdName=DataRows.prodname;
-                                    DepCode=DataRows.DepCode;
-                                    Count=DataRows.countm;
-                                    ShopPrice=DataRows.ShopPrice;
-                                    prototal=DataRows.prototal;
+                                    BarCode = DataRows.BarCode;
+                                    pid = DataRows.pid;
+                                    ProdCode = DataRows.ProdCode;
+                                    ProdName = DataRows.prodname;
+                                    DepCode = DataRows.DepCode;
+                                    Count = DataRows.countm;
+                                    ShopPrice = DataRows.ShopPrice;
+                                    prototal = DataRows.prototal;
                                     var SumData = year + "-" + month + "-" + day + " " + hh + ":" + mm + ":" + ss;
                                     var detailDatas = [];
                                     var detail = {};
-                                    detail.LsNo=this.state.numform;
-                                    detail.sDateTime=SumData;
-                                    detail.TradeFlag=this.state.Seles;
-                                    detail.CashierId=Pid;
-                                    detail.CashierCode=usercode;
-                                    detail.CashierName=userName;
-                                    detail.ClerkId=-999;
-                                    detail.ClerkCode="";
-                                    detail.Pid=pid;
-                                    detail.BarCode=BarCode;
-                                    detail.ClerkName="";
-                                    detail.ProdCode=ProdCode;
-                                    detail.ProdName=ProdName;
-                                    detail.DepCode=DepCode;
-                                    detail.Price=ShopPrice;
-                                    detail.Amount=Count;
-                                    detail.DscTotal="";
-                                    detail.Total=prototal;
-                                    detail.HandDsc="";
-                                    if(i==0){
-                                        detail.AutoDscTotal=this.state.subtract;
-                                    }else {
-                                        detail.AutoDscTotal="";
+                                    detail.LsNo = this.state.numform;
+                                    detail.sDateTime = SumData;
+                                    detail.TradeFlag = this.state.Seles;
+                                    detail.CashierId = Pid;
+                                    detail.CashierCode = usercode;
+                                    detail.CashierName = userName;
+                                    detail.ClerkId = -999;
+                                    detail.ClerkCode = "";
+                                    detail.Pid = pid;
+                                    detail.BarCode = BarCode;
+                                    detail.ClerkName = "";
+                                    detail.ProdCode = ProdCode;
+                                    detail.ProdName = ProdName;
+                                    detail.DepCode = DepCode;
+                                    detail.Price = ShopPrice;
+                                    detail.Amount = Count;
+                                    detail.DscTotal = "";
+                                    detail.Total = prototal;
+                                    if (i == 0) {
+                                        detail.AutoDscTotal = this.state.subtract;
+                                    } else {
+                                        detail.AutoDscTotal = "";
                                     }
-                                    detail.InnerNo=InnerNo;
-                                    detail.OrderNo=OrderNo;
+                                    detail.HandDsc = "";
+                                    detail.InnerNo = innerno;
+                                    detail.OrderNo = OrderNo;
                                     detailDatas.push(detail);
                                     dbAdapter.insertDetail(detailDatas);
-
+                                }
+                                ;
+                                var nextRoute = {
+                                    name: "Index",
+                                    component: Index,
                                 };
-                                dbAdapter.selectSum().then((rows)=>{
-                                    this.details = [];
-                                    for(let i  = 0;i<rows.length;i++){
-                                        dbAdapter.selectDetail(rows.item(i).LsNo).then((datas)=>{
-                                            this.details.push(datas);
-                                        });
-                                    };
-                                    console.log('a',this.details);
-                                    Storage.get('LinkUrl').then((tags) => {
-                                        Storage.get('ShopCode').then((ShopCode) => {
-                                            Storage.get('PosCode').then((PosCode) => {
-                                                var upLoadData = uploaddata.upLoadData(tags, rows, this.details,ShopCode,PosCode);
-                                                // alert('a'+"+"+JSON.stringify(upLoadData));
-                                                alert(tags+"+"+ShopCode+"+"+PosCode+"+"+JSON.stringify(rows)+"+"+JSON.stringify(this.details));
-                                            });
-                                        });
-                                    });
-                                });
-                                // var nextRoute = {
-                                //     name: "Index",
-                                //     component: Index,
-                                // };
-                                // this.props.navigator.push(nextRoute);
+                                this.props.navigator.push(nextRoute);
                                 // dbAdapter.deleteData("shopInfo");
                                 Storage.delete("VipCardNo");
                                 Storage.delete("BalanceTotal");
                                 Storage.delete("JfBal");
                             }
-                        })
-                    })
-                })
-            })
-        })
-    }
-
-    restorage1(){
-        return new Promise((resolve, reject) => {
-                Storage.get('VipCardNo').then((VipCardNo) => {
-                    Storage.get('Pid').then((Pid) => {
-                        Storage.get('usercode').then((usercode) => {
-                            Storage.get('userName').then((userName) => {
-                                if (-this.state.ShopAmount == this.state.payments||-this.state.ShopAmount > this.state.payments) {
-                                    var now = new Date();
-                                    var year = now.getFullYear();
-                                    var month = now.getMonth() + 1;
-                                    var day = now.getDate();
-                                    var hh = now.getHours();
-                                    var mm = now.getMinutes();
-                                    var ss = now.getSeconds();
-                                    if (month >= 1 && month <= 9) {
-                                        month = "0" + month;
-                                    }
-                                    if (day >= 1 && day <= 9) {
-                                        day = "0" + day;
-                                    }
-                                    if (hh >= 1 && hh <= 9) {
-                                        hh = "0" + hh;
-                                    }
-                                    if (mm >= 1 && mm <= 9) {
-                                        mm = "0" + mm;
-                                    }
-                                    if (ss >= 1 && ss <= 9) {
-                                        ss = "0" + ss;
-                                    }
-                                    for (let i = 0; i < this.dataRows.length; i++) {
-                                        var dataRows = this.dataRows[i];
-                                        var ino;
-                                        ino =i+1
-                                        var InnerNo = NumFormatUtils.createInnerNo();
-                                        var SumData = year + "-" + month + "-" + day + " " + hh + ":" + mm + ":" + ss;
-                                        //插入Sum表
-                                        var sumDatas = [];
-                                        var sum = {};
-                                        sum.LsNo = this.state.numform;
-                                        sum.sDateTime = SumData;
-                                        sum.CashierId = Pid;
-                                        sum.CashierCode = usercode;
-                                        sum.CashierName = userName;
-                                        sum.ino = ino;
-                                        sum.DscTotal = "";
-                                        sum.Total = -this.state.ShopAmount;
-                                        sum.TotalPay = this.state.payments;
-                                        sum.Change = this.state.Total;
-                                        sum.TradeFlag = this.state.Seles;
-                                        sum.CustType = this.state.custType;
-                                        sum.CustCode = VipCardNo;
-                                        sum.PayId = dataRows.pid;
-                                        sum.PayCode = dataRows.PayCode;
-                                        sum.Amount = dataRows.total;
-                                        sum.OldAmount = dataRows.total;
-                                        sum.TendPayCode = VipCardNo;
-                                        sum.InnerNo = InnerNo;
-                                        sumDatas.push(sum);
-                                        dbAdapter.insertSum(sumDatas);
-                                    };
-                                    for(let i = 0;i<this.state.dataRows.length;i++){
-                                        var DataRows = this.state.dataRows[i];
-                                        var OrderNo;
-                                        OrderNo =i+1;
-                                        var innerno = NumFormatUtils.CreateInnerNo();
-                                        var BarCode;
-                                        var pid;
-                                        var ProdCode;
-                                        var ProdName;
-                                        var DepCode;
-                                        var Count;
-                                        var ShopPrice;
-                                        var prototal;
-                                        BarCode=DataRows.BarCode;
-                                        pid=DataRows.pid;
-                                        ProdCode=DataRows.ProdCode;
-                                        ProdName=DataRows.prodname;
-                                        DepCode=DataRows.DepCode;
-                                        Count=DataRows.countm;
-                                        ShopPrice=DataRows.ShopPrice;
-                                        prototal=DataRows.prototal;
-                                        var SumData = year + "-" + month + "-" + day + " " + hh + ":" + mm + ":" + ss;
-                                        var detailDatas = [];
-                                        var detail = {};
-                                        detail.LsNo=this.state.numform;
-                                        detail.sDateTime=SumData;
-                                        detail.TradeFlag=this.state.Seles;
-                                        detail.CashierId=Pid;
-                                        detail.CashierCode=usercode;
-                                        detail.CashierName=userName;
-                                        detail.ClerkId=-999;
-                                        detail.ClerkCode="";
-                                        detail.Pid=pid;
-                                        detail.BarCode=BarCode;
-                                        detail.ClerkName="";
-                                        detail.ProdCode=ProdCode;
-                                        detail.ProdName=ProdName;
-                                        detail.DepCode=DepCode;
-                                        detail.Price=ShopPrice;
-                                        detail.Amount=Count;
-                                        detail.DscTotal="";
-                                        detail.Total=prototal;
-                                        if(i==0){
-                                            detail.AutoDscTotal=this.state.subtract;
-                                        }else {
-                                            detail.AutoDscTotal="";
-                                        }
-                                        detail.HandDsc="";
-                                        detail.InnerNo=innerno;
-                                        detail.OrderNo=OrderNo;
-                                        detailDatas.push(detail);
-                                        dbAdapter.insertDetail(detailDatas);
-                                    };
-                                    var nextRoute = {
-                                        name: "Index",
-                                        component: Index,
-                                    };
-                                    this.props.navigator.push(nextRoute);
-                                    // dbAdapter.deleteData("shopInfo");
-                                    Storage.delete("VipCardNo");
-                                    Storage.delete("BalanceTotal");
-                                    Storage.delete("JfBal");
-                                };
-                            });
+                            ;
                         });
                     });
                 });
+            });
         });
     }
 
     //Flatlist字段
-    _renderItem(item,index){
-        return(
-            <TouchableOpacity onPress={()=>this.HorButton(item)} style={[styles.PageRowButton,{marginRight:5}]}>
+    _renderItem(item, index) {
+        return (
+            <TouchableOpacity onPress={() => this.HorButton(item)} style={[styles.PageRowButton, {marginRight: 5}]}>
                 <Text style={styles.PageRowText}>
                     {item.item.payName}
                 </Text>
             </TouchableOpacity>
         )
     }
+
     //FlatList加入kay值
     keyExtractor(item: Object, index: number) {
         return item.payName//FlatList使用json中的ProdName动态绑定key
     }
 
     //付款储值卡网络请求
-    Button(){
+    Button() {
         var now = new Date();
         var year = now.getFullYear();
         var month = now.getMonth() + 1;
@@ -691,40 +719,40 @@ export default class Pay extends Component {
         var hh = now.getHours();
         var mm = now.getMinutes();
         var ss = now.getSeconds();
-        if(month >= 1 && month <= 9){
+        if (month >= 1 && month <= 9) {
             month = "0" + month;
         }
-        if(day >= 1 && day <= 9){
+        if (day >= 1 && day <= 9) {
             day = "0" + day;
         }
-        if(hh >= 1 && hh <= 9){
+        if (hh >= 1 && hh <= 9) {
             hh = "0" + hh;
         }
-        if(mm >= 1 && mm <= 9){
+        if (mm >= 1 && mm <= 9) {
             mm = "0" + mm;
         }
-        if(ss >= 1 && ss <= 9){
+        if (ss >= 1 && ss <= 9) {
             ss = "0" + ss;
         }
-        var sum=year+"-"+month+"-"+day+" "+hh+":"+mm+":"+ss;
+        var sum = year + "-" + month + "-" + day + " " + hh + ":" + mm + ":" + ss;
         return new Promise((resolve, reject) => {
             Storage.get('ShopCode').then((ShopCode) => {
                 Storage.get('PosCode').then((PosCode) => {
-                    let params={
-                        TblName:"VipCardPay",
-                        PayOrderNo:this.state.numform,
-                        CardPwd:NetUtils.MD5(this.state.CardPwd)+'',
-                        shopcode:ShopCode,
-                        poscode:PosCode,
-                        CardFaceNo:this.state.CardFaceNo,
-                        OrderTotal:this.state.amount,
-                        SaleTotal:this.state.ShopAmount,
-                        JfValue:0,
-                        TransFlag:sum,
+                    let params = {
+                        TblName: "VipCardPay",
+                        PayOrderNo: this.state.numform,
+                        CardPwd: NetUtils.MD5(this.state.CardPwd) + '',
+                        shopcode: ShopCode,
+                        poscode: PosCode,
+                        CardFaceNo: this.state.CardFaceNo,
+                        OrderTotal: this.state.amount,
+                        SaleTotal: this.state.ShopAmount,
+                        JfValue: 0,
+                        TransFlag: sum,
                     }
                     Storage.get('LinkUrl').then((tags) => {
                         FetchUtil.post(tags, JSON.stringify(params)).then((data) => {
-                            if(data.retcode==1){
+                            if (data.retcode == 1) {
                                 var TblRow = data.TblRow;
                                 var retcurrJF;
                                 var retZjf;
@@ -738,20 +766,22 @@ export default class Pay extends Component {
                                     retZjf = row.retZjf;
                                     ReferenceNo = row.ReferenceNo;
                                     retTxt = row.retTxt;
-                                };
+                                }
+                                ;
                                 //支付方式
-                                for(let i = 0;i<this.productData.length;i++){
+                                for (let i = 0; i < this.productData.length; i++) {
                                     var Pid;
                                     var PayCode;
                                     var productData = this.productData[i];
-                                    if(productData.payName=="储值卡"){
-                                        Pid=productData.Pid;
-                                        PayCode=productData.PayCode;
+                                    if (productData.payName == "储值卡") {
+                                        Pid = productData.Pid;
+                                        PayCode = productData.PayCode;
                                     }
-                                };
+                                }
+                                ;
                                 var TblRowconcat = {
                                     'payName': '储值卡',
-                                    'CardFaceNo':this.state.CardFaceNo,
+                                    'CardFaceNo': this.state.CardFaceNo,
                                     'total': retcurrJF,
                                     'retZjf': retZjf,
                                     'ReferenceNo': ReferenceNo,
@@ -761,7 +791,7 @@ export default class Pay extends Component {
                                 };
                                 this.dataRows.push(TblRowconcat);
                                 this.state.payments += retcurrJF;
-                                var Total = BigDecimalUtils.subtract(this.state.ShopAmount,this.state.payments,2)
+                                var Total = BigDecimalUtils.subtract(this.state.ShopAmount, this.state.payments, 2)
                                 this.setState({
                                     payments: this.state.payments,
                                     Amount: retcurrJF,
@@ -771,10 +801,11 @@ export default class Pay extends Component {
                                 this.restorage();
                                 this.Total();
 
-                            }else{
+                            } else {
                                 alert(JSON.stringify(data))
-                            };
-                        },(err)=>{
+                            }
+                            ;
+                        }, (err) => {
                             alert("网络请求失败");
                         });
                     })
@@ -788,7 +819,7 @@ export default class Pay extends Component {
     }
 
     //退货储值卡
-    RetButton(){
+    RetButton() {
         var now = new Date();
         var year = now.getFullYear();
         var month = now.getMonth() + 1;
@@ -796,24 +827,24 @@ export default class Pay extends Component {
         var hh = now.getHours();
         var mm = now.getMinutes();
         var ss = now.getSeconds();
-        if(month >= 1 && month <= 9){
+        if (month >= 1 && month <= 9) {
             month = "0" + month;
         }
-        if(day >= 1 && day <= 9){
+        if (day >= 1 && day <= 9) {
             day = "0" + day;
         }
-        if(hh >= 1 && hh <= 9){
+        if (hh >= 1 && hh <= 9) {
             hh = "0" + hh;
         }
-        if(mm >= 1 && mm <= 9){
+        if (mm >= 1 && mm <= 9) {
             mm = "0" + mm;
         }
-        if(ss >= 1 && ss <= 9){
+        if (ss >= 1 && ss <= 9) {
             ss = "0" + ss;
         }
-        var sum=year+"-"+month+"-"+day+" "+hh+":"+mm+":"+ss;
-        var Datatime=this.state.DataTime;
-        if(this.state.DataTime.length==8){
+        var sum = year + "-" + month + "-" + day + " " + hh + ":" + mm + ":" + ss;
+        var Datatime = this.state.DataTime;
+        if (this.state.DataTime.length == 8) {
             var reg = /(.{4})(.*)/;
             Datatime = Datatime.replace(reg, "$1-$2");
             var Reg = /(.{7})(.*)/;
@@ -838,7 +869,7 @@ export default class Pay extends Component {
                         };
                         Storage.get('LinkUrl').then((tags) => {
                             FetchUtil.post(tags, JSON.stringify(params)).then((data) => {
-                                if(data.retcode==1) {
+                                if (data.retcode == 1) {
                                     var TblRow = data.TblRow;
                                     var retcurrJF;
                                     var retZjf;
@@ -853,20 +884,22 @@ export default class Pay extends Component {
                                         ReferenceNo = row.ReferenceNo;
                                         retTxt = row.retTxt;
 
-                                    };
+                                    }
+                                    ;
                                     //支付方式
-                                    for(let i = 0;i<this.productData.length;i++){
+                                    for (let i = 0; i < this.productData.length; i++) {
                                         var Pid;
                                         var PayCode;
                                         var productData = this.productData[i];
-                                        if(productData.payName=="储值卡"){
-                                            Pid=productData.Pid;
-                                            PayCode=productData.PayCode;
+                                        if (productData.payName == "储值卡") {
+                                            Pid = productData.Pid;
+                                            PayCode = productData.PayCode;
                                         }
-                                    };
+                                    }
+                                    ;
                                     var TblRowconcat = {
                                         'payName': '储值卡',
-                                        'CardFaceNo':this.state.CardFaceNo,
+                                        'CardFaceNo': this.state.CardFaceNo,
                                         'total': -retcurrJF,
                                         'retZjf': retZjf,
                                         'ReferenceNo': ReferenceNo,
@@ -876,7 +909,7 @@ export default class Pay extends Component {
                                     };
                                     this.dataRows.push(TblRowconcat);
                                     this.state.payments -= retcurrJF;
-                                    var Total = -(BigDecimalUtils.add(this.state.ShopAmount,this.state.payments,2));
+                                    var Total = -(BigDecimalUtils.add(this.state.ShopAmount, this.state.payments, 2));
                                     this.setState({
                                         payments: this.state.payments,
                                         Amount: retcurrJF,
@@ -890,24 +923,26 @@ export default class Pay extends Component {
                                     });
                                     this.restorage1();
                                     this.RefundTotal();
-                                }else{
+                                } else {
                                     alert(JSON.stringify(data))
-                                };
-                            },(err)=>{
+                                }
+                                ;
+                            }, (err) => {
                                 alert("网络请求失败");
                             });
                         });
                     });
                 });
             });
-        }else{
+        } else {
             alert("请输入正确的时间")
         }
     }
 
-    CloseRetButton(){
+    CloseRetButton() {
         this.RefundTotal();
     }
+
     render() {
         return (
             <View style={styles.container}>
@@ -923,49 +958,63 @@ export default class Pay extends Component {
                     <View style={styles.FristList}>
                         <View style={styles.List}>
                             <View style={styles.ListView1}>
-                                <Text style={[styles.ListText,{textAlign:"center"}]}>应付金额</Text>
+                                <Text style={[styles.ListText, {textAlign: "center"}]}>应付金额</Text>
                             </View>
                         </View>
                         <View style={styles.List}>
                             <View style={styles.ListView1}>
-                                <Text style={[styles.ListText,{textAlign:"center"}]}>支付金额</Text>
+                                <Text style={[styles.ListText, {textAlign: "center"}]}>支付金额</Text>
                             </View>
                         </View>
                         <View style={styles.List}>
                             <View style={styles.ListView1}>
-                                <Text style={[styles.ListText,{textAlign:"center"}]}>剩余金额</Text>
+                                <Text style={[styles.ListText, {textAlign: "center"}]}>剩余金额</Text>
                             </View>
                         </View>
                     </View>
                     <View style={styles.FristList}>
                         {
-                            (this.state.Seles=="T")?
+                            (this.state.Seles == "T") ?
                                 <View style={styles.List}>
                                     <View style={styles.ListView1}>
-                                        <Text style={[styles.ListText,{textAlign:"center"}]}>{this.state.ShopAmount}</Text>
+                                        <Text
+                                            style={[styles.ListText, {textAlign: "center"}]}>{this.state.ShopAmount}</Text>
                                     </View>
-                                </View>:
+                                </View> :
                                 <View style={styles.List}>
                                     <View style={styles.ListView1}>
-                                        <Text style={[styles.ListText,{textAlign:"center"}]}>-{this.state.ShopAmount}</Text>
+                                        <Text
+                                            style={[styles.ListText, {textAlign: "center"}]}>-{this.state.ShopAmount}</Text>
                                     </View>
                                 </View>
                         }
                         <View style={styles.List}>
                             <View style={styles.ListView1}>
-                                <Text style={[styles.ListText,{textAlign:"center"}]}>{this.state.payments}</Text>
+                                <Text style={[styles.ListText, {textAlign: "center"}]}>{this.state.payments}</Text>
                             </View>
                         </View>
                         <View style={styles.List}>
                             <View style={styles.ListView1}>
-                                <Text style={[styles.ListText,{textAlign:"center"}]}>{this.state.Total}</Text>
+                                <Text style={[styles.ListText, {textAlign: "center"}]}>{this.state.Total}</Text>
                             </View>
                         </View>
                     </View>
                 </View>
                 <View style={styles.ShopCont}>
-                    <View style={[{backgroundColor:"#ff4e4e",width:10,height:60,position:"absolute",left:0,}]}></View>
-                    <View style={[{backgroundColor:"#ff4e4e",width:10,height:60,position:"absolute",right:0,}]}></View>
+                    <View style={[{
+                        backgroundColor: "#ff4e4e",
+                        width: 10,
+                        height: 60,
+                        position: "absolute",
+                        left: 0,
+                    }]}></View>
+                    <View style={[{
+                        backgroundColor: "#ff4e4e",
+                        width: 10,
+                        height: 60,
+                        position: "absolute",
+                        right: 0,
+                    }]}></View>
                     <View style={styles.ShopList}>
                         <View style={styles.ListTitle}>
                             <View style={styles.ListClass}>
@@ -1024,9 +1073,9 @@ export default class Pay extends Component {
                                     textalign="center"
                                     underlineColorAndroid='transparent'
                                     style={styles.paymentinput}
-                                    onChangeText={(value)=>{
+                                    onChangeText={(value) => {
                                         this.setState({
-                                            amount:value
+                                            amount: value
                                         })
                                     }}
                                 />
@@ -1040,7 +1089,7 @@ export default class Pay extends Component {
                         </TouchableOpacity>
                     </View>
                     <FlatList
-                        horizontal = {true}
+                        horizontal={true}
                         key={item => item.Pid}
                         style={styles.horizontal}
                         renderItem={this._renderItem.bind(this)}
@@ -1220,7 +1269,8 @@ export default class Pay extends Component {
                                                           style={[styles.MemberClose, {marginRight: 15,}]}>
                                             <Text style={styles.TitleText}>取消</Text>
                                         </TouchableOpacity>
-                                        <TouchableOpacity onPress={this.RetButton.bind(this)} style={styles.MemberClose}>
+                                        <TouchableOpacity onPress={this.RetButton.bind(this)}
+                                                          style={styles.MemberClose}>
                                             <Text style={styles.TitleText}>确定</Text>
                                         </TouchableOpacity>
                                     </View>
@@ -1231,8 +1281,10 @@ export default class Pay extends Component {
                     <Modal
                         transparent={true}
                         visible={this.state.LayerShow}
-                        onShow={() => {}}
-                        onRequestClose={() => {}} >
+                        onShow={() => {
+                        }}
+                        onRequestClose={() => {
+                        }}>
                         <Image source={require("../images/background.png")} style={styles.ModalStyle}>
                             <View style={styles.ModalStyleCont}>
                                 <View style={styles.ModalStyleTitle}>
@@ -1251,8 +1303,10 @@ export default class Pay extends Component {
                     <Modal
                         transparent={true}
                         visible={this.state.ModalShow}
-                        onShow={() => {}}
-                        onRequestClose={() => {}} >
+                        onShow={() => {
+                        }}
+                        onRequestClose={() => {
+                        }}>
                         <Image source={require("../images/background.png")} style={styles.ModalStyle}>
                             <View style={styles.ModalStyleCont}>
                                 <View style={styles.ModalStyleTitle}>
@@ -1278,220 +1332,220 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#f2f2f2',
-        paddingBottom:10,
+        paddingBottom: 10,
     },
-    header:{
-        height:60,
-        backgroundColor:"#ff4e4e",
-        paddingTop:10,
+    header: {
+        height: 60,
+        backgroundColor: "#ff4e4e",
+        paddingTop: 10,
     },
-    cont:{
-        flexDirection:"row",
-        paddingLeft:16,
-        paddingRight:16,
+    cont: {
+        flexDirection: "row",
+        paddingLeft: 16,
+        paddingRight: 16,
     },
-    HeaderList:{
-        flex:6,
-        textAlign:"center",
-        paddingRight:56,
-        color:"#ffffff",
-        fontSize:22,
-        marginTop:3,
+    HeaderList: {
+        flex: 6,
+        textAlign: "center",
+        paddingRight: 56,
+        color: "#ffffff",
+        fontSize: 22,
+        marginTop: 3,
     },
-    TitleCont:{
-        height:74,
-        backgroundColor:"#ff4e4e",
-        paddingLeft:10,
-        paddingRight:10,
+    TitleCont: {
+        height: 74,
+        backgroundColor: "#ff4e4e",
+        paddingLeft: 10,
+        paddingRight: 10,
     },
-    FristList:{
-        height:30,
-        paddingTop:5,
-        flexDirection:"row",
+    FristList: {
+        height: 30,
+        paddingTop: 5,
+        flexDirection: "row",
     },
-    List:{
-        flex:1,
-        flexDirection:"row",
+    List: {
+        flex: 1,
+        flexDirection: "row",
     },
-    ListView:{
-        flex:1,
-        height:20,
-        overflow:"hidden",
-        backgroundColor:"#ff4e4e"
+    ListView: {
+        flex: 1,
+        height: 20,
+        overflow: "hidden",
+        backgroundColor: "#ff4e4e"
     },
-    ListView1:{
-        flex:1
+    ListView1: {
+        flex: 1
     },
-    ListText:{
-        color:"#ffffff",
-        fontSize:16,
+    ListText: {
+        color: "#ffffff",
+        fontSize: 16,
     },
-    ShopCont:{
-        paddingLeft:10,
-        paddingRight:10,
+    ShopCont: {
+        paddingLeft: 10,
+        paddingRight: 10,
     },
-    ShopList:{
-        height:180,
-        borderRadius:5,
-        backgroundColor:"#ffffff",
+    ShopList: {
+        height: 180,
+        borderRadius: 5,
+        backgroundColor: "#ffffff",
     },
-    ListTitle:{
-        height:54,
-        paddingTop:16,
-        flexDirection:"row",
-        backgroundColor:"#f2f2f2",
-        borderTopLeftRadius:5,
-        borderTopRightRadius:5,
+    ListTitle: {
+        height: 54,
+        paddingTop: 16,
+        flexDirection: "row",
+        backgroundColor: "#f2f2f2",
+        borderTopLeftRadius: 5,
+        borderTopRightRadius: 5,
     },
-    ListClass:{
-        flex:1
+    ListClass: {
+        flex: 1
     },
-    ListClassText:{
-        color:"#666666",
-        fontSize:16,
-        textAlign:"center"
+    ListClassText: {
+        color: "#666666",
+        fontSize: 16,
+        textAlign: "center"
     },
-    Prece:{
-        height:54,
-        marginTop:10,
-        marginLeft:20,
-        marginRight:20,
-        flexDirection:"row"
+    Prece: {
+        height: 54,
+        marginTop: 10,
+        marginLeft: 20,
+        marginRight: 20,
+        flexDirection: "row"
     },
-    InputingLeft:{
-        width:80,
-        marginTop:15
+    InputingLeft: {
+        width: 80,
+        marginTop: 15
     },
-    InpuTingText:{
-        color:"#333333",
-        fontSize:16,
+    InpuTingText: {
+        color: "#333333",
+        fontSize: 16,
     },
-    InputingRight:{
-        flex:1,
-        height:54,
-        paddingTop:6,
-        backgroundColor:"#ffffff",
-        borderRadius:5,
+    InputingRight: {
+        flex: 1,
+        height: 54,
+        paddingTop: 6,
+        backgroundColor: "#ffffff",
+        borderRadius: 5,
     },
-    Inputing:{
-        flex:2,
-        flexDirection:"row"
+    Inputing: {
+        flex: 2,
+        flexDirection: "row"
     },
-    Inputing1:{
-        flex:3,
-        flexDirection:"row"
+    Inputing1: {
+        flex: 3,
+        flexDirection: "row"
     },
-    Inputingleft:{
-        width:65,
-        height:20,
+    Inputingleft: {
+        width: 65,
+        height: 20,
     },
-    Inputingright:{
-        flex:1,
-        height:20,
-        overflow:"hidden",
+    Inputingright: {
+        flex: 1,
+        height: 20,
+        overflow: "hidden",
     },
-    InputingText:{
-        fontSize:18,
-        color:"#333333",
+    InputingText: {
+        fontSize: 18,
+        color: "#333333",
     },
-    Inputing1Left:{
-        flexDirection:"row"
+    Inputing1Left: {
+        flexDirection: "row"
     },
-    horizontal:{
-        marginLeft:10,
-        marginRight:10,
-        marginTop:20,
-        paddingBottom:15,
+    horizontal: {
+        marginLeft: 10,
+        marginRight: 10,
+        marginTop: 20,
+        paddingBottom: 15,
     },
-    PageRowButton:{
-        backgroundColor:"#ff4e4e",
-        borderRadius:5,
-        paddingLeft:10,
-        paddingRight:10,
-        paddingTop:10,
-        paddingBottom:10,
-        height:46,
+    PageRowButton: {
+        backgroundColor: "#ff4e4e",
+        borderRadius: 5,
+        paddingLeft: 10,
+        paddingRight: 10,
+        paddingTop: 10,
+        paddingBottom: 10,
+        height: 46,
     },
-    PageRowText:{
-        color:"#ffffff",
-        fontSize:16,
-        textAlign:"center"
+    PageRowText: {
+        color: "#ffffff",
+        fontSize: 16,
+        textAlign: "center"
     },
-    MemberMent:{
-        height:35,
-        marginTop:10,
-        marginLeft:10,
-        marginRight:10,
-        flexDirection:"row"
+    MemberMent: {
+        height: 35,
+        marginTop: 10,
+        marginLeft: 10,
+        marginRight: 10,
+        flexDirection: "row"
     },
-    MemberText:{
-        color:"#333333",
-        fontSize:16,
+    MemberText: {
+        color: "#333333",
+        fontSize: 16,
     },
-    Member:{
-        flex:1,
-        flexDirection:"row",
+    Member: {
+        flex: 1,
+        flexDirection: "row",
     },
-    MemberLeft:{
-        width:50,
+    MemberLeft: {
+        width: 50,
     },
-    MemberRight:{
-        flex:1
+    MemberRight: {
+        flex: 1
     },
-    PayMent:{
-        height:45,
-        marginTop:10,
-        marginLeft:10,
-        marginRight:10,
-        flexDirection:"row"
+    PayMent: {
+        height: 45,
+        marginTop: 10,
+        marginLeft: 10,
+        marginRight: 10,
+        flexDirection: "row"
     },
-    FirstMent:{
-        flex:1,
-        flexDirection:"row"
+    FirstMent: {
+        flex: 1,
+        flexDirection: "row"
     },
-    FirstMent1:{
-        width:70,
-        marginLeft:3,
-        marginRight:3,
-        backgroundColor:"#ff4e4e",
-        borderRadius:5,
-        paddingTop:6,
-        height:35
+    FirstMent1: {
+        width: 70,
+        marginLeft: 3,
+        marginRight: 3,
+        backgroundColor: "#ff4e4e",
+        borderRadius: 5,
+        paddingTop: 6,
+        height: 35
     },
-    FirstMentText:{
-        color:"#ffffff",
-        fontSize:16,
-        textAlign:"center",
+    FirstMentText: {
+        color: "#ffffff",
+        fontSize: 16,
+        textAlign: "center",
     },
-    paymentleft:{
-        width:65,
-        paddingTop:7,
+    paymentleft: {
+        width: 65,
+        paddingTop: 7,
     },
-    paymentright:{
-        flex:1,
-        height:35,
-        backgroundColor:"#ffffff",
-        borderRadius:5,
+    paymentright: {
+        flex: 1,
+        height: 35,
+        backgroundColor: "#ffffff",
+        borderRadius: 5,
     },
-    paymentinput:{
-        flex:1,
+    paymentinput: {
+        flex: 1,
     },
-    ShopList1:{
-        paddingTop:10,
-        paddingBottom:10,
-        backgroundColor:"#ffffff",
-        borderBottomWidth:1,
-        borderBottomColor:"#f2f2f2",
-        flexDirection:"row",
+    ShopList1: {
+        paddingTop: 10,
+        paddingBottom: 10,
+        backgroundColor: "#ffffff",
+        borderBottomWidth: 1,
+        borderBottomColor: "#f2f2f2",
+        flexDirection: "row",
     },
-    Row:{
-        flex:1,
+    Row: {
+        flex: 1,
     },
-    Name:{
-        fontSize:16,
-        color:"#333333",
-        overflow:"hidden",
-        textAlign:"center"
+    Name: {
+        fontSize: 16,
+        color: "#333333",
+        overflow: "hidden",
+        textAlign: "center"
     },
     MemberBounces: {
         backgroundColor: "#3e3d3d",
@@ -1566,34 +1620,34 @@ const styles = StyleSheet.create({
         paddingBottom: 6,
         borderRadius: 5,
     },
-    ModalStyle:{
-        flex:1,
+    ModalStyle: {
+        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        width:null,
-        height:null,
+        width: null,
+        height: null,
     },
-    ModalStyleCont:{
-        height:130,
-        paddingTop:30,
-        paddingLeft:10,
-        paddingRight:10,
-        borderRadius:5,
-        backgroundColor:"#ffffff",
+    ModalStyleCont: {
+        height: 130,
+        paddingTop: 30,
+        paddingLeft: 10,
+        paddingRight: 10,
+        borderRadius: 5,
+        backgroundColor: "#ffffff",
     },
-    ModalStyleTitle:{
-        height:40,
-        paddingLeft:50,
-        paddingRight:50,
-        borderBottomWidth:1,
-        borderBottomColor:"#f5f5f5",
+    ModalStyleTitle: {
+        height: 40,
+        paddingLeft: 50,
+        paddingRight: 50,
+        borderBottomWidth: 1,
+        borderBottomColor: "#f5f5f5",
     },
-    ModalTitleText:{
-        fontSize:16,
-        color:"#333333",
-        textAlign:"center",
+    ModalTitleText: {
+        fontSize: 16,
+        color: "#333333",
+        textAlign: "center",
     },
-    Button:{
-        paddingTop:20,
+    Button: {
+        paddingTop: 20,
     },
 });
