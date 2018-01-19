@@ -7,14 +7,14 @@ export default class UpLoadData {
       return new Promise((resolve,reject)=>{
         let requestBody =JSON.stringify({
             'TblName':'upsum',
-            'shopcode':shopCode,
-            'poscode':posCode,
-            'detail':JSON.stringify(details),
-            'sum':JSON.stringify(sums),
+            'ShopCode':shopCode,
+            'PosCode':posCode,
+            'detail':details,
+            'sum':sums,
         });
           console.log(requestBody);
         FetchUtils.post(url,requestBody).then((success)=>{
-          // alert(JSON.stringify(success))
+            console.log('aaa',success);
             for(let i = 0;i<details.length;i++){
               console.log(details[i]);
             }
