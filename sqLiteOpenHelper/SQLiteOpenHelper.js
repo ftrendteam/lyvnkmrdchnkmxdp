@@ -37,7 +37,7 @@ export default class SQLiteOpenHelper {
     if (!db) {
       this.open();
     }
-    
+    //db.onUpdateComponent()
     db.transaction((tx) => {
       //创建机构信息
       tx.executeSql('CREATE TABLE IF NOT EXISTS tshopitem(pid int not null Primary Key,shopcode varchar(20) null,shopname varchar(200) null,' +
@@ -165,25 +165,25 @@ export default class SQLiteOpenHelper {
         }, (err) => {
           console.log(err);
         });
-      tx.executeSql("CREATE TABLE IF NOT EXISTS Sum(LsNo varchar(12) not null,sDateTime varchar(19) not null,TradeFlag varchar(1) null," +
-        "CashierId int(4) null,CashierCode varchar(12) null,ino int(4) null,CashierName varchar(20) null,DscTotal float(8) null,AutoDscTotal float(8) null," +
-        "Total float(8) null, TotalPay float(8) null,Change float(8) null,CustType varchar(1) null, CustCode varchar(20) null," +
-        "InvCode varchar(12) null,PayId int(4) null,PayCode varchar(2) null,Amount float(8) null,OldAmount float(8) null," +
-        "TendPayCode varchar(30) null,VipTotal float(8) null,TScore float(8) null,VipSCore float(8) null, InnerNo varchar(12) null,TransFlag varchar(19) null,TransDateTime varchar(19) null,YWDate varchar(10) null)",
-        [], () => {
+      tx.executeSql("CREATE TABLE IF NOT EXISTS Sum(LsNo varchar(12) not null,sDateTime varchar(19) not null,TradeFlag varchar(1) null default('')," +
+        "CashierId int(4) null default(0),CashierCode varchar(12) null default(''),ino int(4) not null,CashierName varchar(20) null default(''),DscTotal float(8) null default(0),AutoDscTotal float(8) null default(0)," +
+        "Total float(8) null default(0), TotalPay float(8) null default(0),Change float(8) null default(0),CustType varchar(1) null default(''), CustCode varchar(20) null default('')," +
+        "InvCode varchar(12) null default(''),PayId int(4) null default(0),PayCode varchar(2) null default(''),Amount float(8) null default(0),OldAmount float(8) null default(0)," +
+        "TendPayCode varchar(30) null default(''),VipTotal float(8) null default(0),TScore float(8) null default(0),VipSCore float(8) null default(0), InnerNo varchar(12) not null  ,TransFlag varchar(19) null default(''),TransDateTime varchar(19) null default(''),YWDate varchar(10) null default(''),Primary Key(LsNo,sDateTime,InnerNo,ino))",
+        [], () => {//
         },
         (err) => {
           console.log(err);
         });
-      tx.executeSql("CREATE TABLE IF NOT EXISTS Detail(LsNo varchar(12) not null,sDateTime varchar(19) not null,TradeFlag varchar(1) null," +
-        "CashierId int(4) null,CashierCode varchar(12) null,CashierName varchar(20) null,ClerkId int(4) null,ClerkCode varchar(12) null,Pid int(4) not null,BarCode varchar(18) null," +
-        "ClerkName  varchar(20) null,ProdCode varchar(13) null,ProdName varchar(40) null,DepCode varchar(12) null,Price float(8) null,Amount float(8) null," +
-        "DscTotal float(8) null,AutoDscTotal float(8) null," +
-        "Total float(8) null,HandDsc float(8) null,CxDsc float(8) null,EvenDsc float(8) null,MljDsc float(8) null, OverDsc float(8) null,OtherDsc float(8) null,TranDsc float(1) null, VipDsc float(20) null," +
-        "InnerNo varchar(12) null,OrderNo varchar(3) null,TransFlag varchar(1) null,TransDateTime varchar(19) null,BrandDsc float(8) null," +
-        "isSubProd varchar(1) null,isMinus varchar(1) null,BuyPresentCode varchar(20) null,BuyPresentGroupNo varchar(20) null, BPUsedCountN float(8) null,DscFormNo varchar(20) null,DscMJFormNo varchar(20) null,SSID varchar(32) null," +
-        "DscMZFormNo varchar(20) null,DscGSFormNo varchar(20) null,GSUsedCountN float(8) null,YWDate varchar(10))", [], () => {
-      }, (err) => {
+      tx.executeSql("CREATE TABLE IF NOT EXISTS Detail(LsNo varchar(12) not null,sDateTime varchar(19) not null,TradeFlag varchar(1) null default('')," +
+        "CashierId int(4) null default(0),CashierCode varchar(12) null default(''),CashierName varchar(20) null default(''),ClerkId int(4) null default(0),ClerkCode varchar(12) null default(''),Pid int(4) not null,BarCode varchar(18) null default('')," +
+        "ClerkName  varchar(20) null default(''),ProdCode varchar(13) null default(''),ProdName varchar(40) null default(''),DepCode varchar(12) null default(''),Price float(8) null default(0),Amount float(8) null default(0)," +
+        "DscTotal float(8) null default(0),AutoDscTotal float(8) null default(0)," +
+        "Total float(8) null default(0),HandDsc float(8) null default(0),CxDsc float(8) null default(0),EvenDsc float(8) null default(0),MljDsc float(8) null default(0), OverDsc float(8) null default(0),OtherDsc float(8) null default(0),TranDsc float(1) null default(0), VipDsc float(20) null default(0)," +
+        "InnerNo varchar(12) not null,OrderNo varchar(3) not null,TransFlag varchar(1) null default(''),TransDateTime varchar(19) null default(''),BrandDsc float(8) null default(0)," +
+        "isSubProd varchar(1) null default(''),isMinus varchar(1) null default(''),BuyPresentCode varchar(20) null default(''),BuyPresentGroupNo varchar(20) null default(''), BPUsedCountN float(8) null default(0),DscFormNo varchar(20) null default(''),DscMJFormNo varchar(20) null default(''),SSID varchar(32) null default('')," +
+        "DscMZFormNo varchar(20) null default(''),DscGSFormNo varchar(20) null default(''),GSUsedCountN float(8) null default(0),YWDate varchar(10)  null default(''),Primary Key(LsNo,sDateTime,InnerNo,OrderNo))", [], () => {
+      }, (err) => {//
         console.log(err);
       });
       //挂单表

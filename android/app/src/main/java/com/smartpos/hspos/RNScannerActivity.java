@@ -88,7 +88,7 @@ public class RNScannerActivity extends ReactContextBaseJavaModule{
         private BroadcastReceiver mSamDataReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-            System.out.println("wtf?");
+
                 if (intent.getAction().equals(SCN_CUST_ACTION_SCODE)) {
                    String message = intent.getStringExtra(SCN_CUST_EX_SCODE);
                    reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("code",message);
@@ -106,7 +106,7 @@ public class RNScannerActivity extends ReactContextBaseJavaModule{
                     //soundpool.play(soundid, 1, 1, 0, 0, 1);
 
                     //mVibrator.vibrate(100);
-System.out.println("wtf2");
+
                     byte[] barcode = intent.getByteArrayExtra(ScanManager
                             .DECODE_DATA_TAG);
                     int barcodelen = intent.getIntExtra(ScanManager

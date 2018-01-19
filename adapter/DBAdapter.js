@@ -475,29 +475,30 @@ export default class DBAdapter extends SQLiteOpenHelper {
       });
     });
   }
-
-    /***
-     * 删除shopInfo 表中某一条数据
-     * @param prodCode
-     * @returns {Promise}
-     */
-  deteleShopInfo(ProdCode){
-      return new Promise((resolve, reject) => {
-          db.transaction((tx) => {
-              tx.executeSql("delete from shopInfo where prodCode ='"+ProdCode+"'", [], (tx, results) => {
-                  try {
-                      resolve(true);
-                  } catch (err) {
-                      reject(false);
-                  }
-              },(err)=>{
-                alert(JSON.stringify(err));
-              });
-          }, (error) => {
-              this._errorCB('transaction', error);
-          });
+  
+  /***
+   * 删除shopInfo 表中某一条数据
+   * @param prodCode
+   * @returns {Promise}
+   */
+  deteleShopInfo(ProdCode) {
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        tx.executeSql("delete from shopInfo where prodCode ='" + ProdCode + "'", [], (tx, results) => {
+          try {
+            resolve(true);
+          } catch (err) {
+            reject(false);
+          }
+        }, (err) => {
+          alert(JSON.stringify(err));
+        });
+      }, (error) => {
+        this._errorCB('transaction', error);
       });
+    });
   }
+  
   /***
    * 修改某个商品的数量+1
    */
@@ -1098,30 +1099,30 @@ export default class DBAdapter extends SQLiteOpenHelper {
           let ino = sum.ino;
           let cashierName = sum.CashierName;
           let dscTotal = sum.DscTotal;
-          let autoDscTotal = sum.AutoDscTotal;
+          //let autoDscTotal = sum.AutoDscTotal;
           let total = sum.Total;
           let totalPay = sum.TotalPay;
           let change = sum.Change;
           let custType = sum.CustType;
           let custCode = sum.CustCode;
-          let invCode = sum.InvCode;
+          //let invCode = sum.InvCode;
           let payId = sum.PayId;
           let payCode = sum.PayCode;
           let amount = sum.Amount;
           let oldAmount = sum.OldAmount;
           let tendPayCode = sum.TendPayCode;
-          let vipTotal = sum.VipTotal;
-          let tScore = sum.TScore;
-          let vipSCore = sum.VipSCore;
+          //let vipTotal = sum.VipTotal;
+          //let tScore = sum.TScore;
+          //let vipSCore = sum.VipSCore;
           let innerNo = sum.InnerNo;
-          let transFlag = sum.TransFlag;
-          let transDateTime = sum.TransDateTime;
-          let ywDate = sum.YWDate;
+          //let transFlag = sum.TransFlag;
+          //let transDateTime = sum.TransDateTime;
+          //let ywDate = sum.YWDate;
           console.log(lsNo, sDateTime, tradeFlag, cashierId, cashierCode, ino, cashierName, dscTotal, autoDscTotal, total, totalPay, change, custType, custCode,
             invCode, payId, payCode, amount, oldAmount, tendPayCode, vipTotal, tScore, vipSCore, innerNo, transFlag, transDateTime, ywDate);
           let sql = "insert into Sum(LsNo,sDateTime,TradeFlag,CashierId,CashierCode,ino,CashierName,DscTotal,AutoDscTotal,Total,TotalPay,Change,CustType,CustCode,InvCode," +
             "PayId,PayCode,Amount,OldAmount,TendPayCode,VipTotal,TScore,VipSCore,InnerNo,TransFlag,TransDateTime,YWDate) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-          try{
+          try {
             tx.executeSql(sql, [lsNo, sDateTime, tradeFlag, cashierId, cashierCode, ino, cashierName, dscTotal, autoDscTotal, total, totalPay, change, custType, custCode,
                 invCode, payId, payCode, amount, oldAmount, tendPayCode, vipTotal, tScore, vipSCore, innerNo, transFlag, transDateTime, ywDate], (tx, results) => {
                 //resolve((results.rows));
@@ -1129,10 +1130,10 @@ export default class DBAdapter extends SQLiteOpenHelper {
                 console.log("err===", err);
               }
             );
-          }catch (err){
+          } catch (err) {
             console.log(err);
           }
-         
+          
         } catch (err) {
           console.log("err2==", err);
         }
@@ -1169,32 +1170,32 @@ export default class DBAdapter extends SQLiteOpenHelper {
           let amount = detail.Amount;
           let dscTotal = detail.DscTotal;
           let total = detail.Total;
-          let autoDscTotal = detail.AutoDscTotal;
+          //let autoDscTotal = detail.AutoDscTotal;
           let handDsc = detail.HandDsc;
-          let cxDsc = detail.CxDsc;
-          let evenDsc = detail.EvenDsc;
-          let mljDsc = detail.MljDsc;
-          let overDsc = detail.OverDsc;
-          let otherDsc = detail.OtherDsc;
-          let tranDsc = detail.TranDsc;
-          let vipDsc = detail.VipDsc;
-          let innerNo = detail.InnerNo;
-          let orderNo = detail.OrderNo;
-          let transFlag = detail.TransFlag;
-          let transDateTime = detail.TransDateTime;
-          let brandDsc = detail.BrandDsc;
-          let subProd = detail.isSubProd;
-          let minus = detail.isMinus;
-          let buyPresentCode = detail.BuyPresentCode;
-          let buyPresentGroupNo = detail.BuyPresentGroupNo;
-          let bpUsedCountN = detail.BPUsedCountN;
-          let dscFormNo = detail.DscFormNo;
-          let dscMJFormNo = detail.DscMJFormNo;
-          let ssid = detail.SSID;
-          let dscMZFormNo = detail.DscMZFormNo;
-          let dscGSFormNo = detail.DscGSFormNo;
-          let gsUsedCountN = detail.GSUsedCountN;
-          let ywDate = detail.YWDate;
+          //let cxDsc = detail.CxDsc;
+          //let evenDsc = detail.EvenDsc;
+          //let mljDsc = detail.MljDsc;
+          //let overDsc = detail.OverDsc;
+          //let otherDsc = detail.OtherDsc;
+          //let tranDsc = detail.TranDsc;
+          //let vipDsc = detail.VipDsc;
+          //let innerNo = detail.InnerNo;
+          //let orderNo = detail.OrderNo;
+          //let transFlag = detail.TransFlag;
+          //let transDateTime = detail.TransDateTime;
+          //let brandDsc = detail.BrandDsc;
+          //let subProd = detail.isSubProd;
+          //let minus = detail.isMinus;
+          //let buyPresentCode = detail.BuyPresentCode;
+          //let buyPresentGroupNo = detail.BuyPresentGroupNo;
+          //let bpUsedCountN = detail.BPUsedCountN;
+          //let dscFormNo = detail.DscFormNo;
+          //let dscMJFormNo = detail.DscMJFormNo;
+          //let ssid = detail.SSID;
+          //let dscMZFormNo = detail.DscMZFormNo;
+          //let dscGSFormNo = detail.DscGSFormNo;
+          //let gsUsedCountN = detail.GSUsedCountN;
+          //let ywDate = detail.YWDate;
           let sql = "insert into Detail(LsNo,sDateTime,TradeFlag,CashierId,CashierCode,CashierName,ClerkId,ClerkCode,Pid," +
             "BarCode,ClerkName,ProdCode,ProdName,DepCode,Price,Amount,DscTotal,Total,AutoDscTotal,HandDsc,CxDsc,EvenDsc,MljDsc," +
             "OverDsc,OtherDsc,TranDsc,VipDsc,InnerNo,OrderNo,TransFlag,TransDateTime,BrandDsc,isSubProd,isMinus,BuyPresentCode," +
@@ -1331,31 +1332,33 @@ export default class DBAdapter extends SQLiteOpenHelper {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
         let sql = "select distinct lsno,innerno,sdatetime,transflag from Sum " +
-            "where transflag is null or  transflag='0' order by sdatetime,lsno,innerno limit 100";
+          "where transflag is null or  transflag='0' order by sdatetime,lsno,innerno limit 100";
         tx.executeSql(sql, [], (tx, results) => {
           resolve(results.rows);
         }, (error) => {
           reject("");
         });
-      },(err)=>{
-        console.log("err=",err);
+      }, (err) => {
+        console.log("err=", err);
       });
     });
   }
   
-  selectSumAllData=(lsNo,innerno,sdatetime)=>{
+    selectSumAllData(lsNo, innerno, sdatetime) {
     return new Promise((resolve, reject) => {
-      db.transaction((tx) => {
-        let sql = "select * from Sum where lsno='"+lsNo+"' and transflag='0' and innerno='"+innerno+"' and sdatetime='"+sdatetime+"'";
-        tx.executeSql(sql, [], (tx, results) => {
-          resolve(results.rows);
-        }, (error) => {
-          reject("");
+        db.transaction((tx) => {
+          let sql = "select * from Sum where lsno='" + lsNo + "' AND (TransFlag is null or TransFlag='0' ) and innerno='" + innerno + "' and sdatetime = '" + sdatetime + "'";
+          tx.executeSql(sql, [], (tx, results) => {
+            resolve(results.rows);
+          }, (error) => {
+            reject("");
+          });
+        }, (err) => {
+          console.log("err=", err);
         });
-      },(err)=>{
-        console.log("err=",err);
-      });
-    });
+      }
+    );
+    
   }
   
   /***
@@ -1363,28 +1366,32 @@ export default class DBAdapter extends SQLiteOpenHelper {
    * @param lsNo
    * @return {Promise}
    */
-  selectDetailAllData = (lsNo,innerno,sdatetime) => {
-    return new Promise((resolve,reject)=>{
-      db.transaction((tx) => {
-        let sql = "select * from Sum where lsno='"+lsNo+"' and transflag='0' and innerno='"+innerno+"' and sdatetime='"+sdatetime+"'";
-        tx.executeSql(sql, [], (tx, results) => {
-          resolve(results.rows);
-        }, (error) => {
-          reject("");
+  selectDetailAllData(lsNo, innerno, sdatetime) {
+    return new Promise((resolve, reject) => {
+        db.transaction((tx) => {
+          let sql = "select * from Detail where lsno='" + lsNo + "' AND (TransFlag is null or TransFlag='0') and innerno='" + innerno + "' and sdatetime = '" + sdatetime + "'";
+          console.log(sql)
+          tx.executeSql(sql, [], (tx, results) => {
+            resolve(results.rows);
+          }, (error) => {
+            reject("");
+          });
         });
-      });
-    })
+      }
+    )
+    
   }
+  
   /***
    * 修改流水上传标识
    * @param TransDateTime
    * @param lsNo
    * @return {Promise}
    */
-  upDateSum=(TransDateTime,lsNo)=>{//update product set ProdName='1' where ProdCode='102000001'
-    return new Promise((resolve,reject)=>{
+  upDateSum = (TransDateTime, lsNo) => {//update product set ProdName='1' where ProdCode='102000001'
+    return new Promise((resolve, reject) => {
       db.transaction((tx) => {
-        let sql = "update Sum set TransFlag='1' ,TransDateTime='"+TransDateTime+"' where lsno="+lsNo;
+        let sql = "update Sum set TransFlag='1' ,TransDateTime='" + TransDateTime + "' where lsno=" + lsNo;
         tx.executeSql(sql, [], (tx, results) => {
           resolve(true);
         }, (error) => {
@@ -1393,10 +1400,10 @@ export default class DBAdapter extends SQLiteOpenHelper {
       });
     })
   }
-  upDateDetail=(TransDateTime,lsNo)=>{//update product set ProdName='1' where ProdCode='102000001'
-    return new Promise((resolve,reject)=>{
+  upDateDetail = (TransDateTime, lsNo) => {//update product set ProdName='1' where ProdCode='102000001'
+    return new Promise((resolve, reject) => {
       db.transaction((tx) => {
-        let sql = "update Detail set TransFlag='1' ,TransDateTime='"+TransDateTime+"' where lsno="+lsNo;
+        let sql = "update Detail set TransFlag='1' ,TransDateTime='" + TransDateTime + "' where lsno=" + lsNo;
         tx.executeSql(sql, [], (tx, results) => {
           resolve(true);
         }, (error) => {
@@ -1405,6 +1412,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
       });
     })
   }
+  
   /***
    * 关闭表
    */
