@@ -141,6 +141,7 @@ export default class SellData extends Component {
                                     Storage.save("PosCode", this.state.PosCode);
                                     Storage.save('Name', '销售');
                                     Storage.save("Num", "1");
+                                    Storage.save("inoNum", "1");
                                 } else {
                                     alert(JSON.stringify(response));
                                 }

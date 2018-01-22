@@ -80,7 +80,7 @@ export default class NumFormatUtils {
         return sum;
     }
 
-    //deatil表内部号
+    //内部号
     static InoNum = 1;
     static CreateInnerNo = (inner) => {
         var now = new Date();
@@ -106,11 +106,8 @@ export default class NumFormatUtils {
             ss = "0" + ss;
         }
 
-        var sum=year+""+month+day+hh+mm+ss+NumFormatUtils.InoNum;
-        NumFormatUtils.InoNum=NumFormatUtils.InoNum+1;
-        if (NumFormatUtils.InoNum == 9) {
-            NumFormatUtils.InoNum = 1;
-        }
-        return sum;
+        var sum=year+""+month+day+hh+mm+ss;
+        var str = sum.substring(2);
+        return str;
     }
 }

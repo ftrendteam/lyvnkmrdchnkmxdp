@@ -15,9 +15,6 @@ export default class UpLoadData {
           console.log(requestBody);
         FetchUtils.post(url,requestBody).then((success)=>{
             console.log('aaa',success);
-            for(let i = 0;i<details.length;i++){
-              console.log(details[i]);
-            }
             if ((requestBody.retcode == 1)) {//表示流水上传成功 修改数据库标识
                 resolve(true);
             }else{

@@ -27,12 +27,10 @@ import Storage from "../utils/Storage";
 import NumFormatUtils from "../utils/NumFormatUtils";
 import FormatPrice from "../utils/FormatPrice";
 import BigDecimalUtils from "../utils/BigDecimalUtils";
-import UpLoadData from "../utils/UpLoadData";
 import Swiper from 'react-native-swiper';
 import DBAdapter from "../adapter/DBAdapter";
 
 let dbAdapter = new DBAdapter();
-let uploaddata = new UpLoadData();
 export default class Pay extends Component {
     constructor(props) {
         super(props);
@@ -50,7 +48,7 @@ export default class Pay extends Component {
             Total: "",
             data: "",
             custType: "",
-            VipCardNo: "",
+            VipCardNo: 0,
             cardfaceno: "",
             DataTime: "",
             RetSerinalNo: "",
@@ -174,15 +172,26 @@ export default class Pay extends Component {
                             }
                             round = FormatPrice.round(CUTDEGREE, this.state.ShopAmount, this.state.dataRows);
                             subtract = BigDecimalUtils.subtract(this.state.ShopAmount, round, 2);
+                            console.log(subtract);
                             this.setState({
                                 ShopAmount: round,
                                 subtract: subtract,
                             })
                         })
+                    } else {
+                        console.log("def");
+                        this.setState({
+                            subtract: 0,
+                        })
                     }
                 })
+            } else {
+                console.log("abc");
+                this.setState({
+                    subtract: 0,
+                })
             }
-        })
+        });
 
         dbAdapter.selectAllData("payInfo").then((rows) => {
             let priductData = [];
@@ -260,7 +269,7 @@ export default class Pay extends Component {
                     var payTotal = Number(this.state.amount) + Number(this.state.payments);
                     this.state.payments += -(Number(this.state.amount));
                     var payamount = Number(this.state.AMount) - Number(this.state.amount);
-                    var Total = -(BigDecimalUtils.add(this.state.ShopAmount, this.state.payments, 2));
+                    var Total = BigDecimalUtils.add(this.state.ShopAmount, this.state.payments, 2);
                     var aptotal = BigDecimalUtils.add(payamount, Total, 2);
                     if (this.state.ShopAmount < payTotal) {
                         var Amount = {
@@ -323,9 +332,11 @@ export default class Pay extends Component {
                 } else if (this.state.Seles == "T") {
                     var payTotal = Number(this.state.amount) + Number(this.state.payments);
                     this.state.payments += Number(this.state.amount);
-                    var Total = BigDecimalUtils.subtract(this.state.ShopAmount, this.state.payments, 2)
+                    var Total = -(BigDecimalUtils.subtract(this.state.ShopAmount, this.state.payments, 2));
                     var payamount = Number(this.state.AMount) + Number(this.state.amount);
                     var aptotal = BigDecimalUtils.add(payamount, Total, 2);
+                    console.log('payamount',payamount);
+                    console.log('aptotal',aptotal);
                     if (this.state.ShopAmount < payTotal) {
                         var Amount = {
                             'payName': '现金',
@@ -421,11 +432,11 @@ export default class Pay extends Component {
                             if (ss >= 1 && ss <= 9) {
                                 ss = "0" + ss;
                             }
+                            var InnerNo = NumFormatUtils.CreateInnerNo();
                             for (let i = 0; i < this.dataRows.length; i++) {
                                 var dataRows = this.dataRows[i];
                                 var ino;
                                 ino = i + 1
-                                var InnerNo = NumFormatUtils.createInnerNo();
                                 var SumData = year + "-" + month + "-" + day + " " + hh + ":" + mm + ":" + ss;
                                 //插入Sum表
                                 var sumDatas = [];
@@ -436,7 +447,7 @@ export default class Pay extends Component {
                                 sum.CashierCode = usercode;
                                 sum.CashierName = userName;
                                 sum.ino = ino;
-                                sum.DscTotal = "";
+                                sum.DscTotal = 0;
                                 sum.Total = this.state.ShopAmount;
                                 sum.TotalPay = this.state.payments;
                                 sum.Change = this.state.Total;
@@ -455,9 +466,8 @@ export default class Pay extends Component {
                             ;
                             for (let i = 0; i < this.state.dataRows.length; i++) {
                                 var DataRows = this.state.dataRows[i];
-                                var OrderNo;
+                                var OrderNo = 0;
                                 OrderNo = i + 1;
-                                var InnerNo = NumFormatUtils.CreateInnerNo();
                                 var BarCode;
                                 var pid;
                                 var ProdCode;
@@ -493,41 +503,32 @@ export default class Pay extends Component {
                                 detail.DepCode = DepCode;
                                 detail.Price = ShopPrice;
                                 detail.Amount = Count;
-                                detail.DscTotal = "";
+                                detail.DscTotal = 0;
                                 detail.Total = prototal;
-                                detail.HandDsc = "";
+                                detail.HandDsc = 0;
                                 if (i == 0) {
                                     detail.AutoDscTotal = this.state.subtract;
                                 } else {
-                                    detail.AutoDscTotal = "";
+                                    detail.AutoDscTotal = 0;
                                 }
                                 detail.InnerNo = InnerNo;
-                                detail.OrderNo = OrderNo;
+                                detail.OrderNo = OrderNo + "";
                                 detailDatas.push(detail);
                                 dbAdapter.insertDetail(detailDatas);
 
-                            }
-                            ;
+                            };
                             dbAdapter.selectSum().then((rows) => {
                                 let sums = [];
                                 let details = [];
                                 let index = 0;
                                 for (let i = 0; i < rows.length; i++) {
-                                    // console.log(rows.item(i));
-                                    // var sum = dbAdapter.selectSumAllData(rows.item(i).LsNo,rows.item(i).InnerNo,rows.item(i).sDateTime);
-                                    //     // console.log("sum=",sum);
-                                    //     sums.push(sum);
-                                    // var detail= dbAdapter.selectDetailAllData(rows.item(i).LsNo,rows.item(i).InnerNo,rows.item(i).sDateTime);
-                                    //     // console.log("detail=",detail)
-                                    //     details.push(detail);
                                     dbAdapter.selectSumAllData(rows.item(i).LsNo, rows.item(i).InnerNo, rows.item(i).sDateTime).then((sum) => {
-                                        for (let j =0;j<sum.length;j++){
+                                        for (let j = 0; j < sum.length; j++) {
                                             sums.push(sum.item(j));
                                         }
                                     })
-                                    dbAdapter.selectDetailAllData(rows.item(i).LsNo, rows.item(i).InnerNo, rows.item(i).sDateTime).then((detail) => {
-                                        console.log('a',detail.length);
-                                        for (let j =0;j<detail.length;j++){
+                                    dbAdapter.selectDetailAllData(rows.item(i).LsNo, rows.item(i).sDateTime).then((detail) => {
+                                        for (let j = 0; j < detail.length; j++) {
                                             details.push(detail.item(j));
                                         }
                                         index++;
@@ -535,9 +536,27 @@ export default class Pay extends Component {
                                             Storage.get('LinkUrl').then((tags) => {
                                                 Storage.get('ShopCode').then((ShopCode) => {
                                                     Storage.get('PosCode').then((PosCode) => {
-                                                        var upLoadData = uploaddata.upLoadData(tags, details, sums, ShopCode, PosCode);
-                                                        // alert('a'+"+"+JSON.stringify(upLoadData));
-                                                        // alert(tags+"+"+ShopCode+"+"+PosCode+"+"+JSON.stringify(rows)+"+"+JSON.stringify(this.details));
+                                                        let requestBody = JSON.stringify({
+                                                            'TblName': 'upsum',
+                                                            'ShopCode': ShopCode,
+                                                            'PosCode': PosCode,
+                                                            'detail': details,
+                                                            'sum': sums,
+                                                        });
+                                                        console.log(requestBody);
+                                                        FetchUtil.post(tags, requestBody).then((success) => {
+                                                            console.log(success);
+                                                            if ((success.retcode == 1)) {//表示流水上传成功 修改数据库标识
+                                                                dbAdapter.upDateSum(rows.item(i).LsNo, rows.item(i).sDateTime).then((upDateSum) => {
+                                                                });
+                                                                dbAdapter.upDateDetail(rows.item(i).LsNo, rows.item(i).sDateTime).then((upDateDetail) => {
+                                                                });
+                                                            } else {
+                                                                alert(JSON.stringify(success))
+                                                            }
+                                                        }, (error) => {
+                                                            alert('网络请求失败');
+                                                        });
                                                     });
                                                 });
                                             });
@@ -590,11 +609,11 @@ export default class Pay extends Component {
                                 if (ss >= 1 && ss <= 9) {
                                     ss = "0" + ss;
                                 }
+                                var InnerNo = NumFormatUtils.CreateInnerNo();
                                 for (let i = 0; i < this.dataRows.length; i++) {
                                     var dataRows = this.dataRows[i];
                                     var ino;
                                     ino = i + 1
-                                    var InnerNo = NumFormatUtils.createInnerNo();
                                     var SumData = year + "-" + month + "-" + day + " " + hh + ":" + mm + ":" + ss;
                                     //插入Sum表
                                     var sumDatas = [];
@@ -605,7 +624,7 @@ export default class Pay extends Component {
                                     sum.CashierCode = usercode;
                                     sum.CashierName = userName;
                                     sum.ino = ino;
-                                    sum.DscTotal = "";
+                                    sum.DscTotal = 0;
                                     sum.Total = -this.state.ShopAmount;
                                     sum.TotalPay = this.state.payments;
                                     sum.Change = this.state.Total;
@@ -624,9 +643,8 @@ export default class Pay extends Component {
                                 ;
                                 for (let i = 0; i < this.state.dataRows.length; i++) {
                                     var DataRows = this.state.dataRows[i];
-                                    var OrderNo;
+                                    var OrderNo = 0;
                                     OrderNo = i + 1;
-                                    var innerno = NumFormatUtils.CreateInnerNo();
                                     var BarCode;
                                     var pid;
                                     var ProdCode;
@@ -660,27 +678,73 @@ export default class Pay extends Component {
                                     detail.ProdCode = ProdCode;
                                     detail.ProdName = ProdName;
                                     detail.DepCode = DepCode;
-                                    detail.Price = ShopPrice;
+                                    detail.Price = -ShopPrice;
                                     detail.Amount = Count;
-                                    detail.DscTotal = "";
-                                    detail.Total = prototal;
+                                    detail.DscTotal = 0;
+                                    detail.Total = -prototal;
                                     if (i == 0) {
                                         detail.AutoDscTotal = this.state.subtract;
                                     } else {
-                                        detail.AutoDscTotal = "";
+                                        detail.AutoDscTotal = 0;
                                     }
-                                    detail.HandDsc = "";
-                                    detail.InnerNo = innerno;
-                                    detail.OrderNo = OrderNo;
+                                    detail.HandDsc = 0;
+                                    detail.InnerNo = InnerNo;
+                                    detail.OrderNo = OrderNo + "";
                                     detailDatas.push(detail);
                                     dbAdapter.insertDetail(detailDatas);
-                                }
-                                ;
-                                var nextRoute = {
-                                    name: "Index",
-                                    component: Index,
                                 };
-                                this.props.navigator.push(nextRoute);
+                                dbAdapter.selectSum().then((rows) => {
+                                    let sums = [];
+                                    let details = [];
+                                    let index = 0;
+                                    for (let i = 0; i < rows.length; i++) {
+                                        dbAdapter.selectSumAllData(rows.item(i).LsNo, rows.item(i).InnerNo, rows.item(i).sDateTime).then((sum) => {
+                                            for (let j = 0; j < sum.length; j++) {
+                                                sums.push(sum.item(j));
+                                            }
+                                        })
+                                        dbAdapter.selectDetailAllData(rows.item(i).LsNo, rows.item(i).sDateTime).then((detail) => {
+                                            for (let j = 0; j < detail.length; j++) {
+                                                details.push(detail.item(j));
+                                            }
+                                            index++;
+                                            if (index == rows.length) {//此处执行流水上传操作
+                                                Storage.get('LinkUrl').then((tags) => {
+                                                    Storage.get('ShopCode').then((ShopCode) => {
+                                                        Storage.get('PosCode').then((PosCode) => {
+                                                            let requestBody = JSON.stringify({
+                                                                'TblName': 'upsum',
+                                                                'ShopCode': ShopCode,
+                                                                'PosCode': PosCode,
+                                                                'detail': details,
+                                                                'sum': sums,
+                                                            });
+                                                            console.log(requestBody);
+                                                            FetchUtil.post(tags, requestBody).then((success) => {
+                                                                console.log(success);
+                                                                if ((success.retcode == 1)) {//表示流水上传成功 修改数据库标识
+                                                                    dbAdapter.upDateSum(rows.item(i).LsNo, rows.item(i).sDateTime).then((upDateSum) => {
+                                                                    });
+                                                                    dbAdapter.upDateDetail(rows.item(i).LsNo, rows.item(i).sDateTime).then((upDateDetail) => {
+                                                                    });
+                                                                } else {
+                                                                    alert(JSON.stringify(success))
+                                                                }
+                                                            }, (error) => {
+                                                                alert('网络请求失败');
+                                                            });
+                                                        });
+                                                    });
+                                                });
+                                            }
+                                        })
+                                    }
+                                });
+                                // var nextRoute = {
+                                //     name: "Index",
+                                //     component: Index,
+                                // };
+                                // this.props.navigator.push(nextRoute);
                                 // dbAdapter.deleteData("shopInfo");
                                 Storage.delete("VipCardNo");
                                 Storage.delete("BalanceTotal");
@@ -791,7 +855,7 @@ export default class Pay extends Component {
                                 };
                                 this.dataRows.push(TblRowconcat);
                                 this.state.payments += retcurrJF;
-                                var Total = BigDecimalUtils.subtract(this.state.ShopAmount, this.state.payments, 2)
+                                var Total = -(BigDecimalUtils.add(this.state.ShopAmount, this.state.payments, 2));
                                 this.setState({
                                     payments: this.state.payments,
                                     Amount: retcurrJF,
@@ -909,7 +973,7 @@ export default class Pay extends Component {
                                     };
                                     this.dataRows.push(TblRowconcat);
                                     this.state.payments -= retcurrJF;
-                                    var Total = -(BigDecimalUtils.add(this.state.ShopAmount, this.state.payments, 2));
+                                    var Total = BigDecimalUtils.add(this.state.ShopAmount, this.state.payments, 2);
                                     this.setState({
                                         payments: this.state.payments,
                                         Amount: retcurrJF,
