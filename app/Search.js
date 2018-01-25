@@ -22,7 +22,7 @@ import {
 } from 'react-native';
 
 import Index from "./Index";
-import OrderDetails from "./OrderDetails2";
+import ShoppingCart from "./ShoppingCart";
 import NetUtils from "../utils/NetUtils";
 import NumberUtils from "../utils/NumberUtils";
 import FetchUtil from "../utils/FetchUtils";
@@ -59,10 +59,12 @@ export default class Search extends Component {
             Number1: "",
             Remark: "",
             BarCode:"",
+            modal:"",
             Show: false,
             emptydata:false,
             dataRows: "1",
             dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
+            ShoppData:this.props.ShoppData ? this.props.ShoppData : "",
         };
         this.dataRows = [];
     }
@@ -131,6 +133,7 @@ export default class Search extends Component {
                                             ydcountm: countm,
                                             focus:true,
                                             Search:"",
+                                            modal:1,
                                         })
                                         Storage.get('YdCountm').then((ydcountm) => {
                                             if (ydcountm == 2 && countm != 0) {//原单数量
@@ -215,7 +218,7 @@ export default class Search extends Component {
                                             ProdName: rows.item(0).ProdName,
                                             ShopPrice: rows.item(0).ShopPrice,
                                             Pid: rows.item(0).Pid,
-                                            Number1:"",
+                                            Number1:1,
                                             Remark: rows.item(0).ShopRemark,
                                             prototal: rows.item(0).prototal,
                                             ProdCode: rows.item(0).ProdCode,
@@ -225,12 +228,13 @@ export default class Search extends Component {
                                             ydcountm: countm,
                                             focus:true,
                                             Search:"",
+                                            modal:1,
                                         })
                                         Storage.get('YdCountm').then((ydcountm) => {
                                             if (ydcountm == 2 && countm != 0) {//原单数量
                                                 if (this.state.Number1 == 0) {
                                                     this.setState({
-                                                        Number1:countm
+                                                        Number1:countm,
                                                     })
                                                 }
                                             }else if(this.state.Number1 == 0){
@@ -258,7 +262,6 @@ export default class Search extends Component {
                                                 numberFormat2: numberFormat2,
                                             })
                                         })
-
                                     } else {
                                         alert(JSON.stringify(data))
                                     }
@@ -320,11 +323,19 @@ export default class Search extends Component {
 
     Close() {
         DeviceEventEmitter.removeAllListeners();
-        var nextRoute = {
-            name: "主页",
-            component: Index,
-        };
-        this.props.navigator.push(nextRoute);
+        if(this.state.ShoppData=="0"){
+            var nextRoute = {
+                name: "清单",
+                component: ShoppingCart,
+            };
+            this.props.navigator.push(nextRoute);
+        }else{
+            var nextRoute = {
+                name: "主页",
+                component: Index,
+            };
+            this.props.navigator.push(nextRoute);
+        }
 
     }
 
@@ -397,7 +408,8 @@ export default class Search extends Component {
                         BarCode: rowData.BarCode,
                         ydcountm: countm,
                         Search:"",
-                        Number1:""
+                        Number1:"",
+                        modal:1,
                     })
                     this.Modal();
                 } else {
@@ -416,13 +428,11 @@ export default class Search extends Component {
         });
     }
 
-    inputOnBlur1() {
-        var Number = this.state.Number1;
-        var ShopPrice = this.state.ShopPrice;
-        var Price = Number * ShopPrice;
+    onSubmitEditing(){
+        var ShopPrice = this.state.Number1 * this.state.ShopPrice
         this.setState({
-            totalPrice: Price
-        });
+            numberFormat2:ShopPrice
+        })
     }
 
     add() {
@@ -497,6 +507,8 @@ export default class Search extends Component {
                 numberFormat2: "",
                 Remark: "",
                 ProdName: "",
+                Number1: "",
+                modal:"",
             })
         }
     }
@@ -515,21 +527,38 @@ export default class Search extends Component {
         return (
             <View style={styles.container}>
                 <View style={styles.Title}>
-                    <TextInput
-                        autoFocus={true}
-                        returnKeyType="search"
-                        style={styles.Search}
-                        placeholder="请输入搜索商品名称"
-                        placeholderColor="#999999"
-                        underlineColorAndroid='transparent'
-                        value = {this.state.Search}
-                        onChangeText={(value) => {
-                            this.setState({
-                                Search: value
-                            })
-                            this.inputOnBlur(value)
-                        }}
-                    />
+                    {
+                        (this.state.modal == "1") ?
+                            <TextInput
+                                returnKeyType="search"
+                                style={styles.Search}
+                                placeholder="请输入搜索商品名称"
+                                placeholderColor="#999999"
+                                underlineColorAndroid='transparent'
+                                value={this.state.Search}
+                                onChangeText={(value) => {
+                                    this.setState({
+                                        Search: value
+                                    })
+                                    this.inputOnBlur(value)
+                                }}
+                            /> :
+                            <TextInput
+                                autoFocus={true}
+                                returnKeyType="search"
+                                style={styles.Search}
+                                placeholder="请输入搜索商品名称"
+                                placeholderColor="#999999"
+                                underlineColorAndroid='transparent'
+                                value={this.state.Search}
+                                onChangeText={(value) => {
+                                    this.setState({
+                                        Search: value
+                                    })
+                                    this.inputOnBlur(value)
+                                }}
+                            />
+                    }
                     <Image source={require("../images/2.png")} style={styles.SearchImage}></Image>
                     <TouchableOpacity onPress={this.Close.bind(this)} style={styles.Right1}>
                         <View style={styles.Text1}><Text style={styles.Text}>取消</Text></View>
@@ -545,19 +574,29 @@ export default class Search extends Component {
                                     <Text style={styles.right}>{this.state.ProdName}</Text>
                                 </View>
                                 <View style={[styles.List, {paddingTop: 12}]}>
-                                    <View style={styles.left1}>
-                                        <Text style={[styles.left, {marginTop: 4}]}>数量</Text>
-                                        <TextInput
-                                            style={styles.Number}
-                                            underlineColorAndroid='transparent'
-                                            keyboardType="numeric"
-                                            placeholderTextColor="#333333"
-                                            value={this.state.Number1.toString()}
-                                            onBlur={this.inputOnBlur1.bind(this)}
-                                            onChangeText={(value) => {
-                                                this.setState({Number1: value})
-                                            }}/>
-                                    </View>
+                                    {
+                                        (this.state.modal=="1")?
+                                            <View style={styles.left1}>
+                                                <Text style={[styles.left, {marginTop: 4}]}>数量</Text>
+                                                <TextInput
+                                                    autoFocus={true}
+                                                    style={styles.Number}
+                                                    underlineColorAndroid='transparent'
+                                                    keyboardType="numeric"
+                                                    placeholderTextColor="#333333"
+                                                    value={this.state.Number1.toString()}
+                                                    onChangeText={(value) => {
+                                                        this.setState({Number1: value})
+                                                    }}
+                                                    onSubmitEditing={this.onSubmitEditing.bind(this)}
+                                                    onEndEditing = {this.onSubmitEditing.bind(this)}
+                                                />
+                                            </View>
+                                            :
+                                            <View style={styles.left1}>
+                                                <Text style={[styles.left, {marginTop: 4}]}>数量1</Text>
+                                            </View>
+                                    }
                                     <View style={styles.right1}>
                                         <TouchableOpacity style={styles.sublime} onPress={this.clear.bind(this)}><Image
                                             source={require("../images/1_09.png")}/></TouchableOpacity>

@@ -25,11 +25,13 @@ import Pay from "../Sell/Pay";
 import GoodsDetails from "../app/OrderDetails";
 import NetUtils from "../utils/NetUtils";
 import Storage from "../utils/Storage";
+import NumberUtils from "../utils/NumberUtils";
 import Swiper from 'react-native-swiper';
 import DBAdapter from "../adapter/DBAdapter";
 import DeCodePrePrint18 from "../utils/DeCodePrePrint18";
 import FetchUtil from "../utils/FetchUtils";
 import NumFormatUtils from "../utils/NumFormatUtils";
+import { SwipeListView } from 'react-native-swipe-list-view';
 
 let decodepreprint = new DeCodePrePrint18();
 let dbAdapter = new DBAdapter();
@@ -44,17 +46,18 @@ export default class Sell extends Component {
         this.state = {
             name: "",
             VipCardNo: "",
+            ShopAmount:"",
             ShopNumber: "",
             BalanceTotal: "",
             JfBal: "",
             numform:"",
             MemberTextInput: "",
             promemo:"",
-            ydcountm:"",
             Countm:1,
             Show: false,
             Member: false,
-            dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
+            // dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
+            dataSource:new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
         }
         this.dataRow = [];
     }
@@ -112,18 +115,29 @@ export default class Sell extends Component {
     _dbSearch() {
         this.modal();
         dbAdapter.selectShopInfo().then((rows) => {
-            //this._ModalVisible();
             var shopnumber = 0;
             var shopAmount = 0;
             var ShopPrice=0;
             for (let i = 0; i < rows.length; i++) {
                 var row = rows.item(i);
+                var DataRows = {
+                    'BarCode': row.BarCode,
+                    'pid': row.pid,
+                    'ProdCode': row.ProdCode,
+                    'prototal':  NumberUtils.numberFormat2(row.prototal),
+                    'prodname': row.prodname,
+                    'countm': row.countm,
+                    'ShopPrice': row.ShopPrice,
+                    'promemo': row.promemo,
+                    'DepCode': row.DepCode,
+                    'SuppCode': row.SuppCode,
+                };
                 ShopPrice = (row.countm * row.ShopPrice);
                 shopAmount +=ShopPrice;
                 var number = row.countm;
                 shopnumber += parseInt(row.countm);
                 if (number !== 0) {
-                    this.dataRow.push(row);
+                    this.dataRow.push(DataRows);
                 }
             }
             if (this.dataRow == 0) {
@@ -159,14 +173,14 @@ export default class Sell extends Component {
                             var shopAmount = 0;
                             for (let i = 0; i < rows.length; i++) {
                                 var row = rows.item(i);
-                                var ShopPrice = row.ShopPrice;
-                                var prototal=this.state.Countm*row.ShopPrice;
+                                var ShopPrice = row.StdPrice;
+                                var prototal=this.state.Countm*row.StdPrice;
                                 var number = row.countm;
                                 shopnumber = this.state.Countm+this.state.ShopNumber;
                                 var DataRows = {
                                     'ProdCode':row.ProdCode,
                                     'prodname':row.ProdName,
-                                    'ShopPrice':row.ShopPrice,
+                                    'ShopPrice':row.StdPrice,
                                     'countm': this.state.Countm,
                                     'prototal': prototal,
                                     'pid':row.Pid,
@@ -185,59 +199,17 @@ export default class Sell extends Component {
                             shopInfo.ProdCode=row.ProdCode;
                             shopInfo.prodname = row.ProdName;
                             shopInfo.countm = this.state.Countm;
-                            shopInfo.ShopPrice = row.ShopPrice;
-                            shopInfo.prototal =(this.state.Countm)*(row.ShopPrice);
+                            shopInfo.ShopPrice = row.StdPrice;
+                            shopInfo.prototal =(this.state.Countm)*(row.StdPrice);
                             shopInfo.promemo = this.state.promemo;
                             shopInfo.DepCode = row.DepCode;
-                            shopInfo.ydcountm = this.state.ydcountm;
+                            shopInfo.ydcountm = "";
                             shopInfo.SuppCode = row.SuppCode;
                             shopInfo.BarCode = row.BarCode;
                             shopInfoData.push(shopInfo);
                             //调用插入表方法
                             dbAdapter.insertShopInfo(shopInfoData);
                         })
-                        // Storage.get('FormType').then((tags)=>{
-                        //     this.setState({
-                        //         FormType:tags
-                        //     })
-                        // })
-                        //
-                        // Storage.get('LinkUrl').then((tags) => {
-                        //     this.setState({
-                        //         LinkUrl:tags
-                        //     })
-                        // })
-                        // //商品查询
-                        // Storage.get('userName').then((tags)=>{
-                        //     let params = {
-                        //         reqCode:"App_PosReq",
-                        //         reqDetailCode:"App_Client_CurrProdQry",
-                        //         ClientCode:this.state.ClientCode,
-                        //         sDateTime:Date.parse(new Date()),
-                        //         Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
-                        //         username:tags,
-                        //         usercode:this.state.Usercode,
-                        //         SuppCode:rows.item(0).SuppCode,
-                        //         ShopCode:this.state.ShopCode,
-                        //         ChildShopCode:this.state.ChildShopCode,
-                        //         ProdCode:datas,
-                        //         OrgFormno:this.state.OrgFormno,
-                        //         FormType:this.state.FormType,
-                        //     };
-                        //     FetchUtil.post(this.state.LinkUrl,JSON.stringify(params)).then((data)=>{
-                        //         var countm=JSON.stringify(data.countm);
-                        //         var ShopPrice=JSON.stringify(data.ShopPrice);
-                        //         if(data.retcode == 1){
-                        //             var ShopCar = rows.item(0).ProdName;
-                        //
-                        //             DeviceEventEmitter.removeAllListeners();
-                        //         }else{
-                        //             alert(JSON.stringify(data))
-                        //         }
-                        //     },(err)=>{
-                        //         alert("网络请求失败");
-                        //     })
-                        // })
                     })
                 });
             }else{
@@ -246,14 +218,14 @@ export default class Sell extends Component {
                     var shopAmount = 0;
                     for (let i = 0; i < rows.length; i++) {
                         var row = rows.item(i);
-                        var ShopPrice = row.ShopPrice;
-                        var prototal=this.state.Countm*row.ShopPrice;
+                        var ShopPrice = row.StdPrice;
+                        var prototal=this.state.Countm*row.StdPrice;
                         var number = row.countm;
                         shopnumber = this.state.Countm+this.state.ShopNumber;
                         var DataRows = {
                             'ProdCode':row.ProdCode,
                             'prodname':row.ProdName,
-                            'ShopPrice':row.ShopPrice,
+                            'ShopPrice':row.StdPrice,
                             'countm': this.state.Countm,
                             'prototal': prototal,
                             'pid':row.Pid,
@@ -272,11 +244,11 @@ export default class Sell extends Component {
                     shopInfo.ProdCode=row.ProdCode;
                     shopInfo.prodname = row.ProdName;
                     shopInfo.countm = this.state.Countm;
-                    shopInfo.ShopPrice = row.ShopPrice;
-                    shopInfo.prototal =(this.state.Countm)*(row.ShopPrice);
+                    shopInfo.ShopPrice = row.StdPrice;
+                    shopInfo.prototal =(this.state.Countm)*(row.StdPrice);
                     shopInfo.promemo = this.state.promemo;
                     shopInfo.DepCode = row.DepCode;
-                    shopInfo.ydcountm = this.state.ydcountm;
+                    shopInfo.ydcountm = "";
                     shopInfo.SuppCode = row.SuppCode;
                     shopInfo.BarCode = row.BarCode;
                     shopInfoData.push(shopInfo);
@@ -303,8 +275,45 @@ export default class Sell extends Component {
         );
     }
 
+    renderHiddenRow(rowData, sectionID, rowID){
+        return (
+            <TouchableOpacity onPress={()=>this.deteleShopInfo(rowData)} style={styles.rowBack}>
+                <Text style={styles.rowBackText}>删除</Text>
+            </TouchableOpacity>
+        );
+    }
+
+    deteleShopInfo(rowData, sectionID, rowID){
+        dbAdapter.deteleShopInfo(rowData.ProdCode).then((rows)=>{});
+        dbAdapter.selectShopInfo().then((rows)=>{
+            var shopnumber = 0;
+            var shopAmount = 0;
+            this.dataRow=[];
+            for(let i =0;i<rows.length;i++){
+                var row = rows.item(i);
+                var number = row.countm;
+                shopAmount += parseInt(row.prototal);
+                shopnumber += parseInt(row.countm);
+                if(number!==0){
+                    this.dataRow.push(row);
+                }
+            }
+            this.setState({
+                number1:number,
+                ShopNumber:shopnumber,//数量
+                ShopAmount:shopAmount,//总金额
+                dataSource:this.state.dataSource.cloneWithRows(this.dataRow),
+            })
+        });
+        dbAdapter.selectShopInfoAllCountm().then((rows)=>{
+            var ShopCar = rows.item(0).countm;
+            this.setState({
+                shopcar:ShopCar
+            });
+        });
+    }
+
     ListButton(rowData){
-        // alert(JSON.stringify(rowData.countm));
         this.props.navigator.push({
             component:GoodsDetails,
             params:{
@@ -316,7 +325,8 @@ export default class Sell extends Component {
                 prototal:(this.state.Countm)*(rowData.ShopPrice),
                 countm:rowData.countm,
                 DepCode:rowData.DepCode,
-                ydcountm:this.state.ydcountm,
+                ydcountm:"",
+                promemo:row.promemo,
                 SuppCode:rowData.SuppCode,
                 BarCode:rowData.BarCode,
                 DataName:'销售',
@@ -454,75 +464,141 @@ export default class Sell extends Component {
 
     }
 
+    DeleteShop(){
+        if(this.dataRow==""){
+            alert("请添加商品");
+        }else {
+            dbAdapter.deleteData("shopInfo");
+            this.dataRow = [];
+            this.setState({
+                dataSource: this.state.dataSource.cloneWithRows(this.dataRow),
+                ShopNumber:"",
+                ShopAmount:"",
+            })
+        }
+    }
+
+    inputOnBlur(){
+        dbAdapter.selectAidCode(this.state.MnCode,1).then((rows)=>{
+            if(rows.length==0){
+                alert("助记码不存在")
+            }else{
+                var shopnumber = 0;
+                var shopAmount = 0;
+                for (let i = 0; i < rows.length; i++) {
+                    var row = rows.item(i);
+                    var ShopPrice = row.ShopPrice;
+                    var prototal=this.state.Countm*row.ShopPrice;
+                    var number = row.countm;
+                    shopnumber = this.state.Countm+this.state.ShopNumber;
+                    var DataRows = {
+                        'ProdCode':row.ProdCode,
+                        'prodname':row.ProdName,
+                        'ShopPrice':row.ShopPrice,
+                        'countm': this.state.Countm,
+                        'prototal': prototal,
+                        'pid':row.Pid,
+                    };
+                    this.dataRow.push(DataRows);
+                };
+                shopAmount =ShopPrice+this.state.ShopAmount;
+                this.setState({
+                    ShopNumber: shopnumber,
+                    ShopAmount: shopAmount,
+                    dataSource: this.state.dataSource.cloneWithRows(this.dataRow),
+                });
+                var shopInfoData = [];
+                var shopInfo = {};
+                shopInfo.Pid = row.Pid;
+                shopInfo.ProdCode=row.ProdCode;
+                shopInfo.prodname = row.ProdName;
+                shopInfo.countm = this.state.Countm;
+                shopInfo.ShopPrice = row.ShopPrice;
+                shopInfo.prototal =(this.state.Countm)*(row.ShopPrice);
+                shopInfo.promemo = this.state.promemo;
+                shopInfo.DepCode = row.DepCode;
+                shopInfo.ydcountm = "";
+                shopInfo.SuppCode = row.SuppCode;
+                shopInfo.BarCode = row.BarCode;
+                shopInfoData.push(shopInfo);
+                //调用插入表方法
+                dbAdapter.insertShopInfo(shopInfoData);
+            }
+        })
+    }
+
     render() {
         return (
             <View style={styles.container}>
-                <View style={styles.header}>
-                    <TouchableOpacity onPress={this.Return.bind(this)} style={styles.return}>
-                        <Image source={require("../images/2_01.png")}></Image>
-                    </TouchableOpacity>
-                    <View style={styles.HeaderList}><Text style={styles.HeaderText}>{this.state.name}</Text></View>
-                    <TouchableOpacity onPress={this.Code.bind(this)} style={styles.SearchImage}>
-                        <Image source={require("../images/1_05.png")}></Image>
-                    </TouchableOpacity>
-                </View>
-                <View style={styles.TitleCont}>
-                    <View style={styles.FristList}>
-                        <View style={[styles.List, {flex: 2}]}>
-                            <View style={styles.ListView1}>
-                                <Text style={[styles.ListText, {textAlign: "center"}]}>流水号：</Text>
-                            </View>
-                            <View style={styles.ListView}>
-                                <Text style={styles.ListText}>{this.state.numform}</Text>
-                            </View>
-                        </View>
-                        <TouchableOpacity onPress={this.ReturnGoods.bind(this)} style={styles.refund}>
-                            <Text style={styles.Goods}>退货</Text>
+                <View style={styles.Top}>
+                    <View style={styles.header}>
+                        <TouchableOpacity onPress={this.Return.bind(this)} style={styles.return}>
+                            <Image source={require("../images/2_01.png")}></Image>
+                        </TouchableOpacity>
+                        <View style={styles.HeaderList}><Text style={styles.HeaderText}>{this.state.name}</Text></View>
+                        <TouchableOpacity onPress={this.Code.bind(this)} style={styles.SearchImage}>
+                            <Image source={require("../images/1_05.png")}></Image>
                         </TouchableOpacity>
                     </View>
-                </View>
-                <View style={styles.ShopCont}>
-                    <View style={[{
-                        backgroundColor: "#ff4e4e",
-                        width: 10,
-                        height: 60,
-                        position: "absolute",
-                        left: 0,
-                    }]}></View>
-                    <View style={[{
-                        backgroundColor: "#ff4e4e",
-                        width: 10,
-                        height: 60,
-                        position: "absolute",
-                        right: 0,
-                    }]}></View>
-                    <View style={styles.ShopList}>
-                        <View style={styles.ListTitle}>
-                            <View style={styles.ListClass}>
-                                <Text style={styles.ListClassText}>商品编码</Text>
+                    <View style={styles.TitleCont}>
+                        <View style={styles.FristList}>
+                            <View style={[styles.List, {flex: 2}]}>
+                                <View style={styles.ListView1}>
+                                    <Text style={[styles.ListText, {textAlign: "center"}]}>流水号：</Text>
+                                </View>
+                                <View style={styles.ListView}>
+                                    <Text style={styles.ListText}>{this.state.numform}</Text>
+                                </View>
                             </View>
-                            <View style={styles.ListClass}>
-                                <Text style={styles.ListClassText}>商品名称</Text>
-                            </View>
-                            <View style={styles.ListClass1}>
-                                <Text style={styles.ListClassText}>零售价</Text>
-                            </View>
-                            <View style={styles.ListClass1}>
-                                <Text style={styles.ListClassText}>数量</Text>
-                            </View>
-                            <View style={styles.ListClass1}>
-                                <Text style={styles.ListClassText}>小计</Text>
-                            </View>
+                            <TouchableOpacity onPress={this.ReturnGoods.bind(this)} style={styles.refund}>
+                                <Text style={styles.Goods}>退货</Text>
+                            </TouchableOpacity>
                         </View>
-                        <ListView
-                            style={styles.scrollview}
-                            dataSource={this.state.dataSource}
-                            showsVerticalScrollIndicator={true}
-                            renderRow={this._renderRow.bind(this)}
-                        />
+                    </View>
+                    <View style={styles.ShopCont}>
+                        <View style={[{
+                            backgroundColor: "#ff4e4e",
+                            width: 10,
+                            height: 60,
+                            position: "absolute",
+                            left: 0,
+                        }]}></View>
+                        <View style={[{
+                            backgroundColor: "#ff4e4e",
+                            width: 10,
+                            height: 60,
+                            position: "absolute",
+                            right: 0,
+                        }]}></View>
+                        <ScrollView style={styles.ShopList}>
+                            <View style={styles.ListTitle}>
+                                <View style={styles.ListClass}>
+                                    <Text style={styles.ListClassText}>商品编码</Text>
+                                </View>
+                                <View style={styles.ListClass}>
+                                    <Text style={styles.ListClassText}>商品名称</Text>
+                                </View>
+                                <View style={styles.ListClass1}>
+                                    <Text style={styles.ListClassText}>零售价</Text>
+                                </View>
+                                <View style={styles.ListClass1}>
+                                    <Text style={styles.ListClassText}>数量</Text>
+                                </View>
+                                <View style={styles.ListClass1}>
+                                    <Text style={styles.ListClassText}>小计</Text>
+                                </View>
+                            </View>
+                            <SwipeListView
+                                style={styles.SwipeList}
+                                dataSource={this.state.dataSource}
+                                renderRow={this._renderRow.bind(this)}
+                                renderHiddenRow={this.renderHiddenRow.bind(this)}
+                                rightOpenValue={-100}
+                            />
+                        </ScrollView>
                     </View>
                 </View>
-                <ScrollView>
+                <View style={styles.Bottom}>
                     <View style={styles.ShopCont}>
                         <View style={styles.Prece}>
                             <View style={styles.InputingLeft}>
@@ -536,6 +612,12 @@ export default class Sell extends Component {
                                     textalign="center"
                                     underlineColorAndroid='transparent'
                                     style={styles.TextInput}
+                                    onChangeText={(value)=>{
+                                        this.setState({
+                                            MnCode:value
+                                        })
+                                    }}
+                                    onSubmitEditing={this.inputOnBlur.bind(this)}
                                 />
                             </View>
                         </View>
@@ -545,11 +627,7 @@ export default class Sell extends Component {
                                     <Text style={[styles.InputingText, {fontWeight: "bold"}]}>金额:</Text>
                                 </View>
                                 <View style={styles.Inputingright}>
-                                    <Text style={[styles.InputingText, {
-                                        fontWeight: "bold",
-                                        fontSize: 20,
-                                        color: "red"
-                                    }]}>{this.state.ShopAmount}</Text>
+                                    <Text style={[styles.InputingText, {fontWeight: "bold", fontSize: 20, color: "red"}]}>{this.state.ShopAmount}</Text>
                                 </View>
                             </View>
                             <View style={styles.Inputing1}>
@@ -567,11 +645,7 @@ export default class Sell extends Component {
                                     <Text style={[styles.InputingText, {fontWeight: "bold"}]}>数量:</Text>
                                 </View>
                                 <View style={styles.Inputingright}>
-                                    <Text style={[styles.InputingText, {
-                                        fontWeight: "bold",
-                                        fontSize: 20,
-                                        color: "red"
-                                    }]}>{this.state.ShopNumber}</Text>
+                                    <Text style={[styles.InputingText, {fontWeight: "bold", fontSize: 20, color: "red"}]}>{this.state.ShopNumber}</Text>
                                 </View>
                             </View>
                             <View style={styles.Inputing1}>
@@ -602,15 +676,13 @@ export default class Sell extends Component {
                             autoplayTimeout={4}                //每隔4秒切换
                             horizontal={true}              //水平方向，为false可设置为竖直方向
                             paginationStyle={{bottom: 10}} //小圆点的位置：距离底部10px
-                            showsButtons={true}           //为false时不显示控制按钮
+                            showsButtons={false}           //为false时不显示控制按钮
                             showsPagination={false}       //为false不显示下方圆点
                             dot={<View style={{           //未选中的圆点样式
                                 backgroundColor: 'rgba(0,0,0,.2)',
                                 width: 18,
                                 height: 18,
                                 borderRadius: 4,
-                                marginLeft: 10,
-                                marginRight: 9,
                                 marginTop: 9,
                                 marginBottom: 9,
                             }}/>}
@@ -619,12 +691,9 @@ export default class Sell extends Component {
                                 width: 18,
                                 height: 18,
                                 borderRadius: 4,
-                                marginLeft: 10,
-                                marginRight: 9,
                                 marginTop: 9,
                                 marginBottom: 9,
                             }}/>}
-
                         >
                             <View style={styles.FristPage}>
                                 <View style={styles.PageRow}>
@@ -649,45 +718,17 @@ export default class Sell extends Component {
                             </View>
                             <View style={styles.FristPage}>
                                 <View style={styles.PageRow}>
-                                    <TouchableOpacity style={[styles.PageRowButton, {marginRight: 5}]}>
+                                    <TouchableOpacity onPress={this.DeleteShop.bind(this)}
+                                                      style={[styles.PageRowButton, {marginRight: 5}]}>
                                         <Text style={styles.PageRowText}>
-                                            1
-                                        </Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={[styles.PageRowButton, {marginRight: 5}]}>
-                                        <Text style={styles.PageRowText}>
-                                            2
-                                        </Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={[styles.PageRowButton, {marginRight: 5}]}>
-                                        <Text style={styles.PageRowText}>
-                                            3
-                                        </Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-                            <View style={styles.FristPage}>
-                                <View style={styles.PageRow}>
-                                    <TouchableOpacity style={[styles.PageRowButton, {marginRight: 5}]}>
-                                        <Text style={styles.PageRowText}>
-                                            1
-                                        </Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={[styles.PageRowButton, {marginRight: 5}]}>
-                                        <Text style={styles.PageRowText}>
-                                            2
-                                        </Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity style={[styles.PageRowButton, {marginRight: 5}]}>
-                                        <Text style={styles.PageRowText}>
-                                            3
+                                            清空商品
                                         </Text>
                                     </TouchableOpacity>
                                 </View>
                             </View>
                         </Swiper>
                     </View>
-                </ScrollView>
+                </View>
                 <Modal
                     animationType='fade'
                     transparent={true}
@@ -724,7 +765,6 @@ export default class Sell extends Component {
                                     <View style={styles.CardNumber}>
                                         <TextInput
                                             returnKeyType='search'
-                                            autofocus={true}
                                             keyboardType="numeric"
                                             textalign="center"
                                             underlineColorAndroid='transparent'
@@ -757,10 +797,15 @@ export default class Sell extends Component {
 }
 
 const styles = StyleSheet.create({
+    Top:{
+        flex:1,
+    },
+    Bottom:{
+        height:220,
+    },
     container: {
         flex: 1,
         backgroundColor: '#f2f2f2',
-        paddingBottom: 10,
     },
     header: {
         height: 60,
@@ -838,8 +883,11 @@ const styles = StyleSheet.create({
         paddingLeft: 10,
         paddingRight: 10,
     },
+    SwipeList:{
+
+    },
     ShopList: {
-        height: 180,
+        minHeight: 100,
         borderRadius: 5,
         backgroundColor: "#ffffff",
     },
@@ -865,8 +913,6 @@ const styles = StyleSheet.create({
     Prece: {
         height: 45,
         marginTop: 10,
-        marginLeft: 20,
-        marginRight: 20,
         flexDirection: "row"
     },
     InpuTingText: {
@@ -908,8 +954,8 @@ const styles = StyleSheet.create({
         marginTop: 16,
     },
     FristPage: {
-        marginLeft: 44,
-        marginRight: 44,
+        marginLeft: 10,
+        marginRight: 10,
     },
     PageRow: {
         height: 50,
@@ -1038,4 +1084,15 @@ const styles = StyleSheet.create({
         paddingBottom: 6,
         borderRadius: 5,
     },
+    rowBack:{
+        backgroundColor:"#ff4e4e",
+        paddingTop:10,
+        paddingBottom:10,
+        paddingRight:35
+    },
+    rowBackText:{
+        color:"#ffffff",
+        fontSize:16,
+        textAlign:"right"
+    }
 });

@@ -27,13 +27,14 @@ export default class GoodsDetails extends Component {
             Pid:this.props.Pid ? this.props.Pid : "",
             ShopPrice:this.props.ShopPrice ? this.props.ShopPrice : "",
             Remark:this.props.Remark ? this.props.Remark : "",
-            prototal:this.props.prototal ? this.props.prototal : "",
+            // prototal:this.props.prototal ? this.props.prototal : "",
             Number:this.props.countm ? this.props.countm : "",
             DepCode:this.props.DepCode ? this.props.DepCode : "",
             ydcountm:this.props.ydcountm ? this.props.ydcountm : "",
             SuppCode:this.props.SuppCode ? this.props.SuppCode : "",
             BarCode:this.props.BarCode ? this.props.BarCode : "",
             DataName:this.props.DataName ? this.props.DataName : "",
+            ShoppData:this.props.ShoppData ? this.props.ShoppData : "",
             Price:"",
             totalPrice:"",
             name:"",
@@ -84,6 +85,15 @@ export default class GoodsDetails extends Component {
                 component:Sell,
             };
             this.props.navigator.push(nextRoute);
+        }else if(this.state.ShoppData=="0"){
+            var nextRoute={
+                name:"清单",
+                component:ShoppingCart,
+                params:{
+                    DepCode:this.state.DepCode,
+                }
+            };
+            this.props.navigator.push(nextRoute);
         }else{
             var nextRoute={
                 name:"主页",
@@ -96,14 +106,11 @@ export default class GoodsDetails extends Component {
         }
     }
 
-    //失焦时触发事件
-    inputOnBlur(){
-       var Number=this.state.Number;
-       var ShopPrice=this.state.ShopPrice;
-       this.state.totalPrice =Number*ShopPrice;
-       this.setState({
-           totalPrice: this.state.totalPrice
-       });
+    onSubmitEditing(){
+        var ShopPrice = this.state.Number * this.state.ShopPrice;
+        this.setState({
+            numberFormat2:ShopPrice
+        })
     }
 
     add(){
@@ -177,6 +184,15 @@ export default class GoodsDetails extends Component {
                     component:Sell,
                 };
                 this.props.navigator.push(nextRoute);
+            }else if(this.state.ShoppData=="0"){
+                var nextRoute={
+                    name:"清单",
+                    component:ShoppingCart,
+                    params:{
+                        DepCode:this.state.DepCode,
+                    }
+                };
+                this.props.navigator.push(nextRoute);
             }else{
                 var nextRoute={
                     name:"主页",
@@ -217,8 +233,10 @@ export default class GoodsDetails extends Component {
                             keyboardType="numeric"
                             value={this.state.Number.toString()}
                             placeholderTextColor="#333333"
-                            onBlur={this.inputOnBlur.bind(this)}
-                            onChangeText={(value)=>{this.setState({Number:value})}}/>
+                            onChangeText={(value)=>{this.setState({Number:value})}}
+                            onSubmitEditing={this.onSubmitEditing.bind(this)}
+                            onEndEditing = {this.onSubmitEditing.bind(this)}
+                        />
                     </View>
                     <View style={styles.right1}>
                         <TouchableOpacity style={[styles.sublime,{marginLeft:0,}]} onPress={this.clear.bind(this)}><Image source={require("../images/1_09.png")}/></TouchableOpacity>
@@ -264,19 +282,23 @@ export default class GoodsDetails extends Component {
                         <Text style={styles.price}>元</Text>
                     </View>
                 </View>
-                <View style={[styles.List,{paddingTop:10,}]}>
-                    <View style={styles.left2}>
-                        <Text style={[styles.left,{marginTop:9,}]}>备注</Text>
-                        <TextInput
-                         style={styles.Number1}
-                         placeholder="暂无备注"
-                         placeholderTextColor="#333333"
-                         maxLength={50}
-                         value={this.state.Remark.toString()}
-                         underlineColorAndroid='transparent'
-                         onChangeText={(value)=>{this.setState({Remark:value})}}/>
-                    </View>
-                </View>
+                {
+                    (this.state.YdCountm == 4) ?
+                        null:
+                        <View style={[styles.List,{paddingTop:10,}]}>
+                            <View style={styles.left2}>
+                                <Text style={[styles.left,{marginTop:9,}]}>备注</Text>
+                                <TextInput
+                                    style={styles.Number1}
+                                    placeholder="暂无备注"
+                                    placeholderTextColor="#333333"
+                                    maxLength={50}
+                                    value={this.state.Remark.toString()}
+                                    underlineColorAndroid='transparent'
+                                    onChangeText={(value)=>{this.setState({Remark:value})}}/>
+                            </View>
+                        </View>
+                }
                 <TouchableOpacity style={styles.button} onPress={this.pressPop.bind(this)}>
                     <Text style={styles.ButtonText}>确定</Text>
                 </TouchableOpacity>

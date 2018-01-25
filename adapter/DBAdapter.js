@@ -931,7 +931,6 @@ export default class DBAdapter extends SQLiteOpenHelper {
           " from product a left join shopInfo b on a.Pid=b.Pid  ";
         ssql = ssql + " left join  tdepset c on c.IsDel='0' and a.depcode=c.depcode where a.IsDel='0' and prodtype<>'1'";
         ssql = ssql + "  and (a.prodname like '%" + aidCode + "%' or a.aidcode like '%" + aidCode + "%' or a.prodcode like '%" + aidCode + "%' or a.barcode like '%" + aidCode + "%')";
-        console.log(ssql);
         tx.executeSql(ssql, [], (tx, results) => {
           resolve(results.rows);
         });

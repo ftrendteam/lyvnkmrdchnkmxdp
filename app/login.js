@@ -33,6 +33,7 @@ export default class  login extends Component{
             Pwd:"",
             Sign:"",
             LinkUrl:"",
+            textinput:"",
             show:false,
             ErrorShow:false
         };
@@ -78,8 +79,9 @@ export default class  login extends Component{
                        var Items=Url.replace('/WEBSERVICE/FTRENDWS.ASMX?WSDL',"");
                        Storage.save('Url',Items);
                        var data='/FMJsonInterfaceByDownToPos';
-                       var date=items+'/FMJsonInterfaceByDownToPos';//拼接字符
-                       Storage.save('LinkUrl',date);
+                       var date=items+'/FMJsonInter faceByDownToPos';//拼接字符
+                       var replace = date.replace(/\s/g, "");
+                       Storage.save('LinkUrl',replace);
                     }
                     RNAndroidIMEI.getAndroidIMEI();
                     Storage.save('ClientCode',this.state.ClientCode);
@@ -118,6 +120,16 @@ export default class  login extends Component{
             ErrorShow:!isshow,
         });
     }
+    onSubmitEditing(){
+        this.setState({
+            textinput:1,
+        })
+    }
+    onSubmitEditing1(){
+        this.setState({
+            textinput:""
+        })
+    }
 
     render(){
         return (
@@ -128,41 +140,79 @@ export default class  login extends Component{
                             <Image source={require("../images/logo.png")}></Image>
                         </View>
                         <View style={styles.TextInput}>
-                            <TextInput
-                                autoFocus={true}
-                                returnKeyType='search'
-                                numberoflines={1}
-                                keyboardType="numeric"
-                                placeholder="请输入商户号"
-                                textalign="center"
-                                underlineColorAndroid='transparent'
-                                placeholderTextColor="#bcbdc1"
-                                style={styles.admin}
-                                onChangeText={(value)=>{
-                                    this.setState({
-                                        ClientCode:value
-                                    })
-                                }}/>
+                            {
+                                (this.state.textinput == "1") ?
+                                    <TextInput
+                                        returnKeyType='search'
+                                        numberoflines={1}
+                                        keyboardType="numeric"
+                                        placeholder="请输入商户号"
+                                        textalign="center"
+                                        underlineColorAndroid='transparent'
+                                        placeholderTextColor="#bcbdc1"
+                                        style={styles.admin}
+                                        onChangeText={(value) => {
+                                            this.setState({
+                                                ClientCode: value
+                                            })
+                                        }}
+                                    />
+                                    :
+                                    <TextInput
+                                        autoFocus={true}
+                                        returnKeyType='search'
+                                        numberoflines={1}
+                                        keyboardType="numeric"
+                                        placeholder="请输入商户号"
+                                        textalign="center"
+                                        underlineColorAndroid='transparent'
+                                        placeholderTextColor="#bcbdc1"
+                                        style={styles.admin}
+                                        onChangeText={(value) => {
+                                            this.setState({
+                                                ClientCode: value
+                                            })
+                                        }}
+                                        onSubmitEditing={this.onSubmitEditing.bind(this)}
+                                    />
+                            }
                             <Image source={require("../images/1_11.png")} style={styles.TextImage1}></Image>
                         </View>
                         <View style={styles.TextInput}>
-                            <TextInput
-                                autofocus="{true}"
-                                returnKeyType='search'
-                                secureTextEntry={true}
-                                numberoflines="{1}"
-                                keyboardType="numeric"
-                                placeholder="请输入商户密码"
-                                textalign="center"
-                                underlineColorAndroid='transparent'
-                                placeholderTextColor="#bcbdc1"
-                                style={styles.pass}
-                                onChangeText={(value)=>{
-                                    this.setState({
-                                        Pwd:value
-                                    })
-                                }}
-                            />
+                            {
+                                (this.state.textinput == "1") ?
+                                    <TextInput
+                                        autoFocus={true}
+                                        returnKeyType='search'
+                                        secureTextEntry={true}
+                                        numberoflines={1}
+                                        keyboardType="numeric"
+                                        placeholder="请输入商户密码"
+                                        textalign="center"
+                                        underlineColorAndroid='transparent'
+                                        placeholderTextColor="#bcbdc1"
+                                        style={styles.pass}
+                                        onChangeText={(value) => {
+                                            this.setState({
+                                                Pwd: value
+                                            })
+                                        }}
+                                        onSubmitEditing={this.onSubmitEditing1.bind(this)}
+                                    />
+                                    :
+                                    <TouchableOpacity onPress={this.onSubmitEditing.bind(this)}>
+                                        <TextInput
+                                            editable={false}
+                                            secureTextEntry={true}
+                                            placeholder="请输入商户密码"
+                                            textalign="center"
+                                            underlineColorAndroid='transparent'
+                                            placeholderTextColor="#bcbdc1"
+                                            style={styles.pass}
+                                            value={this.state.Pwd}
+                                        />
+                                    </TouchableOpacity>
+                            }
                             <Image source={require("../images/1_04.png")} style={styles.TextImage1}></Image>
                         </View>
                         <TouchableOpacity onPress={this.pressPush.bind(this)}>

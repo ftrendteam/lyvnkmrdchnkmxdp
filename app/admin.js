@@ -61,6 +61,7 @@ export default class admin extends Component {
             detailInfo1:"",
             linkurl:"",
             sCode1:"",
+            textinput:""
         };
         this.pickerData=[]
     }
@@ -310,13 +311,19 @@ export default class admin extends Component {
 
     }
 
-    _onSubmitEditing(){
-        this._textInput.blur();
+    onSubmitEditing(){
+        this.setState({
+            textinput:1
+        })
     }
-    _onPressSearch(event){
-        this.pressPush()
+
+    onSubmitEditing1(){
+        this.setState({
+            textinput:""
+        })
     }
-    render() {
+
+render() {
     return (
         <ScrollView  style={styles.Container}>
             <Image source={require("../images/bj.png")} style={styles.container}>
@@ -325,41 +332,81 @@ export default class admin extends Component {
                         <Image source={require("../images/logo.png")}></Image>
                     </View>
                     <View style={styles.TextInput}>
-                        <TextInput
-                            autoFocus={true}
-                            returnKeyType='search'
-                            numberoflines={1}
-                            keyboardType="numeric"
-                            placeholder="请输入用户编码"
-                            textalign="center"
-                            underlineColorAndroid='transparent'
-                            placeholderTextColor="#bcbdc1"
-                            style={styles.admin}
-                            onBlur={this.inputOnBlur.bind(this)}
-                            onChangeText={(value)=>{
-                                this.setState({
-                                    Usercode:value
-                                })
-                            }}/>
+                        {
+                            (this.state.textinput=="1")?
+                                <TextInput
+                                    returnKeyType='search'
+                                    numberoflines={1}
+                                    keyboardType="numeric"
+                                    placeholder="请输入用户编码"
+                                    textalign="center"
+                                    underlineColorAndroid='transparent'
+                                    placeholderTextColor="#bcbdc1"
+                                    style={styles.admin}
+                                    onBlur={this.inputOnBlur.bind(this)}
+                                    onChangeText={(value)=>{
+                                        this.setState({
+                                            Usercode:value
+                                        })
+                                    }}
+                                    onSubmitEditing={this.onSubmitEditing.bind(this)}
+                                />
+                                :
+                                <TextInput
+                                    autoFocus={true}
+                                    returnKeyType='search'
+                                    numberoflines={1}
+                                    keyboardType="numeric"
+                                    placeholder="请输入用户编码"
+                                    textalign="center"
+                                    underlineColorAndroid='transparent'
+                                    placeholderTextColor="#bcbdc1"
+                                    style={styles.admin}
+                                    onBlur={this.inputOnBlur.bind(this)}
+                                    onChangeText={(value)=>{
+                                        this.setState({
+                                            Usercode:value
+                                        })
+                                    }}
+                                    onSubmitEditing={this.onSubmitEditing.bind(this)}
+                                />
+                        }
                         <Image source={require("../images/1_07.png")} style={styles.TextImage1}></Image>
                     </View>
                     <View style={[styles.TextInput,{marginTop:15}]}>
-                        <TextInput
-                            returnKeyType='search'
-                            secureTextEntry={true}
-                            numberoflines={1}
-                            keyboardType="numeric"
-                            placeholder="请输入密码"
-                            textalign="center"
-                            underlineColorAndroid='transparent'
-                            placeholderTextColor="#bcbdc1"
-                            style={styles.pass}
-                            onChangeText={(value)=>{
-                                this.setState({
-                                    UserPwd:value
-                                })
-                            }}
-                            />
+                        {
+                            (this.state.textinput == "1") ?
+                                <TextInput
+                                    autoFocus={true}
+                                    returnKeyType='search'
+                                    secureTextEntry={true}
+                                    numberoflines={1}
+                                    keyboardType="numeric"
+                                    placeholder="请输入密码"
+                                    textalign="center"
+                                    underlineColorAndroid='transparent'
+                                    placeholderTextColor="#bcbdc1"
+                                    style={styles.pass}
+                                    onChangeText={(value) => {
+                                        this.setState({
+                                            UserPwd: value
+                                        })
+                                    }}
+                                    onSubmitEditing={this.onSubmitEditing1.bind(this)}
+                                />:
+                                <TouchableOpacity onPress={this.onSubmitEditing.bind(this)}>
+                                    <TextInput
+                                        editable={false}
+                                        secureTextEntry={true}
+                                        placeholder="请输入密码"
+                                        textalign="center"
+                                        underlineColorAndroid='transparent'
+                                        placeholderTextColor="#bcbdc1"
+                                        style={styles.pass}
+                                        value={this.state.UserPwd}
+                                    />
+                                </TouchableOpacity>
+                        }
                         <Image source={require("../images/1_11.png")} style={styles.TextImage1}></Image>
                     </View>
                     <View style={[styles.TextInput,{marginTop:15}]}>
@@ -372,11 +419,6 @@ export default class admin extends Component {
                                 underlineColorAndroid='transparent'
                                 placeholderTextColor="#bcbdc1"
                                 style={styles.pass}
-                                onChangeText={(value)=>{
-                                    this.setState({
-                                        UserPwd:value
-                                    })
-                                }}
                             />
                             <Image source={require("../images/1_14.png")} style={styles.TextImage1}></Image>
                         </TouchableOpacity>
