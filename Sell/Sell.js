@@ -120,24 +120,24 @@ export default class Sell extends Component {
             var ShopPrice=0;
             for (let i = 0; i < rows.length; i++) {
                 var row = rows.item(i);
-                var DataRows = {
-                    'BarCode': row.BarCode,
-                    'pid': row.pid,
-                    'ProdCode': row.ProdCode,
-                    'prototal':  NumberUtils.numberFormat2(row.prototal),
-                    'prodname': row.prodname,
-                    'countm': row.countm,
-                    'ShopPrice': row.ShopPrice,
-                    'promemo': row.promemo,
-                    'DepCode': row.DepCode,
-                    'SuppCode': row.SuppCode,
-                };
+                // var DataRows = {
+                //     'BarCode': row.BarCode,
+                //     'pid': row.pid,
+                //     'ProdCode': row.ProdCode,
+                //     'prototal':  NumberUtils.numberFormat2(row.prototal),
+                //     'prodname': row.prodname,
+                //     'countm': row.countm,
+                //     'ShopPrice': row.ShopPrice,
+                //     'promemo': row.promemo,
+                //     'DepCode': row.DepCode,
+                //     'SuppCode': row.SuppCode,
+                // };
                 ShopPrice = (row.countm * row.ShopPrice);
                 shopAmount +=ShopPrice;
                 var number = row.countm;
                 shopnumber += parseInt(row.countm);
                 if (number !== 0) {
-                    this.dataRow.push(DataRows);
+                    this.dataRow.push(row);
                 }
             }
             if (this.dataRow == 0) {

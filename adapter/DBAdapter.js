@@ -412,7 +412,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
   selectShopInfo() {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
-        tx.executeSql("select * from shopInfo", [], (tx, results) => {
+        tx.executeSql("select a.*,b.* from shopInfo a join product b on a.prodcode=b.prodcode", [], (tx, results) => {
           resolve(results.rows);
         });
       }, (error) => {
