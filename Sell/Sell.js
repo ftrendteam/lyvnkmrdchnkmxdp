@@ -555,6 +555,8 @@ export default class Sell extends Component {
                             </TouchableOpacity>
                         </View>
                     </View>
+                </View>
+                <View style={styles.Center}>
                     <View style={styles.ShopCont}>
                         <View style={[{
                             backgroundColor: "#ff4e4e",
@@ -798,7 +800,11 @@ export default class Sell extends Component {
 
 const styles = StyleSheet.create({
     Top:{
-        flex:1,
+        height:100,
+        backgroundColor:"#ccc"
+    },
+    Center:{
+      flex:1,
     },
     Bottom:{
         height:220,

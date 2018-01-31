@@ -27,7 +27,6 @@ export default class GoodsDetails extends Component {
             Pid:this.props.Pid ? this.props.Pid : "",
             ShopPrice:this.props.ShopPrice ? this.props.ShopPrice : "",
             Remark:this.props.Remark ? this.props.Remark : "",
-            // prototal:this.props.prototal ? this.props.prototal : "",
             Number:this.props.countm ? this.props.countm : "",
             DepCode:this.props.DepCode ? this.props.DepCode : "",
             ydcountm:this.props.ydcountm ? this.props.ydcountm : "",
@@ -107,9 +106,9 @@ export default class GoodsDetails extends Component {
     }
 
     onSubmitEditing(){
-        var ShopPrice = this.state.Number * this.state.ShopPrice;
+        var ShopPrice = (this.state.Number * this.state.ShopPrice);
         this.setState({
-            numberFormat2:ShopPrice
+            numberFormat2:NumberUtils.numberFormat2(ShopPrice)
         })
     }
 

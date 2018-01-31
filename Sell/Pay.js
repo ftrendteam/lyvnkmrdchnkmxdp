@@ -124,7 +124,6 @@ export default class Pay extends Component {
     // }
 
     componentDidMount() {
-        // alert(JSON.stringify(this.state.dataRows));
         Storage.get('Name').then((tags) => {
             this.setState({
                 name: tags
@@ -144,10 +143,11 @@ export default class Pay extends Component {
                 })
             }
         })
-
-        Storage.save("ino", "0");
-        Storage.save("Ino", "0");
-
+        this.setState({
+            amount:this.state.ShopAmount
+        })
+        // Storage.save("ino", "0");
+        // Storage.save("Ino", "0");
         this.dbadapter();
     }
 
@@ -329,7 +329,7 @@ export default class Pay extends Component {
                 } else if (this.state.Seles == "T") {
                     var payTotal = Number(this.state.amount) + Number(this.state.payments);
                     this.state.payments += Number(this.state.amount);
-                    var Total = -(BigDecimalUtils.subtract(this.state.ShopAmount, this.state.payments, 2));
+                    var Total = (BigDecimalUtils.subtract(this.state.ShopAmount, this.state.payments, 2));
                     var payamount = Number(this.state.AMount) + Number(this.state.amount);
                     var aptotal = BigDecimalUtils.subtract(payamount, Total, 2);
                     if (this.state.ShopAmount < payTotal) {
@@ -841,7 +841,7 @@ export default class Pay extends Component {
                                 };
                                 this.dataRows.push(TblRowconcat);
                                 this.state.payments += retcurrJF;
-                                var Total = -(BigDecimalUtils.subtract(this.state.ShopAmount, this.state.payments, 2));
+                                var Total = (BigDecimalUtils.subtract(this.state.ShopAmount, this.state.payments, 2));
                                 this.setState({
                                     payments: this.state.payments,
                                     Amount: retcurrJF,
@@ -1033,14 +1033,13 @@ export default class Pay extends Component {
                                 </View> :
                                 <View style={styles.List}>
                                     <View style={styles.ListView1}>
-                                        <Text
-                                            style={[styles.ListText, {textAlign: "center"}]}>-{this.state.ShopAmount}</Text>
+                                        <Text style={[styles.ListText, {textAlign: "center"}]}>-{this.state.ShopAmount}</Text>
                                     </View>
                                 </View>
                         }
                         <View style={styles.List}>
                             <View style={styles.ListView1}>
-                                <Text style={[styles.ListText, {textAlign: "center"}]}>{this.state.payments}</Text>
+                                <Text style={[styles.ListText, {textAlign: "center"}]}>{this.state.payments}.00</Text>
                             </View>
                         </View>
                         <View style={styles.List}>
@@ -1051,20 +1050,8 @@ export default class Pay extends Component {
                     </View>
                 </View>
                 <View style={styles.ShopCont}>
-                    <View style={[{
-                        backgroundColor: "#ff4e4e",
-                        width: 10,
-                        height: 60,
-                        position: "absolute",
-                        left: 0,
-                    }]}></View>
-                    <View style={[{
-                        backgroundColor: "#ff4e4e",
-                        width: 10,
-                        height: 60,
-                        position: "absolute",
-                        right: 0,
-                    }]}></View>
+                    <View style={[{backgroundColor: "#ff4e4e", width: 10, height: 60, position: "absolute", left: 0,}]}></View>
+                    <View style={[{backgroundColor: "#ff4e4e", width: 10, height: 60, position: "absolute", right: 0,}]}></View>
                     <View style={styles.ShopList}>
                         <View style={styles.ListTitle}>
                             <View style={styles.ListClass}>
@@ -1117,12 +1104,12 @@ export default class Pay extends Component {
                             </View>
                             <View style={styles.paymentright}>
                                 <TextInput
-                                    autofocus={true}
                                     numberoflines={1}
                                     keyboardType="numeric"
                                     textalign="center"
                                     underlineColorAndroid='transparent'
                                     style={styles.paymentinput}
+                                    defaultValue ={this.state.ShopAmount}
                                     onChangeText={(value) => {
                                         this.setState({
                                             amount: value
@@ -1169,7 +1156,6 @@ export default class Pay extends Component {
                                         <View style={styles.CardNumber}>
                                             <TextInput
                                                 returnKeyType='search'
-                                                autofocus={true}
                                                 keyboardType="numeric"
                                                 textalign="center"
                                                 underlineColorAndroid='transparent'
@@ -1190,7 +1176,6 @@ export default class Pay extends Component {
                                         <View style={styles.CardNumber}>
                                             <TextInput
                                                 returnKeyType='search'
-                                                autofocus={true}
                                                 keyboardType="numeric"
                                                 textalign="center"
                                                 underlineColorAndroid='transparent'
@@ -1237,7 +1222,6 @@ export default class Pay extends Component {
                                         <View style={styles.CardNumber}>
                                             <TextInput
                                                 returnKeyType='search'
-                                                autofocus={true}
                                                 keyboardType="numeric"
                                                 textalign="center"
                                                 underlineColorAndroid='transparent'
@@ -1258,7 +1242,6 @@ export default class Pay extends Component {
                                         <View style={styles.CardNumber}>
                                             <TextInput
                                                 returnKeyType='search'
-                                                autofocus={true}
                                                 keyboardType="numeric"
                                                 textalign="center"
                                                 underlineColorAndroid='transparent'
@@ -1279,7 +1262,6 @@ export default class Pay extends Component {
                                         <View style={styles.CardNumber}>
                                             <TextInput
                                                 returnKeyType='search'
-                                                autofocus={true}
                                                 keyboardType="numeric"
                                                 textalign="center"
                                                 underlineColorAndroid='transparent'
@@ -1300,7 +1282,6 @@ export default class Pay extends Component {
                                         <View style={styles.CardNumber}>
                                             <TextInput
                                                 returnKeyType='search'
-                                                autofocus={true}
                                                 keyboardType="numeric"
                                                 textalign="center"
                                                 underlineColorAndroid='transparent'
