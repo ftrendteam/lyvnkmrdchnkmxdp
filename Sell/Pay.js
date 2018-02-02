@@ -54,11 +54,13 @@ export default class Pay extends Component {
             DataTime: "",
             RetSerinalNo: "",
             subtract: "",
+            VipPrice:"",
             JfBal: this.props.JfBal ? this.props.JfBal : "",
             BalanceTotal: this.props.BalanceTotal ? this.props.BalanceTotal : "",
             ShopAmount: this.props.ShopAmount ? this.props.ShopAmount : "",
             numform: this.props.numform ? this.props.numform : "",
             Seles: this.props.Seles ? this.props.Seles : "",
+            vipData:this.props.vipData ? this.props.vipData : "",
             dataRows: this.props.dataRows ? this.props.dataRows : "",
             dataSource: new ListView.DataSource({rowHasChanged: (r1, r2) => true}),
 
@@ -168,27 +170,41 @@ export default class Pay extends Component {
                             var round;
                             var RoundPrice;
                             var subtract;
+                            var vipData;
                             for (let i = 0; i < rows.length; i++) {
                                 var row = rows.item(i);
                                 var CUTDEGREE = row.OptValue;
                             }
                             round = FormatPrice.round(CUTDEGREE, this.state.ShopAmount, this.state.dataRows);
-                            subtract = BigDecimalUtils.subtract(this.state.ShopAmount, round, 2);
+                            subtract = BigDecimalUtils.subtract(this.state.ShopAmount, round, 2);//总价格减去四舍五入的价格
+                            vipData = BigDecimalUtils.add(this.state.vipData, subtract, 2);
                             this.setState({
                                 ShopAmount: round,
                                 subtract: subtract,
+                                VipPrice:vipData,
                             })
+                            // alert("1")
                         })
                     } else {
+                        var vipData;
+                        vipData = BigDecimalUtils.add(this.state.vipData, 0, 2);
                         this.setState({
                             subtract: 0,
+                            ShopAmount:this.state.ShopAmount,
+                            VipPrice:vipData,
                         })
+                        // alert("2")
                     }
                 })
             } else {
+                var vipData;
+                vipData = BigDecimalUtils.add(this.state.vipData, 0, 2);
                 this.setState({
                     subtract: 0,
+                    ShopAmount:this.state.ShopAmount,
+                    VipPrice:vipData,
                 })
+                // alert("3")
             }
         });
 
@@ -439,13 +455,22 @@ export default class Pay extends Component {
                                 sum.CashierCode = usercode;
                                 sum.CashierName = userName;
                                 sum.ino = ino;
-                                sum.DscTotal = 0;
+                                if(VipCardNo==null){
+                                    sum.DscTotal = 0;
+                                }else{
+                                    sum.DscTotal = this.state.VipPrice;
+                                }
                                 sum.Total = this.state.ShopAmount;
                                 sum.TotalPay = this.state.payments;
                                 sum.Change = this.state.Total;
                                 sum.TradeFlag = this.state.Seles;
                                 sum.CustType = this.state.custType;
-                                sum.CustCode = VipCardNo;
+                                if(VipCardNo==null){
+                                    sum.CustCode = "";
+                                }else{
+                                    sum.CustCode = VipCardNo;
+                                }
+
                                 sum.PayId = dataRows.pid;
                                 sum.PayCode = dataRows.PayCode;
                                 sum.Amount = dataRows.total;
@@ -468,13 +493,13 @@ export default class Pay extends Component {
                                 var ShopPrice;
                                 var prototal;
                                 BarCode = DataRows.BarCode;
-                                pid = DataRows.pid;
+                                pid = DataRows.Pid;
                                 ProdCode = DataRows.ProdCode;
-                                ProdName = DataRows.prodname;
+                                ProdName = DataRows.ProdName;
                                 DepCode = DataRows.DepCode;
-                                Count = DataRows.countm;
+                                Count = DataRows.ShopNumber;
                                 ShopPrice = DataRows.ShopPrice;
-                                prototal = DataRows.prototal;
+                                prototal = DataRows.ShopAmount;
                                 var SumData = year + "-" + month + "-" + day + " " + hh + ":" + mm + ":" + ss;
                                 var detailDatas = [];
                                 var detail = {};
@@ -562,6 +587,7 @@ export default class Pay extends Component {
                             Storage.delete("VipCardNo");
                             Storage.delete("BalanceTotal");
                             Storage.delete("JfBal");
+                            Storage.delete("VipPrice");
                         }
                     })
                 })
@@ -613,13 +639,21 @@ export default class Pay extends Component {
                                     sum.CashierCode = usercode;
                                     sum.CashierName = userName;
                                     sum.ino = ino;
-                                    sum.DscTotal = 0;
+                                    if(VipCardNo==null){
+                                        sum.DscTotal = 0;
+                                    }else{
+                                        sum.DscTotal = this.state.VipPrice;
+                                    }
                                     sum.Total = -this.state.ShopAmount;
                                     sum.TotalPay = this.state.payments;
                                     sum.Change = 0;
                                     sum.TradeFlag = this.state.Seles;
                                     sum.CustType = this.state.custType;
-                                    sum.CustCode = VipCardNo;
+                                    if(VipCardNo==null){
+                                        sum.CustCode = "";
+                                    }else{
+                                        sum.CustCode = VipCardNo;
+                                    }
                                     sum.PayId = dataRows.pid;
                                     sum.PayCode = dataRows.PayCode;
                                     sum.Amount = dataRows.total;
@@ -628,8 +662,7 @@ export default class Pay extends Component {
                                     sum.InnerNo = InnerNo;
                                     sumDatas.push(sum);
                                     dbAdapter.insertSum(sumDatas);
-                                }
-                                ;
+                                };
                                 for (let i = 0; i < this.state.dataRows.length; i++) {
                                     var DataRows = this.state.dataRows[i];
                                     var OrderNo = 0;
@@ -643,13 +676,13 @@ export default class Pay extends Component {
                                     var ShopPrice;
                                     var prototal;
                                     BarCode = DataRows.BarCode;
-                                    pid = DataRows.pid;
+                                    pid = DataRows.Pid;
                                     ProdCode = DataRows.ProdCode;
-                                    ProdName = DataRows.prodname;
+                                    ProdName = DataRows.ProdName;
                                     DepCode = DataRows.DepCode;
-                                    Count = DataRows.countm;
+                                    Count = DataRows.ShopNumber;
                                     ShopPrice = DataRows.ShopPrice;
-                                    prototal = DataRows.prototal;
+                                    prototal = DataRows.ShopAmount;
                                     var SumData = year + "-" + month + "-" + day + " " + hh + ":" + mm + ":" + ss;
                                     var detailDatas = [];
                                     var detail = {};
@@ -736,6 +769,7 @@ export default class Pay extends Component {
                                 Storage.delete("VipCardNo");
                                 Storage.delete("BalanceTotal");
                                 Storage.delete("JfBal");
+                                Storage.delete("VipPrice");
                             };
                         });
                     });

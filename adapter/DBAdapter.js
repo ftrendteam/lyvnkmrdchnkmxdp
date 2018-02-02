@@ -412,7 +412,11 @@ export default class DBAdapter extends SQLiteOpenHelper {
   selectShopInfo() {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
-        tx.executeSql("select a.*,b.* from shopInfo a join product b on a.prodcode=b.prodcode", [], (tx, results) => {
+       //let sql="select a.*,b.* from shopInfo a join product b on a.prodcode=b.prodcode";
+          let ssql = "select a.*,ifNull(b.countm,0) as ShopNumber,ifNull(b.ShopPrice,a.StdPrice) as    ShopPrice ,ifNull(b.prototal,0) as ShopAmount   " +
+          ",ifNull(b.promemo,'') as ShopRemark,b.depcode as  DepCode1 " +
+          " from product a join shopInfo b on a.Pid=b.Pid  ";
+        tx.executeSql(ssql, [], (tx, results) => {
           resolve(results.rows);
         });
       }, (error) => {
@@ -664,7 +668,6 @@ export default class DBAdapter extends SQLiteOpenHelper {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
         let ssql = "select PSShop from tShopItem where FNeedPS='1' and ShopCode='" + shopCode + "' and isdel='0'";
-        console.log(ssql);
         tx.executeSql(ssql, [], (tx, results) => {
           resolve(results.rows);
         });
@@ -752,7 +755,6 @@ export default class DBAdapter extends SQLiteOpenHelper {
               let shopCode;
               DataUtils.get('code', '').then((data) => {
                 shopCode = data;
-                console.log("shopCode", shopCode);
                 if (shopCode == currShopCode) {//当前登录的机构号 和本地保存的相同
                   // console.log("当前登录的机构号 和本地保存的相同");
                   let categoryBody = RequestBodyUtils.createCategory(currShopCode);
@@ -990,7 +992,6 @@ export default class DBAdapter extends SQLiteOpenHelper {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
         let sql = "select * from tuserright where usercode='" + userCode + "' and Funccode='A1012'";
-        console.log(sql);
         tx.executeSql(sql, [], (tx, results) => {
           resolve((results.rows.length != 0));
         })
@@ -1085,7 +1086,6 @@ export default class DBAdapter extends SQLiteOpenHelper {
    *保存流水表Sum
    */
   insertSum(sumDatas) {
-    console.log("wtfsadfas");
     db.transaction((tx) => {
       for (let i = 0; i < sumDatas.length; i++) {
         try {
@@ -1194,6 +1194,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
           //let dscGSFormNo = detail.DscGSFormNo;
           //let gsUsedCountN = detail.GSUsedCountN;
           //let ywDate = detail.YWDate;
+            console.log("sdf=",pid);
           let sql = "insert into Detail(LsNo,sDateTime,TradeFlag,CashierId,CashierCode,CashierName,ClerkId,ClerkCode,Pid," +
             "BarCode,ClerkName,ProdCode,ProdName,DepCode,Price,Amount,DscTotal,Total,AutoDscTotal,HandDsc,InnerNo,OrderNo) values(" +
             "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";

@@ -30,6 +30,7 @@ import Swiper from 'react-native-swiper';
 import DBAdapter from "../adapter/DBAdapter";
 import DeCodePrePrint18 from "../utils/DeCodePrePrint18";
 import FetchUtil from "../utils/FetchUtils";
+import VipPrice from "../utils/VipPrice";
 import NumFormatUtils from "../utils/NumFormatUtils";
 import { SwipeListView } from 'react-native-swipe-list-view';
 
@@ -38,6 +39,7 @@ let dbAdapter = new DBAdapter();
 
 var {NativeModules} = require('react-native');
 var RNScannerAndroid = NativeModules.RNScannerAndroid;
+var TblRow1;
 
 export default class Sell extends Component {
 
@@ -46,6 +48,7 @@ export default class Sell extends Component {
         this.state = {
             name: "",
             VipCardNo: "",
+            vipPrice:"",
             ShopAmount:"",
             ShopNumber: "",
             BalanceTotal: "",
@@ -60,6 +63,7 @@ export default class Sell extends Component {
             dataSource:new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
         }
         this.dataRow = [];
+        this.TblRow = [];
     }
 
     modal() {
@@ -77,6 +81,7 @@ export default class Sell extends Component {
     }
 
     componentDidMount() {
+        // alert(JSON.stringify(TblRow1))
         InteractionManager.runAfterInteractions(() => {
             //获取流水号
             NumFormatUtils.createLsNo().then((data) => {
@@ -107,6 +112,7 @@ export default class Sell extends Component {
                     JfBal: tags
                 })
             });
+
             this._dbSearch();
             this.Device();
         })
@@ -118,6 +124,7 @@ export default class Sell extends Component {
             var shopnumber = 0;
             var shopAmount = 0;
             var ShopPrice=0;
+            var vipPrice = 0;
             for (let i = 0; i < rows.length; i++) {
                 var row = rows.item(i);
                 // var DataRows = {
@@ -132,22 +139,36 @@ export default class Sell extends Component {
                 //     'DepCode': row.DepCode,
                 //     'SuppCode': row.SuppCode,
                 // };
-                ShopPrice = (row.countm * row.ShopPrice);
+                ShopPrice = (row.ShopNumber * row.ShopPrice);
                 shopAmount +=ShopPrice;
-                var number = row.countm;
-                shopnumber += parseInt(row.countm);
+                Storage.save("vipPrice", JSON.stringify(shopAmount));
+                var number = row.ShopNumber;
+                shopnumber += parseInt(row.ShopNumber);
+
+                Storage.get('VipCardNo').then((tags) => {
+                    if(tags !==null){
+                        vipPrice = VipPrice.vipPrice(TblRow1[0],this.VipTblRow);
+                        alert("1")
+                    }
+                })
+
+                var VIPprice = shopAmount-vipPrice;
+
                 if (number !== 0) {
                     this.dataRow.push(row);
+                    this.TblRow.push(row);
                 }
             }
             if (this.dataRow == 0) {
                 this.modal();
                 return;
             } else {
-                this.setState({
-                    ShopNumber: shopnumber,//数量
-                    ShopAmount: shopAmount,//总金额this.dataRow
-                    dataSource: this.state.dataSource.cloneWithRows(this.dataRow),
+                Storage.get('VipPrice').then((vipPrice) => {
+                    this.setState({
+                        ShopNumber: shopnumber,//数量
+                        ShopAmount: VIPprice,//总金额this.dataRow
+                        dataSource: this.state.dataSource.cloneWithRows(this.dataRow),
+                    })
                 })
                 this.modal();
             }
@@ -155,11 +176,12 @@ export default class Sell extends Component {
     }
 
     Return() {
-        var nextRoute = {
-            name: "Index",
-            component: Index,
-        };
-        this.props.navigator.push(nextRoute);
+        this.props.navigator.pop();
+        // var nextRoute = {
+        //     name: "Index",
+        //     component: Index,
+        // };
+        // this.props.navigator.push(nextRoute);
     }
 
     Device(){
@@ -171,28 +193,39 @@ export default class Sell extends Component {
                         dbAdapter.selectAidCode(reminder,1).then((rows)=>{
                             var shopnumber = 0;
                             var shopAmount = 0;
+                            var vipPrice = 0;
                             for (let i = 0; i < rows.length; i++) {
                                 var row = rows.item(i);
+                                this.TblRow.push(row);
+                                Storage.get('VipCardNo').then((tags) => {
+                                    if(tags !==null){
+                                        vipPrice = VipPrice.vipPrice(TblRow1[0],this.TblRow);
+                                        // Storage.save("VipPrice", vipPrice);
+                                    }
+                                })
+                                var VIPprice = this.state.ShopAmount-vipPrice;
                                 var ShopPrice = row.StdPrice;
                                 var prototal=this.state.Countm*row.StdPrice;
                                 var number = row.countm;
                                 shopnumber = this.state.Countm+this.state.ShopNumber;
                                 var DataRows = {
                                     'ProdCode':row.ProdCode,
-                                    'prodname':row.ProdName,
+                                    'ProdName':row.ProdName,
                                     'ShopPrice':row.StdPrice,
-                                    'countm': this.state.Countm,
-                                    'prototal': prototal,
+                                    'ShopNumber': this.state.Countm,
+                                    'ShopAmount': prototal,
                                     'pid':row.Pid,
                                 };
                                 this.dataRow.push(DataRows);
                             };
-                            shopAmount =ShopPrice+this.state.ShopAmount;
+                            shopAmount =ShopPrice+VIPprice;
                             this.setState({
+                                vipPrice:vipPrice,
                                 ShopNumber: shopnumber,
                                 ShopAmount: shopAmount,
                                 dataSource: this.state.dataSource.cloneWithRows(this.dataRow),
                             });
+                            //存表
                             var shopInfoData = [];
                             var shopInfo = {};
                             shopInfo.Pid = row.Pid;
@@ -216,28 +249,39 @@ export default class Sell extends Component {
                 dbAdapter.selectAidCode(reminder,1).then((rows)=>{
                     var shopnumber = 0;
                     var shopAmount = 0;
+                    var vipPrice = 0;
                     for (let i = 0; i < rows.length; i++) {
                         var row = rows.item(i);
+                        this.TblRow.push(row);
+                        Storage.get('VipCardNo').then((tags) => {
+                            if(tags !==null){
+                                vipPrice = VipPrice.vipPrice(TblRow1[0],this.TblRow);
+                                // Storage.save("VipPrice", vipPrice);
+                            }
+                        })
+                        var VIPprice = this.state.ShopAmount-vipPrice;
                         var ShopPrice = row.StdPrice;
                         var prototal=this.state.Countm*row.StdPrice;
                         var number = row.countm;
                         shopnumber = this.state.Countm+this.state.ShopNumber;
                         var DataRows = {
                             'ProdCode':row.ProdCode,
-                            'prodname':row.ProdName,
+                            'ProdName':row.ProdName,
                             'ShopPrice':row.StdPrice,
-                            'countm': this.state.Countm,
-                            'prototal': prototal,
+                            'ShopNumber': this.state.Countm,
+                            'ShopAmount': prototal,
                             'pid':row.Pid,
                         };
                         this.dataRow.push(DataRows);
                     };
-                    shopAmount =ShopPrice+this.state.ShopAmount;
+                    shopAmount =ShopPrice+VIPprice;
                     this.setState({
+                        vipPrice:vipPrice,
                         ShopNumber: shopnumber,
                         ShopAmount: shopAmount,
                         dataSource: this.state.dataSource.cloneWithRows(this.dataRow),
                     });
+                    //存表
                     var shopInfoData = [];
                     var shopInfo = {};
                     shopInfo.Pid = row.Pid;
@@ -267,10 +311,10 @@ export default class Sell extends Component {
         return (
             <TouchableOpacity  onPress={()=>this.ListButton(rowData)} style={styles.ShopList1}>
                 <Text style={styles.Name}>{rowData.ProdCode}</Text>
-                <Text style={styles.Name}>{rowData.prodname}</Text>
+                <Text style={styles.Name}>{rowData.ProdName}</Text>
                 <Text style={styles.Number}>{rowData.ShopPrice}</Text>
-                <Text style={styles.Number}>{rowData.countm}</Text>
-                <Text style={styles.Number}>{rowData.prototal}</Text>
+                <Text style={styles.Number}>{rowData.ShopNumber}</Text>
+                <Text style={styles.Number}>{rowData.ShopAmount}</Text>
             </TouchableOpacity>
         );
     }
@@ -288,20 +332,31 @@ export default class Sell extends Component {
         dbAdapter.selectShopInfo().then((rows)=>{
             var shopnumber = 0;
             var shopAmount = 0;
+            var vipPrice = 0;
             this.dataRow=[];
+            this.VipTblRow=[];
             for(let i =0;i<rows.length;i++){
                 var row = rows.item(i);
-                var number = row.countm;
-                shopAmount += parseInt(row.prototal);
-                shopnumber += parseInt(row.countm);
+                this.VipTblRow.push(row);
+                var number = row.ShopNumber;
+                shopAmount += parseInt(row.ShopAmount);
+                shopnumber += parseInt(row.ShopNumber);
                 if(number!==0){
                     this.dataRow.push(row);
                 }
             }
+            Storage.get('VipCardNo').then((tags) => {
+                if(tags !==null){
+                    vipPrice = VipPrice.vipPrice(TblRow1[0],this.VipTblRow);
+                    // Storage.save("VipPrice", vipPrice);
+                }
+            })
+            var VIPprice = shopAmount-vipPrice;
             this.setState({
+                vipPrice:vipPrice,
                 number1:number,
                 ShopNumber:shopnumber,//数量
-                ShopAmount:shopAmount,//总金额
+                ShopAmount:VIPprice,//总金额
                 dataSource:this.state.dataSource.cloneWithRows(this.dataRow),
             })
         });
@@ -318,15 +373,15 @@ export default class Sell extends Component {
             component:GoodsDetails,
             params:{
                 ProdCode:rowData.ProdCode,
-                ProdName:rowData.prodname,
-                Pid:rowData.pid,
+                ProdName:rowData.ProdName,
+                Pid:rowData.Pid,
                 ShopPrice:rowData.ShopPrice,
                 Remark:this.state.promemo,
                 prototal:(this.state.Countm)*(rowData.ShopPrice),
-                countm:rowData.countm,
+                countm:rowData.ShopNumber,
                 DepCode:rowData.DepCode,
                 ydcountm:"",
-                promemo:row.promemo,
+                promemo:"",
                 SuppCode:rowData.SuppCode,
                 BarCode:rowData.BarCode,
                 DataName:'销售',
@@ -343,6 +398,15 @@ export default class Sell extends Component {
     }
 
     Button() {
+        Storage.get('VipCardNo').then((tags) => {
+            if(tags !==null){
+                Storage.get('vipPrice').then((vipPrice) => {
+                    this.setState({
+                        ShopAmount:vipPrice
+                    })
+                })
+            }
+        })
         this.modal();
         Storage.get('ShopCode').then((ShopCode) => {
             Storage.get('PosCode').then((PosCode) => {
@@ -368,16 +432,23 @@ export default class Sell extends Component {
                                 BalanceTotal = JSON.stringify(row.BalanceTotal);//余额
                                 JfBal = JSON.stringify(row.JfBal);//积分
                             };
-                            this.modal();
-                            this.Member();
+                            let vipPrice = VipPrice.vipPrice(TblRow[0],this.TblRow);
+                            // Storage.save("VipPrice", vipPrice);
+                            var VIPprice = this.state.ShopAmount-vipPrice;
                             Storage.save("VipCardNo", VipCardNo);
-                            Storage.save("BalanceTotal", BalanceTotal);
                             Storage.save("JfBal", JfBal);
+                            Storage.save("BalanceTotal", BalanceTotal);
+                            TblRow1=data.TblRow;
                             this.setState({
                                 VipCardNo: VipCardNo,
                                 BalanceTotal: BalanceTotal,
                                 JfBal: JfBal,
+                                ShopAmount: VIPprice,
+                                vipPrice:vipPrice,
                             });
+                            // alert(JSON.stringify(TblRow1));
+                            this.modal();
+                            this.Member();
                         } else {
                             this.modal();
                             alert(JSON.stringify(data));
@@ -389,6 +460,7 @@ export default class Sell extends Component {
     }
 
     PayButton() {
+        // alert(this.state.vipPrice)
         if(this.dataRow==""){
             alert("请添加商品");
         }else{
@@ -402,6 +474,7 @@ export default class Sell extends Component {
                         BalanceTotal: this.state.BalanceTotal,
                         ShopAmount: this.state.ShopAmount,
                         numform:this.state.numform,
+                        vipData:JSON.stringify(this.state.vipPrice),
                         Seles:"R",
                         dataRows:dataRows,
                     }
@@ -417,6 +490,7 @@ export default class Sell extends Component {
                         BalanceTotal: this.state.BalanceTotal,
                         ShopAmount: this.state.ShopAmount,
                         numform:this.state.numform,
+                        vipData:JSON.stringify(this.state.vipPrice),
                         Seles:"T",
                         dataRows:dataRows,
                     }
