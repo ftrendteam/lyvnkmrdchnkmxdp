@@ -4,7 +4,7 @@
 import SQLiteStorage from 'react-native-sqlite-storage';
 SQLiteStorage.DEBUG(false);
 let database_name = "PosBasicItem.db";//数据库文件
-let database_version = "2.0";//版本号
+let database_version = "3.0";//版本号
 let database_displayname = "MySQLite";
 let database_size = -1;//-1应该是表示无限制
 let db;
@@ -30,6 +30,7 @@ export default class SQLiteOpenHelper {
       }, (err) => {
         this._errorCB('open', err);
       });
+    this.createTable();
     return db;
   }
   
@@ -38,6 +39,7 @@ export default class SQLiteOpenHelper {
       this.open();
     }
     //db.onUpdateComponent()
+    db.updater
     db.transaction((tx) => {
       //创建机构信息
       tx.executeSql('CREATE TABLE IF NOT EXISTS tshopitem(pid int not null Primary Key,shopcode varchar(20) null,shopname varchar(200) null,' +
@@ -190,9 +192,11 @@ export default class SQLiteOpenHelper {
         "CashierId int(4) null,CashierCode varchar(12) null,CashierName varchar(20) null,ClerkId int(4) null,ClerkCode varchar(12) null,Pid int(4) not null,BarCode varchar(18) null," +
         "ClerkName  varchar(20) null,ProdCode varchar(13) null,ProdName varchar(40) null,DepCode varchar(12) null,Price float(8) null,Amount float(8) null," +
         "DscTotal float(8) null,AutoDscTotal float(8) null," +
-        "Total float(8) null,HandDscTotal float(8) null,CxDsc float(8) null,EvenDsc float(8) null,MljDsc float(8) null, OverDsc float(8) null,OtherDsc float(8) null,TranDsc float(1) null, VipDsc float(20) null," +
+        "Total float(8) null,HandDscTotal float(8) null,CxDsc float(8) null,EvenDsc float(8) null,MljDsc float(8) null, OverDsc float(8) null," +
+        "OtherDsc float(8) null,TranDsc float(1) null, VipDsc float(20) null," +
         "InnerNo varchar(12) null,OrderNo varchar(3) null,TransFlag varchar(1) null,TransDateTime varchar(19) null,BrandDsc float(8) null," +
-        "isSubProd varchar(1) null,isMinus varchar(1) null,BuyPresentCode varchar(20) null,BuyPresentGroupNo varchar(20) null, BPUsedCountN float(8) null,DscFormNo varchar(20) null,DscMJFormNo varchar(20) null,SSID varchar(32) null," +
+        "isSubProd varchar(1) null,isMinus varchar(1) null,BuyPresentCode varchar(20) null,BuyPresentGroupNo varchar(20) null, " +
+        "BPUsedCountN float(8) null,DscFormNo varchar(20) null,DscMJFormNo varchar(20) null,SSID varchar(32) null," +
         "DscMZFormNo varchar(20) null,DscGSFormNo varchar(20) null,GSUsedCountN float(8) null,YWDate varchar(10))", [], () => {
       }, (err) => {
         console.log(err);
@@ -201,8 +205,30 @@ export default class SQLiteOpenHelper {
         "ExchgRate double(8) null,IsChange varchar(8) null,IsGetCode varchar(2) null,ChangeCode varchar(2) null," +
         "GatherRate int(4) null,IsSystem varchar(1) null,ShortCut varchar(1) null,PayMemo varchar(50)null," +
         "IsDel varchar(1) null,NoDsc varchar(1) null)", [], () => {
-      
+        
       })
+      tx.executeSql("CREATE TABLE IF NOT EXISTS TDscCust(FormNo varchar(20) not null,CustTypeCode varchar(20) null," +
+        "CustTypeName varchar(40) null)", [], () => {
+        
+      })
+      tx.executeSql("CREATE TABLE IF NOT EXISTS TDscPlan(FormNo varchar(20) not null,BeginDate varchar(10) null," +
+        "EndDate varchar(10) null,BeginTime varchar(10) null,EndTime varchar(10) null,VldWeek varchar(7) null)", [], () => {
+        
+      })
+      tx.executeSql("CREATE TABLE IF NOT EXISTS TDscProd(FormNo varchar(20) not null,Pid int(4) null,ProdCode varchar(18) null," +
+        "ProdName varchar(40) null,BarCode varchar(18) null,ProdType varchar(1) null,DscType varchar(1) null,DscValue float(8) null," +
+        "OTax int(4) null,STax int(4) null,DscPrice float(8) null,DscOPrice float(8) null,DscOutOPrice float(8) null," +
+        "StdPrice float(8) null,Spec varchar(20) null,ProdAdr varchar(20) null,DepCode varchar(20) null,DepName varchar(40) null," +
+        "SuppCode varchar(20) null,SuppName varvhar(40) null,BrandCode varvhar(20) null,BrandName varvhar(40) null," +
+        "Remark varvhar(50) null,TimeMark int(4) null,Str1 varvhar(20) null,Str2 varvhar(20) null,Str3 varvhar(20) null," +
+        "Curr1 float(8) null,Curr2 float(8) null,Curr3 float(8) null,Tag int(4) null)", [], () => {
+      })
+      tx.executeSql("CREATE TABLE IF NOT EXISTS KGtuser(Pid int(4) null,UserCode varchar(12) null,BarCode varchar(13) null,UserName varchar(20) null," +
+        "UserPwd varchar(20) null,EditDateTime varchar(19) null,HDscRate float(8) null,IsCashier varchar(1) null," +
+        "IsClerk varchar(1) null,Statues varchar(1) null,IsStationCtrl varchar(1) null,UserMemo varchar(20) null," +
+        "OPriceRight varchar(1) null,PriceRight varchar(1) null,VPriceRight varchar(1) null,PSPriceRight varchar(1) null,IsDel varchar(1) null)",[],()=>{})
+      tx.executeSql("CREATE TABLE IF NOT EXISTS TDscExcept(FormNo varchar(20) not null,ProdCode varchar(20) not null," +
+        "ProdName varchar(40) null,  StdPrice float(8) null, Remark varchar(50) null)",[],()=>{})
     }, (err) => {
       this._errorCB('transaction', err);
     }, () => {
