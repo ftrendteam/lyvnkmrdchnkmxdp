@@ -25,7 +25,7 @@ export default class DownLoadBasicData {
     DownLoadBasicData.downLoadTshopitem(url, shopCode, dbAdapter);
     //downLoadPosOpt(url, shopCode, dbAdapter, posCode);
     Storage.get('PosCode').then((PosCode) => {
-      DownLoadBasicData.downLoadPosOpt(url, shopCode, dbAdapter,PosCode);
+      DownLoadBasicData.downLoadPosOpt(url, shopCode, dbAdapter, PosCode);
     });
   }
   
@@ -90,14 +90,22 @@ export default class DownLoadBasicData {
       });
       FetchUtils.post(url, requestBody).then((response) => {
         if ((response != "" && response.retcode == 1)) {
+          let tDscHead = response.TblRow;
           let tDscCust = response.TblRow2;
+          let TDscDep = response.TblRow3;
           let tDscExcept = response.TblRow4;
+          let tDscBrand = response.TblRow6;
           let tDscPlan = response.TblRow7;
           let tDscProd = response.TblRow9;
+          let tDscSupp = response.TblRow11;
+          dbAdapter.insertTdschead(tDscHead);
+          dbAdapter.insertTDscDep(TDscDep);
           dbAdapter.insertTDscExcept(tDscExcept);
           dbAdapter.insertTDscCust(tDscCust);
+          dbAdapter.insertTDscBrand(tDscBrand);
           dbAdapter.insertTDscPlan(tDscPlan);
           dbAdapter.insertTDscProd(tDscProd);
+          dbAdapter.insertTDscSupp(tDscSupp);
           resolve(true);
         } else {
           reject(false);

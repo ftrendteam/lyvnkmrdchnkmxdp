@@ -223,12 +223,33 @@ export default class SQLiteOpenHelper {
         "Remark varvhar(50) null,TimeMark int(4) null,Str1 varvhar(20) null,Str2 varvhar(20) null,Str3 varvhar(20) null," +
         "Curr1 float(8) null,Curr2 float(8) null,Curr3 float(8) null,Tag int(4) null)", [], () => {
       })
+      
       tx.executeSql("CREATE TABLE IF NOT EXISTS KGtuser(Pid int(4) null,UserCode varchar(12) null,BarCode varchar(13) null,UserName varchar(20) null," +
         "UserPwd varchar(20) null,EditDateTime varchar(19) null,HDscRate float(8) null,IsCashier varchar(1) null," +
         "IsClerk varchar(1) null,Statues varchar(1) null,IsStationCtrl varchar(1) null,UserMemo varchar(20) null," +
         "OPriceRight varchar(1) null,PriceRight varchar(1) null,VPriceRight varchar(1) null,PSPriceRight varchar(1) null,IsDel varchar(1) null)",[],()=>{})
+      
       tx.executeSql("CREATE TABLE IF NOT EXISTS TDscExcept(FormNo varchar(20) not null,ProdCode varchar(20) not null," +
         "ProdName varchar(40) null,  StdPrice float(8) null, Remark varchar(50) null)",[],()=>{})
+      
+      tx.executeSql("CREATE TABLE IF NOT EXISTS Tdschead(FormNo varchar(20) not null,FormName varchar(40)  null,FormType varchar(2) null,dtDep varchar(1) null," +
+        "dtSupp varchar(1) null, dtBrand varchar(1) null, dtProd varchar(1) null, dtAll varchar(1) null, dtCust varchar(1) null," +
+        "FormMaker varchar(30) null, FormDate varchar(10) null, CheckCode varchar(12) null, CheckName varchar(30) null, " +
+        "WriteDate varchar(19) null, UserCode varchar(12) null, UserName varchar(30) null, sDateTime varchar(19) null," +
+        "CheckType varchar(1) null,Tag int(4) null, PrnTimes int(4) null, Remark varchar(200) null, MakeShop varchar(4) null, " +
+        "MakeShopTblCode varchar(5) null, ywRange varchar(1) null, allPF varchar(1) null, AutoMulti varchar(1) null, " +
+        "ConditionType varchar(1) null, Con1 float(8) null, Con2 float(8) null, StopCode varchar(12) null, StopDate varchar(10) null," +
+        " DscType varchar(1) null, DscValue float(8) null, str1 varchar(20) null, str2 varchar(20) null, str3 varchar(20) null," +
+        " str4 varchar(20) null, str5 varchar(20) null,)",[],()=>{})
+  
+      tx.executeSql("CREATE TABLE IF NOT EXISTS TDscDep(FormNo varchar(20) not null,DepCode varchar(20) not null, " +
+        "DepName varchar(40) null, DscType varchar(1) null, DscValue float(8) null, Remark varchar(50) null)",[],()=>{})
+      
+      tx.executeSql("CREATE TABLE IF NOT EXISTS TDscSupp(FormNo varchar(20) not null,SuppCode varchar(20) not null, " +
+        "SuppName varchar(40) null, DscType varchar(1) null, DscValue float(8) null, Remark varchar(50) null)",[],()=>{})
+  
+      tx.executeSql("CREATE TABLE IF NOT EXISTS TDscBrand(FormNo varchar(20) not null,BrandCode varchar(20) not null, " +
+        "BrandName varchar(40) null, DscType varchar(1) null, DscValue float(8) null, Remark varchar(50) null)",[],()=>{})
     }, (err) => {
       this._errorCB('transaction', err);
     }, () => {

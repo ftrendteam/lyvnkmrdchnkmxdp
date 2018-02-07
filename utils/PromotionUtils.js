@@ -19,7 +19,7 @@ export default class PromotionUtils {
           for (let i = 0; i < tDscCustBeans.length; i++) {
             promises.push(dbAdapter.selectTDscPlan(tDscCustBeans.item(i).FormNo));
           }
-          new Promise.all(promises).then((promiseResults) => {
+          new Promise.all(promises).then((promiseResults) => {d
             
             for (let i = 0; i < promiseResults.length; i++) {
               //console.log("wtf=",promiseResults[i])

@@ -1416,7 +1416,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
       console.log("sadf=", error)
     }
   }
-  insertTDscExcept=(datas)=>{
+  insertTDscExcept = (datas) => {
     this.deleteData('TDscExcept');
     db.transaction((tx) => {
       for (let i = 0; i < datas.length; i++) {
@@ -1435,8 +1435,181 @@ export default class DBAdapter extends SQLiteOpenHelper {
       }
     })
   }
+  insertTdschead = (datas) => {
+    this.deleteData('Tdschead');
+    db.transaction((tx) => {
+      for (let i = 0; i < datas.length; i++) {
+        let data = datas[i];
+        let formNo = data.FormNo;
+        let formName = data.FormName;
+        let formType = data.FormType;
+        let dtDep = data.dtDep;
+        let dtSupp = data.dtSupp;
+        let dtBrand = data.dtBrand;
+        let dtProd = data.dtProd;
+        let dtAll = data.dtAll;
+        let dtCust = data.dtCust;
+        let formMaker = data.FormMaker;
+        let formDate = data.FormDate;
+        let checkCode = data.CheckCode;
+        let checkName = data.CheckName;
+        let writeDate = data.WriteDate;
+        let userCode = data.UserCode;
+        let userName = data.UserName;
+        let sDateTime = data.sDateTime;
+        let checkType = data.CheckType;
+        let tag = data.Tag;
+        let prnTimes = data.PrnTimes;
+        let remark = data.Remark;
+        let makeShop = data.MakeShop;
+        let makeShopTblCode = data.MakeShopTblCode;
+        let ywRange = data.ywRange;
+        let allPF = data.allPF;
+        let autoMulti = data.AutoMulti;
+        let conditionType = data.ConditionType;
+        let con1 = data.Con1;
+        let con2 = data.Con2;
+        let stopCode = data.StopCode;
+        let stopDate = data.StopDate;
+        let dscType = data.DscType;
+        let dscValue = data.DscValue;
+        let str1 = data.str1;
+        let str2 = data.str2;
+        let str3 = data.str3;
+        let str4 = data.str4;
+        let str5 = data.str5;
+        let sql = "insert into Tdschead(FormNo,FormName, FormType, dtDep, dtSupp, dtBrand, dtProd, dtAll, dtCust, FormMaker," +
+          " FormDate, CheckCode, CheckName, WriteDate, UserCode, UserName, sDateTime, CheckType, Tag, PrnTimes, Remark, " +
+          "MakeShop, MakeShopTblCode, ywRange, allPF, AutoMulti, ConditionType, Con1, Con2, StopCode, StopDate, DscType," +
+          " DscValue, str1, str2, str3, str4, str5)values(?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?)";
+        tx.executeSql(sql, [formNo, formName, formType, dtDep, dtSupp, dtBrand, dtProd, dtAll, dtCust, formMaker, formDate,
+          checkCode, checkName, writeDate, userCode, userName, sDateTime, checkType, tag, prnTimes, remark, makeShop,
+          makeShopTblCode, ywRange, allPF, autoMulti, conditionType, con1, con2, stopCode, stopDate, dscType, dscValue,
+          str1, str2, str3, str4, str5], (tx, results) => {
+          
+        }, (error) => {
+          console.log("Tdschead=", error)
+        })
+      }
+    })
+  }
+  insertTDscDep = (datas) => {
+    this.deleteData('TDscDep');
+    db.transaction((tx) => {
+      for (let i = 0; i < datas.length; i++) {
+        let data = datas[i];
+        let formNo = datas.FormNo;
+        let depCode = datas.DepCode;
+        let depName = datas.DepName;
+        let dscType = datas.DscType;
+        let dscValue = datas.DscValue;
+        let remark = datas.Remark;
+        let sql = "insert into TDscDep(FormNo,DepCode,DepName, DscType, DscValue, Remark) values(?,?,?,?,?,?)";
+        tx.executeSql(sql, [formNo, depCode, depName, dscType, dscValue, remark], (tx, results) => {
+        
+        }, (error) => {
+          console.log("TDscDep=", error)
+        })
+      }
+    })
+  }
+  insertTDscSupp = (datas) => {
+    this.deleteData('TDscSupp');
+    db.transaction((tx) => {
+      for (let i = 0; i < datas.length; i++) {
+        let data = datas[i];
+        let formNo = datas.FormNo;
+        let suppCode = datas.SuppCode;
+        let suppName = datas.SuppName;
+        let dscType = datas.DscType;
+        let dscValue = datas.DscValue;
+        let remark = datas.Remark;
+        let sql = "insert into TDscSupp(FormNo,SuppCode,SuppName, DscType, DscValue, Remark) values(?,?,?,?,?,?)";
+        tx.executeSql(sql, [formNo, suppCode, suppName, dscType, dscValue, remark], (tx, results) => {
+        
+        }, (error) => {
+          console.log("TDscSupp=", error)
+        })
+      }
+    })
+  }
+  insertTDscBrand = () => {
+    this.deleteData('TDscBrand');
+    db.transaction((tx) => {
+      for (let i = 0; i < datas.length; i++) {
+        let data = datas[i];
+        let formNo = datas.FormNo;
+        let brandCode = datas.BrandCode;
+        let brandName = datas.BrandName;
+        let dscType = datas.DscType;
+        let dscValue = datas.DscValue;
+        let remark = datas.Remark;
+        let sql = "insert into TDscBrand(FormNo,BrandCode,BrandName, DscType, DscValue, Remark) values(?,?,?,?,?,?)";
+        tx.executeSql(sql, [formNo, brandCode, brandName, dscType, dscValue, remark], (tx, results) => {
+        
+        }, (error) => {
+          console.log("TDscBrand=", error)
+        })
+      }
+    })
+  }
+  selectTDscSupp=(SuppCode)=>{
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        let sql = "select * from TDscSupp where SuppCode='" + SuppCode + "'";
+        tx.executeSql(sql, [], (tx, results) => {
+            resolve((results.rows));
+          }, (error) => {
+            console.log("err===", error);
+          }
+        );
+      });
+    });
+  }
   
-  selectTDscExcept=(ProdCode)=>{
+  selectTDscDep=(DepCode)=>{
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        let sql = "select * from TDscDep where DepCode='" + DepCode + "'";
+        tx.executeSql(sql, [], (tx, results) => {
+            resolve((results.rows));
+          }, (error) => {
+            console.log("err===", error);
+          }
+        );
+      });
+    });
+  }
+  
+  selectTDscBrand=(BrandCode)=>{
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        let sql = "select * from TDscBrand where BrandCode='" + BrandCode + "'";
+        tx.executeSql(sql, [], (tx, results) => {
+            resolve((results.rows));
+          }, (error) => {
+            console.log("err===", error);
+          }
+        );
+      });
+    });
+  }
+  
+  selectTdscHead = (FormType) => {
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        let sql = "select * from Tdschead where FormType='" + FormType + "'";
+        tx.executeSql(sql, [], (tx, results) => {
+            resolve((results.rows));
+          }, (error) => {
+            console.log("err===", error);
+          }
+        );
+      });
+    });
+  }
+  
+  selectTDscExcept = (ProdCode) => {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
         let sql = "select * from TDscExcept where ProdCode='" + ProdCode + "'";

@@ -5,70 +5,65 @@
 import BigDecimalUtils from '../../utils/BigDecimalUtils';
 import PromotionUtils from '../../utils/PromotionUtils';
 export default class BGPromotionManager {
-  static BGPromotion(productBean, custTypeCode) {
-    let tDscExceptShop = PromotionUtils.isTDscExceptShop(context, productBean.getProdCode());
-    if (!tDscExceptShop) {
-      //System.out.println("非促销商品！");
-      return;
-    }
-    try {
-      let custAndDate = PromotionUtils.custAndDate(context, custTypeCode);
-      
-      if (!custAndDate) {
-        return;
-      }
-      
-      let tdscheadBeans = XDbUtils.getBasicDB(context).findAll(Selector.from(TdscheadBean.class).where("FormType", "=", "BG"));
-      if (tdscheadBeans != null) {
-        for (let i = 0; i < tdscheadBeans.length; i++) {
-          let tdscheadBean = tdscheadBeans[i];
-          if ("1" == tdscheadBean.DtAll) {
-            //System.out.println("1");
-          } else if ("0" == tdscheadBean.DtAll) {
-            //System.out.println("0");
-            let dtDep = tdscheadBean.DtDep;
-            let dtSupp = tdscheadBean.DtSupp;
-            let dtBrand = tdscheadBean.DtBrand;
-            if ("1".equals(dtDep)) {
-              //System.out.println("0-dtDep");
-              let depCode = XDbUtils.getBasicDB(context).findFirst(Selector.from(TDscDepBean.class).where("DepCode", "=", productBean.DepCode));
-              if (depCode == null) {
-                return;
-              }
-              let dscValue = depCode.DscValue;
-              let dscType = depCode.DscType;
-              if (depCode != null) {
-                let priceMode = depCode.PriceMode;
-                b(productBean, dscValue, dscType, priceMode);
-              }
-            } else if ("1" == dtSupp) {
-              //System.out.println("0-dtSupp");
-              let suppCode = XDbUtils.getBasicDB(context).findFirst(Selector.from(TDscSuppBean.class).where("SuppCode", "=", productBean.SuppCode));
-              if (suppCode != null) {
-                let dscValue = suppCode.DscValue;
-                let priceMode = suppCode.PriceMode;
-                let dscType = suppCode.DscType;
-                b(productBean, dscValue, dscType, priceMode);
-              }
-            } else if ("1" == dtBrand) {
-              //System.out.println("0-dtBrand");
-              let brandCode = XDbUtils.getBasicDB(context).findFirst(Selector.from(TDscBrandBean.class).where("BrandCode", "=", productBean.BrandCode));
-              if (brandCode != null) {
-                let dscValue = brandCode.DscValue;
-                let priceMode = brandCode.PriceMode;
-                let dscType = brandCode.DscType;
-                b(productBean, dscValue, dscType, priceMode);
+  static BGPromotion(productBean, custTypeCode, dbAdapter) {
+    let prodCode = productBean.ProdCode;
+    new Promise.all([PromotionUtils.isTDscExceptShop(prodCode, dbAdapter), PromotionUtils.custAndDate(custTypeCode, dbAdapter, prodCode)]).then((results) => {
+      if (results.length == 2 && results[0] == true && results[1] == true) {
+        //let tdscheadBeans = XDbUtils.getBasicDB(context).findAll(Selector.from(TdscheadBean.class).where("FormType", "=", "BG"));
+        dbAdapter.selectTdscHead("BG").then((tdscheadBeans) => {
+          let promises = [];
+          if (tdscheadBeans != null) {
+            for (let i = 0; i < tdscheadBeans.length; i++) {
+              let tdscheadBean = tdscheadBeans[i];
+              if ("1" == tdscheadBean.DtAll) {
+                //System.out.println("1");
+              } else if ("0" == tdscheadBean.DtAll) {
+                //System.out.println("0");
+                let dtDep = tdscheadBean.DtDep;
+                let dtSupp = tdscheadBean.DtSupp;
+                let dtBrand = tdscheadBean.DtBrand;
+                if ("1".equals(dtDep)) {
+                  //System.out.println("0-dtDep");
+                  let depCode = XDbUtils.getBasicDB(context).findFirst(Selector.from(TDscDepBean.class).where("DepCode", "=", productBean.DepCode));
+                  if (depCode == null) {
+                    return;
+                  }
+                  let dscValue = depCode.DscValue;
+                  let dscType = depCode.DscType;
+                  if (depCode != null) {
+                    let priceMode = depCode.PriceMode;
+                    b(productBean, dscValue, dscType, priceMode);
+                  }
+                } else if ("1" == dtSupp) {
+                  //System.out.println("0-dtSupp");
+                  let suppCode = XDbUtils.getBasicDB(context).findFirst(Selector.from(TDscSuppBean.class).where("SuppCode", "=", productBean.SuppCode));
+                  if (suppCode != null) {
+                    let dscValue = suppCode.DscValue;
+                    let priceMode = suppCode.PriceMode;
+                    let dscType = suppCode.DscType;
+                    b(productBean, dscValue, dscType, priceMode);
+                  }
+                } else if ("1" == dtBrand) {
+                  //System.out.println("0-dtBrand");
+                  let brandCode = XDbUtils.getBasicDB(context).findFirst(Selector.from(TDscBrandBean.class).where("BrandCode", "=", productBean.BrandCode));
+                  if (brandCode != null) {
+                    let dscValue = brandCode.DscValue;
+                    let priceMode = brandCode.PriceMode;
+                    let dscType = brandCode.DscType;
+                    b(productBean, dscValue, dscType, priceMode);
+                  }
+                }
               }
             }
           }
-        }
+        });
+        
       }
-    } catch (error) {
+    });
     
-    }
   }
   
-  static  b(productBean, dscValue, dscType, priceMode) {
+  static b(productBean, dscValue, dscType, priceMode) {
     let stdOPrice = productBean.StdOPrice;
     let stdPrice = productBean.StdPrice;
     let vipPrice1 = productBean.VipPrice1;
