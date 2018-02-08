@@ -11,7 +11,7 @@ export default class PromotionUtils {
    * @return
    * @throws DbException
    */
-  static custAndDate(cardTypeCode, dbAdapter, prodCode) {
+  static custAndDate(cardTypeCode, dbAdapter) {
     return new Promise((resolve, reject) => {
       let promises = [];
       dbAdapter.selectTDscCust(cardTypeCode).then((tDscCustBeans) => {
@@ -19,7 +19,7 @@ export default class PromotionUtils {
           for (let i = 0; i < tDscCustBeans.length; i++) {
             promises.push(dbAdapter.selectTDscPlan(tDscCustBeans.item(i).FormNo));
           }
-          new Promise.all(promises).then((promiseResults) => {d
+          new Promise.all(promises).then((promiseResults) => {
             
             for (let i = 0; i < promiseResults.length; i++) {
               //console.log("wtf=",promiseResults[i])
@@ -40,22 +40,22 @@ export default class PromotionUtils {
                 } else {
                   c = -1;
                 }
-                //console.log(!(DateUtils.compare2HMS(DateUtils.getHSM(),endTime)) &&
-                // DateUtils.compare2HMS(DateUtils.getHSM(),beginTime));
+                //console.log("a=",DateUtils.compareDate(endDate, DateUtils.getDate()));
+                //console.log((DateUtils.compareDate(DateUtils.getDate(), beginDate)));
+                //console.log(c)
+                //console.log(!(DateUtils.compare2HMS(DateUtils.getHSM(), endTime)))
+                //console.log(DateUtils.compare2HMS(DateUtils.getHSM(), beginTime))
                 if (DateUtils.compareDate(endDate, DateUtils.getDate()) && (DateUtils.compareDate(DateUtils.getDate(), beginDate)) && c == 1) {
                   if (!(DateUtils.compare2HMS(DateUtils.getHSM(), endTime)) && DateUtils.compare2HMS(DateUtils.getHSM(), beginTime)) {
-                    dbAdapter.selectTDscProd(prodCode).then((tDscProdBeans) => {
-                      console.log("tDscProdBeans", tDscProdBeans.length);
-                      if (tDscProdBeans != null && tDscProdBeans.length != 0) {
-                        console.log("wtf");
-                        resolve(true);
-                        return;
-                      } else if (i == tDscCustBeans.length - 1 && j == promiseResults[i].length - 1) {
-                        resolve(false);
-                        return;
-                      }
-                    });
+                    resolve(true);
+                    return;
+                  }else{
+                    resolve(false);
+                    return;
                   }
+                }else{
+                  resolve(false);
+                  return;
                 }
               }
             }
@@ -77,9 +77,9 @@ export default class PromotionUtils {
     return new Promise((resolve, reject) => {
       dbAdapter.selectTDscExcept(prodCode).then((results) => {
         if (results.length != 0) {
-          resolve(true);
-        }else{
-          resolve(false);
+          resolve(true);//非促销商品 不参与优惠
+        } else {
+          resolve(false);//可以参与优惠
         }
       });
     })
