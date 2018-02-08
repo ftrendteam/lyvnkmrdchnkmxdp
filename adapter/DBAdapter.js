@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Created by admin on 2017/9/1.
  */
 import SQLiteOpenHelper from '../sqLiteOpenHelper/SQLiteOpenHelper';
@@ -31,7 +31,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
       this.open();
     }
     db.transaction((tx) => {
-      tx.executeSql('delete from ' + dbName + '', [], () => {
+      tx.executeSql("delete from '" + dbName + "'", [], () => {
       
       }, (err) => {
         console.log("detele=", err);
@@ -211,6 +211,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
     this.deleteData('tusershop');
     db.transaction((tx) => {
       for (let i = 0; i < len; i++) {
+        console.log(i)
         let tusershop = tusershopData[i];
         let usercode = tusershop.usercode;
         let shopcode = tusershop.shopcode;
@@ -411,8 +412,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
   selectShopInfo() {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
-       //let sql="select a.*,b.* from shopInfo a join product b on a.prodcode=b.prodcode";
-          let ssql = "select a.*,ifNull(b.countm,0) as ShopNumber,ifNull(b.ShopPrice,a.StdPrice) as    ShopPrice ,ifNull(b.prototal,0) as ShopAmount   " +
+        let ssql = "select a.*,ifNull(b.countm,0) as ShopNumber,ifNull(b.ShopPrice,a.StdPrice) as    ShopPrice ,ifNull(b.prototal,0) as ShopAmount   " +
           ",ifNull(b.promemo,'') as ShopRemark,b.depcode as  DepCode1 " +
           " from product a join shopInfo b on a.Pid=b.Pid  ";
         tx.executeSql(ssql, [], (tx, results) => {
@@ -624,7 +624,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
   selectTUserShopData(Usercode) {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
-        tx.executeSql("select b.ShopCode,b.ShopName from tUserShop a inner join tshopitem b on b.SubCode+rtrim(b.shopcode)+';' like '%;'+rtrim(a.shopcode)+';%' or rtrim(a.shopcode)='0'  where a.UserCode='" + Usercode + "'", [], (tx, results) => {
+        tx.executeSql("select b.ShopCode,b.ShopName from tUserShop a inner join tshopitem b on b.SubCode||rtrim(b.shopcode)||';' like '%;'||rtrim(a.shopcode)||';%' or rtrim(a.shopcode)='0'  where a.UserCode='" + Usercode + "'", [], (tx, results) => {
           resolve(results.rows);
         });
         
@@ -667,6 +667,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
         let ssql = "select PSShop from tShopItem where FNeedPS='1' and ShopCode='" + shopCode + "' and isdel='0'";
+        console.log(ssql);
         tx.executeSql(ssql, [], (tx, results) => {
           resolve(results.rows);
         });
@@ -754,6 +755,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
               let shopCode;
               DataUtils.get('code', '').then((data) => {
                 shopCode = data;
+                console.log("shopCode", shopCode);
                 if (shopCode == currShopCode) {//当前登录的机构号 和本地保存的相同
                   // console.log("当前登录的机构号 和本地保存的相同");
                   let categoryBody = RequestBodyUtils.createCategory(currShopCode);
@@ -991,6 +993,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
         let sql = "select * from tuserright where usercode='" + userCode + "' and Funccode='A1012'";
+        console.log(sql);
         tx.executeSql(sql, [], (tx, results) => {
           resolve((results.rows.length != 0));
         })
@@ -1085,6 +1088,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
    *保存流水表Sum
    */
   insertSum(sumDatas) {
+    console.log("wtfsadfas");
     db.transaction((tx) => {
       for (let i = 0; i < sumDatas.length; i++) {
         try {
@@ -1116,12 +1120,12 @@ export default class DBAdapter extends SQLiteOpenHelper {
           //let transFlag = sum.TransFlag;
           //let transDateTime = sum.TransDateTime;
           //let ywDate = sum.YWDate;
-
+          
           let sql = "insert into Sum(LsNo,sDateTime,TradeFlag,CashierId,CashierCode,ino,CashierName,DscTotal,Total,TotalPay,Change,CustType,CustCode," +
             "PayId,PayCode,Amount,OldAmount,TendPayCode,InnerNo) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
           try {
-            tx.executeSql(sql, [lsNo, sDateTime, tradeFlag, cashierId, cashierCode, ino, cashierName, dscTotal,  total, totalPay, change, custType, custCode,
-                  payId, payCode, amount, oldAmount, tendPayCode, innerNo, ], (tx, results) => {
+            tx.executeSql(sql, [lsNo, sDateTime, tradeFlag, cashierId, cashierCode, ino, cashierName, dscTotal, total, totalPay, change, custType, custCode,
+                payId, payCode, amount, oldAmount, tendPayCode, innerNo,], (tx, results) => {
                 //resolve((results.rows));
               }, (err) => {
                 console.log("err===", err);
@@ -1193,15 +1197,14 @@ export default class DBAdapter extends SQLiteOpenHelper {
           //let dscGSFormNo = detail.DscGSFormNo;
           //let gsUsedCountN = detail.GSUsedCountN;
           //let ywDate = detail.YWDate;
-            console.log("sdf=",pid);
           let sql = "insert into Detail(LsNo,sDateTime,TradeFlag,CashierId,CashierCode,CashierName,ClerkId,ClerkCode,Pid," +
             "BarCode,ClerkName,ProdCode,ProdName,DepCode,Price,Amount,DscTotal,Total,AutoDscTotal,HandDsc,InnerNo,OrderNo) values(" +
             "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
           tx.executeSql(sql, [lsNo, sDateTime, tradeFlag, cashierId, cashierCode, cashierName, clerkId, clerkCode,
-              pid, barCode, clerkName, prodCode, prodName, depCode, price, amount, dscTotal, total,autoDscTotal,
-              handDsc,innerNo,orderNo], (tx, results) => {
+              pid, barCode, clerkName, prodCode, prodName, depCode, price, amount, dscTotal, total, autoDscTotal,
+              handDsc, innerNo, orderNo], (tx, results) => {
               //resolve((results.rows));
-              console.log("resultDeta=",results.rows);
+              console.log("resultDeta=", results.rows);
             }, (error) => {
               console.log("err===", error);
               
@@ -1320,6 +1323,345 @@ export default class DBAdapter extends SQLiteOpenHelper {
     })
     
   }
+  //------------------促销表---------------------------
+  insertTDscCust = (datas) => {
+    this.deleteData('TDscCust');
+    db.transaction((tx) => {
+      for (let i = 0; i < datas.length; i++) {
+        let data = datas[i];
+        let formNo = data.FormNo;
+        let custTypeCode = data.CustTypeCode;
+        let custTypeName = data.CustTypeName;
+        let sql = "insert into TDscCust(FormNo,CustTypeCode,CustTypeName) values(?,?,?)";
+        tx.executeSql(sql, [formNo, custTypeCode, custTypeName], (tx, results) => {
+        
+        }, (error) => {
+          console.log("TDscCust=", error)
+        })
+      }
+    })
+  }
+  
+  insertTDscPlan = (datas) => {
+    this.deleteData('TDscPlan');
+    db.transaction((tx) => {
+      for (let i = 0; i < datas.length; i++) {
+        let data = datas[i];
+        let formNo = data.FormNo;
+        let beginDate = data.BeginDate;
+        let endDate = data.EndDate;
+        let beginTime = data.BeginTime;
+        let endTime = data.EndTime;
+        let vldWeek = data.VldWeek;
+        let sql = "insert into TDscPlan(FormNo,BeginDate,EndDate,BeginTime,EndTime,VldWeek) values(?,?,?,?,?,?)";
+        tx.executeSql(sql, [formNo, beginDate, endDate, beginTime, endTime, vldWeek], (tx, results) => {
+        
+        }, (error) => {
+          console.log("TDscPlan=", error)
+        })
+      }
+    })
+  }
+  insertTDscProd = (datas) => {
+    this.deleteData('TDscProd');
+    try {
+      db.transaction((tx) => {
+        for (let i = 0; i < datas.length; i++) {
+          let data = datas[i];
+          let formNo = data.FormNo;
+          let pid = data.Pid;
+          let prodCode = data.ProdCode;
+          let prodName = data.ProdName;
+          let barCode = data.BarCode;
+          let prodType = data.ProdType;
+          let dscType = data.DscType;
+          let dscValue = data.DscValue;
+          let oTax = data.OTax;
+          let sTax = data.STax;
+          let dscPrice = data.DscPrice;
+          let dscOPrice = data.DscOPrice;
+          let dscOutOPrice = data.DscOutOPrice;
+          let stdPrice = data.StdPrice;
+          let spec = data.Spec;
+          let prodAdr = data.ProdAdr;
+          let depCode = data.DepCode;
+          let depName = data.DepName;
+          let suppCode = data.SuppCode;
+          let suppName = data.SuppName;
+          let brandCode = data.BrandCode;
+          let brandName = data.BrandName;
+          let remark = data.Remark;
+          let timeMark = data.TimeMark;
+          let str1 = data.Str1;
+          let str2 = data.Str2;
+          let str3 = data.Str3;
+          let curr1 = data.Curr1;
+          let curr2 = data.Curr2;
+          let curr3 = data.Curr3;
+          let tag = data.Tag;
+          let sql = "insert into TDscProd(FormNo,Pid, ProdCode, ProdName, BarCode, ProdType, DscType, DscValue, OTax, STax, " +
+            "DscPrice, DscOPrice, DscOutOPrice, StdPrice, Spec, ProdAdr, DepCode, DepName, SuppCode, SuppName, BrandCode, " +
+            "BrandName, Remark, TimeMark, Str1, Str2, Str3, Curr1, Curr2, Curr3, Tag) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+          tx.executeSql(sql, [formNo, pid, prodCode, prodName, barCode, prodType, dscType, dscValue, oTax, sTax, dscPrice, dscOPrice,
+            dscOutOPrice, stdPrice, spec, prodAdr, depCode, depName, suppCode, suppName, brandCode, brandName, remark, timeMark, str1,
+            str2, str3, curr1, curr2, curr3, tag], (tx, results) => {
+            
+          }, (error) => {
+            console.log("TDscProd=", error)
+          })
+        }
+      })
+    } catch (error) {
+      console.log("sadf=", error)
+    }
+  }
+  insertTDscExcept = (datas) => {
+    this.deleteData('TDscExcept');
+    db.transaction((tx) => {
+      for (let i = 0; i < datas.length; i++) {
+        let data = datas[i];
+        let formNo = data.FormNo;
+        let ProdCode = data.ProdCode;
+        let ProdName = data.ProdName;
+        let StdPrice = data.StdPrice;
+        let Remark = data.Remark;
+        let sql = "insert into TDscExcept(FormNo,ProdCode,ProdName,StdPrice,Remark) values(?,?,?,?,?)";
+        tx.executeSql(sql, [formNo, ProdCode, ProdName, StdPrice, Remark], (tx, results) => {
+        
+        }, (error) => {
+          console.log("TDscExcept=", error)
+        })
+      }
+    })
+  }
+  insertTdschead = (datas) => {
+    this.deleteData('Tdschead');
+    db.transaction((tx) => {
+      for (let i = 0; i < datas.length; i++) {
+        let data = datas[i];
+        let formNo = data.FormNo;
+        let formName = data.FormName;
+        let formType = data.FormType;
+        let dtDep = data.dtDep;
+        let dtSupp = data.dtSupp;
+        let dtBrand = data.dtBrand;
+        let dtProd = data.dtProd;
+        let dtAll = data.dtAll;
+        let dtCust = data.dtCust;
+        let formMaker = data.FormMaker;
+        let formDate = data.FormDate;
+        let checkCode = data.CheckCode;
+        let checkName = data.CheckName;
+        let writeDate = data.WriteDate;
+        let userCode = data.UserCode;
+        let userName = data.UserName;
+        let sDateTime = data.sDateTime;
+        let checkType = data.CheckType;
+        let tag = data.Tag;
+        let prnTimes = data.PrnTimes;
+        let remark = data.Remark;
+        let makeShop = data.MakeShop;
+        let makeShopTblCode = data.MakeShopTblCode;
+        let ywRange = data.ywRange;
+        let allPF = data.allPF;
+        let autoMulti = data.AutoMulti;
+        let conditionType = data.ConditionType;
+        let con1 = data.Con1;
+        let con2 = data.Con2;
+        let stopCode = data.StopCode;
+        let stopDate = data.StopDate;
+        let dscType = data.DscType;
+        let dscValue = data.DscValue;
+        let str1 = data.str1;
+        let str2 = data.str2;
+        let str3 = data.str3;
+        let str4 = data.str4;
+        let str5 = data.str5;
+        let sql = "insert into Tdschead(FormNo,FormName, FormType, dtDep, dtSupp, dtBrand, dtProd, dtAll, dtCust, FormMaker," +
+          " FormDate, CheckCode, CheckName, WriteDate, UserCode, UserName, sDateTime, CheckType, Tag, PrnTimes, Remark, " +
+          "MakeShop, MakeShopTblCode, ywRange, allPF, AutoMulti, ConditionType, Con1, Con2, StopCode, StopDate, DscType," +
+          " DscValue, str1, str2, str3, str4, str5)values(?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?)";
+        tx.executeSql(sql, [formNo, formName, formType, dtDep, dtSupp, dtBrand, dtProd, dtAll, dtCust, formMaker, formDate,
+          checkCode, checkName, writeDate, userCode, userName, sDateTime, checkType, tag, prnTimes, remark, makeShop,
+          makeShopTblCode, ywRange, allPF, autoMulti, conditionType, con1, con2, stopCode, stopDate, dscType, dscValue,
+          str1, str2, str3, str4, str5], (tx, results) => {
+          
+        }, (error) => {
+          console.log("Tdschead=", error)
+        })
+      }
+    })
+  }
+  insertTDscDep = (datas) => {
+    this.deleteData('TDscDep');
+    db.transaction((tx) => {
+      for (let i = 0; i < datas.length; i++) {
+        let data = datas[i];
+        let formNo = datas.FormNo;
+        let depCode = datas.DepCode;
+        let depName = datas.DepName;
+        let dscType = datas.DscType;
+        let dscValue = datas.DscValue;
+        let remark = datas.Remark;
+        let sql = "insert into TDscDep(FormNo,DepCode,DepName, DscType, DscValue, Remark) values(?,?,?,?,?,?)";
+        tx.executeSql(sql, [formNo, depCode, depName, dscType, dscValue, remark], (tx, results) => {
+        
+        }, (error) => {
+          console.log("TDscDep=", error)
+        })
+      }
+    })
+  }
+  insertTDscSupp = (datas) => {
+    this.deleteData('TDscSupp');
+    db.transaction((tx) => {
+      for (let i = 0; i < datas.length; i++) {
+        let data = datas[i];
+        let formNo = datas.FormNo;
+        let suppCode = datas.SuppCode;
+        let suppName = datas.SuppName;
+        let dscType = datas.DscType;
+        let dscValue = datas.DscValue;
+        let remark = datas.Remark;
+        let sql = "insert into TDscSupp(FormNo,SuppCode,SuppName, DscType, DscValue, Remark) values(?,?,?,?,?,?)";
+        tx.executeSql(sql, [formNo, suppCode, suppName, dscType, dscValue, remark], (tx, results) => {
+        
+        }, (error) => {
+          console.log("TDscSupp=", error)
+        })
+      }
+    })
+  }
+  insertTDscBrand = () => {
+    this.deleteData('TDscBrand');
+    db.transaction((tx) => {
+      for (let i = 0; i < datas.length; i++) {
+        let data = datas[i];
+        let formNo = datas.FormNo;
+        let brandCode = datas.BrandCode;
+        let brandName = datas.BrandName;
+        let dscType = datas.DscType;
+        let dscValue = datas.DscValue;
+        let remark = datas.Remark;
+        let sql = "insert into TDscBrand(FormNo,BrandCode,BrandName, DscType, DscValue, Remark) values(?,?,?,?,?,?)";
+        tx.executeSql(sql, [formNo, brandCode, brandName, dscType, dscValue, remark], (tx, results) => {
+        
+        }, (error) => {
+          console.log("TDscBrand=", error)
+        })
+      }
+    })
+  }
+  selectTDscSupp=(SuppCode)=>{
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        let sql = "select * from TDscSupp where SuppCode='" + SuppCode + "'";
+        tx.executeSql(sql, [], (tx, results) => {
+            resolve((results.rows));
+          }, (error) => {
+            console.log("err===", error);
+          }
+        );
+      });
+    });
+  }
+  
+  selectTDscDep=(DepCode)=>{
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        let sql = "select * from TDscDep where DepCode='" + DepCode + "'";
+        tx.executeSql(sql, [], (tx, results) => {
+            resolve((results.rows));
+          }, (error) => {
+            console.log("err===", error);
+          }
+        );
+      });
+    });
+  }
+  
+  selectTDscBrand=(BrandCode)=>{
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        let sql = "select * from TDscBrand where BrandCode='" + BrandCode + "'";
+        tx.executeSql(sql, [], (tx, results) => {
+            resolve((results.rows));
+          }, (error) => {
+            console.log("err===", error);
+          }
+        );
+      });
+    });
+  }
+  
+  selectTdscHead = (FormType) => {
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        let sql = "select * from Tdschead where FormType='" + FormType + "'";
+        tx.executeSql(sql, [], (tx, results) => {
+            resolve((results.rows));
+          }, (error) => {
+            console.log("err===", error);
+          }
+        );
+      });
+    });
+  }
+  
+  selectTDscExcept = (ProdCode) => {
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        let sql = "select * from TDscExcept where ProdCode='" + ProdCode + "'";
+        tx.executeSql(sql, [], (tx, results) => {
+            resolve((results.rows));
+          }, (error) => {
+            console.log("err===", error);
+          }
+        );
+      });
+    });
+  }
+  
+  selectTDscCust = (custTypeCode) => {
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        let sql = "select * from TDscCust where  CustTypeCode='" + custTypeCode + "'";
+        tx.executeSql(sql, [], (tx, results) => {
+            resolve((results.rows));
+          }, (error) => {
+            console.log("err===", error);
+          }
+        );
+      });
+    });
+  }
+  selectTDscProd = (prodCode) => {
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        let sql = "select * from TDscProd where  ProdCode='" + prodCode + "'";
+        tx.executeSql(sql, [], (tx, results) => {
+            resolve((results.rows));
+          }, (error) => {
+            console.log("err===", error);
+          }
+        );
+      });
+    });
+  }
+  
+  selectTDscPlan = (formNo) => {
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        let sql = "select * from TDscPlan where  FormNo='" + formNo + "'";
+        tx.executeSql(sql, [], (tx, results) => {
+            resolve((results.rows));
+          }, (error) => {
+            console.log("err===", error);
+          }
+        );
+      });
+    });
+  }
   
   /***
    * 查询sum表前100条为上传的数据
@@ -1340,7 +1682,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
     });
   }
   
-    selectSumAllData(lsNo, innerno, sdatetime) {
+  selectSumAllData(lsNo, innerno, sdatetime) {
     return new Promise((resolve, reject) => {
         db.transaction((tx) => {
           let sql = "select * from Sum where lsno='" + lsNo + "' AND (TransFlag is null or TransFlag='' ) and innerno='" + innerno + "' and sdatetime = '" + sdatetime + "'";
@@ -1386,24 +1728,24 @@ export default class DBAdapter extends SQLiteOpenHelper {
   upDateSum = (TransDateTime, lsNo) => {//update product set ProdName='1' where ProdCode='102000001'
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
-        let sql = "update Sum set TransFlag='1' ,TransDateTime='" + TransDateTime + "' where lsno='" + lsNo+"'";
+        let sql = "update Sum set TransFlag='1' ,TransDateTime='" + TransDateTime + "' where lsno='" + lsNo + "'";
         tx.executeSql(sql, [], (tx, results) => {
           resolve(true);
         }, (error) => {
           reject(false);
         });
-          // tx.executeSql(sql, [], (tx, results) => {
-          //     resolve(results.rows);
-          // }, (error) => {
-          //     reject("");
-          // });
+        // tx.executeSql(sql, [], (tx, results) => {
+        //     resolve(results.rows);
+        // }, (error) => {
+        //     reject("");
+        // });
       });
     })
   }
   upDateDetail = (TransDateTime, lsNo) => {//update product set ProdName='1' where ProdCode='102000001'
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
-        let sql = "update Detail set TransFlag='1' ,TransDateTime='" + TransDateTime + "' where lsno='" + lsNo+"'";
+        let sql = "update Detail set TransFlag='1' ,TransDateTime='" + TransDateTime + "' where lsno='" + lsNo + "'";
         tx.executeSql(sql, [], (tx, results) => {
           resolve(true);
         }, (error) => {
@@ -1411,6 +1753,52 @@ export default class DBAdapter extends SQLiteOpenHelper {
         });
       });
     })
+  }
+  insertKgtuser = (datas) => {
+    this.deleteData('KGtuser');
+    db.transaction((tx) => {
+      for (let i = 0; i < datas.length; i++) {
+        let data = datas[i];
+        let pid = data.pid;
+        let userCode = data.UserCode;
+        let barCode = data.BarCode;
+        let userName = data.UserName;
+        let userPwd = data.UserPwd;
+        let editDateTime = data.EditDateTime;
+        let hDscRate = data.HDscRate;
+        let isCashier = data.IsCashier;
+        let isClerk = data.IsClerk;
+        let statues = data.Statues;
+        let isStationCtrl = data.IsStationCtrl;
+        let userMemo = data.UserMemo;
+        let oPriceRight = data.OPriceRight;
+        let priceRight = data.PriceRight;
+        let vPriceRight = data.VPriceRight;
+        let psPriceRight = data.PSPriceRight;
+        let isDel = data.IsDel;
+        let sql = "insert into KGtuser(Pid,UserCode,BarCode,UserName,UserPwd,EditDateTime,HDscRate,IsCashier,IsClerk," +
+          "Statues,IsStationCtrl, UserMemo, OPriceRight,PriceRight,VPriceRight,PSPriceRight,IsDel) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        tx.executeSql(sql, [pid, userCode, barCode, userName, userPwd, editDateTime, hDscRate, isCashier, isClerk, statues,
+          isStationCtrl, userMemo, oPriceRight, priceRight, vPriceRight, psPriceRight, isDel], (tx, results) => {
+          
+        }, (err) => {
+          console.log("TDscPlan=", err)
+        })
+      }
+    })
+  }
+  selectKgtuser = (UserCode) => {
+    return new Promise((resolve, reject) => {
+        db.transaction((tx) => {
+          let sql = "select * from KGtuser where UserCode='" + UserCode + "'";
+          tx.executeSql(sql, [], (tx, results) => {
+            resolve(results.rows);
+          }, (error) => {
+            reject("");
+          });
+        });
+      }
+    )
   }
   
   /***

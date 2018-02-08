@@ -341,7 +341,6 @@ export  default class RequestBodyUtils {
     Storage.get("CurrDate").then((currentData) => {
       let requestBody = RequestBodyUtils.createProduct(shopCode, currentData, RequestBodyUtils.currPage);
       FetchUtils.post(url, requestBody).then((json) => {
-        //console.log(json);
         if (!(json == "" || json == null || json == undefined || (json == "[]"))) {
           if (json.retcode == 99) {
             RequestBodyUtils.currPage = 1;
@@ -382,9 +381,19 @@ export  default class RequestBodyUtils {
       }, (json) => {
         //TODO 处理请求fail
       }).catch((error) => {
-        console.log('jsonE=' + error);
         reject(false);
       });
+    });
+  }
+  
+  static memberSelect=(cardFaceNo,poscode,shopcode)=>{
+    return JSON.stringify({
+      'TblName': 'ReadVipInfo'  //固定内容
+      , 'CardFaceNo': cardFaceNo
+      , 'poscode': poscode //商户号编码
+      , 'shopcode': shopcode //时间戳
+      , 'IsChuZhi': ''
+      ,
     });
   }
 }

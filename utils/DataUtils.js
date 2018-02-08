@@ -30,7 +30,6 @@ export default class DataUtils {
         reject(defaultValue);
       }
     });
-    
   }
   
   // 删除
