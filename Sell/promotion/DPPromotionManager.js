@@ -12,7 +12,7 @@ export default class DPPromotionManager {
    * @return
    */
   static dp = (cardTypeCode, productBean, dbAdapter) => {
-    new Promise((resolve, reject)=>{
+   return new Promise((resolve, reject)=>{
       let disPrice = 0;
       let shopNewTotal = 0;
       let prodCode = productBean.ProdCode;
@@ -21,7 +21,7 @@ export default class DPPromotionManager {
       let barCode = productBean.BarCode;
       console.log(productBean)
       DPPromotionManager.isContainCustType(cardTypeCode,dbAdapter,prodCode).then((result)=>{
-        //console.log("result=",result)
+        console.log("result=",result)
         if (result) {
           dbAdapter.selectTDscProd(prodCode).then((tDscProdBeans) => {
             if (tDscProdBeans != null) {
@@ -64,9 +64,13 @@ export default class DPPromotionManager {
               resolve(BigDecimalUtils.subtract(productBean.ShopAmount,shopNewTotal,2));
               productBean.ShopAmount = shopNewTotal;
               productBean.ShopPrice = shopNewTotal;
-              //console.log(productBean)
+              console.log(productBean)
+            }else{
+              resolve(0);
             }
           });
+        }else{
+          resolve(0);
         }
       });
       
@@ -85,10 +89,6 @@ export default class DPPromotionManager {
           new Promise.all(promises).then((promiseResults) => {
             
               for (let i = 0; i < promiseResults.length; i++) {
-              //console.log("wtf=",promiseResults[i])
-              //console.log("wtf=",promiseResults[i].length)
-              //console.log("wtf=",promiseResults[i].item(0))
-             
                for (let j = 0; j < promiseResults[i].length; j++) {
                 let tDscPlanBean = promiseResults[i].item(j);
                 let beginDate = tDscPlanBean.BeginDate;
@@ -112,21 +112,18 @@ export default class DPPromotionManager {
                         console.log("wtf");
                         resolve(true);
                        return;
-                      } else if(i==tDscCustBeans.length-1&&j== promiseResults[i].length-1){
+                      } else if(tDscProdBeans.length == 0){
+                        resolve(false);
+                        return;
+                      }else if(i==tDscCustBeans.length-1&&j== promiseResults[i].length-1){
                         resolve(false);
                         return;
                       }
                     });
                   }
-                //  else{
-                //    reject(false);
-                //    return;
-                //  }
+                 
                 }
-                //else{
-                //  reject(false);
-                //  return;
-                //}
+                
               }
             }
         
