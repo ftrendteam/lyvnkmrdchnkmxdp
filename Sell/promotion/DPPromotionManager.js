@@ -12,63 +12,66 @@ export default class DPPromotionManager {
    * @return
    */
   static dp = (cardTypeCode, productBean, dbAdapter) => {
-    let disPrice = 0;
-    let shopNewTotal = 0;
-    let prodCode = productBean.ProdCode;
-    let shopNum = productBean.ShopNumber;
-    let saleType = productBean.SaleType;
-    let barCode = productBean.BarCode;
-    console.log(productBean)
-    DPPromotionManager.isContainCustType(cardTypeCode,dbAdapter,prodCode).then((result)=>{
-      console.log("result=",result)
-      
-      if (result) {
-        dbAdapter.selectTDscProd(prodCode).then((tDscProdBeans) => {
-          if (tDscProdBeans != null) {
-            let tDscProdBean = tDscProdBeans.item(0);
-            let curr1 = tDscProdBean.Curr1;
-            let str1 = tDscProdBean.Str1;
-            let dscPrice = tDscProdBean.DscPrice;
-            //console.log("ad=", tDscProdBean)
-            if (0 == str1) {
-              console.log("ad=")
-              shopNewTotal = BigDecimalUtils.multiply(shopNum,
-                dscPrice, 2);
-              console.log("ad=", shopNewTotal)
-            } else if (1 == str1) {
-              if (shopNum <= curr1) {
+    new Promise((resolve, reject)=>{
+      let disPrice = 0;
+      let shopNewTotal = 0;
+      let prodCode = productBean.ProdCode;
+      let shopNum = productBean.ShopNumber;
+      let saleType = productBean.SaleType;
+      let barCode = productBean.BarCode;
+      console.log(productBean)
+      DPPromotionManager.isContainCustType(cardTypeCode,dbAdapter,prodCode).then((result)=>{
+        //console.log("result=",result)
+        if (result) {
+          dbAdapter.selectTDscProd(prodCode).then((tDscProdBeans) => {
+            if (tDscProdBeans != null) {
+              let tDscProdBean = tDscProdBeans.item(0);
+              let curr1 = tDscProdBean.Curr1;
+              let str1 = tDscProdBean.Str1;
+              let dscPrice = tDscProdBean.DscPrice;
+              //console.log("ad=", tDscProdBean)
+              if (0 == str1) {
+                console.log("ad=")
                 shopNewTotal = BigDecimalUtils.multiply(shopNum,
                   dscPrice, 2);
-              } else {
-                shopNewTotal = BigDecimalUtils.multiply(curr1,
-                  dscPrice, 2);
-                shopNewTotal += BigDecimalUtils.multiply(shopNum
-                  - curr1, productBean.StdPrice, 2);
+                console.log("ad=", shopNewTotal)
+              } else if (1 == str1) {
+                if (shopNum <= curr1) {
+                  shopNewTotal = BigDecimalUtils.multiply(shopNum,
+                    dscPrice, 2);
+                } else {
+                  shopNewTotal = BigDecimalUtils.multiply(curr1,
+                    dscPrice, 2);
+                  shopNewTotal += BigDecimalUtils.multiply(shopNum
+                    - curr1, productBean.StdPrice, 2);
+                }
+              } else if (2 == str1) {
+                if (shopNum > curr1) {
+                  shopNewTotal = BigDecimalUtils.multiply(curr1,
+                    productBean.StdPrice, 2);
+                  shopNewTotal += BigDecimalUtils.multiply(shopNum
+                    - curr1, dscPrice, 2);
+                } else if (shopNum < curr1) {
+                  shopNewTotal = BigDecimalUtils.multiply(shopNum,
+                    productBean.StdPrice, 2);
+                }
+              } else if (3 == str1) {
+                if (shopNum > curr1) {
+                  shopNewTotal = BigDecimalUtils.multiply(shopNum,
+                    dscPrice, 2);
+                }
               }
-            } else if (2 == str1) {
-              if (shopNum > curr1) {
-                shopNewTotal = BigDecimalUtils.multiply(curr1,
-                  productBean.StdPrice, 2);
-                shopNewTotal += BigDecimalUtils.multiply(shopNum
-                  - curr1, dscPrice, 2);
-              } else if (shopNum < curr1) {
-                shopNewTotal = BigDecimalUtils.multiply(shopNum,
-                  productBean.StdPrice, 2);
-              }
-            } else if (3 == str1) {
-              if (shopNum > curr1) {
-                shopNewTotal = BigDecimalUtils.multiply(shopNum,
-                  dscPrice, 2);
-              }
+              resolve(BigDecimalUtils.subtract(productBean.ShopAmount,shopNewTotal,2));
+              productBean.ShopAmount = shopNewTotal;
+              productBean.ShopPrice = shopNewTotal;
+              //console.log(productBean)
             }
-            productBean.ShopAmount = shopNewTotal;
-            productBean.ShopPrice = shopNewTotal;
-            console.log(productBean)
-          }
-        });
-      }
-    });
-    return shopNewTotal;
+          });
+        }
+      });
+      
+    })
+    
   }
   
   static isContainCustType=(cardTypeCode,dbAdapter,prodCode)=>{
