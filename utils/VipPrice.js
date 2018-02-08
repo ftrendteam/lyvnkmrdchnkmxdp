@@ -108,7 +108,7 @@ export default class VipPrice {
             }
             if (typeof memberTotalPrice == "number" && memberTotalPrice != 0) {
                 productBean.ShopAmount = memberTotalPrice;
-                productBean.ShopPrice = memberTotalPrice;
+                // productBean.ShopPrice = memberTotalPrice;
                 let vipNum = productBean.ShopNumber;
 
                 //if ("1" == productBean.SaleType) {

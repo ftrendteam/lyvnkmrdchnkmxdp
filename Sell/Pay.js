@@ -48,13 +48,12 @@ export default class Pay extends Component {
             payments: 0,
             Total: "",
             data: "",
-            custType: "",
-            VipCardNo: 0,
             cardfaceno: "",
             DataTime: "",
             RetSerinalNo: "",
             subtract: "",
             VipPrice:"",
+            VipCardNo: this.props.VipCardNo ? this.props.VipCardNo : "",
             JfBal: this.props.JfBal ? this.props.JfBal : "",
             BalanceTotal: this.props.BalanceTotal ? this.props.BalanceTotal : "",
             ShopAmount: this.props.ShopAmount ? this.props.ShopAmount : "",
@@ -63,7 +62,6 @@ export default class Pay extends Component {
             vipData:this.props.vipData ? this.props.vipData : "",
             dataRows: this.props.dataRows ? this.props.dataRows : "",
             dataSource: new ListView.DataSource({rowHasChanged: (r1, r2) => true}),
-
         }
         this.dataRows = [];
         this.productData = [];
@@ -131,20 +129,6 @@ export default class Pay extends Component {
                 name: tags
             })
         })
-
-        Storage.get('VipCardNo').then((tags) => {
-            if (tags == null) {
-                this.setState({
-                    custType: "0",
-                    custCode: "",
-                })
-            } else {
-                this.setState({
-                    custType: "2",
-                    custCode: this.state.VipCardNo,
-                })
-            }
-        })
         this.setState({
             amount:this.state.ShopAmount
         })
@@ -183,7 +167,6 @@ export default class Pay extends Component {
                                 subtract: subtract,
                                 VipPrice:vipData,
                             })
-                            // alert("1")
                         })
                     } else {
                         var vipData;
@@ -193,7 +176,6 @@ export default class Pay extends Component {
                             ShopAmount:this.state.ShopAmount,
                             VipPrice:vipData,
                         })
-                        // alert("2")
                     }
                 })
             } else {
@@ -204,7 +186,6 @@ export default class Pay extends Component {
                     ShopAmount:this.state.ShopAmount,
                     VipPrice:vipData,
                 })
-                // alert("3")
             }
         });
 
@@ -345,10 +326,10 @@ export default class Pay extends Component {
                 } else if (this.state.Seles == "T") {
                     var payTotal = Number(this.state.amount) + Number(this.state.payments);
                     this.state.payments += Number(this.state.amount);
-                    var Total = (BigDecimalUtils.subtract(this.state.ShopAmount, this.state.payments, 2));
+                    var Total = -(BigDecimalUtils.subtract(this.state.ShopAmount, this.state.payments, 2));
                     var payamount = Number(this.state.AMount) + Number(this.state.amount);
                     var aptotal = BigDecimalUtils.subtract(payamount, Total, 2);
-                    if (this.state.ShopAmount < payTotal) {
+                    if (payTotal>=this.state.ShopAmount) {
                         var Amount = {
                             'payName': '现金',
                             'CardFaceNo': '',
@@ -413,366 +394,350 @@ export default class Pay extends Component {
 
     //保存流水表及detail表
     restorage() {
-        Storage.get('VipCardNo').then((VipCardNo) => {
-            Storage.get('Pid').then((Pid) => {
-                Storage.get('usercode').then((usercode) => {
-                    Storage.get('userName').then((userName) => {
-                        if (this.state.ShopAmount == this.state.payments || this.state.ShopAmount < this.state.payments) {
-                            var now = new Date();
-                            var year = now.getFullYear();
-                            var month = now.getMonth() + 1;
-                            var day = now.getDate();
-                            var hh = now.getHours();
-                            var mm = now.getMinutes();
-                            var ss = now.getSeconds();
-                            if (month >= 1 && month <= 9) {
-                                month = "0" + month;
+        Storage.get('Pid').then((Pid) => {
+            Storage.get('usercode').then((usercode) => {
+                Storage.get('userName').then((userName) => {
+                    if (this.state.ShopAmount == this.state.payments || this.state.ShopAmount < this.state.payments) {
+                        var now = new Date();
+                        var year = now.getFullYear();
+                        var month = now.getMonth() + 1;
+                        var day = now.getDate();
+                        var hh = now.getHours();
+                        var mm = now.getMinutes();
+                        var ss = now.getSeconds();
+                        if (month >= 1 && month <= 9) {
+                            month = "0" + month;
+                        }
+                        if (day >= 1 && day <= 9) {
+                            day = "0" + day;
+                        }
+                        if (hh >= 1 && hh <= 9) {
+                            hh = "0" + hh;
+                        }
+                        if (mm >= 1 && mm <= 9) {
+                            mm = "0" + mm;
+                        }
+                        if (ss >= 1 && ss <= 9) {
+                            ss = "0" + ss;
+                        }
+                        var InnerNo = NumFormatUtils.CreateInnerNo();
+                        for (let i = 0; i < this.dataRows.length; i++) {
+                            var dataRows = this.dataRows[i];
+                            var ino;
+                            ino = i + 1
+                            var SumData = year + "-" + month + "-" + day + " " + hh + ":" + mm + ":" + ss;
+                            //插入Sum表
+                            var sumDatas = [];
+                            var sum = {};
+                            sum.LsNo = this.state.numform;
+                            sum.sDateTime = SumData;
+                            sum.CashierId = Pid;
+                            sum.CashierCode = usercode;
+                            sum.CashierName = userName;
+                            sum.ino = ino;
+                            sum.Total = this.state.ShopAmount;
+                            sum.TotalPay = this.state.payments;
+                            sum.Change = this.state.Total;
+                            sum.TradeFlag = this.state.Seles;
+                            if (this.state.VipCardNo == "") {
+                                sum.DscTotal = 0;
+                                sum.CustType = 0;
+                                sum.CustCode = "";
+                            } else {
+                                sum.DscTotal = this.state.VipPrice;
+                                sum.CustType = 2;
+                                sum.CustCode = this.state.VipCardNo;
                             }
-                            if (day >= 1 && day <= 9) {
-                                day = "0" + day;
-                            }
-                            if (hh >= 1 && hh <= 9) {
-                                hh = "0" + hh;
-                            }
-                            if (mm >= 1 && mm <= 9) {
-                                mm = "0" + mm;
-                            }
-                            if (ss >= 1 && ss <= 9) {
-                                ss = "0" + ss;
-                            }
-                            var InnerNo = NumFormatUtils.CreateInnerNo();
-                            for (let i = 0; i < this.dataRows.length; i++) {
-                                var dataRows = this.dataRows[i];
-                                var ino;
-                                ino = i + 1
-                                var SumData = year + "-" + month + "-" + day + " " + hh + ":" + mm + ":" + ss;
-                                //插入Sum表
-                                var sumDatas = [];
-                                var sum = {};
-                                sum.LsNo = this.state.numform;
-                                sum.sDateTime = SumData;
-                                sum.CashierId = Pid;
-                                sum.CashierCode = usercode;
-                                sum.CashierName = userName;
-                                sum.ino = ino;
-                                if(VipCardNo==null){
-                                    sum.DscTotal = 0;
-                                }else{
-                                    sum.DscTotal = this.state.VipPrice;
-                                }
-                                sum.Total = this.state.ShopAmount;
-                                sum.TotalPay = this.state.payments;
-                                sum.Change = this.state.Total;
-                                sum.TradeFlag = this.state.Seles;
-                                sum.CustType = this.state.custType;
-                                if(VipCardNo==null){
-                                    sum.CustCode = "";
-                                }else{
-                                    sum.CustCode = VipCardNo;
-                                }
 
-                                sum.PayId = dataRows.pid;
-                                sum.PayCode = dataRows.PayCode;
-                                sum.Amount = dataRows.total;
-                                sum.OldAmount = dataRows.total;
-                                sum.TendPayCode = VipCardNo;
-                                sum.InnerNo = InnerNo;
-                                sumDatas.push(sum);
-                                dbAdapter.insertSum(sumDatas);
-                            };
-                            for (let i = 0; i < this.state.dataRows.length; i++) {
-                                var DataRows = this.state.dataRows[i];
-                                var OrderNo = 0;
-                                OrderNo = i + 1;
-                                var BarCode;
-                                var pid;
-                                var ProdCode;
-                                var ProdName;
-                                var DepCode;
-                                var Count;
-                                var ShopPrice;
-                                var prototal;
-                                BarCode = DataRows.BarCode;
-                                pid = DataRows.Pid;
-                                ProdCode = DataRows.ProdCode;
-                                ProdName = DataRows.ProdName;
-                                DepCode = DataRows.DepCode;
-                                Count = DataRows.ShopNumber;
-                                ShopPrice = DataRows.ShopPrice;
-                                prototal = DataRows.ShopAmount;
-                                var SumData = year + "-" + month + "-" + day + " " + hh + ":" + mm + ":" + ss;
-                                var detailDatas = [];
-                                var detail = {};
-                                detail.LsNo = this.state.numform;
-                                detail.sDateTime = SumData;
-                                detail.TradeFlag = this.state.Seles;
-                                detail.CashierId = Pid;
-                                detail.CashierCode = usercode;
-                                detail.CashierName = userName;
-                                detail.ClerkId = -999;
-                                detail.ClerkCode = "";
-                                detail.Pid = pid;
-                                detail.BarCode = BarCode;
-                                detail.ClerkName = "";
-                                detail.ProdCode = ProdCode;
-                                detail.ProdName = ProdName;
-                                detail.DepCode = DepCode;
-                                detail.Price = ShopPrice;
-                                detail.Amount = Count;
-                                detail.DscTotal = 0;
-                                detail.Total = NumberUtils.numberFormat2(prototal);
-                                detail.HandDsc = 0;
-                                if (i == 0) {
-                                    detail.AutoDscTotal = this.state.subtract;
-                                } else {
-                                    detail.AutoDscTotal = 0;
-                                }
-                                detail.InnerNo = InnerNo;
-                                detail.OrderNo = OrderNo + "";
-                                detailDatas.push(detail);
-                                dbAdapter.insertDetail(detailDatas);
+                            sum.PayId = dataRows.pid;
+                            sum.PayCode = dataRows.PayCode;
+                            sum.Amount = dataRows.total;
+                            sum.OldAmount = dataRows.total;
+                            sum.TendPayCode = this.state.VipCardNo;
+                            sum.InnerNo = InnerNo;
+                            sumDatas.push(sum);
+                            dbAdapter.insertSum(sumDatas);
+                        };
+                        for (let i = 0; i < this.state.dataRows.length; i++) {
+                            var DataRows = this.state.dataRows[i];
+                            var OrderNo = 0;
+                            OrderNo = i + 1;
+                            var BarCode;
+                            var pid;
+                            var ProdCode;
+                            var ProdName;
+                            var DepCode;
+                            var Count;
+                            var ShopPrice;
+                            var prototal;
+                            BarCode = DataRows.BarCode;
+                            pid = DataRows.Pid;
+                            ProdCode = DataRows.ProdCode;
+                            ProdName = DataRows.ProdName;
+                            DepCode = DataRows.DepCode;
+                            Count = DataRows.ShopNumber;
+                            ShopPrice = DataRows.ShopPrice;
+                            prototal = DataRows.ShopAmount;
+                            var SumData = year + "-" + month + "-" + day + " " + hh + ":" + mm + ":" + ss;
+                            var detailDatas = [];
+                            var detail = {};
+                            detail.LsNo = this.state.numform;
+                            detail.sDateTime = SumData;
+                            detail.TradeFlag = this.state.Seles;
+                            detail.CashierId = Pid;
+                            detail.CashierCode = usercode;
+                            detail.CashierName = userName;
+                            detail.ClerkId = -999;
+                            detail.ClerkCode = "";
+                            detail.Pid = pid;
+                            detail.BarCode = BarCode;
+                            detail.ClerkName = "";
+                            detail.ProdCode = ProdCode;
+                            detail.ProdName = ProdName;
+                            detail.DepCode = DepCode;
+                            detail.Price = ShopPrice;
+                            detail.Amount = Count;
+                            detail.DscTotal = 0;
+                            detail.Total = NumberUtils.numberFormat2(prototal);
+                            detail.HandDsc = 0;
+                            if (i == 0) {
+                                detail.AutoDscTotal = this.state.subtract;
+                            } else {
+                                detail.AutoDscTotal = 0;
+                            }
+                            detail.InnerNo = InnerNo;
+                            detail.OrderNo = OrderNo + "";
+                            detailDatas.push(detail);
+                            dbAdapter.insertDetail(detailDatas);
 
-                            };
-                            dbAdapter.selectSum().then((rows) => {
-                                let sums = [];
-                                let details = [];
-                                let index = 0;
-                                for (let i = 0; i < rows.length; i++) {
-                                    dbAdapter.selectSumAllData(rows.item(i).LsNo, rows.item(i).InnerNo, rows.item(i).sDateTime).then((sum) => {
-                                        for (let j = 0; j < sum.length; j++) {
-                                            sums.push(sum.item(j));
-                                        }
-                                    })
-                                    dbAdapter.selectDetailAllData(rows.item(i).LsNo, rows.item(i).sDateTime).then((detail) => {
-                                        for (let j = 0; j < detail.length; j++) {
-                                            details.push(detail.item(j));
-                                        }
-                                        index++;
-                                        if (index == rows.length) {//此处执行流水上传操作
-                                            Storage.get('LinkUrl').then((tags) => {
-                                                Storage.get('ShopCode').then((ShopCode) => {
-                                                    Storage.get('PosCode').then((PosCode) => {
-                                                        let requestBody = JSON.stringify({
-                                                            'TblName': 'upsum',
-                                                            'ShopCode': ShopCode,
-                                                            'PosCode': PosCode,
-                                                            'detail': details,
-                                                            'sum': sums,
-                                                        });
-                                                        FetchUtil.post(tags, requestBody).then((success) => {
-                                                            if ((success.retcode == 1)) {//表示流水上传成功 修改数据库标识
-                                                                dbAdapter.upDateSum(rows.item(i).LsNo, rows.item(i).sDateTime).then((upDateSum) => {
-                                                                });
-                                                                dbAdapter.upDateDetail(rows.item(i).LsNo, rows.item(i).sDateTime).then((upDateDetail) => {
-                                                                });
-                                                            } else {
-                                                                alert(JSON.stringify(success))
-                                                            }
-                                                        }, (error) => {
-                                                            alert('网络请求失败');
-                                                        });
+                        };
+                        dbAdapter.selectSum().then((rows) => {
+                            let sums = [];
+                            let details = [];
+                            let index = 0;
+                            for (let i = 0; i < rows.length; i++) {
+                                dbAdapter.selectSumAllData(rows.item(i).LsNo, rows.item(i).InnerNo, rows.item(i).sDateTime).then((sum) => {
+                                    for (let j = 0; j < sum.length; j++) {
+                                        sums.push(sum.item(j));
+                                    }
+                                })
+                                dbAdapter.selectDetailAllData(rows.item(i).LsNo, rows.item(i).sDateTime).then((detail) => {
+                                    for (let j = 0; j < detail.length; j++) {
+                                        details.push(detail.item(j));
+                                    }
+                                    index++;
+                                    if (index == rows.length) {//此处执行流水上传操作
+                                        Storage.get('LinkUrl').then((tags) => {
+                                            Storage.get('ShopCode').then((ShopCode) => {
+                                                Storage.get('PosCode').then((PosCode) => {
+                                                    let requestBody = JSON.stringify({
+                                                        'TblName': 'upsum',
+                                                        'ShopCode': ShopCode,
+                                                        'PosCode': PosCode,
+                                                        'detail': details,
+                                                        'sum': sums,
+                                                    });
+                                                    FetchUtil.post(tags, requestBody).then((success) => {
+                                                        if ((success.retcode == 1)) {//表示流水上传成功 修改数据库标识
+                                                            dbAdapter.upDateSum(rows.item(i).LsNo, rows.item(i).sDateTime).then((upDateSum) => {
+                                                            });
+                                                            dbAdapter.upDateDetail(rows.item(i).LsNo, rows.item(i).sDateTime).then((upDateDetail) => {
+                                                            });
+                                                        } else {
+                                                            alert(JSON.stringify(success))
+                                                        }
+                                                    }, (error) => {
+                                                        alert('网络请求失败');
                                                     });
                                                 });
                                             });
-                                        }
-                                    })
-                                }
-                            });
-                            var nextRoute = {
-                                name: "Index",
-                                component: Index,
-                            };
-                            this.props.navigator.push(nextRoute);
-                            dbAdapter.deleteData("shopInfo");
-                            Storage.delete("VipCardNo");
-                            Storage.delete("BalanceTotal");
-                            Storage.delete("JfBal");
-                            Storage.delete("VipPrice");
-                        }
-                    })
+                                        });
+                                    }
+                                })
+                            }
+                        });
+                        var nextRoute = {
+                            name: "Index",
+                            component: Index,
+                        };
+                        this.props.navigator.push(nextRoute);
+                        dbAdapter.deleteData("shopInfo");
+                        Storage.delete("VipPrice");
+                    }
                 })
             })
         })
     }
 
     restorage1() {
-        return new Promise((resolve, reject) => {
-            Storage.get('VipCardNo').then((VipCardNo) => {
-                Storage.get('Pid').then((Pid) => {
-                    Storage.get('usercode').then((usercode) => {
-                        Storage.get('userName').then((userName) => {
-                            if (-this.state.ShopAmount == this.state.payments || -this.state.ShopAmount > this.state.payments) {
-                                var now = new Date();
-                                var year = now.getFullYear();
-                                var month = now.getMonth() + 1;
-                                var day = now.getDate();
-                                var hh = now.getHours();
-                                var mm = now.getMinutes();
-                                var ss = now.getSeconds();
-                                if (month >= 1 && month <= 9) {
-                                    month = "0" + month;
-                                }
-                                if (day >= 1 && day <= 9) {
-                                    day = "0" + day;
-                                }
-                                if (hh >= 1 && hh <= 9) {
-                                    hh = "0" + hh;
-                                }
-                                if (mm >= 1 && mm <= 9) {
-                                    mm = "0" + mm;
-                                }
-                                if (ss >= 1 && ss <= 9) {
-                                    ss = "0" + ss;
-                                }
-                                var InnerNo = NumFormatUtils.CreateInnerNo();
-                                for (let i = 0; i < this.dataRows.length; i++) {
-                                    var dataRows = this.dataRows[i];
-                                    var ino;
-                                    ino = i + 1
-                                    var SumData = year + "-" + month + "-" + day + " " + hh + ":" + mm + ":" + ss;
-                                    //插入Sum表
-                                    var sumDatas = [];
-                                    var sum = {};
-                                    sum.LsNo = this.state.numform;
-                                    sum.sDateTime = SumData;
-                                    sum.CashierId = Pid;
-                                    sum.CashierCode = usercode;
-                                    sum.CashierName = userName;
-                                    sum.ino = ino;
-                                    if(VipCardNo==null){
-                                        sum.DscTotal = 0;
-                                    }else{
-                                        sum.DscTotal = this.state.VipPrice;
+        Storage.get('Pid').then((Pid) => {
+            Storage.get('usercode').then((usercode) => {
+                Storage.get('userName').then((userName) => {
+                    if (-this.state.ShopAmount == this.state.payments || -this.state.ShopAmount > this.state.payments) {
+                        var now = new Date();
+                        var year = now.getFullYear();
+                        var month = now.getMonth() + 1;
+                        var day = now.getDate();
+                        var hh = now.getHours();
+                        var mm = now.getMinutes();
+                        var ss = now.getSeconds();
+                        if (month >= 1 && month <= 9) {
+                            month = "0" + month;
+                        }
+                        if (day >= 1 && day <= 9) {
+                            day = "0" + day;
+                        }
+                        if (hh >= 1 && hh <= 9) {
+                            hh = "0" + hh;
+                        }
+                        if (mm >= 1 && mm <= 9) {
+                            mm = "0" + mm;
+                        }
+                        if (ss >= 1 && ss <= 9) {
+                            ss = "0" + ss;
+                        }
+                        var InnerNo = NumFormatUtils.CreateInnerNo();
+                        for (let i = 0; i < this.dataRows.length; i++) {
+                            var dataRows = this.dataRows[i];
+                            var ino;
+                            ino = i + 1
+                            var SumData = year + "-" + month + "-" + day + " " + hh + ":" + mm + ":" + ss;
+                            //插入Sum表
+                            var sumDatas = [];
+                            var sum = {};
+                            sum.LsNo = this.state.numform;
+                            sum.sDateTime = SumData;
+                            sum.CashierId = Pid;
+                            sum.CashierCode = usercode;
+                            sum.CashierName = userName;
+                            sum.ino = ino;
+                            sum.Total = -this.state.ShopAmount;
+                            sum.TotalPay = this.state.payments;
+                            sum.Change = 0;
+                            sum.TradeFlag = this.state.Seles;
+                            if (this.state.VipCardNo == "") {
+                                sum.DscTotal = 0;
+                                sum.CustType = 0;
+                                sum.CustCode = "";
+                            } else {
+                                sum.DscTotal = this.state.VipPrice;
+                                sum.CustType = 2;
+                                sum.CustCode = this.state.VipCardNo;
+                            }
+                            sum.PayId = dataRows.pid;
+                            sum.PayCode = dataRows.PayCode;
+                            sum.Amount = dataRows.total;
+                            sum.OldAmount = dataRows.total;
+                            sum.TendPayCode = this.state.VipCardNo;
+                            sum.InnerNo = InnerNo;
+                            sumDatas.push(sum);
+                            dbAdapter.insertSum(sumDatas);
+                        };
+                        for (let i = 0; i < this.state.dataRows.length; i++) {
+                            var DataRows = this.state.dataRows[i];
+                            var OrderNo = 0;
+                            OrderNo = i + 1;
+                            var BarCode;
+                            var pid;
+                            var ProdCode;
+                            var ProdName;
+                            var DepCode;
+                            var Count;
+                            var ShopPrice;
+                            var prototal;
+                            BarCode = DataRows.BarCode;
+                            pid = DataRows.Pid;
+                            ProdCode = DataRows.ProdCode;
+                            ProdName = DataRows.ProdName;
+                            DepCode = DataRows.DepCode;
+                            Count = DataRows.ShopNumber;
+                            ShopPrice = DataRows.ShopPrice;
+                            prototal = DataRows.ShopAmount;
+                            var SumData = year + "-" + month + "-" + day + " " + hh + ":" + mm + ":" + ss;
+                            var detailDatas = [];
+                            var detail = {};
+                            detail.LsNo = this.state.numform;
+                            detail.sDateTime = SumData;
+                            detail.TradeFlag = this.state.Seles;
+                            detail.CashierId = Pid;
+                            detail.CashierCode = usercode;
+                            detail.CashierName = userName;
+                            detail.ClerkId = -999;
+                            detail.ClerkCode = "";
+                            detail.Pid = pid;
+                            detail.BarCode = BarCode;
+                            detail.ClerkName = "";
+                            detail.ProdCode = ProdCode;
+                            detail.ProdName = ProdName;
+                            detail.DepCode = DepCode;
+                            detail.Price = -ShopPrice;
+                            detail.Amount = Count;
+                            detail.DscTotal = 0;
+                            detail.Total = -(NumberUtils.numberFormat2(prototal));
+                            if (i == 0) {
+                                detail.AutoDscTotal = this.state.subtract;
+                            } else {
+                                detail.AutoDscTotal = 0;
+                            }
+                            detail.HandDsc = 0;
+                            detail.InnerNo = InnerNo;
+                            detail.OrderNo = OrderNo + "";
+                            detailDatas.push(detail);
+                            dbAdapter.insertDetail(detailDatas);
+                        };
+                        dbAdapter.selectSum().then((rows) => {
+                            let sums = [];
+                            let details = [];
+                            let index = 0;
+                            for (let i = 0; i < rows.length; i++) {
+                                dbAdapter.selectSumAllData(rows.item(i).LsNo, rows.item(i).InnerNo, rows.item(i).sDateTime).then((sum) => {
+                                    for (let j = 0; j < sum.length; j++) {
+                                        sums.push(sum.item(j));
                                     }
-                                    sum.Total = -this.state.ShopAmount;
-                                    sum.TotalPay = this.state.payments;
-                                    sum.Change = 0;
-                                    sum.TradeFlag = this.state.Seles;
-                                    sum.CustType = this.state.custType;
-                                    if(VipCardNo==null){
-                                        sum.CustCode = "";
-                                    }else{
-                                        sum.CustCode = VipCardNo;
+                                })
+                                dbAdapter.selectDetailAllData(rows.item(i).LsNo, rows.item(i).sDateTime).then((detail) => {
+                                    for (let j = 0; j < detail.length; j++) {
+                                        details.push(detail.item(j));
                                     }
-                                    sum.PayId = dataRows.pid;
-                                    sum.PayCode = dataRows.PayCode;
-                                    sum.Amount = dataRows.total;
-                                    sum.OldAmount = dataRows.total;
-                                    sum.TendPayCode = VipCardNo;
-                                    sum.InnerNo = InnerNo;
-                                    sumDatas.push(sum);
-                                    dbAdapter.insertSum(sumDatas);
-                                };
-                                for (let i = 0; i < this.state.dataRows.length; i++) {
-                                    var DataRows = this.state.dataRows[i];
-                                    var OrderNo = 0;
-                                    OrderNo = i + 1;
-                                    var BarCode;
-                                    var pid;
-                                    var ProdCode;
-                                    var ProdName;
-                                    var DepCode;
-                                    var Count;
-                                    var ShopPrice;
-                                    var prototal;
-                                    BarCode = DataRows.BarCode;
-                                    pid = DataRows.Pid;
-                                    ProdCode = DataRows.ProdCode;
-                                    ProdName = DataRows.ProdName;
-                                    DepCode = DataRows.DepCode;
-                                    Count = DataRows.ShopNumber;
-                                    ShopPrice = DataRows.ShopPrice;
-                                    prototal = DataRows.ShopAmount;
-                                    var SumData = year + "-" + month + "-" + day + " " + hh + ":" + mm + ":" + ss;
-                                    var detailDatas = [];
-                                    var detail = {};
-                                    detail.LsNo = this.state.numform;
-                                    detail.sDateTime = SumData;
-                                    detail.TradeFlag = this.state.Seles;
-                                    detail.CashierId = Pid;
-                                    detail.CashierCode = usercode;
-                                    detail.CashierName = userName;
-                                    detail.ClerkId = -999;
-                                    detail.ClerkCode = "";
-                                    detail.Pid = pid;
-                                    detail.BarCode = BarCode;
-                                    detail.ClerkName = "";
-                                    detail.ProdCode = ProdCode;
-                                    detail.ProdName = ProdName;
-                                    detail.DepCode = DepCode;
-                                    detail.Price = -ShopPrice;
-                                    detail.Amount = Count;
-                                    detail.DscTotal = 0;
-                                    detail.Total = -(NumberUtils.numberFormat2(prototal));
-                                    if (i == 0) {
-                                        detail.AutoDscTotal = this.state.subtract;
-                                    } else {
-                                        detail.AutoDscTotal = 0;
-                                    }
-                                    detail.HandDsc = 0;
-                                    detail.InnerNo = InnerNo;
-                                    detail.OrderNo = OrderNo + "";
-                                    detailDatas.push(detail);
-                                    dbAdapter.insertDetail(detailDatas);
-                                };
-                                dbAdapter.selectSum().then((rows) => {
-                                    let sums = [];
-                                    let details = [];
-                                    let index = 0;
-                                    for (let i = 0; i < rows.length; i++) {
-                                        dbAdapter.selectSumAllData(rows.item(i).LsNo, rows.item(i).InnerNo, rows.item(i).sDateTime).then((sum) => {
-                                            for (let j = 0; j < sum.length; j++) {
-                                                sums.push(sum.item(j));
-                                            }
-                                        })
-                                        dbAdapter.selectDetailAllData(rows.item(i).LsNo, rows.item(i).sDateTime).then((detail) => {
-                                            for (let j = 0; j < detail.length; j++) {
-                                                details.push(detail.item(j));
-                                            }
-                                            index++;
-                                            if (index == rows.length) {//此处执行流水上传操作
-                                                Storage.get('LinkUrl').then((tags) => {
-                                                    Storage.get('ShopCode').then((ShopCode) => {
-                                                        Storage.get('PosCode').then((PosCode) => {
-                                                            let requestBody = JSON.stringify({
-                                                                'TblName': 'upsum',
-                                                                'ShopCode': ShopCode,
-                                                                'PosCode': PosCode,
-                                                                'detail': details,
-                                                                'sum': sums,
+                                    index++;
+                                    if (index == rows.length) {//此处执行流水上传操作
+                                        Storage.get('LinkUrl').then((tags) => {
+                                            Storage.get('ShopCode').then((ShopCode) => {
+                                                Storage.get('PosCode').then((PosCode) => {
+                                                    let requestBody = JSON.stringify({
+                                                        'TblName': 'upsum',
+                                                        'ShopCode': ShopCode,
+                                                        'PosCode': PosCode,
+                                                        'detail': details,
+                                                        'sum': sums,
+                                                    });
+                                                    FetchUtil.post(tags, requestBody).then((success) => {
+                                                        if ((success.retcode == 1)) {//表示流水上传成功 修改数据库标识
+                                                            dbAdapter.upDateSum(rows.item(i).LsNo, rows.item(i).sDateTime).then((upDateSum) => {
                                                             });
-                                                            FetchUtil.post(tags, requestBody).then((success) => {
-                                                                if ((success.retcode == 1)) {//表示流水上传成功 修改数据库标识
-                                                                    dbAdapter.upDateSum(rows.item(i).LsNo, rows.item(i).sDateTime).then((upDateSum) => {
-                                                                    });
-                                                                    dbAdapter.upDateDetail(rows.item(i).LsNo, rows.item(i).sDateTime).then((upDateDetail) => {
-                                                                    });
-                                                                } else {
-                                                                    alert(JSON.stringify(success))
-                                                                }
-                                                            }, (error) => {
-                                                                alert('网络请求失败');
+                                                            dbAdapter.upDateDetail(rows.item(i).LsNo, rows.item(i).sDateTime).then((upDateDetail) => {
                                                             });
-                                                        });
+                                                        } else {
+                                                            alert(JSON.stringify(success))
+                                                        }
+                                                    }, (error) => {
+                                                        alert('网络请求失败');
                                                     });
                                                 });
-                                            }
-                                        })
+                                            });
+                                        });
                                     }
-                                });
-                                var nextRoute = {
-                                    name: "Index",
-                                    component: Index,
-                                };
-                                this.props.navigator.push(nextRoute);
-                                dbAdapter.deleteData("shopInfo");
-                                Storage.delete("VipCardNo");
-                                Storage.delete("BalanceTotal");
-                                Storage.delete("JfBal");
-                                Storage.delete("VipPrice");
-                            };
+                                })
+                            }
                         });
-                    });
+                        var nextRoute = {
+                            name: "Index",
+                            component: Index,
+                        };
+                        this.props.navigator.push(nextRoute);
+                        dbAdapter.deleteData("shopInfo");
+                        Storage.delete("VipPrice");
+                    };
                 });
             });
         });

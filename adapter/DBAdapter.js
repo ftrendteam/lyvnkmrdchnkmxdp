@@ -396,7 +396,6 @@ export default class DBAdapter extends SQLiteOpenHelper {
               resolve(true);
             }, (err) => {
               reject(false);
-              
               console.log(err);
             }
           );
