@@ -97,22 +97,6 @@ export default class Sell extends Component {
                 });
             });
 
-            Storage.get('VipCardNo').then((tags) => {
-                this.setState({
-                    VipCardNo: tags
-                })
-            });
-            Storage.get('BalanceTotal').then((tags) => {
-                this.setState({
-                    BalanceTotal: tags
-                })
-            });
-            Storage.get('JfBal').then((tags) => {
-                this.setState({
-                    JfBal: tags
-                })
-            });
-
             this._dbSearch();
             this.Device();
         })
@@ -144,13 +128,9 @@ export default class Sell extends Component {
                 Storage.save("vipPrice", JSON.stringify(shopAmount));
                 var number = row.ShopNumber;
                 shopnumber += parseInt(row.ShopNumber);
-
-                Storage.get('VipCardNo').then((tags) => {
-                    if(tags !==null){
-                        vipPrice = VipPrice.vipPrice(TblRow1[0],this.VipTblRow);
-                        alert("1")
-                    }
-                })
+                if(this.state.VipCardNo !==""){
+                    vipPrice = VipPrice.vipPrice(TblRow1[0],this.VipTblRow);
+                }
 
                 var VIPprice = shopAmount-vipPrice;
 
@@ -197,12 +177,10 @@ export default class Sell extends Component {
                             for (let i = 0; i < rows.length; i++) {
                                 var row = rows.item(i);
                                 this.TblRow.push(row);
-                                Storage.get('VipCardNo').then((tags) => {
-                                    if(tags !==null){
-                                        vipPrice = VipPrice.vipPrice(TblRow1[0],this.TblRow);
-                                        // Storage.save("VipPrice", vipPrice);
-                                    }
-                                })
+                                if(this.state.VipCardNo !==""){
+                                    vipPrice = VipPrice.vipPrice(TblRow1[0],this.TblRow);
+                                    // Storage.save("VipPrice", vipPrice);
+                                }
                                 var VIPprice = this.state.ShopAmount-vipPrice;
                                 var ShopPrice = row.StdPrice;
                                 var prototal=this.state.Countm*row.StdPrice;
@@ -253,12 +231,9 @@ export default class Sell extends Component {
                     for (let i = 0; i < rows.length; i++) {
                         var row = rows.item(i);
                         this.TblRow.push(row);
-                        Storage.get('VipCardNo').then((tags) => {
-                            if(tags !==null){
-                                vipPrice = VipPrice.vipPrice(TblRow1[0],this.TblRow);
-                                // Storage.save("VipPrice", vipPrice);
-                            }
-                        })
+                        if(this.state.VipCardNo !==""){
+                            vipPrice = VipPrice.vipPrice(TblRow1[0],this.TblRow);
+                        }
                         var VIPprice = this.state.ShopAmount-vipPrice;
                         var ShopPrice = row.StdPrice;
                         var prototal=this.state.Countm*row.StdPrice;
@@ -345,12 +320,9 @@ export default class Sell extends Component {
                     this.dataRow.push(row);
                 }
             }
-            Storage.get('VipCardNo').then((tags) => {
-                if(tags !==null){
-                    vipPrice = VipPrice.vipPrice(TblRow1[0],this.VipTblRow);
-                    // Storage.save("VipPrice", vipPrice);
-                }
-            })
+            if(this.state.VipCardNo !==""){
+                vipPrice = VipPrice.vipPrice(TblRow1[0],this.VipTblRow);
+            }
             var VIPprice = shopAmount-vipPrice;
             this.setState({
                 vipPrice:vipPrice,
@@ -398,15 +370,13 @@ export default class Sell extends Component {
     }
 
     Button() {
-        Storage.get('VipCardNo').then((tags) => {
-            if(tags !==null){
-                Storage.get('vipPrice').then((vipPrice) => {
-                    this.setState({
-                        ShopAmount:vipPrice
-                    })
+        if(this.state.VipCardNo !==""){
+            Storage.get('vipPrice').then((vipPrice) => {
+                this.setState({
+                    ShopAmount:vipPrice
                 })
-            }
-        })
+            })
+        }
         this.modal();
         Storage.get('ShopCode').then((ShopCode) => {
             Storage.get('PosCode').then((PosCode) => {
@@ -433,11 +403,7 @@ export default class Sell extends Component {
                                 JfBal = JSON.stringify(row.JfBal);//积分
                             };
                             let vipPrice = VipPrice.vipPrice(TblRow[0],this.TblRow);
-                            // Storage.save("VipPrice", vipPrice);
                             var VIPprice = this.state.ShopAmount-vipPrice;
-                            Storage.save("VipCardNo", VipCardNo);
-                            Storage.save("JfBal", JfBal);
-                            Storage.save("BalanceTotal", BalanceTotal);
                             TblRow1=data.TblRow;
                             this.setState({
                                 VipCardNo: VipCardNo,
@@ -446,7 +412,6 @@ export default class Sell extends Component {
                                 ShopAmount: VIPprice,
                                 vipPrice:vipPrice,
                             });
-                            // alert(JSON.stringify(TblRow1));
                             this.modal();
                             this.Member();
                         } else {
@@ -460,7 +425,6 @@ export default class Sell extends Component {
     }
 
     PayButton() {
-        // alert(this.state.vipPrice)
         if(this.dataRow==""){
             alert("请添加商品");
         }else{
@@ -470,6 +434,7 @@ export default class Sell extends Component {
                     name: "Pay",
                     component: Pay,
                     params: {
+                        VipCardNo:this.state.VipCardNo,
                         JfBal: this.state.JfBal,
                         BalanceTotal: this.state.BalanceTotal,
                         ShopAmount: this.state.ShopAmount,
@@ -486,6 +451,7 @@ export default class Sell extends Component {
                     name: "Pay",
                     component: Pay,
                     params: {
+                        VipCardNo:this.state.VipCardNo,
                         JfBal: this.state.JfBal,
                         BalanceTotal: this.state.BalanceTotal,
                         ShopAmount: this.state.ShopAmount,

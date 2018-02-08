@@ -214,10 +214,10 @@ const styles = StyleSheet.create({
         marginTop:3,
     },
     ContList:{
-        height:55,
+        height:58,
         paddingLeft:25,
         paddingRight:15,
-        paddingTop:15,
+        paddingTop:12,
         backgroundColor:"#ffffff",
         flexDirection:"row",
         borderBottomWidth:1,
@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
     TextInput1:{
         paddingLeft:5,
         paddingRight:5,
-        marginBottom:2,
+        marginBottom:5,
         fontSize:16,
         color:"#333333"
     },

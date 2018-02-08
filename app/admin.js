@@ -95,7 +95,6 @@ export default class admin extends Component {
                     if (data > msg) {
                         this.Edition();
                     }
-
                 });
             },(err)=>{
                 alert("网络请求失败");

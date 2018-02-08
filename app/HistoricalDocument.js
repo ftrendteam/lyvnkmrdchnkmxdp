@@ -384,8 +384,6 @@ const styles = StyleSheet.create({
      paddingBottom:12,
      borderRadius:5,
  },
- ContList:{
- },
  List:{
     flexDirection:"row",
     fontSize:16,

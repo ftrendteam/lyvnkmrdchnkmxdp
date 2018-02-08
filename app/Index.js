@@ -137,12 +137,13 @@ export default class Index extends Component {
     ShopList(){
         Storage.get('Name').then((tags)=>{
             if(this.state.head=="销售"){
+
                 var nextRoute={
                     name:"Sell",
                     component:Sell
                 };
                 DeviceEventEmitter.removeAllListeners();
-                this.props.navigator.push(nextRoute)
+                this.props.navigator.push(nextRoute);
             }else{
                 var nextRoute={
                     name:"主页",
