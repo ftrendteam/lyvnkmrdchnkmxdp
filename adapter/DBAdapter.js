@@ -1481,7 +1481,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
         let sql = "insert into Tdschead(FormNo,FormName, FormType, dtDep, dtSupp, dtBrand, dtProd, dtAll, dtCust, FormMaker," +
           " FormDate, CheckCode, CheckName, WriteDate, UserCode, UserName, sDateTime, CheckType, Tag, PrnTimes, Remark, " +
           "MakeShop, MakeShopTblCode, ywRange, allPF, AutoMulti, ConditionType, Con1, Con2, StopCode, StopDate, DscType," +
-          " DscValue, str1, str2, str3, str4, str5)values(?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?)";
+          " DscValue, str1, str2, str3, str4, str5)values(?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?)";
         tx.executeSql(sql, [formNo, formName, formType, dtDep, dtSupp, dtBrand, dtProd, dtAll, dtCust, formMaker, formDate,
           checkCode, checkName, writeDate, userCode, userName, sDateTime, checkType, tag, prnTimes, remark, makeShop,
           makeShopTblCode, ywRange, allPF, autoMulti, conditionType, con1, con2, stopCode, stopDate, dscType, dscValue,

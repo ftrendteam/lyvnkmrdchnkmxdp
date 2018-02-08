@@ -112,7 +112,6 @@ export default class DownLoadBasicData {
         }
       });
     });
-    
   }
   
   static async downLoadTshopitem(url, shopCode, dbAdapter) {
