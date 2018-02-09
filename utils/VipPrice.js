@@ -238,7 +238,7 @@ export default class VipPrice {
      * @param allPrice 商品总价
      * @param disPrice disPrice 整单优惠价格
      */
-    static a = (products, allPrice, disPrice) => {
+    static xihuanni = (products, allPrice, disPrice) => {
         for (let i = 0; i < products.length; i++) {
             let product = products[i];
             let multiply = BigDecimalUtils.multiply(BigDecimalUtils.divide
