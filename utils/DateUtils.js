@@ -51,8 +51,12 @@ export default class DateUtils {
    */
   static compareDate = (d1, d2) => {
     try {
+      if(d1==d2) {
+        return true;
+      }
       let b = ((new Date(d1.replace(/-/g, "\/"))) > (new Date(d2.replace(/-/g, "\/"))));
       return b;
+      
     } catch (err) {
       return false;
     }

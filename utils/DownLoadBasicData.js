@@ -99,6 +99,7 @@ export default class DownLoadBasicData {
           let tDscProd = response.TblRow9;
           let tDscSupp = response.TblRow11;
           dbAdapter.insertTdschead(tDscHead);
+          //console.log("wtf2=",tDscHead)
           dbAdapter.insertTDscDep(TDscDep);
           dbAdapter.insertTDscExcept(tDscExcept);
           dbAdapter.insertTDscCust(tDscCust);

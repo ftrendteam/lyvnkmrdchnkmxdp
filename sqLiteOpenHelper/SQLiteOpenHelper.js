@@ -243,13 +243,13 @@ export default class SQLiteOpenHelper {
         " str4 varchar(20) null, str5 varchar(20) null)",[],()=>{})
   
       tx.executeSql("CREATE TABLE IF NOT EXISTS TDscDep(FormNo varchar(20) not null,DepCode varchar(20) not null, " +
-        "DepName varchar(40) null, DscType varchar(1) null, DscValue float(8) null, Remark varchar(50) null)",[],()=>{})
+        "DepName varchar(40) null, DscType varchar(1) null, DscValue float(8) null, Remark varchar(50) null,PriceMode varchar(2) null)",[],()=>{})
       
       tx.executeSql("CREATE TABLE IF NOT EXISTS TDscSupp(FormNo varchar(20) not null,SuppCode varchar(20) not null, " +
-        "SuppName varchar(40) null, DscType varchar(1) null, DscValue float(8) null, Remark varchar(50) null)",[],()=>{})
+        "SuppName varchar(40) null, DscType varchar(1) null, DscValue float(8) null, Remark varchar(50) null,PriceMode varchar(2) null)",[],()=>{})
   
       tx.executeSql("CREATE TABLE IF NOT EXISTS TDscBrand(FormNo varchar(20) not null,BrandCode varchar(20) not null, " +
-        "BrandName varchar(40) null, DscType varchar(1) null, DscValue float(8) null, Remark varchar(50) null)",[],()=>{})
+        "BrandName varchar(40) null, DscType varchar(1) null, DscValue float(8) null, Remark varchar(50) null,PriceMode varchar(2) null)",[],()=>{})
     }, (err) => {
       this._errorCB('transaction', err);
     }, () => {

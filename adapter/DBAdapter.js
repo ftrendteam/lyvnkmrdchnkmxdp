@@ -172,7 +172,6 @@ export default class DBAdapter extends SQLiteOpenHelper {
    */
   insertPosOpt(datas) {
     let len = datas.length;
-    console.log(len);
     if (!db) {
       this.open();
     }
@@ -1497,14 +1496,15 @@ export default class DBAdapter extends SQLiteOpenHelper {
     db.transaction((tx) => {
       for (let i = 0; i < datas.length; i++) {
         let data = datas[i];
-        let formNo = datas.FormNo;
-        let depCode = datas.DepCode;
-        let depName = datas.DepName;
-        let dscType = datas.DscType;
-        let dscValue = datas.DscValue;
-        let remark = datas.Remark;
-        let sql = "insert into TDscDep(FormNo,DepCode,DepName, DscType, DscValue, Remark) values(?,?,?,?,?,?)";
-        tx.executeSql(sql, [formNo, depCode, depName, dscType, dscValue, remark], (tx, results) => {
+        let formNo = data.FormNo;
+        let depCode = data.DepCode;
+        let depName = data.DepName;
+        let dscType = data.DscType;
+        let dscValue = data.DscValue;
+        let remark = data.Remark;
+        let priceMode = data.PriceMode;
+        let sql = "insert into TDscDep(FormNo,DepCode,DepName, DscType, DscValue, Remark,PriceMode) values(?,?,?,?,?,?,?)";
+        tx.executeSql(sql, [formNo, depCode, depName, dscType, dscValue, remark,priceMode], (tx, results) => {
         
         }, (error) => {
           console.log("TDscDep=", error)
@@ -1523,8 +1523,9 @@ export default class DBAdapter extends SQLiteOpenHelper {
         let dscType = datas.DscType;
         let dscValue = datas.DscValue;
         let remark = datas.Remark;
-        let sql = "insert into TDscSupp(FormNo,SuppCode,SuppName, DscType, DscValue, Remark) values(?,?,?,?,?,?)";
-        tx.executeSql(sql, [formNo, suppCode, suppName, dscType, dscValue, remark], (tx, results) => {
+        let priceMode = data.PriceMode;
+        let sql = "insert into TDscSupp(FormNo,SuppCode,SuppName, DscType, DscValue, Remark,PriceMode) values(?,?,?,?,?,?,?)";
+        tx.executeSql(sql, [formNo, suppCode, suppName, dscType, dscValue, remark,priceMode], (tx, results) => {
         
         }, (error) => {
           console.log("TDscSupp=", error)
@@ -1537,14 +1538,15 @@ export default class DBAdapter extends SQLiteOpenHelper {
     db.transaction((tx) => {
       for (let i = 0; i < datas.length; i++) {
         let data = datas[i];
-        let formNo = datas.FormNo;
-        let brandCode = datas.BrandCode;
-        let brandName = datas.BrandName;
-        let dscType = datas.DscType;
-        let dscValue = datas.DscValue;
-        let remark = datas.Remark;
-        let sql = "insert into TDscBrand(FormNo,BrandCode,BrandName, DscType, DscValue, Remark) values(?,?,?,?,?,?)";
-        tx.executeSql(sql, [formNo, brandCode, brandName, dscType, dscValue, remark], (tx, results) => {
+        let formNo = data.FormNo;
+        let brandCode = data.BrandCode;
+        let brandName = data.BrandName;
+        let dscType = data.DscType;
+        let dscValue = data.DscValue;
+        let remark = data.Remark;
+        let priceMode = data.PriceMode;
+        let sql = "insert into TDscBrand(FormNo,BrandCode,BrandName, DscType, DscValue, Remark,PriceMode) values(?,?,?,?,?,?,?)";
+        tx.executeSql(sql, [formNo, brandCode, brandName, dscType, dscValue, remark,priceMode], (tx, results) => {
         
         }, (error) => {
           console.log("TDscBrand=", error)
