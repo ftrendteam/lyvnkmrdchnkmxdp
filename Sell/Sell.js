@@ -22,6 +22,7 @@ import {
 } from 'react-native';
 import Index from "../app/Index";
 import Pay from "../Sell/Pay";
+import DPPromotionManager from "../Sell/promotion/DPPromotionManager";
 import GoodsDetails from "../app/OrderDetails";
 import NetUtils from "../utils/NetUtils";
 import Storage from "../utils/Storage";
@@ -60,7 +61,8 @@ export default class Sell extends Component {
             Show: false,
             Member: false,
             // dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
-            dataSource:new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
+            // dataSource:new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
+            dataSource: new ListView.DataSource({rowHasChanged: (r1, r2) => true}),
         }
         this.dataRow = [];
         this.TblRow = [];
@@ -90,7 +92,6 @@ export default class Sell extends Component {
                 })
                 Storage.save("LsNo",this.state.numform);
             });
-
             Storage.get('Name').then((tags) => {
                 this.setState({
                     name: tags
@@ -111,18 +112,7 @@ export default class Sell extends Component {
             var vipPrice = 0;
             for (let i = 0; i < rows.length; i++) {
                 var row = rows.item(i);
-                // var DataRows = {
-                //     'BarCode': row.BarCode,
-                //     'pid': row.pid,
-                //     'ProdCode': row.ProdCode,
-                //     'prototal':  NumberUtils.numberFormat2(row.prototal),
-                //     'prodname': row.prodname,
-                //     'countm': row.countm,
-                //     'ShopPrice': row.ShopPrice,
-                //     'promemo': row.promemo,
-                //     'DepCode': row.DepCode,
-                //     'SuppCode': row.SuppCode,
-                // };
+                console.log(row)
                 ShopPrice = (row.ShopNumber * row.ShopPrice);
                 shopAmount +=ShopPrice;
                 Storage.save("vipPrice", JSON.stringify(shopAmount));
@@ -131,9 +121,7 @@ export default class Sell extends Component {
                 if(this.state.VipCardNo !==""){
                     vipPrice = VipPrice.vipPrice(TblRow1[0],this.VipTblRow);
                 }
-
                 var VIPprice = shopAmount-vipPrice;
-
                 if (number !== 0) {
                     this.dataRow.push(row);
                     this.TblRow.push(row);

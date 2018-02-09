@@ -19,22 +19,23 @@ export default class DPPromotionManager {
       let shopNum = productBean.ShopNumber;
       let saleType = productBean.SaleType;
       let barCode = productBean.BarCode;
-      console.log(productBean)
+       let dscPrice = 0;
+      // console.log(productBean)
       DPPromotionManager.isContainCustType(cardTypeCode,dbAdapter,prodCode).then((result)=>{
-        console.log("result=",result)
+        // console.log("result=",result)
         if (result) {
           dbAdapter.selectTDscProd(prodCode).then((tDscProdBeans) => {
             if (tDscProdBeans != null) {
               let tDscProdBean = tDscProdBeans.item(0);
               let curr1 = tDscProdBean.Curr1;
               let str1 = tDscProdBean.Str1;
-              let dscPrice = tDscProdBean.DscPrice;
+                dscPrice = tDscProdBean.DscPrice;
               //console.log("ad=", tDscProdBean)
               if (0 == str1) {
-                console.log("ad=")
+                // console.log("ad=")
                 shopNewTotal = BigDecimalUtils.multiply(shopNum,
                   dscPrice, 2);
-                console.log("ad=", shopNewTotal)
+                // console.log("ad=", shopNewTotal)
               } else if (1 == str1) {
                 if (shopNum <= curr1) {
                   shopNewTotal = BigDecimalUtils.multiply(shopNum,
@@ -61,16 +62,18 @@ export default class DPPromotionManager {
                     dscPrice, 2);
                 }
               }
-              resolve(BigDecimalUtils.subtract(productBean.ShopAmount,shopNewTotal,2));
-              productBean.ShopAmount = shopNewTotal;
-              productBean.ShopPrice = shopNewTotal;
-              console.log(productBean)
+              productBean.ShopAmount = Number(shopNewTotal);
+              productBean.ShopPrice = dscPrice;
+              resolve(productBean);
+              // console.log('123=',productBean)
             }else{
-              resolve(0);
+              resolve(productBean);
+              // console.log("aaaa")
             }
           });
         }else{
-          resolve(0);
+              // console.log("bbbbb")
+          resolve(productBean);
         }
       });
       

@@ -261,8 +261,6 @@ export default class admin extends Component {
         if(this.state.Usercode==""){
             alert("请输入用户编码")
         }else{
-            var Usercode=this.state.Usercode;
-            Storage.save('Usercode',Usercode);
             var nextRoute={
                 name:"PickedDate_list",
                 component:PickedDate_list,

@@ -21,6 +21,7 @@ import {
 } from 'react-native';
 import Index from "../app/Index";
 import Sell from "../Sell/Sell";
+import DPPromotionManager from "../Sell/promotion/DPPromotionManager";
 import NetUtils from "../utils/NetUtils";
 import FetchUtil from "../utils/FetchUtils";
 import Storage from "../utils/Storage";
@@ -40,12 +41,15 @@ export default class Pay extends Component {
             RefundTotal: false,
             LayerShow: false,
             ModalShow: false,
+            NewAllPrice:true,
             CardFaceNo: "",
             CardPwd: "",
             name: "",
             amount: "",
             AMount: 0,
             payments: 0,
+            pressStatus:0,
+            PressStatus:0,
             Total: "",
             data: "",
             cardfaceno: "",
@@ -53,10 +57,13 @@ export default class Pay extends Component {
             RetSerinalNo: "",
             subtract: "",
             VipPrice:"",
+            ShopNewAmount:"",
+            NewPrice:"",
+            discount:"",
             VipCardNo: this.props.VipCardNo ? this.props.VipCardNo : "",
             JfBal: this.props.JfBal ? this.props.JfBal : "",
             BalanceTotal: this.props.BalanceTotal ? this.props.BalanceTotal : "",
-            ShopAmount: this.props.ShopAmount ? this.props.ShopAmount : "",
+            // ShopAmount: this.props.ShopAmount ? this.props.ShopAmount : "",
             numform: this.props.numform ? this.props.numform : "",
             Seles: this.props.Seles ? this.props.Seles : "",
             vipData:this.props.vipData ? this.props.vipData : "",
@@ -103,6 +110,65 @@ export default class Pay extends Component {
     ModalButton() {
         this.ModalShow();
     }
+//整单优惠
+    NewAllPrice(){
+        let isShow = this.state.NewAllPrice;
+        this.setState({
+            NewAllPrice: !isShow,
+        })
+    }
+
+    NewPriceButton(){
+        this.NewAllPrice();
+    }
+    //整单优惠计算
+    PriceButton(){
+        if(this.state.discount==""){
+            alert("请选择优惠方式")
+        }else{
+            Storage.get('usercode').then((tags)=>{
+                dbAdapter.selectKgtuser(tags).then((rows) => {
+                    var newAllPrice;
+                    var disCount;
+                    var row =rows.HDscRate;
+                    if(this.state.NewPrice==""){
+                        alert("请输入金额")
+                    }else if(this.state.NewPrice>row){
+                        alert("没有此优惠权限")
+                    }else if(this.state.NewPrice<=row){
+                        if(this.state.discount=="1"){
+                            newAllPrice = BigDecimalUtils.subtract(this.state.ShopAmount,this.state.NewPrice);
+                            alert(newAllPrice)
+                            vipPrice = VipPrice.vipPrice(TblRow1[0],this.VipTblRow);
+                        }else if(this.state.discount=="2"){
+                            disCount = BigDecimalUtils.multiply(this.state.ShopAmount,  BigDecimalUtils.subtract(1,  BigDecimalUtils.divide(this.state.NewPrice,100)));
+                            alert(disCount)
+                        }
+                    }
+
+                })
+            })
+        }
+    }
+//取消
+    PriceClose(){
+        this.NewPriceButton();
+    }
+//优惠价，折扣价选择
+    NewPriceLeft(){
+        this.setState({
+            pressStatus:'pressin',
+            PressStatus:'0',
+            discount:1,
+        });
+    }
+    NewPriceRight(){
+        this.setState({
+            PressStatus:'Pressin',
+            pressStatus:0,
+            discount:2,
+        });
+    }
 
     //物理键
     // componentWillMount(){
@@ -124,69 +190,103 @@ export default class Pay extends Component {
     // }
 
     componentDidMount() {
+        // this.setState({
+        //     pressStatus:'pressin',
+        //     PressStatus:'0',
+        // });
+        //
+        // this.setState({
+        //     pressStatus:'pressin',
+        //     PressStatus:'0',
+        // });
+        // this.setState({
+        //     amount:this.state.ShopAmount
+        // })
         Storage.get('Name').then((tags) => {
             this.setState({
                 name: tags
             })
         })
-        this.setState({
-            amount:this.state.ShopAmount
-        })
-        // Storage.save("ino", "0");
-        // Storage.save("Ino", "0");
         this.dbadapter();
     }
 
     dbadapter() {
-        dbAdapter.selectPosOpt('CUTLEVEL').then((rows) => {
-            for (let i = 0; i < rows.length; i++) {
-                var row = rows.item(i);
-                var CUTLEVEL = row.OptValue;
+        var rows=this.state.dataRows;
+        var shopAmount = 0;
+        var ShopPrice=0;
+        let promises=[];
+        for (let i = 0; i < rows.length; i++) {
+            var row = rows[i];
+            console.log(row)
+            if (this.state.VipCardNo !== "") {
+                promises.push(DPPromotionManager.dp(1, row, dbAdapter));
+            } else if (this.state.VipCardNo == "") {
+                promises.push(DPPromotionManager.dp("*", row, dbAdapter));
             }
-            if (this.state.ShopAmount > CUTLEVEL) {
-                dbAdapter.selectPosOpt('AUTOCUT').then((rows) => {
-                    for (let i = 0; i < rows.length; i++) {
-                        var row = rows.item(i);
-                        var AUTOCUT = row.OptValue;
-                    }
-                    if (AUTOCUT == '1') {
-                        dbAdapter.selectPosOpt('CUTDEGREE').then((rows) => {
-                            var round;
-                            var RoundPrice;
-                            var subtract;
+        }
+        new Promise.all(promises).then((results)=>{
+            for(let i = 0;i<results.length;i++) {
+                var rows = results[i];
+                ShopPrice = (rows.ShopNumber * rows.ShopPrice);
+                shopAmount += ShopPrice;
+            }
+            this.setState({
+                ShopAmount: shopAmount,
+                amount:shopAmount,
+            })
+            dbAdapter.selectPosOpt('CUTLEVEL').then((rows) => {
+                for (let i = 0; i < rows.length; i++) {
+                    var row = rows.item(i);
+                    var CUTLEVEL = row.OptValue;
+                }
+                if (this.state.ShopAmount > CUTLEVEL) {
+                    dbAdapter.selectPosOpt('AUTOCUT').then((rows) => {
+                        for (let i = 0; i < rows.length; i++) {
+                            var row = rows.item(i);
+                            var AUTOCUT = row.OptValue;
+                        }
+                        if (AUTOCUT == '1') {
+                            dbAdapter.selectPosOpt('CUTDEGREE').then((rows) => {
+                                var round;
+                                var RoundPrice;
+                                var subtract;
+                                var vipData;
+                                for (let i = 0; i < rows.length; i++) {
+                                    var row = rows.item(i);
+                                    var CUTDEGREE = row.OptValue;
+                                }
+                                round = FormatPrice.round(CUTDEGREE, this.state.ShopAmount, this.state.dataRows);
+                                subtract = BigDecimalUtils.subtract(this.state.ShopAmount, round, 2);//总价格减去四舍五入的价格
+                                vipData = BigDecimalUtils.add(this.state.vipData, subtract, 2);
+                                this.setState({
+                                    ShopAmount: round,
+                                    subtract: subtract,
+                                    VipPrice:vipData,
+                                })
+                            })
+                        } else {
                             var vipData;
-                            for (let i = 0; i < rows.length; i++) {
-                                var row = rows.item(i);
-                                var CUTDEGREE = row.OptValue;
-                            }
-                            round = FormatPrice.round(CUTDEGREE, this.state.ShopAmount, this.state.dataRows);
-                            subtract = BigDecimalUtils.subtract(this.state.ShopAmount, round, 2);//总价格减去四舍五入的价格
-                            vipData = BigDecimalUtils.add(this.state.vipData, subtract, 2);
+                            vipData = BigDecimalUtils.add(this.state.vipData, 0, 2);
                             this.setState({
-                                ShopAmount: round,
-                                subtract: subtract,
+                                subtract: 0,
+                                ShopAmount:this.state.ShopAmount,
+                                amount:this.state.ShopAmount,
                                 VipPrice:vipData,
                             })
-                        })
-                    } else {
-                        var vipData;
-                        vipData = BigDecimalUtils.add(this.state.vipData, 0, 2);
-                        this.setState({
-                            subtract: 0,
-                            ShopAmount:this.state.ShopAmount,
-                            VipPrice:vipData,
-                        })
-                    }
-                })
-            } else {
-                var vipData;
-                vipData = BigDecimalUtils.add(this.state.vipData, 0, 2);
-                this.setState({
-                    subtract: 0,
-                    ShopAmount:this.state.ShopAmount,
-                    VipPrice:vipData,
-                })
-            }
+                        }
+                    })
+                } else {
+                    var vipData;
+                    vipData = BigDecimalUtils.add(this.state.vipData, 0, 2);
+                    this.setState({
+                        subtract: 0,
+                        ShopAmount:this.state.ShopAmount,
+                        amount:this.state.ShopAmount,
+                        VipPrice:vipData,
+                    })
+                }
+            })
+
         });
 
         dbAdapter.selectAllData("payInfo").then((rows) => {
@@ -199,7 +299,7 @@ export default class Pay extends Component {
             this.setState({
                 data: priductData,
             })
-        })
+        });
     }
 
     Return() {
@@ -423,6 +523,8 @@ export default class Pay extends Component {
                         var InnerNo = NumFormatUtils.CreateInnerNo();
                         for (let i = 0; i < this.dataRows.length; i++) {
                             var dataRows = this.dataRows[i];
+                            console.log('wtf=',dataRows)
+                            console.log(dataRows.pid)
                             var ino;
                             ino = i + 1
                             var SumData = year + "-" + month + "-" + day + " " + hh + ":" + mm + ":" + ss;
@@ -441,11 +543,11 @@ export default class Pay extends Component {
                             sum.TradeFlag = this.state.Seles;
                             if (this.state.VipCardNo == "") {
                                 sum.DscTotal = 0;
-                                sum.CustType = 0;
+                                sum.CustType = '0';
                                 sum.CustCode = "";
                             } else {
                                 sum.DscTotal = this.state.VipPrice;
-                                sum.CustType = 2;
+                                sum.CustType = '2';
                                 sum.CustCode = this.state.VipCardNo;
                             }
 
@@ -460,6 +562,7 @@ export default class Pay extends Component {
                         };
                         for (let i = 0; i < this.state.dataRows.length; i++) {
                             var DataRows = this.state.dataRows[i];
+                            console.log('WTF=',DataRows)
                             var OrderNo = 0;
                             OrderNo = i + 1;
                             var BarCode;
@@ -537,6 +640,7 @@ export default class Pay extends Component {
                                                         'detail': details,
                                                         'sum': sums,
                                                     });
+                                                    console.log(requestBody)
                                                     FetchUtil.post(tags, requestBody).then((success) => {
                                                         if ((success.retcode == 1)) {//表示流水上传成功 修改数据库标识
                                                             dbAdapter.upDateSum(rows.item(i).LsNo, rows.item(i).sDateTime).then((upDateSum) => {
@@ -617,11 +721,11 @@ export default class Pay extends Component {
                             sum.TradeFlag = this.state.Seles;
                             if (this.state.VipCardNo == "") {
                                 sum.DscTotal = 0;
-                                sum.CustType = 0;
+                                sum.CustType ='0';
                                 sum.CustCode = "";
                             } else {
                                 sum.DscTotal = this.state.VipPrice;
-                                sum.CustType = 2;
+                                sum.CustType = '2';
                                 sum.CustCode = this.state.VipCardNo;
                             }
                             sum.PayId = dataRows.pid;
@@ -1038,7 +1142,7 @@ export default class Pay extends Component {
                         }
                         <View style={styles.List}>
                             <View style={styles.ListView1}>
-                                <Text style={[styles.ListText, {textAlign: "center"}]}>{this.state.payments}.00</Text>
+                                <Text style={[styles.ListText, {textAlign: "center"}]}>{this.state.payments}</Text>
                             </View>
                         </View>
                         <View style={styles.List}>
@@ -1194,6 +1298,70 @@ export default class Pay extends Component {
                                             <Text style={styles.TitleText}>取消</Text>
                                         </TouchableOpacity>
                                         <TouchableOpacity onPress={this.Button.bind(this)} style={styles.MemberClose}>
+                                            <Text style={styles.TitleText}>确定</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
+                            </View>
+                        </View>
+                    </Modal>
+                    <Modal
+                        transparent={true}
+                        visible={this.state.NewAllPrice}
+                        onShow={() => {
+                        }}
+                        onRequestClose={() => {
+                        }}>
+                        <View style={styles.MemberBounces}>
+                            <View style={styles.Cont}>
+                                <View style={styles.BouncesTitle}>
+                                    <Text style={[styles.TitleText, {fontSize: 18}]}>整单优惠</Text>
+                                </View>
+                                <View style={styles.NewPriceList}>
+                                    <TouchableOpacity onPress={this.NewPriceLeft.bind(this)} style={styles.NewPriceleft}>
+                                        <View style={styles.Priceleft}>
+                                            <Image source = {this.state.pressStatus =='pressin' ? require("../images/1_42.png") : require("../images/1_43.png")} />
+                                        </View>
+                                        <View style={styles.Priceright}>
+                                            <Text style={styles.PricerightText}>优惠价</Text>
+                                        </View>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={this.NewPriceRight.bind(this)} style={styles.NewPriceright}>
+                                        <View style={styles.Priceleft}>
+                                            <Image source = {this.state.PressStatus =='Pressin' ? require("../images/1_42.png") : require("../images/1_43.png")}  />
+                                        </View>
+                                        <View style={styles.Priceright}>
+                                            <Text style={styles.PricerightText}>折扣价</Text>
+                                        </View>
+                                    </TouchableOpacity>
+                                </View>
+                                <View style={[styles.MemberCont,{height:150}]}>
+                                    <View style={[styles.MemberView,{marginTop:0}]}>
+                                        <View style={styles.Card}>
+                                            <Text style={styles.CardText}>金额(折扣率)：</Text>
+                                        </View>
+                                        <View style={styles.CardNumber}>
+                                            <TextInput
+                                                returnKeyType='search'
+                                                keyboardType="numeric"
+                                                textalign="center"
+                                                underlineColorAndroid='transparent'
+                                                placeholderTextColor="#bcbdc1"
+                                                style={styles.CardTextInput}
+                                                onChangeText={(value) => {
+                                                    this.setState({
+                                                        NewPrice: value
+                                                    })
+                                                }}
+                                            />
+                                        </View>
+                                    </View>
+                                    <View style={styles.MemberButton}>
+                                        <TouchableOpacity onPress={this.PriceClose.bind(this)}
+                                                          style={[styles.MemberClose, {marginRight: 15,}]}>
+                                            <Text style={styles.TitleText}>取消</Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity onPress={this.PriceButton.bind(this)} style={styles.MemberClose}>
                                             <Text style={styles.TitleText}>确定</Text>
                                         </TouchableOpacity>
                                     </View>
@@ -1359,6 +1527,33 @@ export default class Pay extends Component {
 }
 
 const styles = StyleSheet.create({
+    NewPriceList:{
+        flexDirection:"row",
+        paddingLeft:20,
+        paddingRight:20,
+        paddingTop:10,
+        paddingBottom:15,
+    },
+    NewPriceleft:{
+      flex:1,
+        flexDirection:"row",
+    },
+    NewPriceright:{
+        flex:1,
+        flexDirection:"row",
+    },
+    Priceleft:{
+        width:26,
+    },
+    Priceright:{
+        marginLeft:7,
+        flex:1,
+    },
+    PricerightText:{
+      fontSize:16,
+      color:"#333333"
+    },
+
     container: {
         flex: 1,
         backgroundColor: '#f2f2f2',
@@ -1623,7 +1818,7 @@ const styles = StyleSheet.create({
         marginTop: 11,
     },
     CardText: {
-        fontSize: 16,
+        fontSize: 14,
         color: "#333333",
     },
     CardNumber: {

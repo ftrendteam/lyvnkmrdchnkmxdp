@@ -1792,9 +1792,15 @@ export default class DBAdapter extends SQLiteOpenHelper {
         db.transaction((tx) => {
           let sql = "select * from KGtuser where UserCode='" + UserCode + "'";
           tx.executeSql(sql, [], (tx, results) => {
-            resolve(results.rows);
+              if(results.rows.length==1){
+                  resolve(results.rows.item(0));
+              }else{
+                  resolve(results.rows.item(0));
+              }
+              // console.log('WTF')
           }, (error) => {
-            reject("");
+            // console.log('wtf')
+              resolve(results.rows)
           });
         });
       }
