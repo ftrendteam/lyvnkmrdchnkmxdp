@@ -1476,14 +1476,15 @@ export default class DBAdapter extends SQLiteOpenHelper {
         let str3 = data.str3;
         let str4 = data.str4;
         let str5 = data.str5;
+        let pricMode = data.PricMode;
         let sql = "insert into Tdschead(FormNo,FormName, FormType, dtDep, dtSupp, dtBrand, dtProd, dtAll, dtCust, FormMaker," +
           " FormDate, CheckCode, CheckName, WriteDate, UserCode, UserName, sDateTime, CheckType, Tag, PrnTimes, Remark, " +
           "MakeShop, MakeShopTblCode, ywRange, allPF, AutoMulti, ConditionType, Con1, Con2, StopCode, StopDate, DscType," +
-          " DscValue, str1, str2, str3, str4, str5)values(?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?)";
+          " DscValue, str1, str2, str3, str4, str5,PricMode)values(?,?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?)";
         tx.executeSql(sql, [formNo, formName, formType, dtDep, dtSupp, dtBrand, dtProd, dtAll, dtCust, formMaker, formDate,
           checkCode, checkName, writeDate, userCode, userName, sDateTime, checkType, tag, prnTimes, remark, makeShop,
           makeShopTblCode, ywRange, allPF, autoMulti, conditionType, con1, con2, stopCode, stopDate, dscType, dscValue,
-          str1, str2, str3, str4, str5], (tx, results) => {
+          str1, str2, str3, str4, str5,pricMode], (tx, results) => {
           
         }, (error) => {
           console.log("Tdschead=", error)
@@ -1789,12 +1790,17 @@ export default class DBAdapter extends SQLiteOpenHelper {
       }
     })
   }
+  
   selectKgtuser = (UserCode) => {
     return new Promise((resolve, reject) => {
         db.transaction((tx) => {
           let sql = "select * from KGtuser where UserCode='" + UserCode + "'";
           tx.executeSql(sql, [], (tx, results) => {
-            resolve(results.rows);
+            if(results.rows.length==1){
+            resolve(results.rows.item(0));
+            }else{
+              resolve(results.rows);
+            }
           }, (error) => {
             reject("");
           });

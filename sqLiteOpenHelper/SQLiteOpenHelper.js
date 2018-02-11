@@ -240,7 +240,7 @@ export default class SQLiteOpenHelper {
         "MakeShopTblCode varchar(5) null, ywRange varchar(1) null, allPF varchar(1) null, AutoMulti varchar(1) null, " +
         "ConditionType varchar(1) null, Con1 float(8) null, Con2 float(8) null, StopCode varchar(12) null, StopDate varchar(10) null," +
         " DscType varchar(1) null, DscValue float(8) null, str1 varchar(20) null, str2 varchar(20) null, str3 varchar(20) null," +
-        " str4 varchar(20) null, str5 varchar(20) null)",[],()=>{})
+        " str4 varchar(20) null, str5 varchar(20) null,PriceMode varchar(2) null)",[],()=>{})
   
       tx.executeSql("CREATE TABLE IF NOT EXISTS TDscDep(FormNo varchar(20) not null,DepCode varchar(20) not null, " +
         "DepName varchar(40) null, DscType varchar(1) null, DscValue float(8) null, Remark varchar(50) null,PriceMode varchar(2) null)",[],()=>{})
