@@ -236,16 +236,14 @@ export default class VipPrice {
      * 整单优惠
      * @param products 商品数组
      * @param allPrice 商品总价
-     * @param disPrice disPrice 整单优惠价格
+     * @param disPrice disPrice 整单优惠价格/折扣了价格
      */
-    static xihuanni = (products, allPrice, disPrice) => {
+    static disCount = (products, allPrice, disPrice) => {
         for (let i = 0; i < products.length; i++) {
             let product = products[i];
-            let multiply = BigDecimalUtils.multiply(BigDecimalUtils.divide
-            (products.ShopPrice
-                , allPrice, 2), disPrice, 2);
-            let itemTotal = products.ShopPrice;
-            products.ShopPrice = BigDecimalUtils.subtract(itemTotal, multiply, 2);
+            let multiply = BigDecimalUtils.multiply(BigDecimalUtils.divide(product.ShopAmount, allPrice, 2), disPrice, 2);
+            let itemTotal = product.ShopAmount;
+            product.ShopAmount = BigDecimalUtils.subtract(itemTotal, multiply, 2);
         }
     }
 }
