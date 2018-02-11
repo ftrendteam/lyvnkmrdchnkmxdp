@@ -20,7 +20,7 @@ export default class DPPromotionManager {
       let saleType = productBean.SaleType;
       let barCode = productBean.BarCode;
        let dscPrice = 0;
-      // console.log(productBean)
+      // console.log('wtf=',productBean)
       DPPromotionManager.isContainCustType(cardTypeCode,dbAdapter,prodCode).then((result)=>{
         // console.log("result=",result)
         if (result) {
@@ -63,9 +63,9 @@ export default class DPPromotionManager {
                 }
               }
               productBean.ShopAmount = Number(shopNewTotal);
-              productBean.ShopPrice = dscPrice;
+              // productBean.ShopPrice = dscPrice;
               resolve(productBean);
-              // console.log('123=',productBean)
+              // console.log('ccc=',productBean)
             }else{
               resolve(productBean);
               // console.log("aaaa")
@@ -123,14 +123,23 @@ export default class DPPromotionManager {
                         return;
                       }
                     });
+                  }else{
+                      resolve(false);
+                      return;
                   }
                  
+                }else{
+                    resolve(false);
+                    return;
                 }
                 
               }
             }
         
           });
+        }else{
+            resolve(false);
+            return;
         }
       });
     })

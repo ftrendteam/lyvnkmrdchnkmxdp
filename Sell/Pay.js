@@ -29,6 +29,7 @@ import NumberUtils from "../utils/NumberUtils";
 import NumFormatUtils from "../utils/NumFormatUtils";
 import FormatPrice from "../utils/FormatPrice";
 import BigDecimalUtils from "../utils/BigDecimalUtils";
+import VipPrice from "../utils/VipPrice";
 import Swiper from 'react-native-swiper';
 import DBAdapter from "../adapter/DBAdapter";
 
@@ -41,7 +42,7 @@ export default class Pay extends Component {
             RefundTotal: false,
             LayerShow: false,
             ModalShow: false,
-            NewAllPrice:true,
+            NewAllPrice:false,
             CardFaceNo: "",
             CardPwd: "",
             name: "",
@@ -72,6 +73,7 @@ export default class Pay extends Component {
         }
         this.dataRows = [];
         this.productData = [];
+        this.DisCount=[]
     }
 
     //弹框
@@ -130,6 +132,10 @@ export default class Pay extends Component {
                 dbAdapter.selectKgtuser(tags).then((rows) => {
                     var newAllPrice;
                     var disCount;
+                    var disPrice;
+                    var disNewPrice;
+                    var shopAmount = 0;
+                    var ShopPrice=0;
                     var row =rows.HDscRate;
                     if(this.state.NewPrice==""){
                         alert("请输入金额")
@@ -138,11 +144,25 @@ export default class Pay extends Component {
                     }else if(this.state.NewPrice<=row){
                         if(this.state.discount=="1"){
                             newAllPrice = BigDecimalUtils.subtract(this.state.ShopAmount,this.state.NewPrice);
-                            alert(newAllPrice)
-                            vipPrice = VipPrice.vipPrice(TblRow1[0],this.VipTblRow);
+                            console.log('newAllPrice',newAllPrice)
+                            disPrice = VipPrice.disCount(this.DisCount,this.state.ShopAmount,this.state.NewPrice);
+                            this.setState({
+                                ShopAmount: newAllPrice,
+                                amount:newAllPrice,
+                            });
+                            this.NewPriceButton();
                         }else if(this.state.discount=="2"){
-                            disCount = BigDecimalUtils.multiply(this.state.ShopAmount,  BigDecimalUtils.subtract(1,  BigDecimalUtils.divide(this.state.NewPrice,100)));
-                            alert(disCount)
+                            disCount = BigDecimalUtils.multiply(this.state.ShopAmount,BigDecimalUtils.subtract(1,BigDecimalUtils.divide(this.state.NewPrice,100)));
+                            console.log('disCount',disCount)
+                            disNewPrice = BigDecimalUtils.subtract(this.state.ShopAmount,disCount);
+                            console.log('disNewPrice',disNewPrice)
+                            disPrice = VipPrice.disCount(this.DisCount,this.state.ShopAmount,disNewPrice);
+                            console.log(this.DisCount)
+                            this.setState({
+                                ShopAmount: disCount,
+                                amount:disCount,
+                            });
+                            this.NewPriceButton();
                         }
                     }
 
@@ -150,7 +170,7 @@ export default class Pay extends Component {
             })
         }
     }
-//取消
+//取消优惠弹层
     PriceClose(){
         this.NewPriceButton();
     }
@@ -209,7 +229,7 @@ export default class Pay extends Component {
         })
         this.dbadapter();
     }
-
+//促销价及四舍五入
     dbadapter() {
         var rows=this.state.dataRows;
         var shopAmount = 0;
@@ -217,77 +237,90 @@ export default class Pay extends Component {
         let promises=[];
         for (let i = 0; i < rows.length; i++) {
             var row = rows[i];
-            console.log(row)
-            if (this.state.VipCardNo !== "") {
-                promises.push(DPPromotionManager.dp(1, row, dbAdapter));
-            } else if (this.state.VipCardNo == "") {
-                promises.push(DPPromotionManager.dp("*", row, dbAdapter));
-            }
+            promises.push(row);
         }
-        new Promise.all(promises).then((results)=>{
-            for(let i = 0;i<results.length;i++) {
-                var rows = results[i];
-                ShopPrice = (rows.ShopNumber * rows.ShopPrice);
-                shopAmount += ShopPrice;
-            }
-            this.setState({
-                ShopAmount: shopAmount,
-                amount:shopAmount,
-            })
-            dbAdapter.selectPosOpt('CUTLEVEL').then((rows) => {
-                for (let i = 0; i < rows.length; i++) {
-                    var row = rows.item(i);
-                    var CUTLEVEL = row.OptValue;
+
+        if (this.state.VipCardNo !== "") {
+            DPPromotionManager.dp("*", promises, dbAdapter).then((rows)=>{
+                for(let i = 0;i<rows.length;i++) {
+                    var Rows = rows[i];
+                    this.DisCount.push(Rows);
+                    ShopPrice = (Rows.ShopNumber * Rows.ShopPrice);
+                    shopAmount += ShopPrice;
                 }
-                if (this.state.ShopAmount > CUTLEVEL) {
-                    dbAdapter.selectPosOpt('AUTOCUT').then((rows) => {
-                        for (let i = 0; i < rows.length; i++) {
-                            var row = rows.item(i);
-                            var AUTOCUT = row.OptValue;
-                        }
-                        if (AUTOCUT == '1') {
-                            dbAdapter.selectPosOpt('CUTDEGREE').then((rows) => {
-                                var round;
-                                var RoundPrice;
-                                var subtract;
-                                var vipData;
-                                for (let i = 0; i < rows.length; i++) {
-                                    var row = rows.item(i);
-                                    var CUTDEGREE = row.OptValue;
-                                }
-                                round = FormatPrice.round(CUTDEGREE, this.state.ShopAmount, this.state.dataRows);
-                                subtract = BigDecimalUtils.subtract(this.state.ShopAmount, round, 2);//总价格减去四舍五入的价格
-                                vipData = BigDecimalUtils.add(this.state.vipData, subtract, 2);
-                                this.setState({
-                                    ShopAmount: round,
-                                    subtract: subtract,
-                                    VipPrice:vipData,
-                                })
-                            })
-                        } else {
+                this.setState({
+                    ShopAmount: shopAmount,
+                    amount:shopAmount,
+                })
+            })
+        } else if (this.state.VipCardNo == "") {
+            DPPromotionManager.dp("*", promises, dbAdapter).then((rows)=>{
+                for(let i = 0;i<rows.length;i++) {
+                    var Rows = rows[i];
+                    this.DisCount.push(Rows);
+                    ShopPrice = (Rows.ShopNumber * Rows.ShopPrice);
+                    shopAmount += ShopPrice;
+                }
+                this.setState({
+                    ShopAmount: shopAmount,
+                    amount:shopAmount,
+                })
+
+            })
+        }
+
+        dbAdapter.selectPosOpt('CUTLEVEL').then((rows) => {
+            for (let i = 0; i < rows.length; i++) {
+                var row = rows.item(i);
+                var CUTLEVEL = row.OptValue;
+            }
+            if (this.state.ShopAmount > CUTLEVEL) {
+                dbAdapter.selectPosOpt('AUTOCUT').then((rows) => {
+                    for (let i = 0; i < rows.length; i++) {
+                        var row = rows.item(i);
+                        var AUTOCUT = row.OptValue;
+                    }
+                    if (AUTOCUT == '1') {
+                        dbAdapter.selectPosOpt('CUTDEGREE').then((rows) => {
+                            var round;
+                            var RoundPrice;
+                            var subtract;
                             var vipData;
-                            vipData = BigDecimalUtils.add(this.state.vipData, 0, 2);
+                            for (let i = 0; i < rows.length; i++) {
+                                var row = rows.item(i);
+                                var CUTDEGREE = row.OptValue;
+                            }
+                            round = FormatPrice.round(CUTDEGREE, this.state.ShopAmount, this.state.dataRows);
+                            subtract = BigDecimalUtils.subtract(this.state.ShopAmount, round, 2);//总价格减去四舍五入的价格
+                            vipData = BigDecimalUtils.add(this.state.vipData, subtract, 2);
                             this.setState({
-                                subtract: 0,
-                                ShopAmount:this.state.ShopAmount,
-                                amount:this.state.ShopAmount,
+                                ShopAmount: round,
+                                subtract: subtract,
                                 VipPrice:vipData,
                             })
-                        }
-                    })
-                } else {
-                    var vipData;
-                    vipData = BigDecimalUtils.add(this.state.vipData, 0, 2);
-                    this.setState({
-                        subtract: 0,
-                        ShopAmount:this.state.ShopAmount,
-                        amount:this.state.ShopAmount,
-                        VipPrice:vipData,
-                    })
-                }
-            })
-
-        });
+                        })
+                    } else {
+                        var vipData;
+                        vipData = BigDecimalUtils.add(this.state.vipData, 0, 2);
+                        this.setState({
+                            subtract: 0,
+                            ShopAmount:this.state.ShopAmount,
+                            amount:this.state.ShopAmount,
+                            VipPrice:vipData,
+                        })
+                    }
+                })
+            } else {
+                var vipData;
+                vipData = BigDecimalUtils.add(this.state.vipData, 0, 2);
+                this.setState({
+                    subtract: 0,
+                    ShopAmount:this.state.ShopAmount,
+                    amount:this.state.ShopAmount,
+                    VipPrice:vipData,
+                })
+            }
+        })
 
         dbAdapter.selectAllData("payInfo").then((rows) => {
             let priductData = [];
@@ -309,8 +342,11 @@ export default class Pay extends Component {
             ToastAndroid.show('订单未完成', ToastAndroid.SHORT)
         }
     }
-
-    //继续交易
+//整单优惠button
+    discount(){
+        this.NewPriceButton();
+    }
+//继续交易
     JiaoYi() {
         if (this.dataRows == '') {
             var nextRoute = {
@@ -492,7 +528,7 @@ export default class Pay extends Component {
         };
     };
 
-    //保存流水表及detail表
+//保存流水表及detail表
     restorage() {
         Storage.get('Pid').then((Pid) => {
             Storage.get('usercode').then((usercode) => {
@@ -847,7 +883,7 @@ export default class Pay extends Component {
         });
     }
 
-    //Flatlist字段
+//Flatlist字段
     _renderItem(item, index) {
         return (
             <TouchableOpacity onPress={() => this.HorButton(item)} style={[styles.PageRowButton, {marginRight: 5}]}>
@@ -858,12 +894,12 @@ export default class Pay extends Component {
         )
     }
 
-    //FlatList加入kay值
+//FlatList加入kay值
     keyExtractor(item: Object, index: number) {
         return item.payName//FlatList使用json中的ProdName动态绑定key
     }
 
-    //付款储值卡网络请求
+//付款储值卡网络请求
     Button() {
         var now = new Date();
         var year = now.getFullYear();
@@ -971,7 +1007,7 @@ export default class Pay extends Component {
         this.Total();
     }
 
-    //退货储值卡
+//退货储值卡
     RetButton() {
         var now = new Date();
         var year = now.getFullYear();
@@ -1221,7 +1257,7 @@ export default class Pay extends Component {
                                 />
                             </View>
                         </View>
-                        <TouchableOpacity style={styles.FirstMent1}>
+                        <TouchableOpacity onPress={this.discount.bind(this)} style={styles.FirstMent1}>
                             <Text style={styles.FirstMentText}>整单优惠</Text>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={this.JiaoYi.bind(this)} style={styles.FirstMent1}>
@@ -1320,7 +1356,7 @@ export default class Pay extends Component {
                                 <View style={styles.NewPriceList}>
                                     <TouchableOpacity onPress={this.NewPriceLeft.bind(this)} style={styles.NewPriceleft}>
                                         <View style={styles.Priceleft}>
-                                            <Image source = {this.state.pressStatus =='pressin' ? require("../images/1_42.png") : require("../images/1_43.png")} />
+                                            <Image source = {this.state.pressStatus =='pressin' ? require("../images/1_431.png") : require("../images/1_43.png")} />
                                         </View>
                                         <View style={styles.Priceright}>
                                             <Text style={styles.PricerightText}>优惠价</Text>
@@ -1328,7 +1364,7 @@ export default class Pay extends Component {
                                     </TouchableOpacity>
                                     <TouchableOpacity onPress={this.NewPriceRight.bind(this)} style={styles.NewPriceright}>
                                         <View style={styles.Priceleft}>
-                                            <Image source = {this.state.PressStatus =='Pressin' ? require("../images/1_42.png") : require("../images/1_43.png")}  />
+                                            <Image source = {this.state.PressStatus =='Pressin' ? require("../images/1_431.png") : require("../images/1_43.png")}  />
                                         </View>
                                         <View style={styles.Priceright}>
                                             <Text style={styles.PricerightText}>折扣价</Text>

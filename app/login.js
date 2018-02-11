@@ -76,7 +76,7 @@ export default class  login extends Component{
                        var str=LinkUrl;
                        var Url=LinkUrl;
                        var items=str.replace('?WSDL',"");//截取字符
-                       var Items=Url.replace('//WEBSERVICE/FTRENDWS.ASMX?WSDL',"");
+                       var Items=Url.replace('/WEBSERVICE/FTRENDWS.ASMX?WSDL',"");
                        var NullItems=Items.replace(/\s/g, "");
                        Storage.save('Url',NullItems);
                        var data='/FMJsonInterfaceByDownToPos';

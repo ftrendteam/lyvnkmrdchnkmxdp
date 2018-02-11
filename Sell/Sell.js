@@ -112,7 +112,6 @@ export default class Sell extends Component {
             var vipPrice = 0;
             for (let i = 0; i < rows.length; i++) {
                 var row = rows.item(i);
-                console.log(row)
                 ShopPrice = (row.ShopNumber * row.ShopPrice);
                 shopAmount +=ShopPrice;
                 Storage.save("vipPrice", JSON.stringify(shopAmount));
@@ -458,7 +457,6 @@ export default class Sell extends Component {
         // for (let i = 0;i<currentRoutes.length;i++){
         //     let currentRoute = currentRoutes[i];
         //     let name = currentRoute.name;
-        //     console.log("name=",name)
         //     if("Pay"==name){
         //         this.props.navigator.jumpForward();
         //         break;
