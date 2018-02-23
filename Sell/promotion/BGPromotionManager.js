@@ -26,15 +26,15 @@ export default class BGPromotionManager {
                     //System.out.println("0-dtDep");
                     console.log()
                     promises.push(dbAdapter.selectTDscDep(productBean.DepCode));
-                    
+
                   } else if ("1" == dtSupp) {
                     //System.out.println("0-dtSupp");
                     promises.push(dbAdapter.selectTDscSupp(productBean.SuppCode));
-                    
+
                   } else if ("1" == dtBrand) {
                     //System.out.println("0-dtBrand");
                     promises.push(dbAdapter.selectTDscBrand(productBean.BrandCode));
-                    
+
                   }
                 }
               }
@@ -56,7 +56,7 @@ export default class BGPromotionManager {
                   resolve(productBean);
                 }
               });
-              
+
             } else {
               resolve(productBean);
             }
