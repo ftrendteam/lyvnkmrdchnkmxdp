@@ -22,6 +22,7 @@ import {
 import Index from "../app/Index";
 import Sell from "../Sell/Sell";
 import DPPromotionManager from "../Sell/promotion/DPPromotionManager";
+import BGPromotionManager from "../Sell/promotion/BGPromotionManager";
 import NetUtils from "../utils/NetUtils";
 import FetchUtil from "../utils/FetchUtils";
 import Storage from "../utils/Storage";
@@ -64,7 +65,7 @@ export default class Pay extends Component {
             VipCardNo: this.props.VipCardNo ? this.props.VipCardNo : "",
             JfBal: this.props.JfBal ? this.props.JfBal : "",
             BalanceTotal: this.props.BalanceTotal ? this.props.BalanceTotal : "",
-            // ShopAmount: this.props.ShopAmount ? this.props.ShopAmount : "",
+            CardTypeCode: this.props.CardTypeCode ? this.props.CardTypeCode : "",
             numform: this.props.numform ? this.props.numform : "",
             Seles: this.props.Seles ? this.props.Seles : "",
             vipData:this.props.vipData ? this.props.vipData : "",
@@ -241,7 +242,7 @@ export default class Pay extends Component {
         }
 
         if (this.state.VipCardNo !== "") {
-            DPPromotionManager.dp("*", promises, dbAdapter).then((rows)=>{
+            DPPromotionManager.dp(this.state.CardTypeCode, promises, dbAdapter).then((rows)=>{
                 for(let i = 0;i<rows.length;i++) {
                     var Rows = rows[i];
                     this.DisCount.push(Rows);
@@ -253,7 +254,13 @@ export default class Pay extends Component {
                     amount:shopAmount,
                 })
             })
+            BGPromotionManager.BGPromotion(this.state.CardTypeCode, promises, dbAdapter).then((rows)=>{
+                alert(JSON.stringify(rows))
+            })
         } else if (this.state.VipCardNo == "") {
+            BGPromotionManager.BGPromotion("*", promises, dbAdapter).then((rows)=>{
+                console.log('rows=',rows)
+            })
             DPPromotionManager.dp("*", promises, dbAdapter).then((rows)=>{
                 for(let i = 0;i<rows.length;i++) {
                     var Rows = rows[i];

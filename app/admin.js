@@ -258,6 +258,7 @@ export default class admin extends Component {
     }
 
     PickedDate(){
+        Storage.save('Usercode',this.state.Usercode);
         if(this.state.Usercode==""){
             alert("请输入用户编码")
         }else{

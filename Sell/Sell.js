@@ -54,6 +54,7 @@ export default class Sell extends Component {
             ShopNumber: "",
             BalanceTotal: "",
             JfBal: "",
+            CardTypeCode:"",
             numform:"",
             MemberTextInput: "",
             promemo:"",
@@ -383,11 +384,13 @@ export default class Sell extends Component {
                             var BalanceTotal;
                             var JfBal;
                             var CardFaceNo;
+                            var CardTypeCode;
                             for (let i = 0; i < TblRow.length; i++) {
                                 var row = TblRow[i];
                                 VipCardNo =  JSON.stringify(row.VipCardNo);//卡号
                                 BalanceTotal = JSON.stringify(row.BalanceTotal);//余额
                                 JfBal = JSON.stringify(row.JfBal);//积分
+                                CardTypeCode=JSON.stringify(row.CardTypeCode);
                             };
                             let vipPrice = VipPrice.vipPrice(TblRow[0],this.TblRow);
                             var VIPprice = this.state.ShopAmount-vipPrice;
@@ -398,6 +401,7 @@ export default class Sell extends Component {
                                 JfBal: JfBal,
                                 ShopAmount: VIPprice,
                                 vipPrice:vipPrice,
+                                CardTypeCode:CardTypeCode
                             });
                             this.modal();
                             this.Member();
@@ -424,6 +428,7 @@ export default class Sell extends Component {
                         VipCardNo:this.state.VipCardNo,
                         JfBal: this.state.JfBal,
                         BalanceTotal: this.state.BalanceTotal,
+                        CardTypeCode:this.state.CardTypeCode,
                         ShopAmount: this.state.ShopAmount,
                         numform:this.state.numform,
                         vipData:JSON.stringify(this.state.vipPrice),
@@ -441,6 +446,7 @@ export default class Sell extends Component {
                         VipCardNo:this.state.VipCardNo,
                         JfBal: this.state.JfBal,
                         BalanceTotal: this.state.BalanceTotal,
+                        CardTypeCode:this.state.CardTypeCode,
                         ShopAmount: this.state.ShopAmount,
                         numform:this.state.numform,
                         vipData:JSON.stringify(this.state.vipPrice),
