@@ -14,6 +14,7 @@ export default class PromotionUtils {
   static custAndDate(cardTypeCode, dbAdapter) {
     return new Promise((resolve, reject) => {
       let promises = [];
+      let plans = [];
       dbAdapter.selectTDscCust(cardTypeCode).then((tDscCustBeans) => {
         if (tDscCustBeans != null && tDscCustBeans.length != 0) {
           for (let i = 0; i < tDscCustBeans.length; i++) {
@@ -47,14 +48,15 @@ export default class PromotionUtils {
                 //console.log(DateUtils.compare2HMS(DateUtils.getHSM(), beginTime))
                 if (DateUtils.compareDate(endDate, DateUtils.getDate()) && (DateUtils.compareDate(DateUtils.getDate(), beginDate)) && c == 1) {
                   if (!(DateUtils.compare2HMS(DateUtils.getHSM(), endTime)) && DateUtils.compare2HMS(DateUtils.getHSM(), beginTime)) {
-                    resolve(true);
+                    plans.push(tDscPlanBean)
+                    resolve(plans);
                     return;
                   }else{
-                    resolve(false);
+                    resolve(plans);
                     return;
                   }
                 }else{
-                  resolve(false);
+                  resolve(plans);
                   return;
                 }
               }

@@ -9,19 +9,26 @@ export default class BGPromotionManager {
     new Promise((resolve, reject) => {
       let prodCode = productBean.ProdCode;
       new Promise.all([PromotionUtils.isTDscExceptShop(prodCode, dbAdapter), PromotionUtils.custAndDate(custTypeCode, dbAdapter)]).then((results) => {
-        if (results.length == 2 && !results[0] == true && results[1] == true) {
+        if (results.length != 0 && !results[0] == true && results[1].length != 0) {//表示不是非促销商品
           dbAdapter.selectTdscHead("BG").then((tdscheadBeans) => {
             let promises = [];
             if (tdscheadBeans.length != 0) {
               for (let i = 0; i < tdscheadBeans.length; i++) {
                 let tdscheadBean = tdscheadBeans.item(i);
+                let dtDep = tdscheadBean.dtDep;
+                let dtSupp = tdscheadBean.dtSupp;
+                let dtBrand = tdscheadBean.dtBrand;
                 if ("1" == tdscheadBean.dtAll) {
                   //System.out.println("1");
-                } else if ("0" == tdscheadBean.dtAll) {
+                  let dscValue = tdscheadBean.DscValue;
+                  let priceMode = tdscheadBean.PriceMode;
+                  let dscType = tdscheadBean.DscType;
+                  BGPromotionManager.b(productBean, dscValue, dscType, priceMode);
+                  if (i == tdscheadBeans.length - 1) {
+                    resolve(productBean);
+                  }
+                } else if ("0" == tdscheadBean.dtAll) {//非全场促销判断客户和时间范围
                   //System.out.println("0");
-                  let dtDep = tdscheadBean.dtDep;
-                  let dtSupp = tdscheadBean.dtSupp;
-                  let dtBrand = tdscheadBean.dtBrand;
                   if ("1" == dtDep) {
                     //System.out.println("0-dtDep");
                     console.log()
