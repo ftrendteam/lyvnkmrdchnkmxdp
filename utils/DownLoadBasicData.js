@@ -91,6 +91,7 @@ export default class DownLoadBasicData {
       FetchUtils.post(url, requestBody).then((response) => {
         if ((response != "" && response.retcode == 1)) {
           let tDscHead = response.TblRow;
+          let tDscCondition = response.TblRow1;
           let tDscCust = response.TblRow2;
           let TDscDep = response.TblRow3;
           let tDscExcept = response.TblRow4;
@@ -98,7 +99,9 @@ export default class DownLoadBasicData {
           let tDscPlan = response.TblRow7;
           let tDscProd = response.TblRow9;
           let tDscSupp = response.TblRow11;
+          console.log(tDscCondition)
           dbAdapter.insertTdschead(tDscHead);
+          dbAdapter.insertTDscCondition(tDscCondition);
           //console.log("wtf2=",tDscHead)
           dbAdapter.insertTDscDep(TDscDep);
           dbAdapter.insertTDscExcept(tDscExcept);
