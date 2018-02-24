@@ -6,7 +6,7 @@ import BigDecimalUtils from '../../utils/BigDecimalUtils';
 import PromotionUtils from '../../utils/PromotionUtils';
 export default class BGPromotionManager {
   static BGPromotion(custTypeCode, productBean, dbAdapter) {
-    new Promise((resolve, reject) => {
+      return new Promise((resolve, reject) => {
       let prodCode = productBean.ProdCode;
       new Promise.all([PromotionUtils.isTDscExceptShop(prodCode, dbAdapter), PromotionUtils.custAndDate(custTypeCode, dbAdapter)]).then((results) => {
         if (results.length != 0 && !results[0] == true && results[1].length != 0) {//表示不是非促销商品
@@ -31,7 +31,6 @@ export default class BGPromotionManager {
                   //System.out.println("0");
                   if ("1" == dtDep) {
                     //System.out.println("0-dtDep");
-                    console.log()
                     promises.push(dbAdapter.selectTDscDep(productBean.DepCode));
 
                   } else if ("1" == dtSupp) {
@@ -57,19 +56,20 @@ export default class BGPromotionManager {
                       let dscType = object.DscType;
                       BGPromotionManager.b(productBean, dscValue, dscType, priceMode);
                       resolve(productBean);
+                      console.log('productBean',productBean)
                     }
                   }
                 } else {
-                  resolve(productBean);
+                  resolve(false);
                 }
               });
 
             } else {
-              resolve(productBean);
+              resolve(false);
             }
           });
         } else {
-          resolve(productBean);
+          resolve(false);
         }
       });
     });
@@ -82,7 +82,7 @@ export default class BGPromotionManager {
     let vipPrice2 = productBean.VipPrice2;
     let vipPrice3 = productBean.VipPrice3;
     let wPrice = productBean.WPrice;
-    console.log("priceMode=", priceMode)
+    // console.log("priceMode=", priceMode)
     if ("0" == priceMode) {
       BGPromotionManager.setShopTotal(productBean, dscValue, stdOPrice, dscType);
     } else if ("1" == priceMode) {
@@ -99,7 +99,7 @@ export default class BGPromotionManager {
   }
   
   static setShopTotal(productBean, dscValue, basePrice, dscType) {
-    console.log('dscType=', dscValue, basePrice, dscType)
+    // console.log('dscType=', dscValue, basePrice, dscType)
     let shopPrice = 0;
     if ("Z" == dscType) {
       let discountRate = BigDecimalUtils.multiply(basePrice,
@@ -107,7 +107,7 @@ export default class BGPromotionManager {
       shopPrice = discountRate;
       let s = BigDecimalUtils.multiply(productBean.ShopNumber,
         discountRate);
-      console.log('z=', s)
+      // console.log('z=', s)
       productBean.ShopAmount = s;
       productBean.ShopPrice = s;
       //productBean.setItemTotal(s);

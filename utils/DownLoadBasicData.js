@@ -105,6 +105,7 @@ export default class DownLoadBasicData {
           dbAdapter.insertTDscCust(tDscCust);
           dbAdapter.insertTDscBrand(tDscBrand);
           dbAdapter.insertTDscPlan(tDscPlan);
+          console.log("zhendeguiya=",tDscProd)
           dbAdapter.insertTDscProd(tDscProd);
           dbAdapter.insertTDscSupp(tDscSupp);
           resolve(true);

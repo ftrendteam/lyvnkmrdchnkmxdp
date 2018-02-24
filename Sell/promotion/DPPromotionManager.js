@@ -67,13 +67,13 @@ export default class DPPromotionManager {
               resolve(productBean);
               // console.log('ccc=',productBean)
             }else{
-              resolve(productBean);
+              resolve(false);
               // console.log("aaaa")
             }
           });
         }else{
               // console.log("bbbbb")
-          resolve(productBean);
+          resolve(false);
         }
       });
       
@@ -106,13 +106,13 @@ export default class DPPromotionManager {
                 } else {
                   c = -1;
                 }
-                //console.log(!(DateUtils.compare2HMS(DateUtils.getHSM(),endTime)) && DateUtils.compare2HMS(DateUtils.getHSM(),beginTime));
+                console.log(!(DateUtils.compare2HMS(DateUtils.getHSM(),endTime)) && DateUtils.compare2HMS(DateUtils.getHSM(),beginTime));
                 if (DateUtils.compareDate(endDate,DateUtils.getDate()) && (DateUtils.compareDate(DateUtils.getDate(),beginDate)) && c == 1) {
                   if (!(DateUtils.compare2HMS(DateUtils.getHSM(),endTime)) && DateUtils.compare2HMS(DateUtils.getHSM(),beginTime)) {
                     dbAdapter.selectTDscProd(prodCode).then((tDscProdBeans) => {
-                      console.log("tDscProdBeans",tDscProdBeans.length);
+                      // console.log("tDscProdBeans",tDscProdBeans.length);
                       if (tDscProdBeans != null && tDscProdBeans.length != 0) {
-                        console.log("wtf");
+                        // console.log("wtf");
                         resolve(true);
                        return;
                       } else if(tDscProdBeans.length == 0){
