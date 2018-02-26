@@ -23,7 +23,7 @@ export default class PromotionUtils {
           new Promise.all(promises).then((promiseResults) => {
             
             for (let i = 0; i < promiseResults.length; i++) {
-              //console.log("wtf=",promiseResults[i])
+              // console.log("wtf=",promiseResults[i])
               //console.log("wtf=",promiseResults[i].length)
               //console.log("wtf=",promiseResults[i].item(0))
               
@@ -50,13 +50,16 @@ export default class PromotionUtils {
                   if (!(DateUtils.compare2HMS(DateUtils.getHSM(), endTime)) && DateUtils.compare2HMS(DateUtils.getHSM(), beginTime)) {
                     plans.push(tDscPlanBean)
                     resolve(plans);
+                    // console.log('plans=',plans)
                     return;
                   }else{
                     resolve(plans);
+                      // console.log('plans1=',plans)
                     return;
                   }
                 }else{
                   resolve(plans);
+                    // console.log('plans2=',plans)
                   return;
                 }
               }

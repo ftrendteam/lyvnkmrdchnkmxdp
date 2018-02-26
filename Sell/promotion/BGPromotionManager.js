@@ -55,24 +55,27 @@ export default class BGPromotionManager {
                               let dscType = object.DscType;
                               BGPromotionManager.b(productBean, dscValue, dscType, priceMode);
                               resolve(productBean);
-                              // console.log('productBean',productBean)
+                              console.log('productBean',productBean)
                           }
                       }else{
                           resolve(false);
+                          console.log('productBean1')
                       }
-
                   }
                 } else {
                   resolve(false);
+                    console.log('productBean2')
                 }
               });
 
             } else {
               resolve(false);
+                console.log('productBean3')
             }
           });
         } else {
           resolve(false);
+            console.log('productBean4')
         }
       });
     });

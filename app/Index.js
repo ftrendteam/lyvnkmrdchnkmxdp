@@ -1684,6 +1684,7 @@ export default class Index extends Component {
 
     Datacomplete(){
         this.DataComplete();
+        this._setModalVisible();
     }
 
     //单据弹层结束
