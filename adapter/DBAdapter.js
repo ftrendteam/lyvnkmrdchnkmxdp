@@ -623,7 +623,9 @@ export default class DBAdapter extends SQLiteOpenHelper {
   selectTUserShopData(Usercode) {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
-        tx.executeSql("select b.ShopCode,b.ShopName from tUserShop a inner join tshopitem b on b.SubCode||rtrim(b.shopcode)||';' like '%;'||rtrim(a.shopcode)||';%' or rtrim(a.shopcode)='0'  where a.UserCode='" + Usercode + "'", [], (tx, results) => {
+        tx.executeSql("select b.ShopCode,b.ShopName from tUserShop a inner join tshopitem b on b.SubCode||rtrim(b.shopcode)||';' " +
+          "like '%;'||rtrim(a.shopcode)||';%' or rtrim(a.shopcode)='0'  where a.UserCode='" + Usercode + "'", [], (tx, results) => {
+          //alert(results.rows);
           resolve(results.rows);
         });
         
@@ -1554,6 +1556,41 @@ export default class DBAdapter extends SQLiteOpenHelper {
         })
       }
     })
+  }
+  
+  insertTDscCondition=(datas)=>{
+    this.deleteData('TDscCondition');
+    db.transaction((tx) => {
+      for (let i = 0; i < datas.length; i++) {
+        let data = datas[i];
+        let formNo = data.FormNo;
+        let ConType = data.ConType;
+        let con1 = data.Con1;
+        let con2 = data.Con2;
+        let Remark = data.Remark;
+        let cxConType = data.cxConType;
+        
+        let sql = "insert into TDscCondition(FormNo,ConType,Con1,Con2,Remark,cxConType) values(?,?,?,?,?,?)";
+        tx.executeSql(sql, [formNo, ConType, con1, con2, Remark,cxConType], (tx, results) => {
+        
+        }, (error) => {
+          console.log("TDscCondition=", error)
+        })
+      }
+    })
+  }
+  selectTDscCondition=(FormNo)=>{
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        let sql = "select * from TDscCondition where FormNo='" + FormNo + "'";
+        tx.executeSql(sql, [], (tx, results) => {
+            resolve((results.rows));
+          }, (error) => {
+            console.log("err===", error);
+          }
+        );
+      });
+    });
   }
   selectTDscSupp=(SuppCode)=>{
     return new Promise((resolve, reject) => {

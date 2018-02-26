@@ -1,6 +1,10 @@
 /**
- * Created by admin on 2016/9/27.
+ * Created by admin on 2016/9/27. 满赠
  */
+
+//import BigDecimalUtils from '../../utils/BigDecimalUtils';
+import PromotionUtils from '../../utils/PromotionUtils';
+
 let formNo;
 let currentDiscountPrice;
 let conditionType;
@@ -9,125 +13,94 @@ let shopNum;
 let list = [];
 let planList = [];
 export default class MZPromotionManger {
-  
-  
-  static mzPromotion(custTypeCode, productBeans) {
+  static mzPromotion(custTypeCode, productBeans,dbAdapter) {
+    return new Promise(()=>{
+      
+    });
     list = productBeans;
-    
-    let tDscCustBeans = XDbUtils.getBasicDB(context).findAll(Selector.from(TDscCustBean.class).where("CustTypeCode", "=", custTypeCode));
-    if (tDscCustBeans != null) {
-      //判断所有的促销是否符合时间要求
-      for (let j = 0; j < tDscCustBeans.size(); j++) {
-        let tDscPlanBeans = XDbUtils.getBasicDB(context).findAll(Selector.from(TDscPlanBean.class).where("FormNo", "=", tDscCustBeans.get(j).getFormNo()));
-        if (tDscPlanBeans != null && tDscPlanBeans.size() != 0) {
-          for (let index = 0; index < tDscPlanBeans.size(); index++) {
-            let tDscPlanBean = tDscPlanBeans.get(index);
-            let beginDate = tDscPlanBean.BeginDate;
-            let beginTime = tDscPlanBean.BeginTime;
-            let endDate = tDscPlanBean.EndDate;
-            let endTime = tDscPlanBean.EndTime;
-            let vldWeek = tDscPlanBean.VldWeek.split("");
-            let week = DateUtils.getWeek();
-            let c;
-            if (week != 0) {
-              c = vldWeek[week - 1];
-            } else {
-              c = -1;
-            }
-            if (DateUtils.before(endDate) && DateUtils.after(beginDate) && c == 1) {
-              if (DateUtils.compare2HMSBefore(endTime) && DateUtils.compare2HMSAfter(beginTime)) {
-                planList.add(tDscPlanBeans.get(index));
-              } else {
-                //System.out.println("日期不符合");
-              }
-            }
-          }
-        }
+    let promises = [];
+    let tdschead;
+    PromotionUtils.custAndDate(custTypeCode,dbAdapter).then((plans)=>{
+      if (plans.length!=0){
+        planList = plans;
       }
-    }
-    
-    for (let planIndex = 0; planIndex < planList.size(); planIndex++) {//遍历所有商品，取出最大优惠
-      let tdscheadBeans = XDbUtils.getBasicDB(context).
-        findAll(Selector.from(TdscheadBean.class).where("FormType", "=", "MZ").
-          and("FormNo", "=", planList.get(planIndex).getFormNo()));
-//            System.out.println("tdscheadBeans=-=-"+tdscheadBeans.size());
-      if (tdscheadBeans != null) {
-        for (let i = 0; i < productBeans.length; i++) {//遍历所有商品
-          let productBean = productBeans[i];
-          let tDscExceptShop = PromotionUtils.isTDscExceptShop(productBean.ProdCode);
-          if (!tDscExceptShop) {
-            //System.out.println("非促销商品!");
-            continue;
-          }
-          for (let indext = 0; indext < tdscheadBeans.size(); indext++) {
-            //System.out.println(tdscheadBeans.get(indext).getFormNo());
-            let dtAll = tdscheadBeans.get(indext).getDtAll();
-            if ("1" == dtAll) {
-              //System.out.println("全场");
-            } else if ("0".equals(dtAll)) {
-              let dtDep = tdscheadBeans.get(indext).getDtDep();
-              let dtSupp = tdscheadBeans.get(indext).getDtSupp();
-              let dtBrand = tdscheadBeans.get(indext).getDtBrand();
-              let dtProd = tdscheadBeans.get(indext).getDtProd();
-              if ("1" == dtDep) {
-                let tDscDepBean = XDbUtils.getBasicDB(context).findFirst(Selector.from(TDscDepBean.class).where("DepCode ", "=", productBean.getDepCode()));
-                if (tDscDepBean != null) {
-                  //System.out.println("zhixing-1");
-                  MZPromotionManger.initData(indext, productBean, tdscheadBeans, context);
+      for (let planIndex = 0; planIndex < planList.length; planIndex++) {//遍历所有商品，取出最大优惠
+        dbAdapter.selectTdscHead("MZ").then((tdscheadBeans)=>{
+          if (tdscheadBeans.length!=0) {
+            for (let i = 0; i < productBeans.length; i++) {//遍历所有商品
+              let productBean = productBeans.item(i);
+              PromotionUtils.isTDscExceptShop(productBean.ProdCode,dbAdapter).then((tDscExceptShop)=>{
+                if (!tDscExceptShop) {//不是非促销商品
+                  for (let indext = 0; indext < tdscheadBeans.length; indext++) {
+                    //System.out.println(tdscheadBeans.get(indext).getFormNo());
+                      tdschead = tdscheadBeans.item(indext);
+                    let dtAll = tdschead.dtAll();
+                    if ("1" == dtAll) {
+                      //System.out.println("全场");
+                    } else if ("0"==dtAll) {
+                      let dtDep = tdschead.dtDep;
+                      let dtSupp = tdschead.dtSupp;
+                      let dtBrand = tdschead.dtBrand;
+                      let dtProd = tdschead.dtProd;
+                      if ("1" == dtDep) {
+                        promises.push(dbAdapter.selectTDscDep(productBean.DepCode))
+                      } else if ("1" == dtSupp) {
+                        promises.push(dbAdapter.selectTDscSupp(productBean.SuppCode))
+                      } else if ("1" == dtBrand) {
+                        promises.push(dbAdapter.selectTDscBrand(productBean.BrandCode))
+                      } else if ("1" == dtProd) {
+                        promises.push(dbAdapter.selectTDscProd(productBean.ProdCode))
+                      }
+                    }
+                  }
+                  new Promise.all(promises).then((results) => {
+                    //console.log("mj2-1=",results.length)
+                    if (results.length != 0) {
+                      for (let i = 0; i < results.length; i++) {
+                        if (results[i]) {
+                          //MJPromotionManger.initData(productBean, tdschead);
+                          MZPromotionManger.initData(productBean, tdschead);
+                        }
+                      }
+                    }
+                  });
                 }
-              } else if ("1" == dtSupp) {
-                let tDscSuppBean = XDbUtils.getBasicDB(context).findFirst(Selector.from(TDscSuppBean.class).where("CuppCode ", "=", productBean.getSuppCode()));
-                if (tDscSuppBean != null) {
-                  //System.out.println("zhixing-2");
-                  MZPromotionManger.initData(indext, productBean, tdscheadBeans, context);
-                }
-              } else if ("1" == dtBrand) {
-                let tDscBrandBean = XDbUtils.getBasicDB(context).findFirst(Selector.from(TDscBrandBean.class).where("BrandCode ", "=", productBean.getBrandCode()));
-                if (tDscBrandBean != null) {
-                  //System.out.println("zhixing-3");
-                  MZPromotionManger.initData(indext, productBean, tdscheadBeans, context);
-                }
-              } else if ("1" == dtProd) {
-                let tDscProdBean = XDbUtils.getBasicDB(context).findFirst(Selector.from(TDscProdBean.class).where("ProdCode  ", "=", productBean.getProdCode()));
-                if (tDscProdBean != null) {
-                  //System.out.println("zhixing-4");
-                  MZPromotionManger.initData(indext, productBean, tdscheadBeans, context);
-                }
-              }
+              });
             }
+            shopNum = 0;
+            shopTotal = 0;
           }
-        }
-        shopNum = 0;
-        shopTotal = 0;
+        });
+    
       }
-    }
+    });
     return currentDiscountPrice;
   }
   
-  static initData(indext, productBean, tdscheadBeans) {
-    shopNum += productBean.getList().size();
-    shopTotal += productBean.getItemTotal();
-    formNo = tdscheadBeans.get(indext).getFormNo();
-    conditionType = tdscheadBeans.get(indext).getConditionType();
-    let price = countMZPrice(context, tdscheadBeans.get(indext));
+  static initData(productBean, tdschead) {
+    shopNum += productBean.ShopNumber;
+    shopTotal += productBean.ShopAmount;
+    formNo = tdschead.FormNo;
+    conditionType = tdschead.ConditionType;
+    let price = countMZPrice(tdschead);
     if (currentDiscountPrice < price) {
       currentDiscountPrice = price;
     }
   }
   
   static countMZPrice(tdscheadBean) {
-    let con1 = tdscheadBean.getCon1();
+    let con1 = tdscheadBean.Con1;
     if ("0" == conditionType) {//满金额
       if (con1 < shopTotal) {
-        return tdscheadBean.getCon2();
+        return tdscheadBean.Con2;
       }
     } else if ("1" == conditionType) {//数量
       if (con1 < shopNum) {
-        return tdscheadBean.getCon2();
+        return tdscheadBean.Con2;
       }
     } else if ("2" == conditionType) {//项数
-      if (con1 < list.size()) {
-        return tdscheadBean.getCon2();
+      if (con1 < list.length) {
+        return tdscheadBean.Con2;
       }
     }
     return 0;

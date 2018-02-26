@@ -250,6 +250,9 @@ export default class SQLiteOpenHelper {
   
       tx.executeSql("CREATE TABLE IF NOT EXISTS TDscBrand(FormNo varchar(20) not null,BrandCode varchar(20) not null, " +
         "BrandName varchar(40) null, DscType varchar(1) null, DscValue float(8) null, Remark varchar(50) null,PriceMode varchar(2) null)",[],()=>{})
+  
+      tx.executeSql("CREATE TABLE IF NOT EXISTS TDscCondition(FormNo varchar(20) not null,ConType varchar(10) null," +
+        "Con1 float(8) null, Con2 float(8) null, Remark varchar(50) null,cxConType varchar(5) null)",[],()=>{})
     }, (err) => {
       this._errorCB('transaction', err);
     }, () => {

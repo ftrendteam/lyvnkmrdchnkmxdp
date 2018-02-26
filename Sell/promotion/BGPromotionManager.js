@@ -102,7 +102,7 @@ export default class BGPromotionManager {
   }
   
   static setShopTotal(productBean, dscValue, basePrice, dscType) {
-    // console.log('dscType=', dscValue, basePrice, dscType)
+    //console.log('dscType=', dscValue, basePrice, dscType)
     let shopPrice = 0;
     if ("Z" == dscType) {
       let discountRate = BigDecimalUtils.multiply(basePrice,
