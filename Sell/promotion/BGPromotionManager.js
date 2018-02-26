@@ -28,36 +28,39 @@ export default class BGPromotionManager {
                     resolve(productBean);
                   }
                 } else if ("0" == tdscheadBean.dtAll) {//非全场促销判断客户和时间范围
-                  //System.out.println("0");
                   if ("1" == dtDep) {
-                    //System.out.println("0-dtDep");
                     promises.push(dbAdapter.selectTDscDep(productBean.DepCode));
 
                   } else if ("1" == dtSupp) {
-                    //System.out.println("0-dtSupp");
                     promises.push(dbAdapter.selectTDscSupp(productBean.SuppCode));
 
                   } else if ("1" == dtBrand) {
-                    //System.out.println("0-dtBrand");
                     promises.push(dbAdapter.selectTDscBrand(productBean.BrandCode));
 
+                  }else{
+                      resolve(false);
                   }
                 }
               }
               new Promise.all(promises).then((results2) => {
-                //console.log("BGresults2", results2.length);
+                // console.log("BGresults2", results2);
                 if (results2.length != 0) {
                   for (let i = 0; i < results2.length; i++) {
-                    for (let j = 0; j < results2[i].length; j++) {
-                      let object = results2[i].item(j);
-                      //console.log(object)
-                      let dscValue = object.DscValue;
-                      let priceMode = object.PriceMode;
-                      let dscType = object.DscType;
-                      BGPromotionManager.b(productBean, dscValue, dscType, priceMode);
-                      resolve(productBean);
-                      console.log('productBean',productBean)
-                    }
+                      if(results2[i].length!=0){
+                          for (let j = 0; j < results2[i].length; j++) {
+                              let object = results2[i].item(j);
+                              // console.log(object)
+                              let dscValue = object.DscValue;
+                              let priceMode = object.PriceMode;
+                              let dscType = object.DscType;
+                              BGPromotionManager.b(productBean, dscValue, dscType, priceMode);
+                              resolve(productBean);
+                              // console.log('productBean',productBean)
+                          }
+                      }else{
+                          resolve(false);
+                      }
+
                   }
                 } else {
                   resolve(false);
@@ -108,8 +111,9 @@ export default class BGPromotionManager {
       let s = BigDecimalUtils.multiply(productBean.ShopNumber,
         discountRate);
       // console.log('z=', s)
-      productBean.ShopAmount = s;
-      productBean.ShopPrice = s;
+      productBean.ShopAmount = Number(s);
+      productBean.ShopPrice = Number(s);
+        console.log('s=',s)
       //productBean.setItemTotal(s);
     } else if ("S" == dscType) {
       let newPrice = BigDecimalUtils.add(basePrice, BigDecimalUtils.multiply(basePrice, BigDecimalUtils.divide(dscValue, 100)));
@@ -121,8 +125,9 @@ export default class BGPromotionManager {
         //productBean.ShopPrice = productBean.StdPrice;
         //productBean.setItemTotal(productBean.StdPrice);
         //productBean.setItemTotal(multiply);
-        productBean.ShopAmount = multiply;
-        productBean.ShopPrice = shopPrice;
+        productBean.ShopAmount =Number(multiply);
+        productBean.ShopPrice = Number(shopPrice);
+        console.log('multiply=',multiply)
       }
     }
     //console.log("BG=", productBean);

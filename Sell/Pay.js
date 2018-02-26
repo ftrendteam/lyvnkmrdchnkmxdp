@@ -233,14 +233,12 @@ export default class Pay extends Component {
 //促销价及四舍五入
     dbadapter() {
         var rows=this.state.dataRows;
-        console.log(this.state.dataRows)
         var shopAmount = 0;
         var ShopPrice=0;
         let promises=[];
         let Promises=[];
         for (let i = 0; i < rows.length; i++) {
             var row = rows[i];
-            console.log("row=",row)
             if (this.state.VipCardNo !== "") {
                 promises.push(DPPromotionManager.dp(this.state.CardTypeCode, row, dbAdapter));
                 Promises.push(BGPromotionManager.BGPromotion(this.state.CardTypeCode, row, dbAdapter));
@@ -250,77 +248,47 @@ export default class Pay extends Component {
             }
         }
         new Promise.all(promises).then((rows)=> {
-            console.log('rows1=',rows)
-            // for(let i = 0;i<rows.length; i++){
-            //     var row=rows[0];
-            //     console.log(row)
-            // }
-            // if(rows==false) {
-            //     new Promise.all(Promises).then((rows) => {
-            //         console.log('rows2=', rows)
-            //         alert("1234");
-            //     })
-            // }
-            new Promise.all(Promises).then((rows) => {
-                console.log('rows2=', rows)
-                alert("1234");
-            })
-            for(let i = 0;i<this.state.dataRows.length;i++) {
-                var Rows = this.state.dataRows[i];
-                console.log('DataRows=',Rows)
-                this.DisCount.push(Rows);
-                ShopPrice = Rows.ShopAmount;
-                shopAmount += ShopPrice;
+            var Datafasle;
+            for(let i = 0;i<rows.length; i++){
+                var row=rows[0];
+                if(row==true){
+                    Datafasle=true;
+                }else if(row==false){
+                    Datafasle=false;
+                }
             }
-            this.setState({
-                ShopAmount: shopAmount,
-                amount:shopAmount,
-            })
+            // console.log('Datafasle=',Datafasle)
+            if(Datafasle==false){
+                new Promise.all(Promises).then((rows) => {
+                    console.log('true=', rows)
+                    for(let i = 0;i<this.state.dataRows.length;i++) {
+                        var Rows = this.state.dataRows[i];
+                        // console.log('DataRows=',Rows);
+                        this.DisCount.push(Rows);
+                        ShopPrice = Rows.ShopAmount;
+                        shopAmount += ShopPrice;
+                    }
+                    this.setState({
+                        ShopAmount: shopAmount,
+                        amount:shopAmount,
+                    })
+                })
+            }else{
+                for(let i = 0;i<this.state.dataRows.length;i++) {
+                    var Rows = this.state.dataRows[i];
+                    console.log('DataRows=',Rows);
+                    this.DisCount.push(Rows);
+                    ShopPrice = Rows.ShopAmount;
+                    shopAmount += ShopPrice;
+                    console.log('shopAmount1=',shopAmount);
+                }
+                this.setState({
+                    ShopAmount: shopAmount,
+                    amount:shopAmount,
+                })
+                console.log("true1")
+            }
         })
-
-        if (this.state.VipCardNo !== "") {
-            // DPPromotionManager.dp(this.state.CardTypeCode, row, dbAdapter).then((rows)=>{
-            //     if(rows==false){
-            //         BGPromotionManager.BGPromotion(this.state.CardTypeCode, row, dbAdapter).then((rows)=>{
-            //             console.log('rows1=',rows)
-            //         })
-            //     }else{
-            //         for(let i = 0;i<rows.length;i++) {
-            //             var Rows = rows[i];
-            //             this.DisCount.push(Rows);
-            //             ShopPrice = (Rows.ShopNumber * Rows.ShopPrice);
-            //             shopAmount += ShopPrice;
-            //         }
-            //         this.setState({
-            //             ShopAmount: shopAmount,
-            //             amount:shopAmount,
-            //         })
-            //     }
-            // })
-        } else if (this.state.VipCardNo == "") {
-            // DPPromotionManager.dp("*", promises, dbAdapter).then((rows)=>{
-            //     console.log('row=',rows)
-            //     if(rows==false){
-            //         console.log("ytt")
-            //         BGPromotionManager.BGPromotion("*", promises, dbAdapter).then((row)=>{
-            //             console.log('rows2=',row)
-            //         })
-            //     }else{
-            //         for(let i = 0;i<promises.length;i++) {
-            //             var Rows = promises[i];
-            //             console.log('ROWS=',Rows)
-            //             this.DisCount.push(Rows);
-            //             ShopPrice = (Rows.ShopNumber * Rows.ShopPrice);
-            //             shopAmount += ShopPrice;
-            //         }
-            //         this.setState({
-            //             ShopAmount: shopAmount,
-            //             amount:shopAmount,
-            //         })
-            //     }
-            // })
-        }
-
 
         dbAdapter.selectPosOpt('CUTLEVEL').then((rows) => {
             for (let i = 0; i < rows.length; i++) {
@@ -372,6 +340,7 @@ export default class Pay extends Component {
                     amount:this.state.ShopAmount,
                     VipPrice:vipData,
                 })
+                console.log("123")
             }
         })
 
@@ -385,6 +354,7 @@ export default class Pay extends Component {
             this.setState({
                 data: priductData,
             })
+            console.log("456")
         });
     }
 
