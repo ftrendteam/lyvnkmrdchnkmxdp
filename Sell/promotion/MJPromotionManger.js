@@ -12,12 +12,12 @@ let shopTotal = 0;
 let shopNum = 0;
 let list = [];
 let isReturnPrice = false;
-let tDscDepBean;
-let tDscSuppBean;
-let tDscBrandBean;
-let tDscProdBean;
-let tdscheadBeans = [];
-let currentDiscountPrice;
+//let tDscDepBean;
+//let tDscSuppBean;
+//let tDscBrandBean;
+//let tDscProdBean;
+//let tdscheadBeans = [];
+//let currentDiscountPrice;
 let planList = [];
 let dbAdapter;
 export default class MJPromotionManger {
@@ -26,14 +26,14 @@ export default class MJPromotionManger {
     list = productBeans;
     let promises = []
     let tdschead;
-    new Promise((resolve, reject)=>{
+    new Promise((resolve, reject) => {
       PromotionUtils.custAndDate(custTypeCode, dbAdapter).then((plans) => {
         planList = plans;
         for (let planIndex = 0; planIndex < planList.length; planIndex++) {//遍历促销单，取出最大优惠
           dbAdapter.selectTdscHead("MJ").then((tdscheadBeans) => {
             for (let i = 0; i < productBeans.length; i++) {//遍历所有商品
               let productBean = productBeans[i];
-              PromotionUtils.isTDscExceptShop(productBean.ProdCode,dbAdapter).then((tDscExceptShop) => {
+              PromotionUtils.isTDscExceptShop(productBean.ProdCode, dbAdapter).then((tDscExceptShop) => {
                 if (!tDscExceptShop) {
                   if (tdscheadBeans.length != 0) {
                     for (let indext = 0; indext < tdscheadBeans.length; indext++) {
@@ -55,7 +55,13 @@ export default class MJPromotionManger {
                           promises.push(dbAdapter.selectTDscBrand(productBean.BrandCode))
                         } else if ('1' == dtProd) {
                           promises.push(dbAdapter.selectTDscProd(productBean.ProdCode))
+                        } else {
+                          resolve(false);
+                          break;
                         }
+                      }else{
+                        resolve(false);
+                        break;
                       }
                     }
                     new Promise.all(promises).then((results) => {
@@ -63,7 +69,9 @@ export default class MJPromotionManger {
                       if (results.length != 0) {
                         for (let i = 0; i < results.length; i++) {
                           if (results[i]) {
-                            MJPromotionManger.initData(productBean, tdschead).then((result)=>{
+                            MJPromotionManger.initData(productBean, tdschead).then((result) => {
+                              shopNum = 0;
+                              shopTotal = 0;
                               resolve(result);
                             });
                           }
@@ -71,20 +79,20 @@ export default class MJPromotionManger {
                       }
                     });
                   }
+                } else {
+                  resolve(false);
+                  break
                 }
               });
             }
           });
-      
-          shopNum = 0;
-          shopTotal = 0;
         }
       });
     });
   }
   
   static initData(productBean, tdschead) {
-    return new Promise((resolve, reject)=>{
+    return new Promise((resolve, reject) => {
       //console.log("asdf=",tdschead)
       shopNum += productBean.ShopNumber;
       shopTotal += productBean.ShopAmount;
@@ -94,7 +102,7 @@ export default class MJPromotionManger {
       dscValue = tdschead.DscValue;
       formNo = tdschead.FormNo;
       //console.log("mj2=",shopNum, formNo)
-      MJPromotionManger.countMJPrice(shopNum, formNo,productBean).then((result)=>{
+      MJPromotionManger.countMJPrice(shopNum, formNo, productBean).then((result) => {
         resolve(true);
       });
       //let price =
@@ -102,11 +110,11 @@ export default class MJPromotionManger {
       //  currentDiscountPrice = price;
       //}
     })
-   
+    
   }
   
-  static countMJPrice(shopNum, formNo,productBean) {
-    return new Promise((resolve, reject)=>{
+  static countMJPrice(shopNum, formNo, productBean) {
+    return new Promise((resolve, reject) => {
       let discountPrice = 0;
       dbAdapter.selectTDscCondition(formNo).then((select) => {
         if ("0" == conditionType) {//金额
@@ -140,7 +148,7 @@ export default class MJPromotionManger {
                 break;
               }
             }
-        
+            
           }
         } else if ("1" == conditionType) {//数量
           if ("0" == dscType) {//返款
@@ -149,12 +157,12 @@ export default class MJPromotionManger {
               for (let i = select.length - 1; i >= 0; i--) {
                 let con1 = select.item(i).Con1;
                 if (con1 <= shopNum) {
-                  discountPrice = select.item(select.length- 1).Con2;
+                  discountPrice = select.item(select.length - 1).Con2;
                   break;
                 }
               }
-          
-          
+              
+              
             } else if ("1" == str1) {//累加
               let lastCon1 = 0;
               for (let i = select.length - 1; i >= 0; i--) {
@@ -174,7 +182,7 @@ export default class MJPromotionManger {
                 discountPrice = BigDecimalUtils.multiply(shopTotal, BigDecimalUtils.divide(con2, 100));
               }
             }
-        
+            
           }
         } else if ("2" == conditionType) {//项数
           if ("0" == dscType) {//返款
@@ -204,10 +212,10 @@ export default class MJPromotionManger {
             }
           }
         }
-        if(discountPrice>dscValue&&dscValue!=0){
-          discountPrice=dscValue;
+        if (discountPrice > dscValue && dscValue != 0) {
+          discountPrice = dscValue;
         }
-        productBean.ShopAmount = BigDecimalUtils.subtract(productBean.ShopAmount,discountPrice,2);
+        productBean.ShopAmount = BigDecimalUtils.subtract(productBean.ShopAmount, discountPrice, 2);
         resolve(true);
       });
     });
