@@ -1579,6 +1579,65 @@ export default class DBAdapter extends SQLiteOpenHelper {
       }
     })
   }
+  
+  inserttDscPresent=(datas)=>{
+    this.deleteData('tDscPresent');
+    db.transaction((tx) => {
+      for (let i = 0; i < datas.length; i++) {
+        let data = datas[i];
+        let formNo = data.FormNo;
+        let prodCode = data.ProdCode;
+        let prodName = data.ProdName;
+        let planNo = data.PlanNo;
+        let groupNo = data.GroupNo;
+        let countN = data.CountN;
+        let stdPrice = data.StdPrice;
+        let remark = data.Remark;
+        let sql = "insert into tDscPresent(FormNo,ProdCode,ProdName,PlanNo,GroupNo,CountN,StdPrice,Remark) values(?,?,?,?,?,?,?,?)";
+        tx.executeSql(sql, [formNo, prodCode, prodName, planNo, groupNo,countN,stdPrice,remark], (tx, results) => {
+        
+        }, (error) => {
+          console.log("tDscPresent=", error)
+        })
+      }
+    })
+  }
+  
+  inserttDscGroupPrice=(datas)=>{
+    this.deleteData('tDscGroupPrice');
+    db.transaction((tx) => {
+      for (let i = 0; i < datas.length; i++) {
+        let data = datas[i];
+        let formNo = data.FormNo;
+        let groupNo = data.GroupNo;
+        let groupCountN = data.GroupCountN;
+        let groupTotal = data.GroupTotal;
+        let sql = "insert into tDscGroupPrice(FormNo,GroupNo,GroupCountN,GroupTotal) values(?,?,?,?)";
+        tx.executeSql(sql, [formNo, groupNo, groupCountN, groupTotal], (tx, results) => {
+        
+        }, (error) => {
+          console.log("tDscPresent=", error)
+        })
+      }
+    })
+  }
+  
+  /***
+   * 查询满赠促销中赠送商品
+   */
+  selectTdscPresent=()=>{
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        let sql = "select * from tDscPresent";
+        tx.executeSql(sql, [], (tx, results) => {
+            resolve((results.rows));
+          }, (error) => {
+            console.log("err===", error);
+          }
+        );
+      });
+    });
+  }
   selectTDscCondition=(FormNo)=>{
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
@@ -1662,10 +1721,10 @@ export default class DBAdapter extends SQLiteOpenHelper {
     });
   }
   
-  selectTDscCust = (custTypeCode) => {
+  selectTDscCust = (custTypeCode,FormNo) => {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
-        let sql = "select * from TDscCust where  CustTypeCode='" + custTypeCode + "'";
+        let sql = "select * from TDscCust where  CustTypeCode='" + custTypeCode + "' and FormNo='"+FormNo+"'";
         tx.executeSql(sql, [], (tx, results) => {
             resolve((results.rows));
           }, (error) => {
@@ -1679,6 +1738,20 @@ export default class DBAdapter extends SQLiteOpenHelper {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
         let sql = "select * from TDscProd where  ProdCode='" + prodCode + "'";
+        tx.executeSql(sql, [], (tx, results) => {
+            resolve((results.rows));
+          }, (error) => {
+            console.log("err===", error);
+          }
+        );
+      });
+    });
+  }
+  
+  selectTDscProd2 = (prodCode,formNo) => {
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        let sql = "select * from TDscProd where  ProdCode='" + prodCode + "' and FormNo='"+formNo+"'";
         tx.executeSql(sql, [], (tx, results) => {
             resolve((results.rows));
           }, (error) => {

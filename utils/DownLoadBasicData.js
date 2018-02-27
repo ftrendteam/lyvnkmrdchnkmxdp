@@ -95,11 +95,13 @@ export default class DownLoadBasicData {
           let tDscCust = response.TblRow2;
           let TDscDep = response.TblRow3;
           let tDscExcept = response.TblRow4;
+          let tDscGroupPrice = response.TblRow5;
           let tDscBrand = response.TblRow6;
           let tDscPlan = response.TblRow7;
+          let tDscPresent = response.TblRow8;
           let tDscProd = response.TblRow9;
           let tDscSupp = response.TblRow11;
-          console.log(tDscCondition)
+          console.log(tDscGroupPrice)
           dbAdapter.insertTdschead(tDscHead);
           dbAdapter.insertTDscCondition(tDscCondition);
           //console.log("wtf2=",tDscHead)
@@ -108,7 +110,7 @@ export default class DownLoadBasicData {
           dbAdapter.insertTDscCust(tDscCust);
           dbAdapter.insertTDscBrand(tDscBrand);
           dbAdapter.insertTDscPlan(tDscPlan);
-          console.log("zhendeguiya=",tDscProd)
+          dbAdapter.inserttDscPresent(tDscPresent);
           dbAdapter.insertTDscProd(tDscProd);
           dbAdapter.insertTDscSupp(tDscSupp);
           resolve(true);

@@ -253,6 +253,12 @@ export default class SQLiteOpenHelper {
   
       tx.executeSql("CREATE TABLE IF NOT EXISTS TDscCondition(FormNo varchar(20) not null,ConType varchar(10) null," +
         "Con1 float(8) null, Con2 float(8) null, Remark varchar(50) null,cxConType varchar(5) null)",[],()=>{})
+  
+      tx.executeSql("CREATE TABLE IF NOT EXISTS tDscPresent(FormNo varchar(20) not null,ProdCode varchar(20) null," +
+        "ProdName varchar(40) null, PlanNo varchar(20) null, GroupNo varchar(20) null, CountN float(8) null, " +
+        "StdPrice float(8) null, Remark varchar(50) null)",[],()=>{})
+      tx.executeSql("CREATE TABLE IF NOT EXISTS tDscGroupPrice(FormNo varchar(20) not null,GroupNo varchar(2) null," +
+        "GroupCountN float(8) null, GroupTotal float(8) null)",[],()=>{})
     }, (err) => {
       this._errorCB('transaction', err);
     }, () => {

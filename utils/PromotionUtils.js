@@ -11,11 +11,11 @@ export default class PromotionUtils {
    * @return
    * @throws DbException
    */
-  static custAndDate(cardTypeCode, dbAdapter) {
+  static custAndDate(cardTypeCode, dbAdapter,FormNo) {
     return new Promise((resolve, reject) => {
       let promises = [];
       let plans = [];
-      dbAdapter.selectTDscCust(cardTypeCode).then((tDscCustBeans) => {
+      dbAdapter.selectTDscCust(cardTypeCode,FormNo).then((tDscCustBeans) => {
         if (tDscCustBeans != null && tDscCustBeans.length != 0) {
           for (let i = 0; i < tDscCustBeans.length; i++) {
             promises.push(dbAdapter.selectTDscPlan(tDscCustBeans.item(i).FormNo));

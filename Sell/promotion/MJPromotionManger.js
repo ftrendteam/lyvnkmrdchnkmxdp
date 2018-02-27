@@ -29,25 +29,23 @@ export default class MJPromotionManger {
     let TDscExceptShops = [];
     let tdschead;
     return new Promise((resolve, reject) => {
-      
-      PromotionUtils.custAndDate(custTypeCode, dbAdapter).then((plans) => {
-        console.log("a=", plans.length)
-        planList = plans;
-        for (let planIndex = 0; planIndex < planList.length; planIndex++) {//遍历促销单，取出最大优惠
-          dbAdapter.selectTdscHead("MJ").then((tdscheadBeans) => {
-            for (let i = 0; i < productBeans.length; i++) {//遍历所有商品
-              let productBean = productBeans[i];
-              TDscExceptShops.push(PromotionUtils.isTDscExceptShop(productBean.ProdCode, dbAdapter));
-            }
-            new Promise.all(TDscExceptShops).then((TDscExceptShop) => {//是否是非促销商品
-              for (let i = 0; i < TDscExceptShop.length; i++) {
-                let productBean = productBeans[i];
-                let tDscExceptShop = TDscExceptShop[i];
-                if (!tDscExceptShop) {//不是非促销商品 判断促销类型
-                  if (tdscheadBeans.length != 0) {
-                    for (let indext = 0; indext < tdscheadBeans.length; indext++) {
-                      tdschead = tdscheadBeans.item(indext);
-                      //console.log("wtf=",tdschead)
+      dbAdapter.selectTdscHead("MJ").then((tdscheadBeans) => {
+        for (let i = 0; i < productBeans.length; i++) {//遍历所有商品
+          let productBean = productBeans[i];
+          TDscExceptShops.push(PromotionUtils.isTDscExceptShop(productBean.ProdCode, dbAdapter));
+        }
+        new Promise.all(TDscExceptShops).then((TDscExceptShop) => {//是否是非促销商品
+          for (let i = 0; i < TDscExceptShop.length; i++) {
+            let productBean = productBeans[i];
+            let tDscExceptShop = TDscExceptShop[i];
+            if (!tDscExceptShop) {//不是非促销商品 判断促销类型
+              if (tdscheadBeans.length != 0) {
+                for (let indext = 0; indext < tdscheadBeans.length; indext++) {
+                  tdschead = tdscheadBeans.item(indext);
+                  //console.log("wtf=",tdschead)
+                  PromotionUtils.custAndDate(custTypeCode, dbAdapter,tdschead.FormNo).then((plans) => {
+                    planList = plans;
+                    for (let planIndex = 0; planIndex < planList.length; planIndex++) {//遍历促销单，取出最大优惠
                       let dtAll = tdschead.dtAll;
                       if ("1" == dtAll) {
                       } else if ("0" == dtAll) {
@@ -78,36 +76,36 @@ export default class MJPromotionManger {
                         //break;
                       }
                     }
-                  }
-                } else {
-                  //resolve(false);
-                  //break
+                    new Promise.all(promises).then((results) => {
+                      console.log("mj2sadf-1=", results)
+                      if (results.length != 0) {
+                        for (let i = 0; i < results.length; i++) {
+                          if (results[i].length != 0) {
+                            MJPromotionManger.initData(productBeans[i], tdschead).then((result) => {
+                              shopNum = 0;
+                              shopTotal = 0;
+                              if (i == results.length - 1) {
+                                resolve(result);
+                              }
+                            });
+                          }
+                        }
+                      }
+                    });
+                  });
+                  
                 }
               }
-              new Promise.all(promises).then((results) => {
-                console.log("mj2sadf-1=", results)
-                if (results.length != 0) {
-                  for (let i = 0; i < results.length; i++) {
-                    if (results[i].length != 0) {
-                      MJPromotionManger.initData(productBeans[i], tdschead).then((result) => {
-                        shopNum = 0;
-                        shopTotal = 0;
-                        if (i == results.length - 1) {
-                          resolve(result);
-                        }
-                      });
-                    }
-                  }
-                  //new Promise.all(initProducts).then((resultsProd)=>{
-                  //  resolve(true);
-                  //});
-                }
-              });
-            });
-            
-          });
-        }
+            } else {
+              resolve(false);
+              //break
+            }
+          }
+          
+        });
+    
       });
+     
     });
   }
   
@@ -121,7 +119,7 @@ export default class MJPromotionManger {
       dscType = tdschead.DscType;
       dscValue = tdschead.DscValue;
       formNo = tdschead.FormNo;
-      //console.log("mj2=",shopNum, formNo)
+      console.log("mj2=",shopNum, formNo)
       MJPromotionManger.countMJPrice(shopNum, formNo, productBean).then((result) => {
         resolve(true);
       });
@@ -236,7 +234,7 @@ export default class MJPromotionManger {
           discountPrice = dscValue;
         }
         productBean.ShopAmount = BigDecimalUtils.subtract(productBean.ShopAmount, discountPrice, 2);
-        console.log("sadf=", productBean.ShopAmount, "---", productBean.ProdName)
+        //console.log("sadf=", productBean.ShopAmount, "---", productBean.ProdName)
         resolve(true);
       });
     });

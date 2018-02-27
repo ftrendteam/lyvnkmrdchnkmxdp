@@ -1,73 +1,52 @@
 /**
- * Created by admin on 2016/9/28.
+ * Created by admin on 2016/9/28. 买赠促销
  */
+import PromotionUtils from '../../utils/PromotionUtils';
 let planList = [];
 export default class BPPromotionsManger {
   
-  static bpPromotons(productBeans, custTypeCode) {
-    
-    let tdscheadBeans = XDbUtils.getBasicDB(context).findAll(Selector.from(TdscheadBean.class).where("FormType", "=", "BP"));
-    if (tdscheadBeans == null) {
-      return "";
-    }
-    for (let i = 0; i < tdscheadBeans.size(); i++) {
-      if ("1".equals(tdscheadBeans.get(i).getDtCust())) {
-        let tDscProdBean = XDbUtils.getBasicDB(context).findFirst(Selector.from(TDscProdBean.class).where("ProdCode", "=", productBeans.getProdCode()));
-        if (tDscProdBean == null) {
-          return "";
-        }
-        let curr1 = tDscProdBean.getCurr1();//买商品的个数
-        if (curr1 <= productBeans.getList().size()) {
-          return tDscProdBean.getFormNo();
-        } else {
-          return "";
-        }
-      } else {
-        List < TDscCustBean > tDscCustBeans = XDbUtils.getBasicDB(context).findAll(Selector.from(TDscCustBean.class).where("CustTypeCode", "=", custTypeCode).and("FormNo", "=", tdscheadBeans.get(i).getFormNo()));
-        if (tDscCustBeans == null) {
-          break;
-        }
-        for (let j = 0; j < tDscCustBeans.size(); j++) {
-          let tDscPlanBeans = XDbUtils.getBasicDB(context).findAll(Selector.from(TDscPlanBean.class).where("FormNo", "=", tDscCustBeans.get(j).getFormNo()));
-          if (tDscPlanBeans != null && tDscPlanBeans.size() != 0) {
-            for (let index = 0; index < tDscPlanBeans.size(); index++) {
-              let tDscPlanBean = tDscPlanBeans.get(index);
-              let beginDate = tDscPlanBean.getBeginDate();
-              let beginTime = tDscPlanBean.getBeginTime();
-              let endDate = tDscPlanBean.getEndDate();
-              let endTime = tDscPlanBean.getEndTime();
-              let vldWeek = tDscPlanBean.getVldWeek().split("");
-              let week = DateUtils.getWeek();
-              let c;
-              if (week != 0) {
-                c = vldWeek[week - 1];
-              } else {
-                c = vldWeek[vldWeek.length - 1];
-              }
-              if (DateUtils.before(endDate) && DateUtils.after(beginDate) && c == '1') {
-                if (DateUtils.compare2HMSBefore(endTime) && DateUtils.compare2HMSAfter(beginTime)) {
-                  planList.add(tDscPlanBeans.get(index));
-                }
-              }
-            }
+  static bpPromotons(productBean, custTypeCode, dbAdapter) {
+    return new Promise((resolve, reject) => {
+      dbAdapter.selectTdscHead("BP").then((tdscheadBeans) => {
+        for (let i = 0; i < tdscheadBeans.length; i++) {
+          let tdschead = tdscheadBeans.item(i);
+          let dtCust = tdschead.dtCust;
+          let FromNo = tdschead.FormNo;
+          console.log("bp=",dtCust)
+          if (1 == dtCust) {//全场促销
+            PromotionUtils.custAndDate(custTypeCode, dbAdapter,FromNo).then((plans) => {
+              planList = plans;
+            });
+          } else {
+            PromotionUtils.custAndDate(custTypeCode, dbAdapter,FromNo).then((plans) => {
+              planList = plans;
+              BPPromotionsManger.isHasGiveShop(productBean, dbAdapter).then((giveFormNo) => {
+                resolve(giveFormNo);
+              });
+            });
           }
         }
-      }
-      
-    }
-    return isHasGiveShop(context, productBeans);
+      });
+    })
+    
   }
   
-  static isHasGiveShop(productBeans) {
-    for (let i = 0; i < planList.size(); i++) {
-      let tDscProdBean = XDbUtils.getBasicDB(context).findFirst(Selector.from(TDscProdBean.class).where("FormNo", "=", planList.get(i).getFormNo()).and("ProCode", "=", productBeans.getProdCode()));
-      let curr1 = tDscProdBean.getCurr1();//买商品的个数
-      if (curr1 <= productBeans.ShopNumber) {
-        return tDscProdBean.FormNo;
-      } else {
-        return "";
+  static isHasGiveShop(productBean, dbAdapter) {
+   return new Promise((resolve, reject) => {
+      for (let i = 0; i < planList.length; i++) {
+        dbAdapter.selectTDscProd2(productBean.ProdCode, planList[i].FormNo).then((tDscProdBean) => {
+          for(let j = 0;j<tDscProdBean.length;j++){
+            let item = tDscProdBean.item(i);
+            let curr1 = item.Curr1;//买商品的个数成立 赠送商品
+            if (curr1 <= productBean.ShopNumber) {
+              resolve(item.FormNo);
+            } else {
+              resolve("");
+            }
+          }
+        });
       }
-    }
-    return "";
+    })
+    
   }
 }
