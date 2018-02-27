@@ -250,7 +250,7 @@ export default class Pay extends Component {
             }
         }
 
-        //分单促销
+        //单品促销
         new Promise.all(promises).then((rows)=> {
             var Datafasle;
             for(let i = 0;i<rows.length; i++){
@@ -262,12 +262,13 @@ export default class Pay extends Component {
                 }
             }
             if(Datafasle==false){
+
+
                 //分组促销
                 new Promise.all(BGPromotion).then((rows) => {
                     var BGDatafasle;
                     for(let i = 0;i<rows.length; i++){
                         var row=rows[0];
-                        console.log('abc=',row)
                         if(row==true){
                             BGDatafasle=true;
                         }else if(row==false){
@@ -277,10 +278,22 @@ export default class Pay extends Component {
                     console.log('BGDatafasle=', BGDatafasle);
                     if(BGDatafasle==false){
                         //满减促销
-                        console.log('dataRows=',this.state.dataRows)
                         MJPromotionManger.MJPromotion(this.state.dataRows,"*",dbAdapter).then((rows) => {
-                            console.log("MJProduct=",rows)
+                            console.log("MJProduct=",this.state.dataRows)
+                            for(let i = 0;i<this.state.dataRows.length;i++) {
+                                var Rows = this.state.dataRows[i];
+                                console.log('DataRows=',Rows);
+                                this.DisCount.push(Rows);
+                                ShopPrice = Rows.ShopAmount;
+                                shopAmount += ShopPrice;
+                            }
+                            this.setState({
+                                ShopAmount: shopAmount,
+                                amount:shopAmount,
+                            })
+
                         })
+
                     }else{
                         for(let i = 0;i<this.state.dataRows.length;i++) {
                             var Rows = this.state.dataRows[i];

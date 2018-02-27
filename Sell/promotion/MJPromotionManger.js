@@ -31,7 +31,7 @@ export default class MJPromotionManger {
     return new Promise((resolve, reject) => {
       
       PromotionUtils.custAndDate(custTypeCode, dbAdapter).then((plans) => {
-        console.log("a=", plans.length)
+        // console.log("a=", plans.length)
         planList = plans;
         for (let planIndex = 0; planIndex < planList.length; planIndex++) {//遍历促销单，取出最大优惠
           dbAdapter.selectTdscHead("MJ").then((tdscheadBeans) => {
@@ -57,7 +57,7 @@ export default class MJPromotionManger {
                         let dtProd = tdschead.dtProd;
                         //console.log('1' == dtDep)
                         if ('1' == dtDep) {
-                          console.log("dtDep")
+                          // console.log("dtDep")
                           promises.push(dbAdapter.selectTDscDep(productBean.DepCode))
                           //initProducts.push(MJPromotionManger.initData(productBean, tdschead))
                         } else if ('1' == dtSupp) {
@@ -85,7 +85,7 @@ export default class MJPromotionManger {
                 }
               }
               new Promise.all(promises).then((results) => {
-                console.log("mj2sadf-1=", results)
+                // console.log("mj2sadf-1=", results)
                 if (results.length != 0) {
                   for (let i = 0; i < results.length; i++) {
                     if (results[i].length != 0) {
@@ -235,8 +235,9 @@ export default class MJPromotionManger {
         if (discountPrice > dscValue && dscValue != 0) {
           discountPrice = dscValue;
         }
-        productBean.ShopAmount = BigDecimalUtils.subtract(productBean.ShopAmount, discountPrice, 2);
-        console.log("sadf=", productBean.ShopAmount, "---", productBean.ProdName)
+        productBean.ShopAmount = Number(BigDecimalUtils.subtract(productBean.ShopAmount, discountPrice, 2));
+        // console.log("sadf=", productBean.ShopAmount, "---", productBean.ShopPrice);
+
         resolve(true);
       });
     });

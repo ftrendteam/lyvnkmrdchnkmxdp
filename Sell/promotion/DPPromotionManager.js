@@ -63,7 +63,7 @@ export default class DPPromotionManager {
                 }
               }
               productBean.ShopAmount = Number(shopNewTotal);
-              // productBean.ShopPrice = dscPrice;
+              productBean.ShopPrice = dscPrice;
               resolve(productBean);
               // console.log('ccc=',productBean)
             }else{

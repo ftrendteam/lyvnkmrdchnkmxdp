@@ -55,27 +55,23 @@ export default class BGPromotionManager {
                               let dscType = object.DscType;
                               BGPromotionManager.b(productBean, dscValue, dscType, priceMode);
                               resolve(productBean);
-                              console.log('productBean',productBean)
+                              // console.log('productBean',productBean)
                           }
                       }else{
                           resolve(false);
-                          console.log('productBean1')
                       }
                   }
                 } else {
                   resolve(false);
-                    console.log('productBean2')
                 }
               });
 
             } else {
               resolve(false);
-                console.log('productBean3')
             }
           });
         } else {
           resolve(false);
-            console.log('productBean4')
         }
       });
     });
@@ -115,8 +111,8 @@ export default class BGPromotionManager {
         discountRate);
       // console.log('z=', s)
       productBean.ShopAmount = Number(s);
-      productBean.ShopPrice = Number(s);
-        console.log('s=',s)
+      // productBean.ShopPrice = Number(s);
+      //   console.log('s=',s)
       //productBean.setItemTotal(s);
     } else if ("S" == dscType) {
       let newPrice = BigDecimalUtils.add(basePrice, BigDecimalUtils.multiply(basePrice, BigDecimalUtils.divide(dscValue, 100)));
@@ -129,8 +125,8 @@ export default class BGPromotionManager {
         //productBean.setItemTotal(productBean.StdPrice);
         //productBean.setItemTotal(multiply);
         productBean.ShopAmount =Number(multiply);
-        productBean.ShopPrice = Number(shopPrice);
-        console.log('multiply=',multiply)
+        // productBean.ShopPrice = Number(shopPrice);
+        // console.log('multiply=',multiply)
       }
     }
     //console.log("BG=", productBean);
