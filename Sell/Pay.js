@@ -23,6 +23,7 @@ import Index from "../app/Index";
 import Sell from "../Sell/Sell";
 import DPPromotionManager from "../Sell/promotion/DPPromotionManager";
 import BGPromotionManager from "../Sell/promotion/BGPromotionManager";
+import MJPromotionManger from "../Sell/promotion/MJPromotionManger";
 import NetUtils from "../utils/NetUtils";
 import FetchUtil from "../utils/FetchUtils";
 import Storage from "../utils/Storage";
@@ -236,17 +237,20 @@ export default class Pay extends Component {
         var shopAmount = 0;
         var ShopPrice=0;
         let promises=[];
-        let Promises=[];
+        let BGPromotion=[];
+        let MJPromotion=[];
         for (let i = 0; i < rows.length; i++) {
             var row = rows[i];
             if (this.state.VipCardNo !== "") {
                 promises.push(DPPromotionManager.dp(this.state.CardTypeCode, row, dbAdapter));
-                Promises.push(BGPromotionManager.BGPromotion(this.state.CardTypeCode, row, dbAdapter));
+                BGPromotion.push(BGPromotionManager.BGPromotion(this.state.CardTypeCode, row, dbAdapter));
             }else if(this.state.VipCardNo == ""){
                 promises.push(DPPromotionManager.dp("*", row, dbAdapter));
-                Promises.push(BGPromotionManager.BGPromotion("*", row, dbAdapter));
+                BGPromotion.push(BGPromotionManager.BGPromotion("*", row, dbAdapter));
             }
         }
+
+        //单品促销
         new Promise.all(promises).then((rows)=> {
             var Datafasle;
             for(let i = 0;i<rows.length; i++){
@@ -257,36 +261,65 @@ export default class Pay extends Component {
                     Datafasle=false;
                 }
             }
-            // console.log('Datafasle=',Datafasle)
             if(Datafasle==false){
-                new Promise.all(Promises).then((rows) => {
-                    console.log('true=', rows)
-                    for(let i = 0;i<this.state.dataRows.length;i++) {
-                        var Rows = this.state.dataRows[i];
-                        // console.log('DataRows=',Rows);
-                        this.DisCount.push(Rows);
-                        ShopPrice = Rows.ShopAmount;
-                        shopAmount += ShopPrice;
+
+
+                //分组促销
+                new Promise.all(BGPromotion).then((rows) => {
+                    var BGDatafasle;
+                    for(let i = 0;i<rows.length; i++){
+                        var row=rows[0];
+                        if(row==true){
+                            BGDatafasle=true;
+                        }else if(row==false){
+                            BGDatafasle=false;
+                        }
                     }
-                    this.setState({
-                        ShopAmount: shopAmount,
-                        amount:shopAmount,
-                    })
+                    console.log('BGDatafasle=', BGDatafasle);
+                    if(BGDatafasle==false){
+                        //满减促销
+                        MJPromotionManger.MJPromotion(this.state.dataRows,"*",dbAdapter).then((rows) => {
+                            console.log("MJProduct=",this.state.dataRows)
+                            for(let i = 0;i<this.state.dataRows.length;i++) {
+                                var Rows = this.state.dataRows[i];
+                                console.log('DataRows=',Rows);
+                                this.DisCount.push(Rows);
+                                ShopPrice = Rows.ShopAmount;
+                                shopAmount += ShopPrice;
+                            }
+                            this.setState({
+                                ShopAmount: shopAmount,
+                                amount:shopAmount,
+                            })
+
+                        })
+
+                    }else{
+                        for(let i = 0;i<this.state.dataRows.length;i++) {
+                            var Rows = this.state.dataRows[i];
+                            // console.log('DataRows=',Rows);
+                            this.DisCount.push(Rows);
+                            ShopPrice = Rows.ShopAmount;
+                            shopAmount += ShopPrice;
+                        }
+                        this.setState({
+                            ShopAmount: shopAmount,
+                            amount:shopAmount,
+                        })
+                    }
                 })
             }else{
                 for(let i = 0;i<this.state.dataRows.length;i++) {
                     var Rows = this.state.dataRows[i];
-                    console.log('DataRows=',Rows);
+                    // console.log('DataRows=',Rows);
                     this.DisCount.push(Rows);
                     ShopPrice = Rows.ShopAmount;
                     shopAmount += ShopPrice;
-                    console.log('shopAmount1=',shopAmount);
                 }
                 this.setState({
                     ShopAmount: shopAmount,
                     amount:shopAmount,
                 })
-                console.log("true1")
             }
         })
 
