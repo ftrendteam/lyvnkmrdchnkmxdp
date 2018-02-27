@@ -160,7 +160,7 @@ export default class Index extends Component {
     }
     //二维码扫描
     Code(){
-        RNScannerAndroid.openScanner();
+      NativeModules.RNScannerAndroid.openScanner();
     }
     //扫码方法
     Device(){
@@ -190,8 +190,8 @@ export default class Index extends Component {
                                                     ShopPrice:row.StdPrice,
                                                     Pid:row.Pid,
                                                     countm:row.ShopNumber,
-                                                    promemo:row.promemo,
-                                                    prototal:row.prototal,
+                                                    promemo:row.ShopRemark,
+                                                    prototal:row.ShopAmount,
                                                     ProdCode:row.ProdCode,
                                                     DepCode:row.DepCode1,
                                                     SuppCode:row.SuppCode,
@@ -281,8 +281,8 @@ export default class Index extends Component {
                                             ShopPrice:row.StdPrice,
                                             Pid:row.Pid,
                                             countm:row.ShopNumber,
-                                            promemo:row.promemo,
-                                            prototal:row.prototal,
+                                            promemo:row.ShopRemark,
+                                            prototal:row.ShopAmount,
                                             ProdCode:row.ProdCode,
                                             DepCode:row.DepCode1,
                                             SuppCode:row.SuppCode,
@@ -368,7 +368,19 @@ export default class Index extends Component {
 
     //页面执行方法
     componentDidMount(){
+        Storage.save("num","1");
         InteractionManager.runAfterInteractions(() => {
+          Storage.get('LinkUrl').then((tags) => {
+            this.setState({
+              LinkUrl:tags
+            })
+            let memberSelect =JSON.stringify({
+              'TblName': 'DownPosShop'  //固定内容
+            });
+            FetchUtil.post(this.state.LinkUrl,memberSelect).then((data)=>{
+            });
+          })
+          
             this.Storage();
             this._fetch();
             this.Device();
@@ -394,6 +406,16 @@ export default class Index extends Component {
             })
 
         });
+        //dbAdapter.selectSum().then((datas)=>{
+        //    let details = [];
+        //  console.log("a",datas.length);
+        //    for(let i  = 0;i<datas.length;i++){
+        //      console.log("a",datas.item(i));
+        //        dbAdapter.selectDetail(datas.item(i).LsNo).then((details)=>{
+        //            details.push(details);
+        //        });
+        //    }
+        //});
     }
 
     Storage(){
@@ -675,8 +697,8 @@ export default class Index extends Component {
                                 ShopPrice:row.StdPrice,
                                 Pid:item.item.Pid,
                                 countm:item.item.ShopNumber,
-                                promemo:item.item.promemo,
-                                prototal:item.item.prototal,
+                                promemo:item.item.ShopRemark,
+                                prototal:item.item.ShopAmount,
                                 ProdCode:item.item.ProdCode,
                                 DepCode:item.item.DepCode1,
                                 SuppCode:item.item.SuppCode,

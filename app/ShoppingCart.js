@@ -143,9 +143,10 @@ export default class ShoppingCart extends Component {
             this.ds=[];
             for(let i =0;i<rows.length;i++){
                 var row = rows.item(i);
-                var number = row.countm;
-                shopAmount += parseInt(row.prototal);
-                shopnumber += parseInt(row.countm);
+                console.log(row)
+                var number = row.ShopNumber;
+                shopAmount += parseInt(row.ShopAmount);
+                shopnumber += parseInt(row.ShopNumber);
                 if(number!==0){
                     this.ds.push(row);
                 }
@@ -272,7 +273,7 @@ export default class ShoppingCart extends Component {
                                             Pid:rows.item(0).Pid,
                                             countm:rows.item(0).ShopNumber,
                                             promemo:rows.item(0).promemo,
-                                            prototal:rows.item(0).prototal,
+                                            prototal:rows.item(0).ShopAmount,
                                             ProdCode:rows.item(0).ProdCode,
                                             DepCode:rows.item(0).DepCode1,
                                             SuppCode:rows.item(0).SuppCode,
@@ -336,8 +337,8 @@ export default class ShoppingCart extends Component {
                                             ShopPrice:ShopPrice,
                                             Pid:rows.item(0).Pid,
                                             countm:rows.item(0).ShopNumber,
-                                            promemo:rows.item(0).promemo,
-                                            prototal:rows.item(0).prototal,
+                                            promemo:rows.item(0).ShopRemark,
+                                            prototal:rows.item(0).ShopAmount,
                                             ProdCode:rows.item(0).ProdCode,
                                             DepCode:rows.item(0).DepCode1,
                                             SuppCode:rows.item(0).SuppCode,
@@ -363,10 +364,10 @@ export default class ShoppingCart extends Component {
         return (
             <TouchableOpacity style={styles.ShopList} onPress={()=>this.OrderDetails(rowData)}>
                 <View style={styles.ShopTop}>
-                    <Text style={[styles.Name,styles.Name1]}>{rowData.prodname}</Text>
-                    <Text style={[styles.Number,styles.Name1]}>{rowData.countm}(件)</Text>
+                    <Text style={[styles.Name,styles.Name1]}>{rowData.ProdName}</Text>
+                    <Text style={[styles.Number,styles.Name1]}>{rowData.ShopNumber}(件)</Text>
                     <Text style={[styles.Price,styles.Name1]}>{rowData.ShopPrice}</Text>
-                    <Text style={[styles.SmallScale,styles.Name1]}>{rowData.prototal}</Text>
+                    <Text style={[styles.SmallScale,styles.Name1]}>{rowData.ShopAmount}</Text>
                 </View>
             </TouchableOpacity>
         );
@@ -388,9 +389,9 @@ export default class ShoppingCart extends Component {
             this.ds=[];
             for(let i =0;i<rows.length;i++){
                 var row = rows.item(i);
-                var number = row.countm;
-                shopAmount += parseInt(row.prototal);
-                shopnumber += parseInt(row.countm);
+                var number = row.ShopNumber;
+                shopAmount += parseInt(row.ShopAmount);
+                shopnumber += parseInt(row.ShopNumber);
                 if(number!==0){
                     this.ds.push(row);
                 }
@@ -472,9 +473,9 @@ export default class ShoppingCart extends Component {
                     this.props.navigator.push({
                         component:OrderDetails,
                         params:{
-                            ProdName:rowData.prodname,
+                            ProdName:rowData.ProdName,
                             ShopPrice:rowData.ShopPrice,
-                            countm:rowData.countm,
+                            countm:rowData.ShopNumber,
                             Pid:rowData.pid,
                             ProdCode:rowData.ProdCode,
                             DepCode:rowData.DepCode,
@@ -678,7 +679,7 @@ export default class ShoppingCart extends Component {
             <View style={styles.ScreenList}>
                 <View style={styles.coulumnScreen}>
                     <Text style={styles.coulumnText}>
-                        {rowData.prodname}
+                        {rowData.ProdName}
                     </Text>
                 </View>
                 <View style={styles.coulumnScreen}>

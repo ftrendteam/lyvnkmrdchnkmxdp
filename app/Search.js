@@ -220,7 +220,7 @@ export default class Search extends Component {
                                             Pid: rows.item(0).Pid,
                                             Number1:1,
                                             Remark: rows.item(0).ShopRemark,
-                                            prototal: rows.item(0).prototal,
+                                            prototal: rows.item(0).ShopAmount,
                                             ProdCode: rows.item(0).ProdCode,
                                             DepCode: rows.item(0).DepCode1,
                                             SuppCode: rows.item(0).SuppCode,
