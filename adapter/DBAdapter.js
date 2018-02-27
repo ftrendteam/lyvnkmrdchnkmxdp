@@ -394,6 +394,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
             "values(?,?,?,?,?,?,?,?,?,?,?)";
           tx.executeSql(sql, [Pid, ProdCode, shopName, ShopNumber, ShopPrice, ShopAmount, ShopRemark, DepCode, ydcountm, suppCode, BarCode], () => {
               resolve(true);
+              console.log()
             }, (err) => {
               reject(false);
               console.log(err);
@@ -1625,18 +1626,18 @@ export default class DBAdapter extends SQLiteOpenHelper {
   /***
    * 查询满赠促销中赠送商品
    */
-  selectTdscPresent=()=>{
-    return new Promise((resolve, reject) => {
-      db.transaction((tx) => {
-        let sql = "select * from tDscPresent";
-        tx.executeSql(sql, [], (tx, results) => {
-            resolve((results.rows));
-          }, (error) => {
-            console.log("err===", error);
-          }
-        );
+  selectTdscPresent=(FormNo)=>{
+      return new Promise((resolve, reject) => {
+          db.transaction((tx) => {
+              let sql = "select * from tDscPresent where FormNo='"+FormNo+"'";
+              tx.executeSql(sql, [], (tx, results) => {
+                      resolve((results.rows));
+                  }, (error) => {
+                      console.log("err===", error);
+                  }
+              );
+          });
       });
-    });
   }
   selectTDscCondition=(FormNo)=>{
     return new Promise((resolve, reject) => {
@@ -1651,6 +1652,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
       });
     });
   }
+
   selectTDscSupp=(SuppCode)=>{
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {

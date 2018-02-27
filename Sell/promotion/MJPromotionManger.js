@@ -77,7 +77,7 @@ export default class MJPromotionManger {
                       }
                     }
                     new Promise.all(promises).then((results) => {
-                      console.log("mj2sadf-1=", results)
+                      // console.log("mj2sadf-1=", results)
                       if (results.length != 0) {
                         for (let i = 0; i < results.length; i++) {
                           if (results[i].length != 0) {
@@ -88,8 +88,12 @@ export default class MJPromotionManger {
                                 resolve(result);
                               }
                             });
+                          }else{
+                              resolve(false);
                           }
                         }
+                      }else{
+                          resolve(false);
                       }
                     });
                   });
@@ -233,8 +237,8 @@ export default class MJPromotionManger {
         if (discountPrice > dscValue && dscValue != 0) {
           discountPrice = dscValue;
         }
-        productBean.ShopAmount = BigDecimalUtils.subtract(productBean.ShopAmount, discountPrice, 2);
-        //console.log("sadf=", productBean.ShopAmount, "---", productBean.ProdName)
+        productBean.ShopAmount = Number(BigDecimalUtils.subtract(productBean.ShopAmount, discountPrice, 2));
+        console.log("sadf=", productBean.ShopAmount, "---", productBean.ProdName)
         resolve(true);
       });
     });

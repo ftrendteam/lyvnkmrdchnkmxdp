@@ -34,12 +34,12 @@ export default class MZPromotionManger {
               if (!tDscExceptShop) {//不是非促销商品
                 for (let indext = 0; indext < tdscheadBeans.length; indext++) {
                   tdschead = tdscheadBeans.item(indext);
-                  PromotionUtils.custAndDate(custTypeCode, dbAdapter,tdschead.FromNo).then((plans) => {
+                  PromotionUtils.custAndDate(custTypeCode, dbAdapter,tdschead.FormNo).then((plans) => {
                     if (plans.length != 0) {
                       planList = plans;
                     }
                     for (let planIndex = 0; planIndex < planList.length; planIndex++) {//遍历所有商品，取出最大优惠
-                      //console.log("mz2=", tdschead)
+                      console.log("mz2=", tdschead)
                       let dtAll = tdschead.dtAll;
                       if ("1" == dtAll) {
                         //System.out.println("全场");
@@ -49,13 +49,17 @@ export default class MZPromotionManger {
                         let dtBrand = tdschead.dtBrand;
                         let dtProd = tdschead.dtProd;
                         if ("1" == dtDep) {
-                          promises.push(dbAdapter.selectTDscDep(productBean.DepCode))
+                          promises.push(dbAdapter.selectTDscDep(productBean.DepCode));
+                            console.log("aaa=");
                         } else if ("1" == dtSupp) {
-                          promises.push(dbAdapter.selectTDscSupp(productBean.SuppCode))
+                          promises.push(dbAdapter.selectTDscSupp(productBean.SuppCode));
+                            console.log("bbb=");
                         } else if ("1" == dtBrand) {
-                          promises.push(dbAdapter.selectTDscBrand(productBean.BrandCode))
+                          promises.push(dbAdapter.selectTDscBrand(productBean.BrandCode));
+                            console.log("ccc=");
                         } else if ("1" == dtProd) {
-                          promises.push(dbAdapter.selectTDscProd(productBean.ProdCode))
+                          promises.push(dbAdapter.selectTDscProd(productBean.ProdCode));
+                            console.log("ddd=");
                         }
                       }
                     }
@@ -68,6 +72,7 @@ export default class MZPromotionManger {
                                 MZPromotionManger.shopNum = 0;
                                 MZPromotionManger.shopTotal = 0;
                                 resolve(result);
+                                  // console.log("result=",result);
                               }
                             });
                           }
@@ -77,7 +82,7 @@ export default class MZPromotionManger {
                   });
                 }
               }else{
-              
+                  console.log("abc=");
               }
             }
             
@@ -89,6 +94,7 @@ export default class MZPromotionManger {
   static shopTotal=0;
   static shopNum=0;
   static initData(productBean, tdschead) {
+    let results = [];
     return new Promise((resolve, reject) => {
       MZPromotionManger.shopNum += productBean.ShopNumber;
       MZPromotionManger.shopTotal +=productBean.ShopAmount;
@@ -96,7 +102,9 @@ export default class MZPromotionManger {
       conditionType = tdschead.ConditionType;
       //let price =
       let countMZPrice = MZPromotionManger.countMZPrice(tdschead);
-      resolve(countMZPrice);
+      results.push(countMZPrice)
+      results.push(formNo)
+      resolve(results);
     });
     
     //if (currentDiscountPrice < price) {
@@ -123,7 +131,7 @@ export default class MZPromotionManger {
         return (tdscheadBean.Con2);
       }
     } else {
-      return (0);
+      return (-1);
     }
   }
   

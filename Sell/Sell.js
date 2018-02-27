@@ -144,12 +144,12 @@ export default class Sell extends Component {
     }
 
     Return() {
-        this.props.navigator.pop();
-        // var nextRoute = {
-        //     name: "Index",
-        //     component: Index,
-        // };
-        // this.props.navigator.push(nextRoute);
+        // this.props.navigator.pop();
+        var nextRoute = {
+            name: "Index",
+            component: Index,
+        };
+        this.props.navigator.push(nextRoute);
     }
 
     Device(){

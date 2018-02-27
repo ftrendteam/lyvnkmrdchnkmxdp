@@ -79,10 +79,12 @@ export default class  login extends Component{
                        var Items=Url.replace('/WEBSERVICE/FTRENDWS.ASMX?WSDL',"");
                        var NullItems=Items.replace(/\s/g, "");
                        Storage.save('Url',NullItems);
+                       // console.log('NullItems=',NullItems)
                        var data='/FMJsonInterfaceByDownToPos';
                        var date=items+'/FMJsonInter faceByDownToPos';//拼接字符
                        var replace = date.replace(/\s/g, "");
                        Storage.save('LinkUrl',replace);
+                       // console.log('LinkUrl1=',replace)
                     }
                     RNAndroidIMEI.getAndroidIMEI();
                     Storage.save('ClientCode',this.state.ClientCode);

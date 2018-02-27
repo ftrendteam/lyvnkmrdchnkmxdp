@@ -24,6 +24,8 @@ import Sell from "../Sell/Sell";
 import DPPromotionManager from "../Sell/promotion/DPPromotionManager";
 import BGPromotionManager from "../Sell/promotion/BGPromotionManager";
 import MJPromotionManger from "../Sell/promotion/MJPromotionManger";
+import MZPromotionManger from "../Sell/promotion/MZPromotionManger";
+import BPPromotionsManger from "../Sell/promotion/BPPromotionsManger";
 import NetUtils from "../utils/NetUtils";
 import FetchUtil from "../utils/FetchUtils";
 import Storage from "../utils/Storage";
@@ -45,6 +47,7 @@ export default class Pay extends Component {
             LayerShow: false,
             ModalShow: false,
             NewAllPrice:false,
+            MZPrice:false,
             CardFaceNo: "",
             CardPwd: "",
             name: "",
@@ -63,6 +66,7 @@ export default class Pay extends Component {
             ShopNewAmount:"",
             NewPrice:"",
             discount:"",
+            ShopPrice:"",
             VipCardNo: this.props.VipCardNo ? this.props.VipCardNo : "",
             JfBal: this.props.JfBal ? this.props.JfBal : "",
             BalanceTotal: this.props.BalanceTotal ? this.props.BalanceTotal : "",
@@ -72,6 +76,7 @@ export default class Pay extends Component {
             vipData:this.props.vipData ? this.props.vipData : "",
             dataRows: this.props.dataRows ? this.props.dataRows : "",
             dataSource: new ListView.DataSource({rowHasChanged: (r1, r2) => true}),
+            DataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
         }
         this.dataRows = [];
         this.productData = [];
@@ -113,6 +118,13 @@ export default class Pay extends Component {
 
     ModalButton() {
         this.ModalShow();
+    }
+
+    MZPrice(){
+        let isShow = this.state.MZPrice;
+        this.setState({
+            MZPrice: !isShow,
+        })
     }
 //整单优惠
     NewAllPrice(){
@@ -211,19 +223,7 @@ export default class Pay extends Component {
     //     };
     // }
 
-    componentDidMount() {
-        // this.setState({
-        //     pressStatus:'pressin',
-        //     PressStatus:'0',
-        // });
-        //
-        // this.setState({
-        //     pressStatus:'pressin',
-        //     PressStatus:'0',
-        // });
-        // this.setState({
-        //     amount:this.state.ShopAmount
-        // })
+    componentDidMount(){
         Storage.get('Name').then((tags) => {
             this.setState({
                 name: tags
@@ -239,17 +239,19 @@ export default class Pay extends Component {
         let promises=[];
         let BGPromotion=[];
         let MJPromotion=[];
+        let bpPromotons=[]
         for (let i = 0; i < rows.length; i++) {
             var row = rows[i];
             if (this.state.VipCardNo !== "") {
                 promises.push(DPPromotionManager.dp(this.state.CardTypeCode, row, dbAdapter));
                 BGPromotion.push(BGPromotionManager.BGPromotion(this.state.CardTypeCode, row, dbAdapter));
+                bpPromotons.push(BPPromotionsManger.bpPromotons(row, this.state.CardTypeCode, dbAdapter));
             }else if(this.state.VipCardNo == ""){
                 promises.push(DPPromotionManager.dp("*", row, dbAdapter));
                 BGPromotion.push(BGPromotionManager.BGPromotion("*", row, dbAdapter));
+                bpPromotons.push(BPPromotionsManger.bpPromotons(row, "*", dbAdapter));
             }
         }
-
         //单品促销
         new Promise.all(promises).then((rows)=> {
             var Datafasle;
@@ -262,52 +264,116 @@ export default class Pay extends Component {
                 }
             }
             if(Datafasle==false){
-
-
                 //分组促销
-                new Promise.all(BGPromotion).then((rows) => {
-                    var BGDatafasle;
-                    for(let i = 0;i<rows.length; i++){
-                        var row=rows[0];
-                        if(row==true){
-                            BGDatafasle=true;
-                        }else if(row==false){
-                            BGDatafasle=false;
-                        }
+                // new Promise.all(BGPromotion).then((rows) => {
+                //     var BGDatafasle;
+                //     for(let i = 0;i<rows.length; i++){
+                //         var row=rows[0];
+                //         console.log('abc=',row)
+                //         if(row==true){
+                //             BGDatafasle=true;
+                //         }else if(row==false){
+                //             BGDatafasle=false;
+                //         }
+                //     }
+                //     console.log('BGDatafasle=', BGDatafasle);
+                //     if(BGDatafasle==false){
+                //         //满减促销
+
+                //     }else{
+                //         for(let i = 0;i<this.state.dataRows.length;i++) {
+                //             var Rows = this.state.dataRows[i];
+                //             // console.log('DataRows=',Rows);
+                //             this.DisCount.push(Rows);
+                //             ShopPrice = Rows.ShopAmount;
+                //             shopAmount += ShopPrice;
+                //         }
+                //         this.setState({
+                //             ShopAmount: shopAmount,
+                //             amount:shopAmount,
+                //         })
+                //     }
+                // })
+
+
+                //满减促销
+                // MJPromotionManger.MJPromotion(this.state.dataRows,"*",dbAdapter).then((rows) => {
+                //     if(rows==false){
+                //         //满赠促销
+                //     }else{
+                //         for(let i = 0;i<this.state.dataRows.length;i++) {
+                //             var Rows = this.state.dataRows[i];
+                //             console.log('DataRows=',Rows);
+                //             this.DisCount.push(Rows);
+                //             ShopPrice = Rows.ShopAmount;
+                //             shopAmount += ShopPrice;
+                //         }
+                //         this.setState({
+                //             ShopAmount: shopAmount,
+                //             amount:shopAmount,
+                //         })
+                //     }
+                //
+                // })
+
+                //满赠促销
+                // MZPromotionManger.mzPromotion("*",this.state.dataRows,dbAdapter).then((rows)=>{
+                //     // console.log('rows=',rows)
+                //     for(let i = 0;i<this.state.dataRows.length;i++) {
+                //         var Rows = this.state.dataRows[i];
+                //         // console.log('DataRows=',Rows);
+                //         this.DisCount.push(Rows);
+                //         ShopPrice = Rows.ShopAmount;
+                //         shopAmount += ShopPrice;
+                //     }
+                //     this.setState({
+                //         ShopPrice:rows[0],
+                //         ShopAmount: shopAmount,
+                //         amount:shopAmount,
+                //     })
+                //
+                //     let ShopPrice=[];
+                //     if(rows.length==2){
+                //         dbAdapter.selectTdscPresent(rows[1]).then((rows) => {
+                //             ShopPrice.push(rows.item(0))
+                //             this.setState({
+                //                 DataSource: this.state.DataSource.cloneWithRows(ShopPrice),
+                //             })
+                //             this.MZPrice();
+                //
+                //         })
+                //     }else{
+                //         //买赠促销
+                //     }
+                // })
+
+                //买赠促销
+                new Promise.all(bpPromotons).then((rows)=> {
+                    console.log('MZ=',rows[0]);
+                    for(let i = 0;i<this.state.dataRows.length;i++) {
+                        var Rows = this.state.dataRows[i];
+                        // console.log('DataRows=',Rows);
+                        this.DisCount.push(Rows);
+                        ShopPrice = Rows.ShopAmount;
+                        shopAmount += ShopPrice;
                     }
-                    console.log('BGDatafasle=', BGDatafasle);
-                    if(BGDatafasle==false){
-                        //满减促销
-                        MJPromotionManger.MJPromotion(this.state.dataRows,"*",dbAdapter).then((rows) => {
-                            console.log("MJProduct=",this.state.dataRows)
-                            for(let i = 0;i<this.state.dataRows.length;i++) {
-                                var Rows = this.state.dataRows[i];
-                                console.log('DataRows=',Rows);
-                                this.DisCount.push(Rows);
-                                ShopPrice = Rows.ShopAmount;
-                                shopAmount += ShopPrice;
-                            }
+                    this.setState({
+                        ShopAmount: shopAmount,
+                        amount:shopAmount,
+                    })
+                    let MZShopPrice=[];
+                    if(rows.length>=1){
+                        dbAdapter.selectTdscPresent(rows[0]).then((rows) => {
+                            MZShopPrice.push(rows.item(0))
+                            console.log('MZShopPrice=',MZShopPrice)
                             this.setState({
-                                ShopAmount: shopAmount,
-                                amount:shopAmount,
+                                DataSource: this.state.DataSource.cloneWithRows(MZShopPrice),
                             })
-
-                        })
-
-                    }else{
-                        for(let i = 0;i<this.state.dataRows.length;i++) {
-                            var Rows = this.state.dataRows[i];
-                            // console.log('DataRows=',Rows);
-                            this.DisCount.push(Rows);
-                            ShopPrice = Rows.ShopAmount;
-                            shopAmount += ShopPrice;
-                        }
-                        this.setState({
-                            ShopAmount: shopAmount,
-                            amount:shopAmount,
+                            this.MZPrice();
                         })
                     }
                 })
+
             }else{
                 for(let i = 0;i<this.state.dataRows.length;i++) {
                     var Rows = this.state.dataRows[i];
@@ -393,7 +459,11 @@ export default class Pay extends Component {
 
     Return() {
         if (this.state.CardFaceNo == "") {
-            this.props.navigator.pop();
+            var nextRoute = {
+                name: "Index",
+                component: Index,
+            };
+            this.props.navigator.push(nextRoute);
         } else {
             ToastAndroid.show('订单未完成', ToastAndroid.SHORT)
         }
@@ -430,6 +500,45 @@ export default class Pay extends Component {
                 <View style={styles.Row}><Text style={styles.Name}>{rowData.ReferenceNo}</Text></View>
             </View>
         );
+    }
+
+    ShopPrice(rowData, sectionID, rowID) {
+        return (
+            <TouchableOpacity style={styles.ShopPRice} onPress={() => this.ShopAmount(rowData)}>
+                <View style={styles.Row}><Text style={styles.Name}>{rowData.ProdName}</Text></View>
+                <View style={styles.Row}><Text style={styles.Name}>{rowData.StdPrice}</Text></View>
+                <View style={styles.Row}><Text style={styles.Name}>{rowData.FormNo}</Text></View>
+            </TouchableOpacity>
+        );
+    }
+    ShopAmount(rowData){
+        var shopInfoData = [];
+        var shopInfo = {};
+        shopInfo.Pid = "";
+        shopInfo.ProdCode= rowData.ProdCode;
+        shopInfo.prodname = rowData.ProdName;
+        shopInfo.countm = "";
+        shopInfo.ShopPrice = rowData.StdPrice;
+        shopInfo.prototal = "";
+        shopInfo.promemo = "";
+        shopInfo.DepCode = "";
+        shopInfo.ydcountm = "";
+        shopInfo.SuppCode = "";
+        shopInfo.BarCode = "";
+        shopInfoData.push(shopInfo);
+        //调用插入表方法
+        dbAdapter.insertShopInfo(shopInfoData);
+        this.MZPrice();
+        var AllShop= this.state.ShopAmount+this.state.ShopPrice;
+        console.log('AllShop=',AllShop)
+        this.setState({
+            ShopAmount: AllShop,
+            amount:AllShop,
+        })
+    }
+
+    ShopClose(){
+        this.MZPrice();
     }
 
     HorButton(item) {
@@ -1612,6 +1721,41 @@ export default class Pay extends Component {
                             </View>
                         </Image>
                     </Modal>
+                    <Modal
+                        transparent={true}
+                        visible={this.state.MZPrice}
+                        onShow={() => {
+                        }}
+                        onRequestClose={() => {
+                        }}>
+                        <View style={styles.MemberBounces}>
+                            <View style={styles.Cont}>
+                                <View style={styles.BouncesTitle}>
+                                    <Text style={[styles.TitleText, {fontSize: 18}]}>添加{this.state.ShopPrice}元 赠送以下商品</Text>
+                                </View>
+                                <View style={styles.ShopAmount}>
+                                    <View style={styles.ShopName}>
+                                        <Text style={styles.ShopText}>商品名</Text>
+                                    </View>
+                                    <View style={styles.ShopName}>
+                                        <Text style={styles.ShopText}>数量</Text>
+                                    </View>
+                                    <View style={styles.ShopName}>
+                                        <Text style={styles.ShopText}>组号</Text>
+                                    </View>
+                                </View>
+                                <ListView
+                                    style={styles.ShopData}
+                                    dataSource={this.state.DataSource}
+                                    showsVerticalScrollIndicator={true}
+                                    renderRow={this.ShopPrice.bind(this)}
+                                />
+                                <TouchableOpacity style={styles.ShopDataClose} onPress={this.ShopClose.bind(this)}>
+                                    <Text style={styles.PageRowText}>取消</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </Modal>
                 </ScrollView>
             </View>
         );
@@ -1619,6 +1763,38 @@ export default class Pay extends Component {
 }
 
 const styles = StyleSheet.create({
+    ShopDataClose:{
+        marginLeft:30,
+        marginRight:30,
+        paddingTop:10,
+        paddingBottom:10,
+        backgroundColor: "#ff4e4e",
+        borderRadius: 5,
+    },
+    ShopAmount:{
+        paddingTop:10,
+        paddingBottom:10,
+        flexDirection:"row",
+    },
+    ShopName:{
+        flex:1
+    },
+    ShopText:{
+        color: "#666666",
+        fontSize: 16,
+        textAlign: "center"
+    },
+    ShopPRice: {
+        paddingTop: 5,
+        paddingBottom: 5,
+        backgroundColor: "#ffffff",
+        borderBottomWidth: 1,
+        borderBottomColor: "#f2f2f2",
+        flexDirection: "row",
+    },
+    ShopData:{
+        height:180,
+    },
     NewPriceList:{
         flexDirection:"row",
         paddingLeft:20,

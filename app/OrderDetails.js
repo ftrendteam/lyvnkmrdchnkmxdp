@@ -7,6 +7,7 @@
 import React, {Component} from 'react';
 import {Image, ScrollView, StyleSheet, Text, TextInput, ToastAndroid, TouchableOpacity, View,} from 'react-native';
 import Index from "./Index";
+import ShoppingCart from "./ShoppingCart";
 import Search from "./Search";
 import Sell from "../Sell/Sell";
 import NumberUtils from "../utils/NumberUtils";

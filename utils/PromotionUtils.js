@@ -43,7 +43,7 @@ export default class PromotionUtils {
                 }
                 //console.log("a=",DateUtils.compareDate(endDate, DateUtils.getDate()));
                 //console.log((DateUtils.compareDate(DateUtils.getDate(), beginDate)));
-                //console.log(c)
+                // console.log('c=',c)
                 //console.log(!(DateUtils.compare2HMS(DateUtils.getHSM(), endTime)))
                 //console.log(DateUtils.compare2HMS(DateUtils.getHSM(), beginTime))
                 if (DateUtils.compareDate(endDate, DateUtils.getDate()) && (DateUtils.compareDate(DateUtils.getDate(), beginDate)) && c == 1) {
