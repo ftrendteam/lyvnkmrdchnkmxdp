@@ -6,6 +6,7 @@ let planList = [];
 export default class BPPromotionsManger {
   
   static bpPromotons(productBean, custTypeCode, dbAdapter) {
+      console.log('123=')
     return new Promise((resolve, reject) => {
       dbAdapter.selectTdscHead("BP").then((tdscheadBeans) => {
         for (let i = 0; i < tdscheadBeans.length; i++) {
@@ -16,12 +17,14 @@ export default class BPPromotionsManger {
           if (1 == dtCust) {//全场促销
             PromotionUtils.custAndDate(custTypeCode, dbAdapter,FromNo).then((plans) => {
               planList = plans;
+              console.log('plans=',plans)
             });
           } else {
             PromotionUtils.custAndDate(custTypeCode, dbAdapter,FromNo).then((plans) => {
               planList = plans;
               BPPromotionsManger.isHasGiveShop(productBean, dbAdapter).then((giveFormNo) => {
                 resolve(giveFormNo);
+                  console.log('giveFormNo=',giveFormNo)
               });
             });
           }

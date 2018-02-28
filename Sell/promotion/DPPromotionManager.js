@@ -22,7 +22,7 @@ export default class DPPromotionManager {
        let dscPrice = 0;
       // console.log('wtf=',productBean)
       DPPromotionManager.isContainCustType(cardTypeCode,dbAdapter,prodCode).then((result)=>{
-        // console.log("result=",result)
+        console.log("result=",result)
         if (result) {
           dbAdapter.selectTDscProd(prodCode).then((tDscProdBeans) => {
             if (tDscProdBeans != null) {
@@ -65,14 +65,14 @@ export default class DPPromotionManager {
               productBean.ShopAmount = Number(shopNewTotal);
               productBean.ShopPrice = dscPrice;
               resolve(productBean);
-              // console.log('ccc=',productBean)
+              console.log('ccc=',productBean)
             }else{
               resolve(false);
-              // console.log("aaaa")
+              console.log("aaaa")
             }
           });
         }else{
-              // console.log("bbbbb")
+          console.log("bbbbb")
           resolve(false);
         }
       });
@@ -85,8 +85,10 @@ export default class DPPromotionManager {
     return new Promise((resolve, reject)=>{
       let promises = [];
       dbAdapter.selectTDscCust(cardTypeCode).then((tDscCustBeans) => {
+          console.log('length=',tDscCustBeans.length);
+          console.log('tDscCustBeans=',tDscCustBeans);
         if (tDscCustBeans != null && tDscCustBeans.length != 0) {
-         for (let i = 0; i < tDscCustBeans.length; i++) {
+          for (let i = 0; i < tDscCustBeans.length; i++) {
             promises.push(dbAdapter.selectTDscPlan(tDscCustBeans.item(i).FormNo));
           }
           new Promise.all(promises).then((promiseResults) => {
@@ -125,11 +127,13 @@ export default class DPPromotionManager {
                     });
                   }else{
                       resolve(false);
+                      console.log("ytt2");
                       return;
                   }
                  
                 }else{
                     resolve(false);
+                    console.log("ytt1");
                     return;
                 }
                 
@@ -139,6 +143,7 @@ export default class DPPromotionManager {
           });
         }else{
             resolve(false);
+            console.log("ytt");
             return;
         }
       });
