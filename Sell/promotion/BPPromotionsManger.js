@@ -12,7 +12,7 @@ export default class BPPromotionsManger {
           let tdschead = tdscheadBeans.item(i);
           let dtCust = tdschead.dtCust;
           let FromNo = tdschead.FormNo;
-          console.log("bp=",dtCust)
+          // console.log("bp=",dtCust)
           if (1 == dtCust) {//全场促销
             PromotionUtils.custAndDate(custTypeCode, dbAdapter,FromNo).then((plans) => {
               planList = plans;

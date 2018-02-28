@@ -349,7 +349,7 @@ export default class Pay extends Component {
 
                 //买赠促销
                 new Promise.all(bpPromotons).then((rows)=> {
-                    console.log('MZ=',rows[0]);
+                    // console.log('MZ=',rows[0]);
                     for(let i = 0;i<this.state.dataRows.length;i++) {
                         var Rows = this.state.dataRows[i];
                         // console.log('DataRows=',Rows);
@@ -365,7 +365,7 @@ export default class Pay extends Component {
                     if(rows.length>=1){
                         dbAdapter.selectTdscPresent(rows[0]).then((rows) => {
                             MZShopPrice.push(rows.item(0))
-                            console.log('MZShopPrice=',MZShopPrice)
+                            // console.log('MZShopPrice=',MZShopPrice)
                             this.setState({
                                 DataSource: this.state.DataSource.cloneWithRows(MZShopPrice),
                             })
@@ -439,7 +439,7 @@ export default class Pay extends Component {
                     amount:this.state.ShopAmount,
                     VipPrice:vipData,
                 })
-                console.log("123")
+                // console.log("123")
             }
         })
 
@@ -453,7 +453,7 @@ export default class Pay extends Component {
             this.setState({
                 data: priductData,
             })
-            console.log("456")
+            // console.log("456")
         });
     }
 
@@ -511,6 +511,8 @@ export default class Pay extends Component {
             </TouchableOpacity>
         );
     }
+
+    //满赠 买赠促销商品插入shopinfo表
     ShopAmount(rowData){
         var shopInfoData = [];
         var shopInfo = {};
@@ -530,7 +532,7 @@ export default class Pay extends Component {
         dbAdapter.insertShopInfo(shopInfoData);
         this.MZPrice();
         var AllShop= this.state.ShopAmount+this.state.ShopPrice;
-        console.log('AllShop=',AllShop)
+        // console.log('AllShop=',AllShop)
         this.setState({
             ShopAmount: AllShop,
             amount:AllShop,
