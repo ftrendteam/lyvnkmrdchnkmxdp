@@ -34,10 +34,11 @@ import FetchUtil from "../utils/FetchUtils";
 import VipPrice from "../utils/VipPrice";
 import NumFormatUtils from "../utils/NumFormatUtils";
 import { SwipeListView } from 'react-native-swipe-list-view';
-
 let decodepreprint = new DeCodePrePrint18();
 let dbAdapter = new DBAdapter();
-
+import MZPromotionManger from '../Sell/promotion/MZPromotionManger';
+import BPPromotionsManger from '../Sell/promotion/BPPromotionsManger';
+import MJPromotionManger from '../Sell/promotion/MJPromotionManger'
 var {NativeModules} = require('react-native');
 var RNScannerAndroid = NativeModules.RNScannerAndroid;
 var TblRow1;
@@ -127,6 +128,11 @@ export default class Sell extends Component {
                     this.TblRow.push(row);
                 }
             }
+          //MZPromotionManger.mzPromotion("*",this.dataRow,dbAdapter);
+          //MJPromotionManger.MJPromotion(this.dataRow,"*",dbAdapter).then((cc)=>{
+          //      console.log("wtf===",cc)
+          //});
+          BPPromotionsManger.bpPromotons(row,"*",dbAdapter);
             if (this.dataRow == 0) {
                 this.modal();
                 return;
@@ -172,7 +178,7 @@ export default class Sell extends Component {
                                 var VIPprice = this.state.ShopAmount-vipPrice;
                                 var ShopPrice = row.StdPrice;
                                 var prototal=this.state.Countm*row.StdPrice;
-                                var number = row.countm;
+                                var number = row.ShopNumber;
                                 shopnumber = this.state.Countm+this.state.ShopNumber;
                                 var DataRows = {
                                     'ProdCode':row.ProdCode,
@@ -225,7 +231,7 @@ export default class Sell extends Component {
                         var VIPprice = this.state.ShopAmount-vipPrice;
                         var ShopPrice = row.StdPrice;
                         var prototal=this.state.Countm*row.StdPrice;
-                        var number = row.countm;
+                        var number = row.ShopNumber;
                         shopnumber = this.state.Countm+this.state.ShopNumber;
                         var DataRows = {
                             'ProdCode':row.ProdCode,
@@ -521,7 +527,7 @@ export default class Sell extends Component {
                     var row = rows.item(i);
                     var ShopPrice = row.ShopPrice;
                     var prototal=this.state.Countm*row.ShopPrice;
-                    var number = row.countm;
+                    var number = row.ShopNumber;
                     shopnumber = this.state.Countm+this.state.ShopNumber;
                     var DataRows = {
                         'ProdCode':row.ProdCode,
