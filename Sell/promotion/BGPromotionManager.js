@@ -25,6 +25,7 @@ export default class BGPromotionManager {
                     let dscValue = tdscheadBean.DscValue;
                     let priceMode = tdscheadBean.PriceMode;
                     let dscType = tdscheadBean.DscType;
+                    //console.log("sdfasdf="dscValue)
                     BGPromotionManager.b(productBean, dscValue, dscType, priceMode);
                     if (i == tdscheadBeans.length - 1) {
                       resolve(productBean);
