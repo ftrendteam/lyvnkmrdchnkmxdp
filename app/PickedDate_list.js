@@ -47,6 +47,7 @@ export default class PickedDate_list extends Component {
                 for(let i =0;i<rows.length;i++){
                     var row = rows.item(i);
                     this.dataRows.push(row);
+                    console.log(this.dataRows)
                 }
                 this.setState({
                     dataSource:this.state.dataSource.cloneWithRows(this.dataRows)

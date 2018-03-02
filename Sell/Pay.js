@@ -254,6 +254,7 @@ export default class Pay extends Component {
         }
         //单品促销
         new Promise.all(promises).then((rows)=> {
+            console.log('aaa',rows)
             var Datafasle;
             for(let i = 0;i<rows.length; i++){
                 var row=rows[0];
@@ -263,6 +264,7 @@ export default class Pay extends Component {
                     Datafasle=false;
                 }
             }
+            console.log('Datafasle=',Datafasle)
             if(Datafasle==false){
                 //分组促销
                 // new Promise.all(BGPromotion).then((rows) => {
@@ -348,36 +350,36 @@ export default class Pay extends Component {
                 // })
 
                 //买赠促销
-                new Promise.all(bpPromotons).then((rows)=> {
-                    // console.log('MZ=',rows[0]);
-                    for(let i = 0;i<this.state.dataRows.length;i++) {
-                        var Rows = this.state.dataRows[i];
-                        // console.log('DataRows=',Rows);
-                        this.DisCount.push(Rows);
-                        ShopPrice = Rows.ShopAmount;
-                        shopAmount += ShopPrice;
-                    }
-                    this.setState({
-                        ShopAmount: shopAmount,
-                        amount:shopAmount,
-                    })
-                    let MZShopPrice=[];
-                    if(rows.length>=1){
-                        dbAdapter.selectTdscPresent(rows[0]).then((rows) => {
-                            MZShopPrice.push(rows.item(0))
-                            // console.log('MZShopPrice=',MZShopPrice)
-                            this.setState({
-                                DataSource: this.state.DataSource.cloneWithRows(MZShopPrice),
-                            })
-                            this.MZPrice();
-                        })
-                    }
-                })
+                // new Promise.all(bpPromotons).then((rows)=> {
+                //     console.log('MZ=',rows[0]);
+                //     for(let i = 0;i<this.state.dataRows.length;i++) {
+                //         var Rows = this.state.dataRows[i];
+                //         console.log('DataRows111=',Rows);
+                //         this.DisCount.push(Rows);
+                //         ShopPrice = Rows.ShopAmount;
+                //         shopAmount += ShopPrice;
+                //     }
+                //     this.setState({
+                //         ShopAmount: shopAmount,
+                //         amount:shopAmount,
+                //     })
+                //     let MZShopPrice=[];
+                //     if(rows.length>=1){
+                //         dbAdapter.selectTdscPresent(rows[0]).then((rows) => {
+                //             MZShopPrice.push(rows.item(0))
+                //             // console.log('MZShopPrice=',MZShopPrice)
+                //             this.setState({
+                //                 DataSource: this.state.DataSource.cloneWithRows(MZShopPrice),
+                //             })
+                //             this.MZPrice();
+                //         })
+                //     }
+                // })
 
             }else{
                 for(let i = 0;i<this.state.dataRows.length;i++) {
                     var Rows = this.state.dataRows[i];
-                    // console.log('DataRows=',Rows);
+                    console.log('DataRows=',Rows);
                     this.DisCount.push(Rows);
                     ShopPrice = Rows.ShopAmount;
                     shopAmount += ShopPrice;
