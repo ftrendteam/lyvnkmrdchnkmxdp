@@ -43,6 +43,13 @@ export default class MZPromotionManger {
                       let dtAll = tdschead.dtAll;
                       if ("1" == dtAll) {
                         //System.out.println("全场");
+                        MZPromotionManger.initData(productBeans[i], tdschead).then((result) => {
+                          if (i == results.length - 1) {
+                            MZPromotionManger.shopNum = 0;
+                            MZPromotionManger.shopTotal = 0;
+                            resolve(result);
+                          }
+                        });
                       } else if ("0" == dtAll) {
                         let dtDep = tdschead.dtDep;
                         let dtSupp = tdschead.dtSupp;
@@ -85,7 +92,6 @@ export default class MZPromotionManger {
                   console.log("abc=");
               }
             }
-            
           });
         }
       });

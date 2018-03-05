@@ -4,7 +4,6 @@
 import PromotionUtils from '../../utils/PromotionUtils';
 let planList = [];
 export default class BPPromotionsManger {
-  
   static bpPromotons(productBean, custTypeCode, dbAdapter) {
     return new Promise((resolve, reject) => {
       dbAdapter.selectTdscHead("BP").then((tdscheadBeans) => {
@@ -31,7 +30,6 @@ export default class BPPromotionsManger {
         }
       });
     })
-    
   }
   
   static isHasGiveShop(productBean, dbAdapter) {
