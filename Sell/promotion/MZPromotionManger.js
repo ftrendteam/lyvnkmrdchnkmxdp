@@ -93,6 +93,8 @@ export default class MZPromotionManger {
               }
             }
           });
+        }else{
+          return (-1);
         }
       });
     });

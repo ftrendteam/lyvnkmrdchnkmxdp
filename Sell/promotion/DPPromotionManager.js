@@ -21,10 +21,6 @@ export default class DPPromotionManager {
       let barCode = productBean.BarCode;
        let dscPrice = 0;
      dbAdapter.selectTdscHead("DP").then((formTypes)=>{
-         if(formTypes.length==0){
-             resolve(false);
-             return;
-         }
         for(let i = 0;i<formTypes.length;i++){
           let item = formTypes.item(i);
           let formNo = item.FormNo;
@@ -37,7 +33,7 @@ export default class DPPromotionManager {
                   let curr1 = tDscProdBean.Curr1;
                   let str1 = tDscProdBean.Str1;
                   dscPrice = tDscProdBean.DscPrice;
-                  // console.log("ad=", tDscProdBean)
+                  //console.log("ad=", tDscProdBean)
                   if (0 == str1) {
                     // console.log("ad=")
                     shopNewTotal = BigDecimalUtils.multiply(shopNum,
@@ -70,7 +66,7 @@ export default class DPPromotionManager {
                     }
                   }
                   productBean.ShopAmount = Number(shopNewTotal);
-                  // console.log("dp=",productBean.ShopAmount)
+                  console.log("dp=",productBean.ShopAmount)
                   //productBean.ShopPrice = dscPrice;
                   resolve(productBean);
                   // console.log('ccc=',productBean)
