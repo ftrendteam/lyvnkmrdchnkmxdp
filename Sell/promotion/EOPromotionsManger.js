@@ -90,7 +90,7 @@ export default class EOPromotionsManger {
               //重新赋值商品价格
               for(let m = 0;m<productBeans.length;m++){
                 if (productBeans[m].Pid==shopList[j].pid) {
-                  productBeans[m].ShopAmount = Numbers(hopList[j].prototal);
+                  productBeans[m].ShopAmount = Number(shopList[j].prototal);
                 }
     
               }

@@ -268,154 +268,148 @@ export default class Pay extends Component {
             console.log('Datafasle=',Datafasle)
             if(Datafasle==false){
                 //分组促销
-                // new Promise.all(BGPromotion).then((rows) => {
-                //     var BGDatafasle;
-                //     for(let i = 0;i<rows.length; i++){
-                //         var row=rows[0];
-                //         console.log('abc=',rows)
-                //         if(row==true){
-                //             BGDatafasle=true;
-                //         }else if(row==false){
-                //             BGDatafasle=false;
-                //         }
-                //     }
-                //     console.log('BGDatafasle=', BGDatafasle);
-                //     if(BGDatafasle==false){
-                //         //满减促销
-                //         console.log('DataRows=',this.state.dataRows);
-                //
-                //     }else{
-                //         for(let i = 0;i<this.state.dataRows.length;i++) {
-                //             var Rows = this.state.dataRows[i];
-                //             console.log('DataRows=',Rows);
-                //             this.DisCount.push(Rows);
-                //             ShopPrice = Rows.ShopAmount;
-                //             shopAmount += ShopPrice;
-                //         }
-                //         this.setState({
-                //             ShopAmount: shopAmount,
-                //             amount:shopAmount,
-                //         })
-                //     }
-                // })
+                new Promise.all(BGPromotion).then((rows) => {
+                    // var BGDatafasle;
+                    // for(let i = 0;i<rows.length; i++){
+                    //     var row=rows[0];
+                    //     console.log('abc=',rows)
+                    //     if(row==true){
+                    //         BGDatafasle=true;
+                    //     }else if(row==false){
+                    //         BGDatafasle=false;
+                    //     }
+                    // }
+                    // console.log('BGDatafasle=', BGDatafasle);
+                    var Fenzu = 0;
+                    var FenzuAmount = 0;
+                    for(let i = 0;i<this.state.dataRows.length;i++) {
+                        var Rows = this.state.dataRows[i];
+                        console.log('分组=',Rows);
+                        this.DisCount.push(Rows);
+                        Fenzu = Rows.ShopAmount;
+                        FenzuAmount += Fenzu;
+                    }
+                    this.setState({
+                        ShopAmount: FenzuAmount,
+                        amount:FenzuAmount,
+                    })
+                })
 
                 //满减促销
-                // MJPromotionManger.MJPromotion(this.state.dataRows,"*",dbAdapter).then((rows) => {
-                //     console.log('rows=',rows)
-                //     if(rows==false){
-                //         //满赠促销
-                //     }else{
-                //         for(let i = 0;i<this.state.dataRows.length;i++) {
-                //             var Rows = this.state.dataRows[i];
-                //             console.log('DataRows=',Rows);
-                //             this.DisCount.push(Rows);
-                //             ShopPrice = Rows.ShopAmount;
-                //             shopAmount += ShopPrice;
-                //         }
-                //         this.setState({
-                //             ShopAmount: shopAmount,
-                //             amount:shopAmount,
-                //         })
-                //     }
-                //
-                // })
+                MJPromotionManger.MJPromotion(this.state.dataRows,"*",dbAdapter).then((rows) => {
+                    var Manjian = 0;
+                    var ManJian = 0;
+                    for(let i = 0;i<this.state.dataRows.length;i++) {
+                        var Rows = this.state.dataRows[i];
+                        console.log('满减=',Rows);
+                        this.DisCount.push(Rows);
+                        Manjian = Rows.ShopAmount;
+                        ManJian += Manjian;
+                    }
+                    this.setState({
+                        ShopAmount: ManJian,
+                        amount:ManJian,
+                    })
+
+                })
 
                 //满赠促销
-                // MZPromotionManger.mzPromotion("*",this.state.dataRows,dbAdapter).then((rows)=>{
-                //     console.log('rows=',rows)
-                //     for(let i = 0;i<this.state.dataRows.length;i++) {
-                //         var Rows = this.state.dataRows[i];
-                //         console.log('DataRows=',Rows);
-                //         this.DisCount.push(Rows);
-                //         ShopPrice = Rows.ShopAmount;
-                //         shopAmount += ShopPrice;
-                //     }
-                //     this.setState({
-                //         ShopPrice:rows[0],
-                //         ShopAmount: shopAmount,
-                //         amount:shopAmount,
-                //     })
-                //
-                //     let ShopPrice=[];
-                //     if(rows.length==2){
-                //         dbAdapter.selectTdscPresent(rows[1]).then((rows) => {
-                //             ShopPrice.push(rows.item(0))
-                //             console.log('ShopPrice=',ShopPrice)
-                //             this.setState({
-                //                 DataSource: this.state.DataSource.cloneWithRows(ShopPrice),
-                //             })
-                //             this.MZPrice();
-                //
-                //         })
-                //     }else{
-                //         //买赠促销
-                //     }
-                // })
+                MZPromotionManger.mzPromotion("*",this.state.dataRows,dbAdapter).then((rows)=>{
+                    console.log('rows=',rows)
+                    var Manze = 0;
+                    var ManZe = 0;
+                    for(let i = 0;i<this.state.dataRows.length;i++) {
+                        var Rows = this.state.dataRows[i];
+                        console.log('满赠=',Rows);
+                        this.DisCount.push(Rows);
+                        Manze = Rows.ShopAmount;
+                        shopAmount += Manze;
+                    }
+                    this.setState({
+                        ShopPrice:rows[0],
+                        ManZe: ManZe,
+                        amount:ManZe,
+                    })
 
-                //买赠促销
-                // new Promise.all(bpPromotons).then((rows)=> {
-                //     console.log('MZ=',rows);
-                //     for(let i = 0;i<this.state.dataRows.length;i++) {
-                //         var Rows = this.state.dataRows[i];
-                //         console.log('DataRows111=',Rows);
-                //         this.DisCount.push(Rows);
-                //         ShopPrice = Rows.ShopAmount;
-                //         shopAmount += ShopPrice;
-                //     }
-                //     this.setState({
-                //         ShopAmount: shopAmount,
-                //         amount:shopAmount,
-                //     })
-                //     console.log('length=',rows.length)
-                //     let MZShopPrice=[];
-                //     if(rows.length>=1){
-                //         dbAdapter.selectTdscPresent(rows[0]).then((rows) => {
-                //             MZShopPrice.push(rows.item(0))
-                //             console.log('MZShopPrice=',MZShopPrice)
-                //             this.setState({
-                //                 DataSource: this.state.DataSource.cloneWithRows(MZShopPrice),
-                //             })
-                //             this.MZPrice();
-                //         })
-                //     }else{
-                //         //组合促销
-                //     }
-                // })
+                    let ShopPrice=[];
+                    if(rows.length==2){
+                        dbAdapter.selectTdscPresent(rows[1]).then((rows) => {
+                            ShopPrice.push(rows.item(0))
+                            console.log('ShopPrice=',ShopPrice)
+                            this.setState({
+                                DataSource: this.state.DataSource.cloneWithRows(ShopPrice),
+                            })
+                            this.MZPrice();
+
+                        })
+                    }
+                })
+
+               // 买赠促销
+                new Promise.all(bpPromotons).then((rows)=> {
+                    console.log('MZ=',rows);
+                    var Maize = 0;
+                    var MaiZe = 0;
+                    for(let i = 0;i<this.state.dataRows.length;i++) {
+                        var Rows = this.state.dataRows[i];
+                        console.log('买赠=',Rows);
+                        this.DisCount.push(Rows);
+                        Maize = Rows.ShopAmount;
+                        MaiZe += Maize;
+                    }
+                    this.setState({
+                        ShopAmount: MaiZe,
+                        amount:MaiZe,
+                    })
+                    console.log('length=',rows.length)
+                    let MZShopPrice=[];
+                    if(rows.length>=1&&rows[0]!=""){
+                        dbAdapter.selectTdscPresent(rows[0]).then((rows) => {
+                            MZShopPrice.push(rows.item(0))
+                            console.log('买赠1=',MZShopPrice)
+                            this.setState({
+                                DataSource: this.state.DataSource.cloneWithRows(MZShopPrice),
+                            })
+                            this.MZPrice();
+                        })
+                    }
+                })
+
                 //组合促销
                 GSPromotionsManger.gsPromotionsManger(this.state.dataRows,"*",dbAdapter).then((rows) => {
                     console.log('ZH=',rows)
                     console.log('DataRows1111=',this.state.dataRows)
-
+                    var Zuhe = 0;
+                    var ZuHe = 0;
+                    for(let i = 0;i<this.state.dataRows.length;i++) {
+                        var Rows = this.state.dataRows[i];
+                        this.DisCount.push(Rows);
+                        console.log("组合",this.state.dataRows);
+                        Zuhe = Rows.ShopAmount;
+                        ZuHe += Zuhe;
+                    }
+                    this.setState({
+                        ShopAmount: ZuHe,
+                        amount:ZuHe,
+                    })
                     //奇偶促销
                 })
                 //奇偶促销
-                // EOPromotionsManger.eoPromotionsManger(this.state.dataRows,"*",dbAdapter).then((rows) => {
-                //     if(rows==true){
-                //         for(let i = 0;i<this.state.dataRows.length;i++) {
-                //             var Rows = this.state.dataRows[i];
-                //             this.DisCount.push(Rows);
-                //             console.log("DDataRows",this.state.dataRows);
-                //             ShopPrice = Rows.ShopAmount;
-                //             shopAmount += ShopPrice;
-                //         }
-                //         this.setState({
-                //             ShopAmount: shopAmount,
-                //             amount:shopAmount,
-                //         })
-                //     }else{
-                //         for(let i = 0;i<this.state.dataRows.length;i++) {
-                //             var Rows = this.state.dataRows[i];
-                //             this.DisCount.push(Rows);
-                //             console.log("SSSataRows",this.state.dataRows);
-                //             ShopPrice = Rows.ShopAmount;
-                //             shopAmount += ShopPrice;
-                //         }
-                //         this.setState({
-                //             ShopAmount: shopAmount,
-                //             amount:shopAmount,
-                //         })
-                //     }
-                // })
+                EOPromotionsManger.eoPromotionsManger(this.state.dataRows,"*",dbAdapter).then((rows) => {
+                    var Jiou = 0;
+                    var JiOu = 0;
+                    for(let i = 0;i<this.state.dataRows.length;i++) {
+                        var Rows = this.state.dataRows[i];
+                        this.DisCount.push(Rows);
+                        console.log("奇偶",this.state.dataRows);
+                        Jiou = Rows.ShopAmount;
+                        JiOu += Jiou;
+                    }
+                    this.setState({
+                        ShopAmount: JiOu,
+                        amount:JiOu,
+                    })
+                })
 
             }else{
                 for(let i = 0;i<this.state.dataRows.length;i++) {
