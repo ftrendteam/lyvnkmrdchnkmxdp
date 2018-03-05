@@ -21,6 +21,10 @@ export default class DPPromotionManager {
       let barCode = productBean.BarCode;
        let dscPrice = 0;
      dbAdapter.selectTdscHead("DP").then((formTypes)=>{
+         if(formTypes.length==0){
+             resolve(false);
+             return
+         }
         for(let i = 0;i<formTypes.length;i++){
           let item = formTypes.item(i);
           let formNo = item.FormNo;
