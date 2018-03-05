@@ -132,7 +132,7 @@ export default class Sell extends Component {
           //MJPromotionManger.MJPromotion(this.dataRow,"*",dbAdapter).then((cc)=>{
           //      console.log("wtf===",cc)
           //});
-          BPPromotionsManger.bpPromotons(row,"*",dbAdapter);
+          // BPPromotionsManger.bpPromotons(row,"*",dbAdapter);
             if (this.dataRow == 0) {
                 this.modal();
                 return;
