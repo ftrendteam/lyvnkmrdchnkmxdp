@@ -394,7 +394,6 @@ export default class DBAdapter extends SQLiteOpenHelper {
             "values(?,?,?,?,?,?,?,?,?,?,?)";
           tx.executeSql(sql, [Pid, ProdCode, shopName, ShopNumber, ShopPrice, ShopAmount, ShopRemark, DepCode, ydcountm, suppCode, BarCode], () => {
               resolve(true);
-              console.log()
             }, (err) => {
               reject(false);
               console.log(err);
@@ -412,9 +411,16 @@ export default class DBAdapter extends SQLiteOpenHelper {
   selectShopInfo() {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
-        let ssql = "select a.*,ifNull(b.countm,0) as ShopNumber,ifNull(b.ShopPrice,a.StdPrice) as    ShopPrice ,ifNull(b.prototal,0) as ShopAmount   " +
-          ",ifNull(b.promemo,'') as ShopRemark,b.depcode as  DepCode1 " +
-          " from product a join shopInfo b on a.Pid=b.Pid  ";
+        let ssql = "select a.*,ifNull(b.countm,0) as ShopNumber,ifNull(b.ShopPrice,a.StdPrice) as ShopPrice ,ifNull(b.prototal,0) as ShopAmount   " +
+        ",ifNull(b.promemo,'') as ShopRemark,b.depcode as  DepCode1 " +
+        " from product a join shopInfo b on a.Pid=b.Pid";
+        
+        //let ssql = "select a.*,ifNull(b.countm,0) as ShopNumber,ifNull(b.ShopPrice,a.StdPrice) as ShopPrice ,ifNull(b.prototal,0) as ShopAmount   " +
+        //  ",ifNull(b.promemo,'') as ShopRemark,c.depcode" + DepLevel + " as DepCode1 " +
+        //  " from product a left join shopInfo b on a.Pid=b.Pid  ";
+        //ssql = ssql + " left join  tdepset c on c.IsDel='0' and a.depcode=c.depcode where a.IsDel='0' and prodtype<>'1'";
+        //ssql = ssql + "  and  a.prodcode ='" + prodCode + "'";
+        //
         tx.executeSql(ssql, [], (tx, results) => {
           resolve(results.rows);
         });
@@ -1622,22 +1628,34 @@ export default class DBAdapter extends SQLiteOpenHelper {
       }
     })
   }
-  
+  selectTDscGroupPrice=(FormNo)=>{
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        let sql = "select * from tDscGroupPrice where FormNo='"+FormNo+"'";
+        tx.executeSql(sql, [], (tx, results) => {
+            resolve((results.rows));
+          }, (error) => {
+            console.log("err===", error);
+          }
+        );
+      });
+    });
+  }
   /***
    * 查询满赠促销中赠送商品
    */
   selectTdscPresent=(FormNo)=>{
-      return new Promise((resolve, reject) => {
-          db.transaction((tx) => {
-              let sql = "select * from tDscPresent where FormNo='"+FormNo+"'";
-              tx.executeSql(sql, [], (tx, results) => {
-                      resolve((results.rows));
-                  }, (error) => {
-                      console.log("err===", error);
-                  }
-              );
-          });
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        let sql = "select * from tDscPresent where FormNo='"+FormNo+"'";
+        tx.executeSql(sql, [], (tx, results) => {
+            resolve((results.rows));
+          }, (error) => {
+            console.log("err===", error);
+          }
+        );
       });
+    });
   }
   selectTDscCondition=(FormNo)=>{
     return new Promise((resolve, reject) => {
@@ -1652,7 +1670,6 @@ export default class DBAdapter extends SQLiteOpenHelper {
       });
     });
   }
-
   selectTDscSupp=(SuppCode)=>{
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
@@ -1671,6 +1688,71 @@ export default class DBAdapter extends SQLiteOpenHelper {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
         let sql = "select * from TDscDep where DepCode='" + DepCode + "'";
+        tx.executeSql(sql, [], (tx, results) => {
+            resolve((results.rows));
+          }, (error) => {
+            console.log("err===", error);
+          }
+        );
+      });
+    });
+  }
+  
+  /***
+   * 获取当前符合指定
+   * @param FormNo
+   * @return {Promise}
+   */
+  selectTDscDepAll=(FormNo)=>{
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        let sql = "select * from shopinfo  a join product c on a.pid=c.pid join tdscdep b on c.depcode=b.depcode where " +
+          "b.FormNo='"+FormNo+"' and (FormType<>'DP' or FormType is null) and a.prodcode not in (select prodcode from tdscExcept where FormNo='"+FormNo+"')";
+        tx.executeSql(sql, [], (tx, results) => {
+            resolve((results.rows));
+          }, (error) => {
+            console.log("err===", error);
+          }
+        );
+      });
+    });
+  }
+  
+  selectTDscSuppAll=(FormNo)=>{
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        let sql = "select * from shopinfo  a join product c on a.pid=c.pid join TDscSupp b on c.SuppCode=b.SuppCode " +
+          "where b.formno='"+FormNo+"' and (FormType<>'DP' or FormType is null) and a.prodcode not in (select prodcode from tdscExcept where FormNo='"+FormNo+"')"
+        tx.executeSql(sql, [], (tx, results) => {
+            resolve((results.rows));
+          }, (error) => {
+            console.log("err===", error);
+          }
+        );
+      });
+    });
+  }
+  
+  selectTDscBrandAll=(FormNo)=>{
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        let sql = "select * from shopinfo  a join product c on a.pid=c.pid join TDscBrand b on c.BrandCode=b.BrandCode " +
+          "where b.formno='"+FormNo+"' and (FormType<>'DP' or FormType is null) and a.prodcode not in (select prodcode from tdscExcept where FormNo='"+FormNo+"')"
+        tx.executeSql(sql, [], (tx, results) => {
+            resolve((results.rows));
+          }, (error) => {
+            console.log("err===", error);
+          }
+        );
+      });
+    });
+  }
+  
+  selectTDscProdAll=(FormNo)=>{
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        let sql ="select * from shopinfo  a join product c on a.pid=c.pid join TDscProd b on c.ProdCode=b.ProdCode " +
+          "where b.formno='"+FormNo+"' and (FormType<>'DP' or FormType is null) and a.prodcode not in (select prodcode from tdscExcept where FormNo='"+FormNo+"')"
         tx.executeSql(sql, [], (tx, results) => {
             resolve((results.rows));
           }, (error) => {

@@ -259,6 +259,19 @@ export default class SQLiteOpenHelper {
         "StdPrice float(8) null, Remark varchar(50) null)",[],()=>{})
       tx.executeSql("CREATE TABLE IF NOT EXISTS tDscGroupPrice(FormNo varchar(20) not null,GroupNo varchar(2) null," +
         "GroupCountN float(8) null, GroupTotal float(8) null)",[],()=>{})
+  
+      /***
+       * 数据库表更新
+       */
+      tx.executeSql("select name from sqlite_master where type='table' and lower(name) ='shopinfo' and lower(sql) " +
+        "like lower('%FormType%')",[],(tx,results)=>{
+          if(results.rows.length==0){
+            
+            tx.executeSql("alter table shopInfo add FormType varchar(5)",[],()=>{
+            
+            })
+          }
+      })
     }, (err) => {
       this._errorCB('transaction', err);
     }, () => {

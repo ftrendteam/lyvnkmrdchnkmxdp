@@ -101,10 +101,11 @@ export default class DownLoadBasicData {
           let tDscPresent = response.TblRow8;
           let tDscProd = response.TblRow9;
           let tDscSupp = response.TblRow11;
-          console.log(tDscGroupPrice)
+          console.log(tDscHead)
           dbAdapter.insertTdschead(tDscHead);
           dbAdapter.insertTDscCondition(tDscCondition);
           //console.log("wtf2=",tDscHead)
+          dbAdapter.inserttDscGroupPrice(tDscGroupPrice);
           dbAdapter.insertTDscDep(TDscDep);
           dbAdapter.insertTDscExcept(tDscExcept);
           dbAdapter.insertTDscCust(tDscCust);
