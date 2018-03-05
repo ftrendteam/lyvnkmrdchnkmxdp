@@ -546,7 +546,7 @@ export default class ShoppingCart extends Component {
                         reqCode: "App_PosReq",
                         reqDetailCode: this.state.reqDetailCode,
                         ClientCode: this.state.ClientCode,
-                        sDateTime: "2017-08-09 12:12:12",
+                        sDateTime: "2017-08-09 12:12:12",//获取当前时间转换成时间戳
                         Sign: NetUtils.MD5("App_PosReq" + "##" +this.state.reqDetailCode + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',
                         username: this.state.Username,
                         usercode: this.state.Userpwd,
@@ -561,6 +561,7 @@ export default class ShoppingCart extends Component {
                         },
                         DetailInfo2: this.ds,
                     };
+                    console.log('params=',JSON.stringify(params))
                     if(this.state.Screen=="1"||this.state.Screen=="2"){
                         var DetailInfo2=params.DetailInfo2;
                         for(let i =0;i<DetailInfo2.length;i++){
@@ -573,6 +574,7 @@ export default class ShoppingCart extends Component {
                         }
                         if(this.screen==""||this.state.OrgFormno==null){
                             FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
+                                console.log('data=',data)
                                 if(data.retcode == 1){
                                     if(this.state.Screen!=="1"||this.state.Screen!=="2"||this.screen==""||scode==null){
                                         this.Wait();
@@ -594,6 +596,7 @@ export default class ShoppingCart extends Component {
                         }
                     }else{
                         FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
+                            console.log('data1=',data)
                             if(data.retcode == 1){
                                 if(this.state.Screen!=="1"||this.state.Screen!=="2"||this.screen==""||scode==null){
                                     this.Wait();
@@ -660,6 +663,7 @@ export default class ShoppingCart extends Component {
                         DetailInfo2: this.ds,
                     };
                     FetchUtils.post(this.state.linkurl, JSON.stringify(params)).then((data) => {
+                        console.log('data2=',data)
                         if (data.retcode == 1) {
                             this.ScreenBod();
                             this.Succeed();

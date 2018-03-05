@@ -195,6 +195,7 @@ export default class HistoricalDocument extends Component {
                 this._setModalVisible();
             if(data.retcode == 1){
                 var DetailInfo1 = data.DetailInfo1;
+                console.log('DetailInfo1=',DetailInfo1)
                 this.dataRows = this.dataRows.concat(DetailInfo1);
                 if(this.dataRows==0){
                     return;

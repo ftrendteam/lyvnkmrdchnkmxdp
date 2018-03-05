@@ -412,7 +412,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
   selectShopInfo() {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
-        let ssql = "select a.*,ifNull(b.countm,0) as ShopNumber,ifNull(b.ShopPrice,a.StdPrice) as    ShopPrice ,ifNull(b.prototal,0) as ShopAmount   " +
+        let ssql = "select a.*,b.countm ,b.promemo,b.ydcountm,ifNull(b.ShopPrice,a.StdPrice) as ProPrice,ifNull(b.countm,0) as ShopNumber,ifNull(b.ShopPrice,a.StdPrice) as    ShopPrice ,ifNull(b.prototal,0) as ShopAmount   " +
           ",ifNull(b.promemo,'') as ShopRemark,b.depcode as  DepCode1 " +
           " from product a join shopInfo b on a.Pid=b.Pid  ";
         tx.executeSql(ssql, [], (tx, results) => {
