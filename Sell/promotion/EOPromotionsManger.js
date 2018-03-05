@@ -14,11 +14,11 @@ export default class EOPromotionsManger {
    * @return {Promise}
    */
   static eoPromotionsManger(productBeans, custTypeCode, dbAdapter) {
-    return new Promise((resolve, reject)=>{
+    return new Promise((resolve, reject) => {
       let promises = [];
       //按价格由大到小排序
       dbAdapter.selectTdscHead("EO").then((tdscheadBeans) => {
-        if(tdscheadBeans==0){
+        if (tdscheadBeans == 0) {
           resolve(false);
           return;
         }
@@ -27,6 +27,7 @@ export default class EOPromotionsManger {
           let dtCust = tdschead.dtCust;
           let formNo = tdschead.FormNo;
           let dtAll = tdschead.dtAll;
+          let autoMulti = tdschead.AutoMulti;
           //console.log("tdschead=", tdschead)
           PromotionUtils.custAndDate(custTypeCode, dbAdapter, formNo).then((plans) => {
             planList = plans;
@@ -57,7 +58,7 @@ export default class EOPromotionsManger {
                 for (let j = 0; j < results[i].length; j++) {
                   shopList.push(results[i].item(j));
                 }
-                EOPromotionsManger.initData(formNo, dbAdapter, productBeans).then((result) => {
+                EOPromotionsManger.initData(formNo, dbAdapter, productBeans, autoMulti).then((result) => {
                   resolve(true);
                 });
               }
@@ -66,49 +67,67 @@ export default class EOPromotionsManger {
         }
       });
     });
-   
+    
   }
   
-  static initData(formNo, dbAdapter,productBeans) {
+  static initData(formNo, dbAdapter, productBeans, autoMulti) {
     let price = 0;
-    return new Promise((resolve, reject)=>{
+    return new Promise((resolve, reject) => {
       dbAdapter.selectTDscCondition(formNo).then((tDscConditions) => {
-        for(let i =0;i<tDscConditions.length;i++){
-          let tDscCondition = tDscConditions.item(i);
-          let con1 = tDscCondition.Con1;
-          let con2 = tDscCondition.Con2;
-          let cxConType = tDscCondition.cxConType;
-          if ("0" == cxConType) {//折扣
-            for(let j = 0;j<shopList.length;j++){
-              for(let k = 1;k<=shopList[j].countm;k++){
-                if(k==con1){
-                  price = BigDecimalUtils.add(BigDecimalUtils.multiply(BigDecimalUtils.subtract(1,BigDecimalUtils.divide(con2,100,2),2),shopList[j].ShopPrice,2),price,2);
-                  //console.log("price===",price)
+        for (let j = 0; j < shopList.length; j++) {
+          let count = 0;
+          let loopCount = 0;
+          if (shopList[j].countm % tDscConditions.length == 0) {
+            count = shopList[j].countm / tDscConditions.length;
+          } else {
+            count = parseInt(shopList[j].countm / tDscConditions.length) +shopList[j].countm % tDscConditions.length;
+          }
+          //console.log("count=",count);
+          for (let n = 0; n < count; n++) {
+            for (let i = 0; i < tDscConditions.length; i++) {
+                let tDscCondition = tDscConditions.item(i);
+                let con1 = tDscCondition.Con1;
+                let con2 = tDscCondition.Con2;
+                let cxConType = tDscCondition.cxConType;
+                if ("0" == cxConType) {//折扣
+                for (let k = loopCount * tDscConditions.length + 1; k <= shopList[j].countm; k++) {
+                  if ((k - loopCount * tDscConditions.length) == con1) {
+                    //console.log(BigDecimalUtils.multiply(BigDecimalUtils.subtract(1, BigDecimalUtils.divide(con2, 100, 2), 2),
+                    //  shopList[j].ShopPrice, 2))
+                    price = BigDecimalUtils.add(BigDecimalUtils.multiply(BigDecimalUtils.subtract(1, BigDecimalUtils.divide(con2, 100, 2), 2),
+                      shopList[j].ShopPrice, 2), price, 2);
+                    //console.log("price===",price)
+                  }
                 }
+                //if (tDscConditions.length < shopList[j].countm || i == tDscConditions.length - 1) {
+                //  count++;
+                //}
+                
               }
-              shopList[j].prototal = price;
-              //重新赋值商品价格
-              for(let m = 0;m<productBeans.length;m++){
-                if (productBeans[m].Pid==shopList[j].pid) {
-                  productBeans[m].ShopAmount = shopList[j].prototal;
-                }
-    
-              }
+              //else if ("1" == cxConType) {//固定价
+              //  //System.out.println("eo-2");
+              //  productBean.setItemTotal(BigDecimalUtils.multiply(con2, productBean.getList().size()));
+              //} else if ("2" == cxConType) {//买减
+              //  //System.out.println("eo-3");
+              //  //if (productBean.getList().size() == 1) {
+              //  //  //productBean.setItemTotal(BigDecimalUtils.scaleAdd(productBean.getItemTotal(),
+              //  // BigDecimalUtils.subtract(productBean.getStdPrice(), con2))); } else {
+              //  // productBean.setItemTotal(BigDecimalUtils.scaleAdd(productBean.getItemTotal(),
+              //  // BigDecimalUtils.subtract(productBean.getStdPrice(), con2))); }
+              //}
             }
-            
-          } else if ("1" == cxConType) {//固定价
-            //System.out.println("eo-2");
-            //productBean.setItemTotal(BigDecimalUtils.multiply(con2, productBean.getList().size()));
-          } else if ("2" == cxConType) {//买减
-            //System.out.println("eo-3");
-            //if (productBean.getList().size() == 1) {
-            //  //productBean.setItemTotal(BigDecimalUtils.scaleAdd(productBean.getItemTotal(), BigDecimalUtils.subtract(productBean.getStdPrice(), con2)));
-            //} else {
-            //  productBean.setItemTotal(BigDecimalUtils.scaleAdd(productBean.getItemTotal(),
-            //    BigDecimalUtils.subtract(productBean.getStdPrice(), con2)));
-            //}
+            loopCount++;
+          }
+          
+          shopList[j].prototal = price;
+          //重新赋值商品价格
+          for (let m = 0; m < productBeans.length; m++) {
+            if (productBeans[m].Pid == shopList[j].pid) {
+              productBeans[m].ShopAmount = shopList[j].prototal;
+            }
           }
         }
+        
         resolve(true);
       });
     });

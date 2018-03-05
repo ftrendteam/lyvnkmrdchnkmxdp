@@ -9,6 +9,10 @@ export default class BGPromotionManager {
       return new Promise((resolve, reject) => {
       let prodCode = productBean.ProdCode;
         dbAdapter.selectTdscHead("BG").then((tdscheadBeans) => {
+          if(tdscheadBeans.length==0){
+            resolve(false);
+            return;
+          }
           let promises = [];
           if (tdscheadBeans.length != 0) {
             for (let i = 0; i < tdscheadBeans.length; i++) {

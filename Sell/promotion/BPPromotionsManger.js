@@ -7,6 +7,10 @@ export default class BPPromotionsManger {
   static bpPromotons(productBean, custTypeCode, dbAdapter) {
     return new Promise((resolve, reject) => {
       dbAdapter.selectTdscHead("BP").then((tdscheadBeans) => {
+        if(tdscheadBeans.length==0){
+          resolve("");
+          return
+        }
         for (let i = 0; i < tdscheadBeans.length; i++) {
           let tdschead = tdscheadBeans.item(i);
           let dtCust = tdschead.dtCust;

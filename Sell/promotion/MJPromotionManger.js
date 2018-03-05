@@ -30,6 +30,10 @@ export default class MJPromotionManger {
     let tdschead;
     return new Promise((resolve, reject) => {
       dbAdapter.selectTdscHead("MJ").then((tdscheadBeans) => {
+        if(tdscheadBeans.length==0){
+          resolve(false);
+          return;
+        }
         for (let i = 0; i < productBeans.length; i++) {//遍历所有商品
           let productBean = productBeans[i];
           TDscExceptShops.push(PromotionUtils.isTDscExceptShop(productBean.ProdCode, dbAdapter));

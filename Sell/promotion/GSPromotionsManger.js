@@ -17,6 +17,10 @@ export default class GSPromotionsManger {
     let promises = [];
     return new Promise((resolve, reject) => {
       dbAdapter.selectTdscHead("GS").then((tdscheadBeans) => {//获取所有的组合促销单号
+        if(tdscheadBeans.length==0){
+          resolve(false);
+          return;
+        }
         if (tdscheadBeans.length != 0) {
           for (let i = 0; i < tdscheadBeans.length; i++) {
             let tdschead = tdscheadBeans.item(i);
@@ -145,12 +149,9 @@ export default class GSPromotionsManger {
                 if(remainder==0){
                   shopListPro.prototal=BigDecimalUtils.multiply(BigDecimalUtils.divide(shopListPro.countm,groupCountN,2),groupTotal,2);
                 }else{
-                  shopListPro.prototal=BigDecimalUtils.add(BigDecimalUtils.multiply(BigDecimalUtils.divide(shopListPro.countm,groupCountN,0),groupTotal,2),
-                    BigDecimalUtils.multiply(remainder,shopListPro.prototal,2),2);
+                  shopListPro.prototal=BigDecimalUtils.add(BigDecimalUtils.multiply(parseInt(shopListPro.countm/groupCountN),groupTotal,2),
+                    BigDecimalUtils.multiply(remainder,shopListPro.ShopPrice,2),2);
                 }
-                
-                //shopListPro.prototal = BigDecimalUtils.divide(groupTotal, groupCountN, 2)
-                console.log("wnale=", shopListPro.prototal);
                 for (let i = 0; i < productBeans.length; i++) {
                   console.log(productBeans[i].Pid,shopListPro.pid)
                   if (productBeans[i].Pid==shopListPro.pid) {
