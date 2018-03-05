@@ -30,7 +30,7 @@ export default class GSPromotionsManger {
                 if (!tDscExceptShop) {
                   //System.out.println("非促销商品!");
                   let tdschead = tdscheadBeans.item(i);
-                  //console.log("tdschead=" + tdschead)
+                  console.log("tdschead=" + tdschead)
                   let dtAll = tdschead.dtAll;
                   if ("1" == dtAll) {
                     //System.out.println("全场");
@@ -60,6 +60,7 @@ export default class GSPromotionsManger {
                       //shopList.add(productBeans.get(i));
                       GSPromotionsManger.initData(autoMulti, formNo, dbAdapter).then((result) => {
                         resolve(true);
+                        console.log('ZH=',result)
                       });
                     }
                   }
@@ -69,7 +70,7 @@ export default class GSPromotionsManger {
                 for (let planIndex = 0; planIndex < planList.length; planIndex++) {
                   let formNo = planList[i].FormNo;
                   let tdschead = tdscheadBeans.item(i);
-                  //console.log("tdschead=" , tdschead)
+                  console.log("tdschead=" , tdschead)
                   let dtAll = tdschead.dtAll;
                   if ("1" == dtAll) {
                     //System.out.println("全场");
@@ -98,11 +99,12 @@ export default class GSPromotionsManger {
                         for (let j = 0; j < results[i].length; j++) {
                           shopList.push(results[i].item(j));
                           GSPromotionsManger.number = BigDecimalUtils.add(results[i].item(j).countm, GSPromotionsManger.number, 2);
-                          //console.log("dsdfasdfas=",results[i].item(j));
+                          console.log("dsdfasdfas=",results[i].item(j));
                         }
                         if (results[i].length != 0) {
                           GSPromotionsManger.initData(autoMulti, formNo, dbAdapter, productBeans).then((result) => {
                             resolve(true);
+                              console.log('ZH1=',result)
                           });
                         }
                       }
@@ -122,39 +124,46 @@ export default class GSPromotionsManger {
   static initData(autoMulti, formNo, dbAdapter, productBeans) {
     return new Promise((resolve, reject) => {
       dbAdapter.selectTDscGroupPrice(formNo).then((tDscGroupPrices) => {
-        //console.log("b=", autoMulti, formNo)
-        //console.log("b=", tDscGroupPrices)
+        console.log("b=", autoMulti, formNo)
+        console.log("b=", tDscGroupPrices.length)
         if (tDscGroupPrices.length == 0) {
           resolve(false);
         }
-        
+
         if ("1" == autoMulti) {//自动倍数
           //System.out.println("1-1");
           let count = 0;
           //let size = shopList.length;
-          //console.log(tDscGroupPriceBean)
+          console.log('tDscGroupPriceBean=',tDscGroupPrices.length)
           for (let i = tDscGroupPrices.length - 1; i >= 0; i--) {
             let tDscGroupPriceBean = tDscGroupPrices.item(i);
             let groupCountN = tDscGroupPriceBean.GroupCountN;
             let groupTotal = tDscGroupPriceBean.GroupTotal;
             count++;
+            console.log("aaa=",GSPromotionsManger.number - groupCountN * count);
+              console.log("ttt=",groupCountN);
             if (GSPromotionsManger.number - groupCountN * count >= groupCountN) {
+                console.log("bbb=",shopList.length)
               for (let j = 0; j < shopList.length; j++) {
                 let shopListPro = shopList[j];
                 let remainder = shopListPro.countm%groupCountN;//计算是否含有小数
                 if(remainder==0){
+                    console.log("ccc")
                   shopListPro.prototal=BigDecimalUtils.multiply(BigDecimalUtils.divide(shopListPro.countm,groupCountN,2),groupTotal,2);
                 }else{
                   shopListPro.prototal=BigDecimalUtils.add(BigDecimalUtils.multiply(BigDecimalUtils.divide(shopListPro.countm,groupCountN,0),groupTotal,2),
                     BigDecimalUtils.multiply(remainder,shopListPro.prototal,2),2);
+                    console.log("eee")
                 }
                 
                 //shopListPro.prototal = BigDecimalUtils.divide(groupTotal, groupCountN, 2)
-                console.log("wnale=", shopListPro.prototal);
+                console.log("wnale2222=", shopListPro.prototal);
+                  console.log('length111111=',productBeans.length);
                 for (let i = 0; i < productBeans.length; i++) {
                   console.log(productBeans[i].Pid,shopListPro.pid)
                   if (productBeans[i].Pid==shopListPro.pid) {
                     productBeans[i].ShopAmount = shopListPro.prototal;
+                    console.log("sdafasdf=",productBeans[i].ShopAmount)
                   }
                 }
               }
@@ -163,7 +172,6 @@ export default class GSPromotionsManger {
             
           }
         } else if ("0" == autoMulti) {
-          
           for (let i = tDscGroupPrices.length - 1; i >= 0; i--) {
             let tDscGroupPriceBean = tDscGroupPrices.item(i);
             let groupCountN = tDscGroupPriceBean.GroupCountN;
