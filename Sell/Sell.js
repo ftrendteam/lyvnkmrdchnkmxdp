@@ -297,40 +297,44 @@ export default class Sell extends Component {
     }
 
     deteleShopInfo(rowData, sectionID, rowID){
-        dbAdapter.deteleShopInfo(rowData.ProdCode).then((rows)=>{});
-        dbAdapter.selectShopInfo().then((rows)=>{
-            var shopnumber = 0;
-            var shopAmount = 0;
-            var vipPrice = 0;
-            this.dataRow=[];
-            this.VipTblRow=[];
-            for(let i =0;i<rows.length;i++){
-                var row = rows.item(i);
-                this.VipTblRow.push(row);
-                var number = row.ShopNumber;
-                shopAmount += parseInt(row.ShopAmount);
-                shopnumber += parseInt(row.ShopNumber);
-                if(number!==0){
-                    this.dataRow.push(row);
-                }
+        dbAdapter.deteleShopInfo(rowData.ProdCode).then((rows)=>{
+            console.log('ytttt=',rows)
+            if(rows==true){
+                dbAdapter.selectShopInfo().then((rows)=>{
+                    var shopnumber = 0;
+                    var shopAmount = 0;
+                    var vipPrice = 0;
+                    this.dataRow=[];
+                    this.VipTblRow=[];
+                    for(let i =0;i<rows.length;i++){
+                        var row = rows.item(i);
+                        this.VipTblRow.push(row);
+                        var number = row.ShopNumber;
+                        shopAmount += parseInt(row.ShopAmount);
+                        shopnumber += parseInt(row.ShopNumber);
+                        if(number!==0){
+                            this.dataRow.push(row);
+                        }
+                    }
+                    if(this.state.VipCardNo !==""){
+                        vipPrice = VipPrice.vipPrice(TblRow1[0],this.VipTblRow);
+                    }
+                    var VIPprice = shopAmount-vipPrice;
+                    this.setState({
+                        vipPrice:vipPrice,
+                        number1:number,
+                        ShopNumber:shopnumber,//数量
+                        ShopAmount:VIPprice,//总金额
+                        dataSource:this.state.dataSource.cloneWithRows(this.dataRow),
+                    })
+                });
+                dbAdapter.selectShopInfoAllCountm().then((rows)=>{
+                    var ShopCar = rows.item(0).countm;
+                    this.setState({
+                        shopcar:ShopCar
+                    });
+                });
             }
-            if(this.state.VipCardNo !==""){
-                vipPrice = VipPrice.vipPrice(TblRow1[0],this.VipTblRow);
-            }
-            var VIPprice = shopAmount-vipPrice;
-            this.setState({
-                vipPrice:vipPrice,
-                number1:number,
-                ShopNumber:shopnumber,//数量
-                ShopAmount:VIPprice,//总金额
-                dataSource:this.state.dataSource.cloneWithRows(this.dataRow),
-            })
-        });
-        dbAdapter.selectShopInfoAllCountm().then((rows)=>{
-            var ShopCar = rows.item(0).countm;
-            this.setState({
-                shopcar:ShopCar
-            });
         });
     }
 

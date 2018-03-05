@@ -27,6 +27,7 @@ import MJPromotionManger from "../Sell/promotion/MJPromotionManger";
 import MZPromotionManger from "../Sell/promotion/MZPromotionManger";
 import BPPromotionsManger from "../Sell/promotion/BPPromotionsManger";
 import GSPromotionsManger from "../Sell/promotion/GSPromotionsManger";
+import EOPromotionsManger from "../Sell/promotion/EOPromotionsManger";
 import NetUtils from "../utils/NetUtils";
 import FetchUtil from "../utils/FetchUtils";
 import Storage from "../utils/Storage";
@@ -255,7 +256,6 @@ export default class Pay extends Component {
         }
         //单品促销
         new Promise.all(promises).then((rows)=> {
-            // console.log('aaa',rows)
             var Datafasle;
             for(let i = 0;i<rows.length; i++){
                 var row=rows[0];
@@ -298,7 +298,6 @@ export default class Pay extends Component {
                 //         })
                 //     }
                 // })
-
 
                 //满减促销
                 // MJPromotionManger.MJPromotion(this.state.dataRows,"*",dbAdapter).then((rows) => {
@@ -379,19 +378,43 @@ export default class Pay extends Component {
                 //             this.MZPrice();
                 //         })
                 //     }else{
-                //         console.log("kkkkkkk")
+                //         //组合促销
                 //     }
                 // })
                 //组合促销
-                console.log('DataRows=',this.state.dataRows)
                 GSPromotionsManger.gsPromotionsManger(this.state.dataRows,"*",dbAdapter).then((rows) => {
                     console.log('ZH=',rows)
                     console.log('DataRows1111=',this.state.dataRows)
-                })
 
-                // new Promise.all(gsPromotionsManger).then((rows)=> {
-                //   console.log('ZH=',rows)
-                //     console.log('DataRows=',this.state.dataRows)
+                    //奇偶促销
+                })
+                //奇偶促销
+                // EOPromotionsManger.eoPromotionsManger(this.state.dataRows,"*",dbAdapter).then((rows) => {
+                //     if(rows==true){
+                //         for(let i = 0;i<this.state.dataRows.length;i++) {
+                //             var Rows = this.state.dataRows[i];
+                //             this.DisCount.push(Rows);
+                //             console.log("DDataRows",this.state.dataRows);
+                //             ShopPrice = Rows.ShopAmount;
+                //             shopAmount += ShopPrice;
+                //         }
+                //         this.setState({
+                //             ShopAmount: shopAmount,
+                //             amount:shopAmount,
+                //         })
+                //     }else{
+                //         for(let i = 0;i<this.state.dataRows.length;i++) {
+                //             var Rows = this.state.dataRows[i];
+                //             this.DisCount.push(Rows);
+                //             console.log("SSSataRows",this.state.dataRows);
+                //             ShopPrice = Rows.ShopAmount;
+                //             shopAmount += ShopPrice;
+                //         }
+                //         this.setState({
+                //             ShopAmount: shopAmount,
+                //             amount:shopAmount,
+                //         })
+                //     }
                 // })
 
             }else{

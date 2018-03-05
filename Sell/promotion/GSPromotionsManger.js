@@ -16,7 +16,8 @@ export default class GSPromotionsManger {
     //按价格由大到小排序
     let promises = [];
     return new Promise((resolve, reject) => {
-      dbAdapter.selectTdscHead("GS").then((tdscheadBeans) => {//获取所有的组合促销单号
+      dbAdapter.selectTdscHead
+      ("GS").then((tdscheadBeans) => {//获取所有的组合促销单号
         if (tdscheadBeans.length != 0) {
           for (let i = 0; i < tdscheadBeans.length; i++) {
             let tdschead = tdscheadBeans.item(i);
