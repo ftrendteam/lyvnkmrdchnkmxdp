@@ -26,6 +26,7 @@ import BGPromotionManager from "../Sell/promotion/BGPromotionManager";
 import MJPromotionManger from "../Sell/promotion/MJPromotionManger";
 import MZPromotionManger from "../Sell/promotion/MZPromotionManger";
 import BPPromotionsManger from "../Sell/promotion/BPPromotionsManger";
+import GSPromotionsManger from "../Sell/promotion/GSPromotionsManger";
 import NetUtils from "../utils/NetUtils";
 import FetchUtil from "../utils/FetchUtils";
 import Storage from "../utils/Storage";
@@ -239,7 +240,7 @@ export default class Pay extends Component {
         let promises=[];
         let BGPromotion=[];
         let MJPromotion=[];
-        let bpPromotons=[]
+        let bpPromotons=[];
         for (let i = 0; i < rows.length; i++) {
             var row = rows[i];
             if (this.state.VipCardNo !== "") {
@@ -353,34 +354,45 @@ export default class Pay extends Component {
                 // })
 
                 //买赠促销
-                new Promise.all(bpPromotons).then((rows)=> {
-                    console.log('MZ=',rows);
-                    for(let i = 0;i<this.state.dataRows.length;i++) {
-                        var Rows = this.state.dataRows[i];
-                        console.log('DataRows111=',Rows);
-                        this.DisCount.push(Rows);
-                        ShopPrice = Rows.ShopAmount;
-                        shopAmount += ShopPrice;
-                    }
-                    this.setState({
-                        ShopAmount: shopAmount,
-                        amount:shopAmount,
-                    })
-                    console.log('length=',rows.length)
-                    let MZShopPrice=[];
-                    if(rows.length>=1){
-                        dbAdapter.selectTdscPresent(rows[0]).then((rows) => {
-                            MZShopPrice.push(rows.item(0))
-                            console.log('MZShopPrice=',MZShopPrice)
-                            this.setState({
-                                DataSource: this.state.DataSource.cloneWithRows(MZShopPrice),
-                            })
-                            this.MZPrice();
-                        })
-                    }else{
-                        console.log("kkkkkkk")
-                    }
+                // new Promise.all(bpPromotons).then((rows)=> {
+                //     console.log('MZ=',rows);
+                //     for(let i = 0;i<this.state.dataRows.length;i++) {
+                //         var Rows = this.state.dataRows[i];
+                //         console.log('DataRows111=',Rows);
+                //         this.DisCount.push(Rows);
+                //         ShopPrice = Rows.ShopAmount;
+                //         shopAmount += ShopPrice;
+                //     }
+                //     this.setState({
+                //         ShopAmount: shopAmount,
+                //         amount:shopAmount,
+                //     })
+                //     console.log('length=',rows.length)
+                //     let MZShopPrice=[];
+                //     if(rows.length>=1){
+                //         dbAdapter.selectTdscPresent(rows[0]).then((rows) => {
+                //             MZShopPrice.push(rows.item(0))
+                //             console.log('MZShopPrice=',MZShopPrice)
+                //             this.setState({
+                //                 DataSource: this.state.DataSource.cloneWithRows(MZShopPrice),
+                //             })
+                //             this.MZPrice();
+                //         })
+                //     }else{
+                //         console.log("kkkkkkk")
+                //     }
+                // })
+                //组合促销
+                console.log('DataRows=',this.state.dataRows)
+                GSPromotionsManger.gsPromotionsManger(this.state.dataRows,"*",dbAdapter).then((rows) => {
+                    console.log('ZH=',rows)
+                    console.log('DataRows1111=',this.state.dataRows)
                 })
+
+                // new Promise.all(gsPromotionsManger).then((rows)=> {
+                //   console.log('ZH=',rows)
+                //     console.log('DataRows=',this.state.dataRows)
+                // })
 
             }else{
                 for(let i = 0;i<this.state.dataRows.length;i++) {
