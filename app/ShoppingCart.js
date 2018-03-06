@@ -561,7 +561,6 @@ export default class ShoppingCart extends Component {
                         },
                         DetailInfo2: this.ds,
                     };
-                    console.log('params=',JSON.stringify(params))
                     if(this.state.Screen=="1"||this.state.Screen=="2"){
                         var DetailInfo2=params.DetailInfo2;
                         for(let i =0;i<DetailInfo2.length;i++){
