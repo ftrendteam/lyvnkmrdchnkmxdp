@@ -40,7 +40,8 @@ export default class GoodsDetails extends Component {
             name:"",
             YdCountm:"",
             shuliang:"",
-            numberFormat2:""
+            numberFormat2:"",
+            BQNumber:1,
         }
     }
 
@@ -115,15 +116,17 @@ export default class GoodsDetails extends Component {
 
     add(){
         // var Number1=this.state.Number;
-        if(this.state.Number==""){
+        if(this.state.Number==""||this.state.BQNumber==1){
             this.setState({
                 Number:1,
+                BQNumber:2,
                 numberFormat2:this.state.ShopPrice,
             });
         }else{
             let numberFormat2 = NumberUtils.numberFormat2((parseInt(this.state.Number)+1)*(this.state.ShopPrice));
             this.setState({
                 Number:parseInt(this.state.Number)+1,
+                BQNumber:parseInt(this.state.BQNumber)+1,
                 numberFormat2:numberFormat2,
             });
         }
@@ -132,8 +135,10 @@ export default class GoodsDetails extends Component {
     subtraction(){
         if(this.state.Number >0){
             var Number1=this.state.Number;
+            var BQNumber1=this.state.BQNumber;
             this.setState({
                 Number:parseInt(Number1)-1,
+                BQNumber:parseInt(BQNumber1)-1,
             });
             let numberFormat2 = NumberUtils.numberFormat2((parseInt(Number1)-1)*(this.state.ShopPrice));
             this.setState({
@@ -152,6 +157,7 @@ export default class GoodsDetails extends Component {
         let numberFormat2 = NumberUtils.numberFormat2((0)*(this.state.ShopPrice));
         this.setState({
             Number:0,
+            BQNumber:0,
             numberFormat2:numberFormat2,
         })
     }
@@ -167,9 +173,17 @@ export default class GoodsDetails extends Component {
             shopInfo.Pid = this.state.Pid;
             shopInfo.ProdCode=this.state.ProdCode;
             shopInfo.prodname = this.state.ProdName;
-            shopInfo.countm = this.state.Number;
+            if(this.state.name=="标签打印"){
+                shopInfo.countm = this.state.BQNumber;
+            }else{
+                shopInfo.countm = this.state.Number;
+            }
             shopInfo.ShopPrice = this.state.ShopPrice;
-            shopInfo.prototal =(this.state.Number)*(this.state.ShopPrice);
+            if(this.state.name=="标签打印"){
+                shopInfo.prototal ="0";//金额
+            }else{
+                shopInfo.prototal =(this.state.Number)*(this.state.ShopPrice);//金额
+            }
             shopInfo.promemo = this.state.Remark;
             shopInfo.DepCode = this.state.DepCode;
             shopInfo.ydcountm = this.state.ydcountm;
@@ -226,17 +240,31 @@ export default class GoodsDetails extends Component {
                 <View style={[styles.List,{paddingTop:12}]}>
                     <View style={styles.left1}>
                         <Text style={[styles.left,{marginTop:4}]}>数量</Text>
-                        <TextInput
-                            style={styles.Number}
-                            autoFocus={true}
-                            underlineColorAndroid='transparent'
-                            keyboardType="numeric"
-                            value={this.state.Number.toString()}
-                            placeholderTextColor="#333333"
-                            onChangeText={(value)=>{this.setState({Number:value})}}
-                            onSubmitEditing={this.onSubmitEditing.bind(this)}
-                            onEndEditing = {this.onSubmitEditing.bind(this)}
-                        />
+                        {
+                            (this.state.YdCountm == 3) ?
+                                <TextInput
+                                    style={styles.Number}
+                                    autoFocus={true}
+                                    underlineColorAndroid='transparent'
+                                    keyboardType="numeric"
+                                    value={this.state.BQNumber.toString()}
+                                    placeholderTextColor="#333333"
+                                    onChangeText={(value)=>{this.setState({BQNumber:value})}}
+                                    onSubmitEditing={this.onSubmitEditing.bind(this)}
+                                    onEndEditing = {this.onSubmitEditing.bind(this)}
+                                />:
+                                <TextInput
+                                    style={styles.Number}
+                                    autoFocus={true}
+                                    underlineColorAndroid='transparent'
+                                    keyboardType="numeric"
+                                    value={this.state.Number.toString()}
+                                    placeholderTextColor="#333333"
+                                    onChangeText={(value)=>{this.setState({Number:value})}}
+                                    onSubmitEditing={this.onSubmitEditing.bind(this)}
+                                    onEndEditing = {this.onSubmitEditing.bind(this)}
+                                />
+                        }
                     </View>
                     <View style={styles.right1}>
                         <TouchableOpacity style={[styles.sublime,{marginLeft:0,}]} onPress={this.clear.bind(this)}><Image source={require("../images/1_09.png")}/></TouchableOpacity>
@@ -245,7 +273,7 @@ export default class GoodsDetails extends Component {
                     </View>
                 </View>
                 {
-                    (this.state.YdCountm==1)?
+                    (this.state.YdCountm==1||this.state.YdCountm==3)?
                     <View style={styles.List}>
                         <View style={styles.left2}>
                             <Text style={styles.left}>现在库存</Text>
@@ -271,17 +299,19 @@ export default class GoodsDetails extends Component {
                         <Text style={styles.price}>元/件</Text>
                     </View>
                 </View>
-                <View style={styles.List}>
-                    <View style={styles.left2}>
-                        <Text style={styles.left}>金额</Text>
-                        <Text style={styles.Price1}>
-                        {this.state.numberFormat2}
-                        </Text>
-                    </View>
-                    <View style={styles.right2}>
-                        <Text style={styles.price}>元</Text>
-                    </View>
-                </View>
+                {
+                    (this.state.YdCountm == 3) ?
+                        null:
+                        <View style={styles.List}>
+                            <View style={styles.left2}>
+                                <Text style={styles.left}>金额</Text>
+                                <Text style={styles.Price1}>{this.state.numberFormat2}</Text>
+                            </View>
+                            <View style={styles.right2}>
+                                <Text style={styles.price}>元</Text>
+                            </View>
+                        </View>
+                }
                 {
                     (this.state.YdCountm == 4) ?
                         null:

@@ -1257,6 +1257,60 @@ export default class Index extends Component {
         }
     }
 
+    BQbutton(){
+        if(this.state.ShopCar1>0){
+            this._setModalVisible();
+            alert("商品未提交")
+        }else if(this.state.username==null){
+            this._setModalVisible();
+        }else{
+            dbAdapter.selectUserRight(this.state.usercode,"K0216").then((rows)=>{
+                if(rows==true){
+                    if(this.state.Disting=="0"){
+                        var date = new Date();
+                        var data=JSON.stringify(date.getTime());
+                        Storage.save('Name','标签打印');
+                        var invoice = "标签打印";
+                        this.setState({
+                            head:invoice,
+                            active:data,
+                        });
+                        this._setModalVisible();
+                        Storage.save('Date',this.state.active);
+                    }else if(this.state.Disting=="1"){
+                        var date = new Date();
+                        var data=JSON.stringify(date.getTime());
+                        Storage.save('Name','要货单');
+                        Storage.save('Document', "要货单");
+                        Storage.save('FormType','YWYW');
+                        Storage.save('ProYH','ProYH');
+                        Storage.save('YdCountm','1');
+                        Storage.save('Date',this.state.active);
+                        var invoice = "要货单";
+                        this.setState({
+                            head:invoice,
+                            active:data,
+                        });
+                        var nextRoute={
+                            name:"主页",
+                            component:Search
+                        };
+                        this.props.navigator.push(nextRoute);
+                        DeviceEventEmitter.removeAllListeners();
+                        this._setModalVisible();
+                    }else{
+                        this.Promp();
+                    }
+                }
+            })
+
+            Storage.save('YdCountm','3');
+            Storage.save('Name','标签打印');
+            Storage.save('ProYH','BJQ');
+            Storage.save('valueOf','App_Client_BJQ ');
+        }
+    }
+
     StockEnquiries(){
         var nextRoute = {
             name: "库存查询",
@@ -1947,6 +2001,14 @@ export default class Index extends Component {
                                 <Image source={require("../images/1_48.png")} style={styles.ModalImageLine} />
                             </View>
                             <View style={[styles.ModalHead,{marginBottom:10}]}>
+                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.BQbutton.bind(this)}>
+                                    <Text style={styles.ModalHeadImage1}>
+                                        <Image source={require("../images/1_60.png")} />
+                                    </Text>
+                                    <Text style={styles.ModalHeadText}>
+                                        标签打印
+                                    </Text>
+                                </TouchableOpacity>
                                 <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.pullOut.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_56.png")} />
@@ -1963,7 +2025,6 @@ export default class Index extends Component {
                                         数据更新
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.ModalHeadImage}></TouchableOpacity>
                             </View>
                         </View>
                     </ScrollView>

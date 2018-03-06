@@ -81,7 +81,7 @@ export default class  login extends Component{
                        Storage.save('Url',NullItems);
                        // console.log('NullItems=',NullItems)
                        var data='/FMJsonInterfaceByDownToPos';
-                       var date=items+'/FMJsonInter faceByDownToPos';//拼接字符
+                       var date=items+'/FMJsonInterfaceByDownToPos';//拼接字符
                        var replace = date.replace(/\s/g, "");
                        Storage.save('LinkUrl',replace);
                        // console.log('LinkUrl1=',replace)

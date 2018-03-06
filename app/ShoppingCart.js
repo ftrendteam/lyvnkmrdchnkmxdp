@@ -515,6 +515,7 @@ export default class ShoppingCart extends Component {
         })
 
         Storage.get('LinkUrl').then((tags) => {
+            console.log('tags=',tags)
             this.setState({
                 linkurl:tags
             })
@@ -561,54 +562,76 @@ export default class ShoppingCart extends Component {
                         },
                         DetailInfo2: this.ds,
                     };
-                    if(this.state.Screen=="1"||this.state.Screen=="2"){
-                        var DetailInfo2=params.DetailInfo2;
-                        for(let i =0;i<DetailInfo2.length;i++){
-                            let detail = DetailInfo2[i];
-                            let ydcountm = detail.ydcountm;
-                            let countm = detail.countm;
-                            if(ydcountm!==countm){
-                                this.screen.push(detail);
+                    console.log('params=',JSON.stringify(params))
+                    console.log(this.state.linkurl)
+                    FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
+                        console.log('data=',data)
+                        if(data.retcode == 1){
+                            if(this.state.Screen!=="1"||this.state.Screen!=="2"||this.screen==""||scode==null){
+                                // this.Wait();
+                                // this.Succeed();
                             }
-                        }
-                        if(this.screen==""||this.state.OrgFormno==null){
-                            FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
-                                console.log('data=',data)
-                                if(data.retcode == 1){
-                                    if(this.state.Screen!=="1"||this.state.Screen!=="2"||this.screen==""||scode==null){
-                                        this.Wait();
-                                        this.Succeed();
-                                    }
-                                }else{
-                                    this.Wait();
-                                    alert(JSON.stringify(data))
-                                }
-                            },(err)=>{
-                                alert("网络请求失败");
-                            })
                         }else{
-                            this.setState({
-                                dataSource:this.state.dataSource.cloneWithRows(this.screen),
-                            })
-                            this.Wait();
-                            this.ScreenBod();
+                            // this.Wait();
+                            alert(JSON.stringify(data))
                         }
-                    }else{
-                        FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
-                            console.log('data1=',data)
-                            if(data.retcode == 1){
-                                if(this.state.Screen!=="1"||this.state.Screen!=="2"||this.screen==""||scode==null){
-                                    this.Wait();
-                                    this.Succeed();
-                                }
-                            }else{
-                                this.Wait();
-                                alert(JSON.stringify(data))
-                            }
-                        },(err)=>{
-                            alert("网络请求失败");
-                        })
-                    }
+                    },(err)=>{
+                        alert("网络请求失败2");
+                        console.log('网络请求失败1111')
+                    })
+
+
+
+                    // if(this.state.Screen=="1"||this.state.Screen=="2"){
+                    //     var DetailInfo2=params.DetailInfo2;
+                    //     for(let i =0;i<DetailInfo2.length;i++){
+                    //         let detail = DetailInfo2[i];
+                    //         let ydcountm = detail.ydcountm;
+                    //         let countm = detail.countm;
+                    //         if(ydcountm!==countm){
+                    //             this.screen.push(detail);
+                    //         }
+                    //     }
+                    //     if(this.screen==""||this.state.OrgFormno==null){
+                    //         FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
+                    //             console.log('data=',data)
+                    //             if(data.retcode == 1){
+                    //                 if(this.state.Screen!=="1"||this.state.Screen!=="2"||this.screen==""||scode==null){
+                    //                     this.Wait();
+                    //                     this.Succeed();
+                    //                 }
+                    //             }else{
+                    //                 this.Wait();
+                    //                 alert(JSON.stringify(data))
+                    //             }
+                    //         },(err)=>{
+                    //             alert("网络请求失败");
+                    //             console.log('网络请求失败')
+                    //         })
+                    //     }else{
+                    //         this.setState({
+                    //             dataSource:this.state.dataSource.cloneWithRows(this.screen),
+                    //         })
+                    //         this.Wait();
+                    //         this.ScreenBod();
+                    //     }
+                    // }else{
+                    //     FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
+                    //         console.log('data1=',data)
+                    //         if(data.retcode == 1){
+                    //             if(this.state.Screen!=="1"||this.state.Screen!=="2"||this.screen==""||scode==null){
+                    //                 this.Wait();
+                    //                 this.Succeed();
+                    //             }
+                    //         }else{
+                    //             this.Wait();
+                    //             alert(JSON.stringify(data))
+                    //         }
+                    //     },(err)=>{
+                    //         alert("网络请求失败");
+                    //         console.log('网络请求失败1')
+                    //     })
+                    // }
                 })
             })
         }
