@@ -92,6 +92,7 @@ export default class Index extends Component {
             FormType:"",
             LinkUrl:"",
             Disting:"",
+            ShopNumber:"",
             pressStatus:0,
             PressStatus:0,
             nomore: true,
@@ -634,20 +635,31 @@ export default class Index extends Component {
     //修改商品数量增减查询
     Countm(item){
         //调取数量
-        dbAdapter.upDataShopInfoCountmSub(item.item.ProdCode).then((rows)=>{});
-        item.item.ShopNumber=item.item.ShopNumber-1;
-        let select =0;
-        for (let i = 0; i < this.dataRows.length; i++) {
-            if (item.item.DepCode1 == this.dataRows[i].DepCode) {//判断当前品类是否相等
-                select = i;
-                let ShopNumber = this.dataRows[i].ShopNumber;
-                this.dataRows[i].ShopNumber = ShopNumber - 1;
+        // alert(this.state.ShopNumber);
+        if(this.state.ShopNumber=="0"){
+            alert("数量不能为0")
+        }else{
+            dbAdapter.upDataShopInfoCountmSub(item.item.ProdCode).then((rows)=>{});
+            item.item.ShopNumber=item.item.ShopNumber-1;
+            let select =0;
+            for (let i = 0; i < this.dataRows.length; i++) {
+                if (item.item.DepCode1 == this.dataRows[i].DepCode) {//判断当前品类是否相等
+                    select = i;
+                    let ShopNumber = this.dataRows[i].ShopNumber;
+                    this.dataRows[i].ShopNumber = ShopNumber - 1;
+                }
             }
+            if(item.item.ShopNumber=="0"){
+                // alert(this.state.ShopNumber)
+                dbAdapter.deteleShopInfo(item.item.ProdCode).then((rows)=>{});
+                this.setState({
+                    ShopCar1:0,
+                    ShopNumber:0,
+                    // dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
+                })
+            }
+            this._fetch1();
         }
-        if(item.item.ShopNumber=="0"){
-            dbAdapter.deteleShopInfo(item.item.ProdCode).then((rows)=>{});
-        }
-        this._fetch1();
     }
 
     _separator = () => {

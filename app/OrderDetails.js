@@ -119,7 +119,7 @@ export default class GoodsDetails extends Component {
         if(this.state.Number==""||this.state.BQNumber==1){
             this.setState({
                 Number:1,
-                BQNumber:2,
+                BQNumber:parseInt(this.state.BQNumber)+1,
                 numberFormat2:this.state.ShopPrice,
             });
         }else{
@@ -157,7 +157,7 @@ export default class GoodsDetails extends Component {
         let numberFormat2 = NumberUtils.numberFormat2((0)*(this.state.ShopPrice));
         this.setState({
             Number:0,
-            BQNumber:0,
+            BQNumber:1,
             numberFormat2:numberFormat2,
         })
     }
@@ -234,13 +234,7 @@ export default class GoodsDetails extends Component {
             shopInfoData.push(shopInfo);
             //调用插入表方法
             dbAdapter.insertShopInfo(shopInfoData);
-            if(this.state.DataName=="销售"){
-                var nextRoute={
-                    name:"销售",
-                    component:Sell,
-                };
-                this.props.navigator.push(nextRoute);
-            }else if(this.state.ShoppData=="0"){
+            if(this.state.ShoppData=="0"){
                 var nextRoute={
                     name:"清单",
                     component:ShoppingCart,
@@ -374,7 +368,7 @@ export default class GoodsDetails extends Component {
                 {
                     (this.state.YdCountm == 3) ?
                         <TouchableOpacity style={styles.button} onPress={this.PressPop.bind(this)}>
-                            <Text style={styles.ButtonText}>确定11</Text>
+                            <Text style={styles.ButtonText}>确定</Text>
                         </TouchableOpacity>
                         :
                         <TouchableOpacity style={styles.button} onPress={this.pressPop.bind(this)}>
