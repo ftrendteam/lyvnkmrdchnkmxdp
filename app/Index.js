@@ -122,7 +122,7 @@ export default class Index extends Component {
 
     History(){
         Storage.get('Name').then((tags)=>{
-            if(this.state.head=="销售"){
+            if(this.state.head=="销售"||this.state.head=="标签打印"){
                 ToastAndroid.show('暂不支持该业务', ToastAndroid.SHORT)
             }else{
                 var nextRoute={
@@ -1258,12 +1258,19 @@ export default class Index extends Component {
     }
 
     BQbutton(){
+
         if(this.state.ShopCar1>0){
             this._setModalVisible();
             alert("商品未提交")
         }else if(this.state.username==null){
             this._setModalVisible();
         }else{
+            Storage.delete('OrgFormno');
+            Storage.delete('scode');
+            Storage.delete('shildshop');
+            Storage.delete('YuanDan');
+            Storage.delete('Screen');
+            Storage.delete('StateMent');
             dbAdapter.selectUserRight(this.state.usercode,"K0216").then((rows)=>{
                 if(rows==true){
                     if(this.state.Disting=="0"){
@@ -1305,9 +1312,10 @@ export default class Index extends Component {
             })
 
             Storage.save('YdCountm','3');
+            Storage.save('Document', "标签打印");
             Storage.save('Name','标签打印');
             Storage.save('ProYH','BJQ');
-            Storage.save('valueOf','App_Client_BJQ ');
+            Storage.save('valueOf','App_Client_BJQ');
         }
     }
 

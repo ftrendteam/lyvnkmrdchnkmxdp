@@ -76,6 +76,7 @@ export default class ShoppingCart extends Component {
             OrgFormno:"",
             FormType:"",
             LinkUrl:"",
+            Document:"",
             BeiZhu:"暂无备注",
             dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
             ds:new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
@@ -86,6 +87,12 @@ export default class ShoppingCart extends Component {
     //自动跑接口
     componentDidMount(){
         InteractionManager.runAfterInteractions(() => {
+            Storage.get('Document').then((tags)=>{
+                this.setState({
+                    Document:tags
+                })
+
+            })
             this._dpSearch();
             this._fetch();
             this.Storage();
@@ -143,7 +150,6 @@ export default class ShoppingCart extends Component {
             this.ds=[];
             for(let i =0;i<rows.length;i++){
                 var row = rows.item(i);
-                console.log(row)
                 var number = row.ShopNumber;
                 shopAmount += parseInt(row.ShopAmount);
                 shopnumber += parseInt(row.ShopNumber);
@@ -367,7 +373,11 @@ export default class ShoppingCart extends Component {
                     <Text style={[styles.Name,styles.Name1]}>{rowData.ProdName}</Text>
                     <Text style={[styles.Number,styles.Name1]}>{rowData.ShopNumber}(件)</Text>
                     <Text style={[styles.Price,styles.Name1]}>{rowData.ShopPrice}</Text>
-                    <Text style={[styles.SmallScale,styles.Name1]}>{rowData.ShopAmount}</Text>
+                    {
+                        (this.state.Document=="标签打印")?
+                            null:
+                            <Text style={[styles.SmallScale,styles.Name1]}>{rowData.ShopAmount}</Text>
+                    }
                 </View>
             </TouchableOpacity>
         );
@@ -515,7 +525,6 @@ export default class ShoppingCart extends Component {
         })
 
         Storage.get('LinkUrl').then((tags) => {
-            console.log('tags=',tags)
             this.setState({
                 linkurl:tags
             })
@@ -562,76 +571,56 @@ export default class ShoppingCart extends Component {
                         },
                         DetailInfo2: this.ds,
                     };
-                    console.log('params=',JSON.stringify(params))
-                    console.log(this.state.linkurl)
-                    FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
-                        console.log('data=',data)
-                        if(data.retcode == 1){
-                            if(this.state.Screen!=="1"||this.state.Screen!=="2"||this.screen==""||scode==null){
-                                // this.Wait();
-                                // this.Succeed();
+                    if(this.state.Screen=="1"||this.state.Screen=="2"){
+                        var DetailInfo2=params.DetailInfo2;
+                        for(let i =0;i<DetailInfo2.length;i++){
+                            let detail = DetailInfo2[i];
+                            let ydcountm = detail.ydcountm;
+                            let countm = detail.countm;
+                            if(ydcountm!==countm){
+                                this.screen.push(detail);
                             }
-                        }else{
-                            // this.Wait();
-                            alert(JSON.stringify(data))
                         }
-                    },(err)=>{
-                        alert("网络请求失败2");
-                        console.log('网络请求失败1111')
-                    })
-
-
-
-                    // if(this.state.Screen=="1"||this.state.Screen=="2"){
-                    //     var DetailInfo2=params.DetailInfo2;
-                    //     for(let i =0;i<DetailInfo2.length;i++){
-                    //         let detail = DetailInfo2[i];
-                    //         let ydcountm = detail.ydcountm;
-                    //         let countm = detail.countm;
-                    //         if(ydcountm!==countm){
-                    //             this.screen.push(detail);
-                    //         }
-                    //     }
-                    //     if(this.screen==""||this.state.OrgFormno==null){
-                    //         FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
-                    //             console.log('data=',data)
-                    //             if(data.retcode == 1){
-                    //                 if(this.state.Screen!=="1"||this.state.Screen!=="2"||this.screen==""||scode==null){
-                    //                     this.Wait();
-                    //                     this.Succeed();
-                    //                 }
-                    //             }else{
-                    //                 this.Wait();
-                    //                 alert(JSON.stringify(data))
-                    //             }
-                    //         },(err)=>{
-                    //             alert("网络请求失败");
-                    //             console.log('网络请求失败')
-                    //         })
-                    //     }else{
-                    //         this.setState({
-                    //             dataSource:this.state.dataSource.cloneWithRows(this.screen),
-                    //         })
-                    //         this.Wait();
-                    //         this.ScreenBod();
-                    //     }
-                    // }else{
-                    //     FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
-                    //         console.log('data1=',data)
-                    //         if(data.retcode == 1){
-                    //             if(this.state.Screen!=="1"||this.state.Screen!=="2"||this.screen==""||scode==null){
-                    //                 this.Wait();
-                    //                 this.Succeed();
-                    //             }
-                    //         }else{
-                    //             this.Wait();
-                    //             alert(JSON.stringify(data))
-                    //         }
-                    //     },(err)=>{
-                    //         alert("网络请求失败");
-                    //         console.log('网络请求失败1')
-                    //     })
-                    // }
+                        if(this.screen==""||this.state.OrgFormno==null){
+                            FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
+                                console.log('data=',data)
+                                if(data.retcode == 1){
+                                    if(this.state.Screen!=="1"||this.state.Screen!=="2"||this.screen==""||scode==null){
+                                        this.Wait();
+                                        this.Succeed();
+                                    }
+                                }else{
+                                    this.Wait();
+                                    alert(JSON.stringify(data))
+                                }
+                            },(err)=>{
+                                alert("网络请求失败");
+                                console.log('网络请求失败')
+                            })
+                        }else{
+                            this.setState({
+                                dataSource:this.state.dataSource.cloneWithRows(this.screen),
+                            })
+                            this.Wait();
+                            this.ScreenBod();
+                        }
+                    }else{
+                        FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
+                            console.log('data1=',data)
+                            if(data.retcode == 1){
+                                if(this.state.Screen!=="1"||this.state.Screen!=="2"||this.screen==""||scode==null){
+                                    this.Wait();
+                                    this.Succeed();
+                                }
+                            }else{
+                                this.Wait();
+                                alert(JSON.stringify(data))
+                            }
+                        },(err)=>{
+                            alert("网络请求失败");
+                            console.log('网络请求失败1')
+                        })
+                    }
                 })
             })
         }
@@ -826,7 +815,7 @@ export default class ShoppingCart extends Component {
                 this.props.navigator.push(nextRoute);
                 this.DataSource();
             }
-            if(tags=="要货单"||tags=="实时盘点单"){
+            if(tags=="要货单"||tags=="实时盘点单"||tags=="标签打印"){
                 this.DataSource();
                 this.Succeed();
             }
@@ -874,6 +863,7 @@ export default class ShoppingCart extends Component {
     }
 
     render() {
+        // console.log(this.state.Document)
         return (
             <View style={styles.container}>
                 <View style={styles.header}>
@@ -892,7 +882,12 @@ export default class ShoppingCart extends Component {
                         <Text style={styles.Name}>名字</Text>
                         <Text style={styles.Number}>数量</Text>
                         <Text style={styles.Price}>单价</Text>
-                        <Text style={styles.SmallScale}>小计</Text>
+                        {
+                            (this.state.Document=="标签打印")?
+                                null
+                                :
+                                <Text style={styles.SmallScale}>小计</Text>
+                        }
                     </View>
                     <View>
                         <SwipeListView
@@ -917,10 +912,15 @@ export default class ShoppingCart extends Component {
                             <Text style={[styles.ClientText,styles.ClientType]}>货品：</Text>
                             <Text style={styles.ClientType}>{this.state.ShopNumber}</Text>
                         </Text>
-                        <Text style={styles.ClientText}>
-                            <Text style={[styles.ClientText,styles.ClientType]}>总价：</Text>
-                            <Text style={styles.Price1}>{this.state.ShopAmount}</Text>
-                        </Text>
+                        {
+                            (this.state.Document=="标签打印")?
+                                null
+                                :
+                                <Text style={styles.ClientText}>
+                                    <Text style={[styles.ClientText,styles.ClientType]}>总价：</Text>
+                                    <Text style={styles.Price1}>{this.state.ShopAmount}</Text>
+                                </Text>
+                        }
 
                     </View>
                     <View style={styles.Note}>

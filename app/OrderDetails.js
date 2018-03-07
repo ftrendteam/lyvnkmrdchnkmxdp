@@ -165,7 +165,7 @@ export default class GoodsDetails extends Component {
     pressPop(){
         if(this.state.name==null) {
             alert("请选择单据")
-        }else if(this.state.Number==0||this.state.Number == ""){
+        }else if(this.state.Number==0){
             ToastAndroid.show('商品数量不能为空', ToastAndroid.SHORT);
         }else{
             var shopInfoData = [];
@@ -173,17 +173,59 @@ export default class GoodsDetails extends Component {
             shopInfo.Pid = this.state.Pid;
             shopInfo.ProdCode=this.state.ProdCode;
             shopInfo.prodname = this.state.ProdName;
-            if(this.state.name=="标签打印"){
-                shopInfo.countm = this.state.BQNumber;
-            }else{
-                shopInfo.countm = this.state.Number;
-            }
+            shopInfo.countm = this.state.Number;
             shopInfo.ShopPrice = this.state.ShopPrice;
-            if(this.state.name=="标签打印"){
-                shopInfo.prototal ="0";//金额
+            shopInfo.prototal =(this.state.Number)*(this.state.ShopPrice);//金额
+            shopInfo.promemo = this.state.Remark;
+            shopInfo.DepCode = this.state.DepCode;
+            shopInfo.ydcountm = this.state.ydcountm;
+            shopInfo.SuppCode = this.state.SuppCode;
+            shopInfo.BarCode = this.state.BarCode;
+            shopInfoData.push(shopInfo);
+            //调用插入表方法
+            dbAdapter.insertShopInfo(shopInfoData);
+            if(this.state.DataName=="销售"){
+                var nextRoute={
+                    name:"销售",
+                    component:Sell,
+                };
+                this.props.navigator.push(nextRoute);
+            }else if(this.state.ShoppData=="0"){
+                var nextRoute={
+                    name:"清单",
+                    component:ShoppingCart,
+                    params:{
+                        DepCode:this.state.DepCode,
+                    }
+                };
+                this.props.navigator.push(nextRoute);
             }else{
-                shopInfo.prototal =(this.state.Number)*(this.state.ShopPrice);//金额
+                var nextRoute={
+                    name:"主页",
+                    component:Index,
+                    params:{
+                        DepCode:this.state.DepCode,
+                    }
+                };
+                this.props.navigator.push(nextRoute);
             }
+        }
+    }
+
+    PressPop(){
+        if(this.state.name==null) {
+            alert("请选择单据")
+        }else if(this.state.BQNumber==""||this.state.BQNumber==0){
+            ToastAndroid.show('商品数量不能为空', ToastAndroid.SHORT);
+        }else{
+            var shopInfoData = [];
+            var shopInfo = {};
+            shopInfo.Pid = this.state.Pid;
+            shopInfo.ProdCode=this.state.ProdCode;
+            shopInfo.prodname = this.state.ProdName;
+            shopInfo.countm = this.state.BQNumber;
+            shopInfo.ShopPrice = this.state.ShopPrice;
+            shopInfo.prototal ="0";//金额
             shopInfo.promemo = this.state.Remark;
             shopInfo.DepCode = this.state.DepCode;
             shopInfo.ydcountm = this.state.ydcountm;
@@ -329,9 +371,16 @@ export default class GoodsDetails extends Component {
                             </View>
                         </View>
                 }
-                <TouchableOpacity style={styles.button} onPress={this.pressPop.bind(this)}>
-                    <Text style={styles.ButtonText}>确定</Text>
-                </TouchableOpacity>
+                {
+                    (this.state.YdCountm == 3) ?
+                        <TouchableOpacity style={styles.button} onPress={this.PressPop.bind(this)}>
+                            <Text style={styles.ButtonText}>确定11</Text>
+                        </TouchableOpacity>
+                        :
+                        <TouchableOpacity style={styles.button} onPress={this.pressPop.bind(this)}>
+                            <Text style={styles.ButtonText}>确定</Text>
+                        </TouchableOpacity>
+                }
             </View>
         </ScrollView>
       </ScrollView>
