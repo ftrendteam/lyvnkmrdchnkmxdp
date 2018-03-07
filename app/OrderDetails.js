@@ -41,7 +41,7 @@ export default class GoodsDetails extends Component {
             YdCountm:"",
             shuliang:"",
             numberFormat2:"",
-            BQNumber:1,
+            BQNumber:this.props.countm ? this.props.countm : 1,
         }
     }
 
@@ -117,12 +117,14 @@ export default class GoodsDetails extends Component {
     add(){
         // var Number1=this.state.Number;
         if(this.state.Number==""||this.state.BQNumber==1){
+            // alert(this.state.Number)
             this.setState({
-                Number:1,
+                Number:parseInt(this.state.Number)+1,
                 BQNumber:parseInt(this.state.BQNumber)+1,
                 numberFormat2:this.state.ShopPrice,
             });
         }else{
+            // alert("yt")
             let numberFormat2 = NumberUtils.numberFormat2((parseInt(this.state.Number)+1)*(this.state.ShopPrice));
             this.setState({
                 Number:parseInt(this.state.Number)+1,
@@ -133,7 +135,7 @@ export default class GoodsDetails extends Component {
     }
 
     subtraction(){
-        if(this.state.Number >0){
+        if(this.state.Number >0||this.state.BQNumber >1){
             var Number1=this.state.Number;
             var BQNumber1=this.state.BQNumber;
             this.setState({
@@ -144,9 +146,8 @@ export default class GoodsDetails extends Component {
             this.setState({
                 numberFormat2:numberFormat2,
             });
-        }
-        if(this.state.Number == 0||this.state.Number == ""){
-            ToastAndroid.show('商品数量不能为空', ToastAndroid.SHORT);
+        }else if(this.state.Number == 0||this.state.BQNumber == ""){
+            ToastAndroid.show('商品数量为0', ToastAndroid.SHORT);
             this.setState({
                Number:0
             });

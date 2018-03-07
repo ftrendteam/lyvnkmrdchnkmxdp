@@ -148,13 +148,28 @@ export default class ShoppingCart extends Component {
             var shopnumber = 0;
             var shopAmount = 0;
             this.ds=[];
+            this.DataShop=[];
             for(let i =0;i<rows.length;i++){
                 var row = rows.item(i);
                 var number = row.ShopNumber;
+
+                var prodcode = row.ProdCode;
+                var countm = row.countm;
+                var ProPrice = row.ShopPrice;
+                var promemo = row.promemo;
+                var ydcountm = row.ydcountm;
                 shopAmount += parseInt(row.ShopAmount);
                 shopnumber += parseInt(row.ShopNumber);
                 if(number!==0){
                     this.ds.push(row);
+                    var DataShop = {
+                        'prodcode': prodcode,
+                        'countm': countm,
+                        'ProPrice': ProPrice,
+                        'promemo': promemo,
+                        'ydcountm': ydcountm,
+                    }
+                    this.DataShop.push(DataShop);
                 }
             }
             if(this.ds==0){
@@ -569,7 +584,7 @@ export default class ShoppingCart extends Component {
                             "pdaGuid":this.state.IMEI,
                             "pdgFormno":this.state.ProYH+this.state.Date
                         },
-                        DetailInfo2: this.ds,
+                        DetailInfo2: this.DataShop,
                     };
                     if(this.state.Screen=="1"||this.state.Screen=="2"){
                         var DetailInfo2=params.DetailInfo2;
@@ -583,7 +598,6 @@ export default class ShoppingCart extends Component {
                         }
                         if(this.screen==""||this.state.OrgFormno==null){
                             FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
-                                console.log('data=',data)
                                 if(data.retcode == 1){
                                     if(this.state.Screen!=="1"||this.state.Screen!=="2"||this.screen==""||scode==null){
                                         this.Wait();
@@ -595,7 +609,6 @@ export default class ShoppingCart extends Component {
                                 }
                             },(err)=>{
                                 alert("网络请求失败");
-                                console.log('网络请求失败')
                             })
                         }else{
                             this.setState({
@@ -606,7 +619,6 @@ export default class ShoppingCart extends Component {
                         }
                     }else{
                         FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
-                            console.log('data1=',data)
                             if(data.retcode == 1){
                                 if(this.state.Screen!=="1"||this.state.Screen!=="2"||this.screen==""||scode==null){
                                     this.Wait();
@@ -618,7 +630,6 @@ export default class ShoppingCart extends Component {
                             }
                         },(err)=>{
                             alert("网络请求失败");
-                            console.log('网络请求失败1')
                         })
                     }
                 })
@@ -671,10 +682,9 @@ export default class ShoppingCart extends Component {
                             "pdaGuid": this.state.IMEI,
                             "pdgFormno": this.state.ProYH + this.state.Date
                         },
-                        DetailInfo2: this.ds,
+                        DetailInfo2: this.DataShop,
                     };
                     FetchUtils.post(this.state.linkurl, JSON.stringify(params)).then((data) => {
-                        console.log('data2=',data)
                         if (data.retcode == 1) {
                             this.ScreenBod();
                             this.Succeed();
@@ -863,7 +873,6 @@ export default class ShoppingCart extends Component {
     }
 
     render() {
-        // console.log(this.state.Document)
         return (
             <View style={styles.container}>
                 <View style={styles.header}>

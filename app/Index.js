@@ -371,16 +371,11 @@ export default class Index extends Component {
     componentDidMount(){
         Storage.save("num","1");
         InteractionManager.runAfterInteractions(() => {
-          Storage.get('LinkUrl').then((tags) => {
-            this.setState({
-              LinkUrl:tags
-            })
-            let memberSelect =JSON.stringify({
-              'TblName': 'DownPosShop'  //固定内容
-            });
-            FetchUtil.post(this.state.LinkUrl,memberSelect).then((data)=>{
-            });
-          })
+          // Storage.get('LinkUrl').then((tags) => {
+          //   this.setState({
+          //     LinkUrl:tags
+          //   })
+          // })
           
             this.Storage();
             this._fetch();
@@ -407,16 +402,6 @@ export default class Index extends Component {
             })
 
         });
-        //dbAdapter.selectSum().then((datas)=>{
-        //    let details = [];
-        //  console.log("a",datas.length);
-        //    for(let i  = 0;i<datas.length;i++){
-        //      console.log("a",datas.item(i));
-        //        dbAdapter.selectDetail(datas.item(i).LsNo).then((details)=>{
-        //            details.push(details);
-        //        });
-        //    }
-        //});
     }
 
     Storage(){
@@ -636,9 +621,9 @@ export default class Index extends Component {
     Countm(item){
         //调取数量
         // alert(this.state.ShopNumber);
-        if(this.state.ShopNumber=="0"){
-            alert("数量不能为0")
-        }else{
+        // if(this.state.ShopNumber=="0"||this.state.shopcar==""){
+        //     alert("数量不能为0")
+        // }else{
             dbAdapter.upDataShopInfoCountmSub(item.item.ProdCode).then((rows)=>{});
             item.item.ShopNumber=item.item.ShopNumber-1;
             let select =0;
@@ -655,11 +640,13 @@ export default class Index extends Component {
                 this.setState({
                     ShopCar1:0,
                     ShopNumber:0,
-                    // dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
                 })
             }
+            if(item.item.ShopNumber<0){
+                alert("123")
+            }
             this._fetch1();
-        }
+        // }
     }
 
     _separator = () => {
@@ -809,6 +796,7 @@ export default class Index extends Component {
             Storage.delete('YuanDan');
             Storage.delete('Screen');
             Storage.delete('StateMent');
+            Storage.delete('BQNumber');
             Storage.get('code').then((tags) => {
                 dbAdapter.isYHPSXP(tags).then((rows)=>{
                     if(rows.length>=1){
@@ -881,6 +869,7 @@ export default class Index extends Component {
             Storage.delete('YuanDan');
             Storage.delete('Screen');
             Storage.delete('StateMent');
+            Storage.delete('BQNumber');
             dbAdapter.selectUserRight(this.state.usercode,"K0604").then((rows) => {
                 if (rows == true) {
                     if(this.state.Disting=="0"||this.state.Disting=="1") {
@@ -914,6 +903,7 @@ export default class Index extends Component {
             Storage.delete('shildshop');
             Storage.delete('YuanDan');
             Storage.delete('StateMent');
+            Storage.delete('BQNumber');
             dbAdapter.selectUserRight(this.state.usercode,"K0611").then((rows) => {
                 if (rows == true) {
                     if(this.state.Disting=="0") {
@@ -978,6 +968,7 @@ export default class Index extends Component {
             Storage.delete('scode');
             Storage.delete('shildshop');
             Storage.delete('StateMent');
+            Storage.delete('BQNumber');
             dbAdapter.selectUserRight(this.state.usercode,"K0607").then((rows) => {
                 if (rows == true) {
                     if(this.state.Disting=="0"||this.state.Disting=="1") {
@@ -1012,6 +1003,7 @@ export default class Index extends Component {
             Storage.delete('scode');
             Storage.delete('shildshop');
             Storage.delete('StateMent');
+            Storage.delete('BQNumber');
             Storage.get('code').then((tags) => {
                 dbAdapter.isYHPSXP(tags).then((rows)=>{
                     if(rows.length>=1){
@@ -1054,6 +1046,7 @@ export default class Index extends Component {
             Storage.delete('scode');
             Storage.delete('shildshop');
             Storage.delete('StateMent');
+            Storage.delete('BQNumber');
             Storage.get('code').then((tags) => {
                 dbAdapter.isCGYS(tags).then((rows)=>{
                     if(rows.length>=1) {
@@ -1094,6 +1087,7 @@ export default class Index extends Component {
             Storage.delete('scode');
             Storage.delete('shildshop');
             Storage.delete('StateMent');
+            Storage.delete('BQNumber');
             Storage.get('code').then((tags) => {
                 dbAdapter.isCGYS(tags).then((rows)=>{
                     if(rows.length>=1) {
@@ -1135,6 +1129,7 @@ export default class Index extends Component {
             Storage.delete('scode');
             Storage.delete('shildshop');
             Storage.delete('StateMent');
+            Storage.delete('BQNumber');
             Storage.get('code').then((tags) => {
                 dbAdapter.isXPCG(tags).then((rows)=>{
                     if(rows.length>=1) {
@@ -1176,6 +1171,7 @@ export default class Index extends Component {
             Storage.delete('scode');
             Storage.delete('shildshop');
             Storage.delete('StateMent');
+            Storage.delete('BQNumber');
             Storage.get('code').then((tags) => {
                 dbAdapter.isYHPSXP(tags).then((rows)=>{
                     if(rows.length>=1){
@@ -1283,12 +1279,12 @@ export default class Index extends Component {
             Storage.delete('YuanDan');
             Storage.delete('Screen');
             Storage.delete('StateMent');
+            Storage.delete('BQNumber');
             dbAdapter.selectUserRight(this.state.usercode,"K0216").then((rows)=>{
                 if(rows==true){
                     if(this.state.Disting=="0"){
                         var date = new Date();
                         var data=JSON.stringify(date.getTime());
-                        Storage.save('Name','标签打印');
                         var invoice = "标签打印";
                         this.setState({
                             head:invoice,
@@ -1299,13 +1295,7 @@ export default class Index extends Component {
                     }else if(this.state.Disting=="1"){
                         var date = new Date();
                         var data=JSON.stringify(date.getTime());
-                        Storage.save('Name','要货单');
-                        Storage.save('Document', "要货单");
-                        Storage.save('FormType','YWYW');
-                        Storage.save('ProYH','ProYH');
-                        Storage.save('YdCountm','1');
-                        Storage.save('Date',this.state.active);
-                        var invoice = "要货单";
+                        var invoice = "标签打印";
                         this.setState({
                             head:invoice,
                             active:data,
@@ -1315,6 +1305,7 @@ export default class Index extends Component {
                             component:Search
                         };
                         this.props.navigator.push(nextRoute);
+                        Storage.save('Date',this.state.active);
                         DeviceEventEmitter.removeAllListeners();
                         this._setModalVisible();
                     }else{
@@ -1324,6 +1315,7 @@ export default class Index extends Component {
             })
 
             Storage.save('YdCountm','3');
+            Storage.save('BQNumber','3');
             Storage.save('Document', "标签打印");
             Storage.save('Name','标签打印');
             Storage.save('ProYH','BJQ');
@@ -1355,6 +1347,7 @@ export default class Index extends Component {
             Storage.delete('history');
             Storage.delete('FirstTime1');
             Storage.delete("Disting");
+            Storage.delete('BQNumber');
         }
     }
 
@@ -1373,6 +1366,7 @@ export default class Index extends Component {
             Storage.delete('history');
             Storage.delete('FirstTime1');
             Storage.delete("Disting");
+            Storage.delete('BQNumber');
         }
     }
 

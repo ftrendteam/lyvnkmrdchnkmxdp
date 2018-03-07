@@ -60,6 +60,7 @@ export default class Search extends Component {
             Remark: "",
             BarCode:"",
             modal:"",
+            BQNumber:"",
             Show: false,
             emptydata:false,
             dataRows: "1",
@@ -319,6 +320,12 @@ export default class Search extends Component {
             })
         })
 
+        Storage.get('BQNumber').then((tags) => {
+            this.setState({
+                BQNumber: tags
+            })
+        })
+
     }
 
     Close() {
@@ -513,6 +520,42 @@ export default class Search extends Component {
         }
     }
 
+    PressPop() {
+        if (this.state.name == null) {
+            alert("请选择单据")
+        } else if (this.state.Number1 == 0) {
+            ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
+        } else {
+            // alert(this.state.Remark);
+            var shopInfoData = [];
+            var shopInfo = {};
+            shopInfo.Pid = this.state.Pid;
+            shopInfo.ProdCode = this.state.ProdCode;
+            shopInfo.prodname = this.state.ProdName;
+            shopInfo.countm = this.state.Number1;
+            shopInfo.ShopPrice = this.state.ShopPrice;
+            shopInfo.prototal = "0";
+            shopInfo.promemo = this.state.Remark;
+            shopInfo.DepCode = this.state.DepCode;
+            shopInfo.ydcountm = this.state.ydcountm;
+            shopInfo.SuppCode = this.state.SuppCode;
+            shopInfo.BarCode = this.state.BarCode;
+            shopInfoData.push(shopInfo);
+            //调用插入表方法
+            dbAdapter.insertShopInfo(shopInfoData);
+            this.setState({
+                Number1: "",
+                ydcountm: "",
+                ShopPrice: "",
+                numberFormat2: "",
+                Remark: "",
+                ProdName: "",
+                Number1: "",
+                modal:"",
+            })
+        }
+    }
+
     _Emptydata(){
         let isShow = this.state.emptydata;
         this.setState({
@@ -594,7 +637,7 @@ export default class Search extends Component {
                                             </View>
                                             :
                                             <View style={styles.left1}>
-                                                <Text style={[styles.left, {marginTop: 4}]}>数量1</Text>
+                                                <Text style={[styles.left, {marginTop: 4}]}>数量</Text>
                                             </View>
                                     }
                                     <View style={styles.right1}>
@@ -607,7 +650,7 @@ export default class Search extends Component {
                                     </View>
                                 </View>
                                 {
-                                    (this.state.YdCountm == 1) ?
+                                    (this.state.YdCountm == 1||this.state.BQNumber == 3) ?
                                         <View style={styles.List}>
                                             <View style={styles.left2}>
                                                 <Text style={styles.left}>现在库存</Text>
@@ -633,17 +676,21 @@ export default class Search extends Component {
                                         <Text style={styles.price}>元/件</Text>
                                     </View>
                                 </View>
-                                <View style={styles.List}>
-                                    <View style={styles.left2}>
-                                        <Text style={styles.left}>金额</Text>
-                                        <Text style={styles.Price1}>
-                                            {this.state.numberFormat2}
-                                        </Text>
-                                    </View>
-                                    <View style={styles.right2}>
-                                        <Text style={styles.price}>元</Text>
-                                    </View>
-                                </View>
+                                {
+                                    (this.state.BQNumber == 3) ?
+                                        null :
+                                        <View style={styles.List}>
+                                            <View style={styles.left2}>
+                                                <Text style={styles.left}>金额</Text>
+                                                <Text style={styles.Price1}>
+                                                    {this.state.numberFormat2}
+                                                </Text>
+                                            </View>
+                                            <View style={styles.right2}>
+                                                <Text style={styles.price}>元</Text>
+                                            </View>
+                                        </View>
+                                }
                                 <View style={[styles.List, {paddingTop: 10,}]}>
                                     <View style={styles.left2}>
                                         <Text style={[styles.left, {marginTop: 9,}]}>备注</Text>
@@ -656,9 +703,16 @@ export default class Search extends Component {
                                             }}/>
                                     </View>
                                 </View>
-                                <TouchableOpacity style={styles.button} onPress={this.pressPop.bind(this)}>
-                                    <Text style={styles.ButtonText}>确定</Text>
-                                </TouchableOpacity>
+                                {
+                                    (this.state.BQNumber == 3)?
+                                        <TouchableOpacity style={styles.button} onPress={this.PressPop.bind(this)}>
+                                            <Text style={styles.ButtonText}>确定1</Text>
+                                        </TouchableOpacity>
+                                        :
+                                        <TouchableOpacity style={styles.button} onPress={this.pressPop.bind(this)}>
+                                            <Text style={styles.ButtonText}>确定</Text>
+                                        </TouchableOpacity>
+                                }
                             </View>
                         </ScrollView>
                         :
