@@ -431,6 +431,24 @@ export default class DBAdapter extends SQLiteOpenHelper {
   }
   
   /***
+   * 单据提交查询接口
+   */
+  selectShopInfoSub=()=>{
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        let ssql = "select b.ProdCode,b.countm,b.promemo,b.ydcountm,ifNull(b.countm,0) as ShopNumber,ifNull(b.ShopPrice,a.StdPrice) as ProPrice,ifNull(b.ShopPrice,a.StdPrice) as ShopPrice ,ifNull(b.prototal,0) as ShopAmount   " +
+          ",ifNull(b.promemo,'') as ShopRemark,b.depcode as  DepCode1 " +
+          " from product a join shopInfo b on a.Pid=b.Pid";
+        tx.executeSql(ssql, [], (tx, results) => {
+          resolve(results.rows);
+        });
+      }, (error) => {
+        this._errorCB('transaction', error);
+      });
+    });
+  }
+  
+  /***
    * 查询shopInfo表中所有商品的数量总和
    */
   selectShopInfoAllCountm() {
@@ -1697,7 +1715,19 @@ export default class DBAdapter extends SQLiteOpenHelper {
       });
     });
   }
-  
+  updateShopInfoFormType=(pid)=>{
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        let sql = "update shopinfo set FormType='DP' where pid='"+pid+"'";
+        tx.executeSql(sql, [], (tx, results) => {
+            resolve((results.rows));
+          }, (error) => {
+            console.log("err===", error);
+          }
+        );
+      });
+    });
+  }
   /***
    * 获取当前符合指定
    * @param FormNo
@@ -1707,7 +1737,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
         let sql = "select * from shopinfo  a join product c on a.pid=c.pid join tdscdep b on c.depcode=b.depcode where " +
-          "b.FormNo='"+FormNo+"' and (FormType<>'DP' or FormType is null) and a.prodcode not in (select prodcode from tdscExcept where FormNo='"+FormNo+"')";
+          "b.FormNo='"+FormNo+"' and (FormType<>'DP' or FormType is null) and a.prodcode not in (select prodcode from tdscExcept where FormNo='"+FormNo+"') order by prototal DESC";
         tx.executeSql(sql, [], (tx, results) => {
             resolve((results.rows));
           }, (error) => {
