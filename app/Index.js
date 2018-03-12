@@ -27,27 +27,29 @@ import {
     ActivityIndicator,
     InteractionManager,
 } from 'react-native';
-import HistoricalDocument from "./HistoricalDocument";
-import ShoppingCart from "./ShoppingCart";
-import admin from "./admin";
-import OrderDetails from "./OrderDetails";
-import SunYi from "./SunYi";
-import Search from "./Search";
-import Query from "./Query";
-import Distrition from "./Distrition";
-import ProductCG from "./ProductCG";
-import ProductYS from "./ProductYS";
-import ProductXP from "./ProductXP";
-import ProductSH from "./ProductSH";
-import SellData from "../Sell/Sell_Data";
-import Sell from "../Sell/Sell";
-import StockEnquiries from "../StockEnquiries/StockEnquiries";
+import HistoricalDocument from "./HistoricalDocument";//历史单据
+import ShoppingCart from "./ShoppingCart";//清单
+import admin from "./admin";//登录页==用户编码
+import OrderDetails from "./OrderDetails";//商品详情页，数量增加
+import SunYi from "./SunYi";//损益单
+import Search from "./Search";//搜索
+import Query from "./Query";//盘点单
+import Distrition from "./Distrition";//配送单
+import ProductCG from "./ProductCG";//商品采购单
+import ProductYS from "./ProductYS";//商品验收单
+import ProductXP from "./ProductXP";//协配采购单
+import ProductSH from "./ProductSH";//协配收货单
+import SellData from "../Sell/Sell_Data";//销售商品列表
+import Sell from "../Sell/Sell";//销售付款页面
+import StockEnquiries from "../StockEnquiries/StockEnquiries";//库存查询
+import Shopsearch from "../StockEnquiries/Shopsearch";//点击商品 商品查询
+import SearchData from "../StockEnquiries/SearchData";//搜索页面 商品查询
 import NetUtils from "../utils/NetUtils";
-import FetchUtil from "../utils/FetchUtils";
-import UpData from "../utils/UpData";
-import DBAdapter from "../adapter/DBAdapter";
-import Storage from '../utils/Storage';
-import DeCodePrePrint18 from "../utils/DeCodePrePrint18";
+import FetchUtil from "../utils/FetchUtils";//网络请求封装
+import UpData from "../utils/UpData";//数据更新
+import DBAdapter from "../adapter/DBAdapter";//接口页面
+import Storage from '../utils/Storage';//保存 获取
+import DeCodePrePrint18 from "../utils/DeCodePrePrint18";//商品扫码
 import SideMenu from 'react-native-side-menu';
 var {NativeModules} = require('react-native');
 var RNScannerAndroid = NativeModules.RNScannerAndroid;
@@ -122,7 +124,6 @@ export default class Index extends Component {
     }
 
     History(){
-        Storage.get('Name').then((tags)=>{
             if(this.state.head=="销售"||this.state.head=="标签打印"){
                 ToastAndroid.show('暂不支持该业务', ToastAndroid.SHORT)
             }else{
@@ -132,7 +133,6 @@ export default class Index extends Component {
                 };
                 this.props.navigator.push(nextRoute)
             }
-        })
     }
 
     ShopList(){
@@ -235,22 +235,32 @@ export default class Index extends Component {
                                                 var ShopPrice=JSON.stringify(data.ShopPrice);
                                                 if(data.retcode == 1){
                                                     var ShopCar = rows.item(0).ProdName;
-                                                    this.props.navigator.push({
-                                                        component:OrderDetails,
-                                                        params:{
-                                                            ProdName:rows.item(0).ProdName,
-                                                            ShopPrice:ShopPrice,
-                                                            Pid:rows.item(0).Pid,
-                                                            countm:rows.item(0).ShopNumber,
-                                                            promemo:rows.item(0).promemo,
-                                                            prototal:rows.item(0).prototal,
-                                                            ProdCode:rows.item(0).ProdCode,
-                                                            DepCode:rows.item(0).DepCode1,
-                                                            SuppCode:rows.item(0).SuppCode,
-                                                            ydcountm:countm,
-                                                            BarCode: rows.item(0).BarCode,
-                                                        }
-                                                    })
+                                                    if(this.state.head=="商品查询"){
+                                                        this.props.navigator.push({
+                                                            component:Shopsearch,
+                                                            params:{
+                                                                ProdCode:rows.item(0).ProdCode,
+                                                                DepCode:rows.item(0).DepCode1,
+                                                            }
+                                                        })
+                                                    }else{
+                                                        this.props.navigator.push({
+                                                            component:OrderDetails,
+                                                            params:{
+                                                                ProdName:rows.item(0).ProdName,
+                                                                ShopPrice:ShopPrice,
+                                                                Pid:rows.item(0).Pid,
+                                                                countm:rows.item(0).ShopNumber,
+                                                                promemo:rows.item(0).promemo,
+                                                                prototal:rows.item(0).prototal,
+                                                                ProdCode:rows.item(0).ProdCode,
+                                                                DepCode:rows.item(0).DepCode1,
+                                                                SuppCode:rows.item(0).SuppCode,
+                                                                ydcountm:countm,
+                                                                BarCode: rows.item(0).BarCode,
+                                                            }
+                                                        })
+                                                    }
                                                 }else{
                                                     alert(JSON.stringify(data))
                                                 }
@@ -326,24 +336,35 @@ export default class Index extends Component {
                                         var ShopPrice = JSON.stringify(data.ShopPrice);
                                         if (data.retcode == 1) {
                                             var ShopCar = rows.item(0).ProdName;
-                                            this.props.navigator.push({
-                                                component: OrderDetails,
-                                                params: {
-                                                    ProdName: rows.item(0).ProdName,
-                                                    ShopPrice: rows.item(0).ShopPrice,
-                                                    Pid: rows.item(0).Pid,
-                                                    countm: rows.item(0).ShopNumber,
-                                                    promemo: rows.item(0).promemo,
-                                                    prototal: rows.item(0).prototal,
-                                                    ProdCode: rows.item(0).ProdCode,
-                                                    DepCode: rows.item(0).DepCode1,
-                                                    SuppCode: rows.item(0).SuppCode,
-                                                    ydcountm: countm,
-                                                    BarCode: rows.item(0).BarCode,
-                                                }
-                                            })
+                                            if(this.state.head=="商品查询"){
+                                                this.props.navigator.push({
+                                                    component:Shopsearch,
+                                                    params:{
+                                                        ProdCode:rows.item(0).ProdCode,
+                                                        DepCode:rows.item(0).DepCode1,
+                                                    }
+                                                })
+                                            }else{
+                                                this.props.navigator.push({
+                                                    component: OrderDetails,
+                                                    params: {
+                                                        ProdName: rows.item(0).ProdName,
+                                                        ShopPrice: rows.item(0).ShopPrice,
+                                                        Pid: rows.item(0).Pid,
+                                                        countm: rows.item(0).ShopNumber,
+                                                        promemo: rows.item(0).promemo,
+                                                        prototal: rows.item(0).prototal,
+                                                        ProdCode: rows.item(0).ProdCode,
+                                                        DepCode: rows.item(0).DepCode1,
+                                                        SuppCode: rows.item(0).SuppCode,
+                                                        ydcountm: countm,
+                                                        BarCode: rows.item(0).BarCode,
+                                                    }
+                                                })
+                                            }
                                             DeviceEventEmitter.removeAllListeners();
                                         } else {
+                                            alert(JSON.stringify(data))
                                         }
                                     }, (err) => {
                                         alert("网络请求失败");
@@ -359,11 +380,19 @@ export default class Index extends Component {
 
     //搜索
     pressPush(){
-        var nextRoute={
-            name:"主页",
-            component:Search
-        };
-        this.props.navigator.push(nextRoute);
+        if(this.state.head=="商品查询"){
+            var nextRoute={
+                name:"主页",
+                component:SearchData
+            };
+            this.props.navigator.push(nextRoute);
+        }else{
+            var nextRoute={
+                name:"主页",
+                component:Search
+            };
+            this.props.navigator.push(nextRoute);
+        }
         DeviceEventEmitter.removeAllListeners();
     }
 
@@ -371,12 +400,7 @@ export default class Index extends Component {
     componentDidMount(){
         Storage.save("num","1");
         InteractionManager.runAfterInteractions(() => {
-          // Storage.get('LinkUrl').then((tags) => {
-          //   this.setState({
-          //     LinkUrl:tags
-          //   })
-          // })
-          
+
             this.Storage();
             this._fetch();
             this.Device();
@@ -642,9 +666,6 @@ export default class Index extends Component {
                     ShopNumber:0,
                 })
             }
-            if(item.item.ShopNumber<0){
-                alert("123")
-            }
             this._fetch1();
         // }
     }
@@ -707,7 +728,7 @@ export default class Index extends Component {
                         })
                     };
                 })
-            } else{
+            }else{
                 Storage.get('userName').then((tags)=>{
                     let params = {
                         reqCode:"App_PosReq",
@@ -728,22 +749,32 @@ export default class Index extends Component {
                         var countm=JSON.stringify(data.countm);
                         var ShopPrice=JSON.stringify(data.ShopPrice);
                         if(data.retcode == 1){
-                            this.props.navigator.push({
-                                component:OrderDetails,
-                                params:{
-                                    ProdName:item.item.ProdName,
-                                    ShopPrice:ShopPrice,
-                                    Pid:item.item.Pid,
-                                    countm:item.item.ShopNumber,
-                                    promemo:item.item.promemo,
-                                    prototal:item.item.prototal,
-                                    ProdCode:item.item.ProdCode,
-                                    DepCode:item.item.DepCode1,
-                                    SuppCode:item.item.SuppCode,
-                                    ydcountm:countm,
-                                    BarCode:item.item.BarCode,
-                                }
-                            })
+                            if(this.state.head=="商品查询"){
+                                this.props.navigator.push({
+                                    component:Shopsearch,
+                                    params:{
+                                        ProdCode:item.item.ProdCode,
+                                        DepCode:item.item.DepCode1,
+                                    }
+                                })
+                            }else{
+                                this.props.navigator.push({
+                                    component:OrderDetails,
+                                    params:{
+                                        ProdName:item.item.ProdName,
+                                        ShopPrice:ShopPrice,
+                                        Pid:item.item.Pid,
+                                        countm:item.item.ShopNumber,
+                                        promemo:item.item.promemo,
+                                        prototal:item.item.prototal,
+                                        ProdCode:item.item.ProdCode,
+                                        DepCode:item.item.DepCode1,
+                                        SuppCode:item.item.SuppCode,
+                                        ydcountm:countm,
+                                        BarCode:item.item.BarCode,
+                                    }
+                                })
+                            }
                         }else{
                             alert(JSON.stringify(data))
                         }
@@ -1324,12 +1355,50 @@ export default class Index extends Component {
     }
 
     StockEnquiries(){
-        var nextRoute = {
-            name: "库存查询",
-            component: StockEnquiries
-        };
-        this.props.navigator.push(nextRoute);
-        this._setModalVisible();
+        if(this.state.ShopCar1>0){
+            this._setModalVisible();
+            alert("商品未提交")
+        }else if(this.state.username==null){
+            this._setModalVisible();
+        }else{
+            Storage.delete('OrgFormno');
+            Storage.delete('scode');
+            Storage.delete('shildshop');
+            Storage.delete('YuanDan');
+            Storage.delete('Screen');
+            Storage.delete('StateMent');
+            Storage.delete('BQNumber');
+            var nextRoute = {
+                name: "库存查询",
+                component: StockEnquiries
+            };
+            this.props.navigator.push(nextRoute);
+            this._setModalVisible();
+        }
+    }
+
+    ShopSearch(){
+        if(this.state.ShopCar1>0){
+            this._setModalVisible();
+            alert("商品未提交")
+        }else if(this.state.username==null){
+            this._setModalVisible();
+        }else{
+            Storage.delete('OrgFormno');
+            Storage.delete('scode');
+            Storage.delete('shildshop');
+            Storage.delete('YuanDan');
+            Storage.delete('Screen');
+            Storage.delete('StateMent');
+            Storage.delete('BQNumber');
+            var invoice = "商品查询";
+            this.setState({
+                head:invoice,
+            });
+            this._setModalVisible();
+            Storage.save('Name','商品查询');
+
+        }
     }
 
     pullOut(){
@@ -1826,38 +1895,46 @@ export default class Index extends Component {
                     </View>
                 </View>
                 <View style={styles.footer}>
-                    <TouchableOpacity style={styles.Home} onPress={this.History.bind(this)}><Image source={require("../images/1_300.png")}></Image><Text style={styles.home1}>历史单据查询</Text></TouchableOpacity>
+                    {
+                        (this.state.head == "商品查询") ?
+                            null :
+                            <TouchableOpacity style={styles.Home} onPress={this.History.bind(this)}><Image source={require("../images/1_300.png")}></Image><Text style={styles.home1}>历史单据查询</Text></TouchableOpacity>
+                    }
                     <TouchableOpacity style={styles.Home}><Image source={require("../images/1_31.png")}></Image><Text style={styles.home2}>商品</Text></TouchableOpacity>
-                    <TouchableOpacity style={styles.Home} onPress={this.ShopList.bind(this)}>
-                        <View>
-                            <Image source={require("../images/1_322.png")}>
-                                {
-                                    (this.state.shopcar==0)?
-                                        null:
-                                        <Text style={[{position:"absolute", right:-200,}]}>{this.state.shopcar}</Text>
-                                }
-                                {
-                                    (this.state.shopcar>0)?
-                                        <Text style={[styles.ShopCar,{paddingTop:3,}]}>{this.state.shopcar}</Text>:null
-                                }
-                                {
-                                    (this.state.shopcar<999)?
-                                        null:
-                                        <Text style={[styles.ShopCar,{width:30,height:30,top:11,lineHeight:21,}]}>{this.state.shopcar}</Text>
-                                }
-                                {
-                                    (this.state.shopcar>999)?
-                                        <View>
-                                            <Text style={[styles.ShopCar,{width:30,height:30,top:11,lineHeight:23}]}>{this.state.shopcar}</Text>
-                                            <Text style={styles.Add}>
-                                                +
-                                            </Text>
-                                        </View>:null
-                                }
-                            </Image>
-                        </View>
-                        <Text style={styles.home1}>清单</Text>
-                    </TouchableOpacity>
+                    {
+                        (this.state.head=="商品查询")?
+                            null:
+                            <TouchableOpacity style={styles.Home} onPress={this.ShopList.bind(this)}>
+                                <View>
+                                    <Image source={require("../images/1_322.png")}>
+                                        {
+                                            (this.state.shopcar==0)?
+                                                null:
+                                                <Text style={[{position:"absolute", right:-200,}]}>{this.state.shopcar}</Text>
+                                        }
+                                        {
+                                            (this.state.shopcar>0)?
+                                                <Text style={[styles.ShopCar,{paddingTop:3,}]}>{this.state.shopcar}</Text>:null
+                                        }
+                                        {
+                                            (this.state.shopcar<999)?
+                                                null:
+                                                <Text style={[styles.ShopCar,{width:30,height:30,top:11,lineHeight:21,}]}>{this.state.shopcar}</Text>
+                                        }
+                                        {
+                                            (this.state.shopcar>999)?
+                                                <View>
+                                                    <Text style={[styles.ShopCar,{width:30,height:30,top:11,lineHeight:23}]}>{this.state.shopcar}</Text>
+                                                    <Text style={styles.Add}>
+                                                        +
+                                                    </Text>
+                                                </View>:null
+                                        }
+                                    </Image>
+                                </View>
+                                <Text style={styles.home1}>清单</Text>
+                            </TouchableOpacity>
+                    }
                 </View>
                 <Modal
                     animationType='fade'
@@ -2015,6 +2092,14 @@ export default class Index extends Component {
                                 <Image source={require("../images/1_48.png")} style={styles.ModalImageLine} />
                             </View>
                             <View style={[styles.ModalHead,{marginBottom:10}]}>
+                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.ShopSearch.bind(this)}>
+                                    <Text style={styles.ModalHeadImage1}>
+                                        <Image source={require("../images/1_58.png")} />
+                                    </Text>
+                                    <Text style={styles.ModalHeadText}>
+                                        商品查询
+                                    </Text>
+                                </TouchableOpacity>
                                 <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.BQbutton.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_60.png")} />
@@ -2023,7 +2108,7 @@ export default class Index extends Component {
                                         标签打印
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.pullOut.bind(this)}>
+                                <TouchableOpacity style={styles.ModalHeadImage} onPress={this.pullOut.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_56.png")} />
                                     </Text>
@@ -2031,7 +2116,12 @@ export default class Index extends Component {
                                         退出账号
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity onPress={this.UpData.bind(this)} style={styles.ModalHeadImage}>
+                            </View>
+                            <View style={styles.ModalLine}>
+                                <Image source={require("../images/1_48.png")} style={styles.ModalImageLine} />
+                            </View>
+                            <View style={[styles.ModalHead,{marginBottom:10}]}>
+                                <TouchableOpacity onPress={this.UpData.bind(this)} style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_59.png")} />
                                     </Text>

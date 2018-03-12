@@ -166,9 +166,9 @@ export default class GoodsDetails extends Component {
     pressPop(){
         if(this.state.name==null) {
             alert("请选择单据")
-        }else if(this.state.Number==0){
-            ToastAndroid.show('商品数量不能为空', ToastAndroid.SHORT);
-        }else{
+        }
+        if(this.state.name=="实时盘点单"){
+            alert("1111")
             var shopInfoData = [];
             var shopInfo = {};
             shopInfo.Pid = this.state.Pid;
@@ -209,6 +209,52 @@ export default class GoodsDetails extends Component {
                     }
                 };
                 this.props.navigator.push(nextRoute);
+            }
+        }else{
+            if(this.state.Number==0){
+                ToastAndroid.show('商品数量不能为空', ToastAndroid.SHORT);
+            }else{
+                var shopInfoData = [];
+                var shopInfo = {};
+                shopInfo.Pid = this.state.Pid;
+                shopInfo.ProdCode=this.state.ProdCode;
+                shopInfo.prodname = this.state.ProdName;
+                shopInfo.countm = this.state.Number;
+                shopInfo.ShopPrice = this.state.ShopPrice;
+                shopInfo.prototal =(this.state.Number)*(this.state.ShopPrice);//金额
+                shopInfo.promemo = this.state.Remark;
+                shopInfo.DepCode = this.state.DepCode;
+                shopInfo.ydcountm = this.state.ydcountm;
+                shopInfo.SuppCode = this.state.SuppCode;
+                shopInfo.BarCode = this.state.BarCode;
+                shopInfoData.push(shopInfo);
+                //调用插入表方法
+                dbAdapter.insertShopInfo(shopInfoData);
+                if(this.state.DataName=="销售"){
+                    var nextRoute={
+                        name:"销售",
+                        component:Sell,
+                    };
+                    this.props.navigator.push(nextRoute);
+                }else if(this.state.ShoppData=="0"){
+                    var nextRoute={
+                        name:"清单",
+                        component:ShoppingCart,
+                        params:{
+                            DepCode:this.state.DepCode,
+                        }
+                    };
+                    this.props.navigator.push(nextRoute);
+                }else{
+                    var nextRoute={
+                        name:"主页",
+                        component:Index,
+                        params:{
+                            DepCode:this.state.DepCode,
+                        }
+                    };
+                    this.props.navigator.push(nextRoute);
+                }
             }
         }
     }

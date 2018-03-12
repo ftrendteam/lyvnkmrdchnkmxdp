@@ -17,6 +17,7 @@ import {
     Navigator,
     Dimensions,
     ScrollView,
+    ToastAndroid,
     TouchableOpacity,
     ActivityIndicator,
     TouchableHighlight,
@@ -437,11 +438,17 @@ export default class ShoppingCart extends Component {
     }
 
     History(){
-        var nextRoute={
-            name:"主页",
-            component:HistoricalDocument
-        };
-        this.props.navigator.push(nextRoute)
+        Storage.get('Name').then((tags)=> {
+            if(tags=="销售"||tags=="标签打印"){
+                ToastAndroid.show('暂不支持该业务', ToastAndroid.SHORT)
+            }else{
+                var nextRoute = {
+                    name: "主页",
+                    component: HistoricalDocument
+                };
+                this.props.navigator.push(nextRoute)
+            }
+        })
     }
 
     Shop(){
