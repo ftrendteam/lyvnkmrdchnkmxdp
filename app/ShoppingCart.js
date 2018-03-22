@@ -41,6 +41,7 @@ import NetUtils from "../utils/NetUtils";
 import FetchUtils from "../utils/FetchUtils";
 import DBAdapter from "../adapter/DBAdapter";
 import Storage from "../utils/Storage";
+import NumberUtils from "../utils/NumberUtils";
 import SideMenu from 'react-native-side-menu';
 import { SwipeListView } from 'react-native-swipe-list-view';
 
@@ -59,6 +60,7 @@ export default class ShoppingCart extends Component {
             ScreenBod:false,
             Succeed:false,
             Wait:false,
+            DeleteData:false,
             ShopNumber:"",
             ShopAmount:"",
             reqDetailCode:"",
@@ -78,6 +80,7 @@ export default class ShoppingCart extends Component {
             FormType:"",
             LinkUrl:"",
             Document:"",
+            SUbmit:"",
             BeiZhu:"暂无备注",
             dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
             ds:new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
@@ -152,26 +155,28 @@ export default class ShoppingCart extends Component {
             this.DataShop=[];
             for(let i =0;i<rows.length;i++){
                 var row = rows.item(i);
+                var prodname = row.prodname;
                 var number = row.ShopNumber;
-
                 var prodcode = row.ProdCode;
                 var countm = row.countm;
                 var ProPrice = row.ShopPrice;
                 var promemo = row.promemo;
                 var ydcountm = row.ydcountm;
-                shopAmount += parseInt(row.ShopAmount);
-                shopnumber += parseInt(row.ShopNumber);
-                if(number!==0){
-                    this.ds.push(row);
-                    var DataShop = {
-                        'prodcode': prodcode,
-                        'countm': countm,
-                        'ProPrice': ProPrice,
-                        'promemo': promemo,
-                        'ydcountm': ydcountm,
-                    }
-                    this.DataShop.push(DataShop);
+                var barCode = row.BarCode;
+                var SHopAMount=NumberUtils.numberFormat2(row.ShopAmount);
+                shopAmount += Number(SHopAMount);
+                shopnumber += Number(row.ShopNumber);
+                this.ds.push(row);
+                var DataShop = {
+                    'prodname':prodname,
+                    'barCode':barCode,
+                    'prodcode': prodcode,
+                    'countm': countm,
+                    'ProPrice': ProPrice,
+                    'promemo': promemo,
+                    'ydcountm': ydcountm,
                 }
+                this.DataShop.push(DataShop);
             }
             if(this.ds==0){
                 this.modal();
@@ -385,16 +390,28 @@ export default class ShoppingCart extends Component {
     renderRow(rowData, sectionID, rowID){
         return (
             <TouchableOpacity style={styles.ShopList} onPress={()=>this.OrderDetails(rowData)}>
-                <View style={styles.ShopTop}>
-                    <Text style={[styles.Name,styles.Name1]}>{rowData.ProdName}</Text>
-                    <Text style={[styles.Number,styles.Name1]}>{rowData.ShopNumber}(件)</Text>
-                    <Text style={[styles.Price,styles.Name1]}>{rowData.ShopPrice}</Text>
+                <View style={styles.RowList}>
                     {
-                        (this.state.Document=="标签打印")?
-                            null:
-                            <Text style={[styles.SmallScale,styles.Name1]}>{rowData.ShopAmount}</Text>
+                        (rowData.ProdCode=="")?
+                            <Text style={[styles.Name,styles.Name1]}>{rowData.ProdCode}</Text>
+                            :
+                            <Text style={[styles.Name,styles.Name1]}>{rowData.BarCode}</Text>
                     }
+                    <Text style={[styles.Name,styles.Name1]}>{rowData.ProdName}</Text>
                 </View>
+                <View style={styles.RowList1}>
+                    <Text style={[styles.Number,styles.Name1]}>{rowData.ShopNumber}(件)</Text>
+                </View>
+                <View style={styles.RowList1}>
+                    <Text style={[styles.Price,styles.Name1]}>{rowData.ShopPrice}</Text>
+                </View>
+                {
+                    (this.state.Document=="标签打印")?
+                        null:
+                        <View style={styles.RowList1}>
+                            <Text style={[styles.SmallScale,styles.Name1]}>{rowData.ShopAmount}</Text>
+                        </View>
+                }
             </TouchableOpacity>
         );
     }
@@ -416,8 +433,9 @@ export default class ShoppingCart extends Component {
             for(let i =0;i<rows.length;i++){
                 var row = rows.item(i);
                 var number = row.ShopNumber;
-                shopAmount += parseInt(row.ShopAmount);
-                shopnumber += parseInt(row.ShopNumber);
+                var SHopAMount=NumberUtils.numberFormat2(row.ShopAmount);
+                shopAmount += Number(SHopAMount);
+                shopnumber += Number(row.ShopNumber);
                 if(number!==0){
                     this.ds.push(row);
                 }
@@ -538,72 +556,97 @@ export default class ShoppingCart extends Component {
 
     //提交
     submit(){
-        this.screen = [];
-
-        Storage.get('shildshop').then((tags)=>{
-            this.setState({
-                shildshop:tags
-            })
+        this.setState({
+            SUbmit:1
         })
-
-        Storage.get('LinkUrl').then((tags) => {
-            this.setState({
-                linkurl:tags
-            })
-        })
-
-        Storage.get('Screen').then((tags)=>{
-            this.setState({
-                Screen:tags
-            })
-        })
-
-        if(this.ds==0){
-            alert("请添加商品");
+        if(this.state.SUbmit==1){
+            return;
         }else{
-            this.Wait();
-            Storage.get('code').then((tags) => {
-                Storage.get("usercode","").then((usercode)=>{
-                    Storage.get("username","").then((username)=>{
+            if(this.ds==0){
+                alert("请添加商品");
+            }else{
+                this.screen = [];
+                Storage.get('shildshop').then((tags)=>{
+                    this.setState({
+                        shildshop:tags
+                    })
+                })
+
+                Storage.get('LinkUrl').then((tags) => {
+                    this.setState({
+                        linkurl:tags
+                    })
+                })
+
+                Storage.get('Screen').then((tags)=>{
+                    this.setState({
+                        Screen:tags
+                    })
+                })
+                this.Wait();
+                Storage.get('code').then((tags) => {
+                    Storage.get("usercode","").then((usercode)=>{
+                        Storage.get("username","").then((username)=>{
+                            let params = {
+                                ClientCode: this.state.ClientCode,
+                                username: this.state.Username,
+                                usercode: this.state.Userpwd,
+                                Remark: this.state.ShopRemark,
+                            };
+                        });
+                    });
+                    Storage.get('scode').then((scode)=>{
                         let params = {
+                            reqCode: "App_PosReq",
+                            reqDetailCode: this.state.reqDetailCode,
                             ClientCode: this.state.ClientCode,
+                            sDateTime: "2017-08-09 12:12:12",//获取当前时间转换成时间戳
+                            Sign: NetUtils.MD5("App_PosReq" + "##" +this.state.reqDetailCode + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',
                             username: this.state.Username,
                             usercode: this.state.Userpwd,
-                            Remark: this.state.ShopRemark,
+                            DetailInfo1: {
+                                "ShopCode": tags,
+                                "OrgFormno": this.state.OrgFormno,
+                                "ProMemo": this.state.Remark,
+                                "SuppCode":scode,
+                                "childshop":this.state.shildshop,
+                                "pdaGuid":this.state.IMEI,
+                                "pdgFormno":this.state.ProYH+this.state.Date
+                            },
+                            DetailInfo2: this.DataShop,
                         };
-                    });
-                });
-                Storage.get('scode').then((scode)=>{
-                    let params = {
-                        reqCode: "App_PosReq",
-                        reqDetailCode: this.state.reqDetailCode,
-                        ClientCode: this.state.ClientCode,
-                        sDateTime: "2017-08-09 12:12:12",//获取当前时间转换成时间戳
-                        Sign: NetUtils.MD5("App_PosReq" + "##" +this.state.reqDetailCode + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',
-                        username: this.state.Username,
-                        usercode: this.state.Userpwd,
-                        DetailInfo1: {
-                            "ShopCode": tags,
-                            "OrgFormno": this.state.OrgFormno,
-                            "ProMemo": this.state.Remark,
-                            "SuppCode":scode,
-                            "childshop":this.state.shildshop,
-                            "pdaGuid":this.state.IMEI,
-                            "pdgFormno":this.state.ProYH+this.state.Date
-                        },
-                        DetailInfo2: this.DataShop,
-                    };
-                    if(this.state.Screen=="1"||this.state.Screen=="2"){
-                        var DetailInfo2=params.DetailInfo2;
-                        for(let i =0;i<DetailInfo2.length;i++){
-                            let detail = DetailInfo2[i];
-                            let ydcountm = detail.ydcountm;
-                            let countm = detail.countm;
-                            if(ydcountm!==countm){
-                                this.screen.push(detail);
+                        if(this.state.Screen=="1"||this.state.Screen=="2"){
+                            var DetailInfo2=params.DetailInfo2;
+                            for(let i =0;i<DetailInfo2.length;i++){
+                                let detail = DetailInfo2[i];
+                                let ydcountm = detail.ydcountm;
+                                let countm = detail.countm;
+                                if(ydcountm!==countm){
+                                    this.screen.push(detail);
+                                }
                             }
-                        }
-                        if(this.screen==""||this.state.OrgFormno==null){
+                            if(this.screen==""||this.state.OrgFormno==null){
+                                FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
+                                    if(data.retcode == 1){
+                                        if(this.state.Screen!=="1"||this.state.Screen!=="2"||this.screen==""||scode==null){
+                                            this.Wait();
+                                            this.Succeed();
+                                        }
+                                    }else{
+                                        this.Wait();
+                                        alert(JSON.stringify(data))
+                                    }
+                                },(err)=>{
+                                    alert("网络请求失败");
+                                })
+                            }else{
+                                this.setState({
+                                    dataSource:this.state.dataSource.cloneWithRows(this.screen),
+                                })
+                                this.Wait();
+                                this.ScreenBod();
+                            }
+                        }else{
                             FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
                                 if(data.retcode == 1){
                                     if(this.state.Screen!=="1"||this.state.Screen!=="2"||this.screen==""||scode==null){
@@ -617,30 +660,10 @@ export default class ShoppingCart extends Component {
                             },(err)=>{
                                 alert("网络请求失败");
                             })
-                        }else{
-                            this.setState({
-                                dataSource:this.state.dataSource.cloneWithRows(this.screen),
-                            })
-                            this.Wait();
-                            this.ScreenBod();
                         }
-                    }else{
-                        FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
-                            if(data.retcode == 1){
-                                if(this.state.Screen!=="1"||this.state.Screen!=="2"||this.screen==""||scode==null){
-                                    this.Wait();
-                                    this.Succeed();
-                                }
-                            }else{
-                                this.Wait();
-                                alert(JSON.stringify(data))
-                            }
-                        },(err)=>{
-                            alert("网络请求失败");
-                        })
-                    }
+                    })
                 })
-            })
+            }
         }
     }
 
@@ -711,7 +734,7 @@ export default class ShoppingCart extends Component {
             <View style={styles.ScreenList}>
                 <View style={styles.coulumnScreen}>
                     <Text style={styles.coulumnText}>
-                        {rowData.ProdName}
+                        {rowData.prodname}
                     </Text>
                 </View>
                 <View style={styles.coulumnScreen}>
@@ -858,15 +881,7 @@ export default class ShoppingCart extends Component {
         Storage.save('Date',this.state.active);
     }
 
-    //提交商品等待框
-    Wait(){
-        let isShow = this.state.Wait;
-        this.setState({
-            Wait:!isShow,
-        });
-    }
-
-    DeleteShop(){
+    DataButton(){
         dbAdapter.deleteData("shopInfo");
         this.ds=[];
         var price="";
@@ -877,6 +892,29 @@ export default class ShoppingCart extends Component {
             shopcar:"",
             BeiZhu:"暂无备注",
         })
+        this.DeleteData();
+    }
+
+    CloseButton(){
+        this.DeleteData();
+    }
+    //提交商品等待框
+    Wait(){
+        let isShow = this.state.Wait;
+        this.setState({
+            Wait:!isShow,
+        });
+    }
+
+    DeleteData(){
+        let isShow = this.state.DeleteData;
+        this.setState({
+            DeleteData:!isShow,
+        });
+    }
+
+    DeleteShop(){
+        this.DeleteData();
     }
 
     render() {
@@ -1148,6 +1186,32 @@ export default class ShoppingCart extends Component {
                 <Modal
                     animationType='fade'
                     transparent={true}
+                    visible={this.state.DeleteData}
+                    onShow={() => {}}
+                    onRequestClose={() => {}}>
+                    <View style={[styles.modalStyle,{justifyContent: 'center',alignItems: 'center',}]}>
+                        <View style={[styles.ModalView,{borderRadius:5,paddingBottom:20,width:300,backgroundColor:"#ffffff"}]}>
+                            <View style={styles.ModalStyleTitle}>
+                                <Text style={styles.ModalTitleText}>是否清空全部商品？</Text>
+                            </View>
+                            <View style={styles.Row}>
+                                <TouchableOpacity onPress={this.DataButton.bind(this)} style={styles.DataButton}>
+                                    <Text style={styles.ModalTitleText}>
+                                        确定
+                                    </Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={this.CloseButton.bind(this)} style={styles.CloseButton}>
+                                    <Text style={styles.ModalTitleText}>
+                                        取消
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </View>
+                </Modal>
+                <Modal
+                    animationType='fade'
+                    transparent={true}
                     visible={this.state.Wait}
                     onShow={() => {}}
                     onRequestClose={() => {}} >
@@ -1160,10 +1224,35 @@ export default class ShoppingCart extends Component {
                 </Modal>
             </View>
         );
-    }
+    }l
 }
 
 const styles = StyleSheet.create({
+    ModalStyleTitle:{
+        paddingTop:20,
+        paddingBottom:20,
+        borderBottomWidth:1,
+        borderBottomColor:"#f5f5f5",
+    },
+    ModalTitleText:{
+        fontSize:16,
+        color:"#333333",
+        textAlign:"center",
+    },
+    Row:{
+        flexDirection:"row",
+    },
+    DataButton:{
+        flex:1,
+        marginRight:20,
+        paddingTop:25,
+        paddingBottom:15,
+    },
+    CloseButton:{
+        flex:1,
+        paddingTop:25,
+        paddingBottom:15,
+    },
     container:{
         flex:1,
         backgroundColor:"#f2f2f2",
@@ -1196,6 +1285,12 @@ const styles = StyleSheet.create({
         paddingBottom:20,
         alignItems:"center",
     },
+    RowList:{
+        flex:2,
+    },
+    RowList1:{
+        flex:1,
+    },
     Name:{
         flex:2,
         fontSize:18,
@@ -1203,7 +1298,7 @@ const styles = StyleSheet.create({
     },
     Number:{
         flex:1,
-        textAlign:"right",
+        textAlign:"left",
         fontSize:18,
         color:"#333333",
     },
@@ -1222,14 +1317,11 @@ const styles = StyleSheet.create({
     ShopList:{
         paddingLeft:25,
         paddingRight:25,
-        height:65,
         paddingTop:18,
         paddingBottom:18,
         backgroundColor:"#ffffff",
         borderBottomWidth:1,
-        borderBottomColor:"#f2f2f2"
-    },
-    ShopTop:{
+        borderBottomColor:"#f2f2f2",
         flexDirection:"row",
     },
     Name1:{

@@ -117,6 +117,7 @@ export default class SearchData extends Component {
             }
         };
         this.props.navigator.push(nextRoute);
+        DeviceEventEmitter.removeAllListeners();
     }
 
     inputOnBlur(value) {
@@ -157,7 +158,7 @@ export default class SearchData extends Component {
                         // console.log(JSON.stringify(data))
                         if(data.retcode == 1){
                             var TblRow = data.TblRow;
-                            alert(JSON.stringify(TblRow))
+                            // alert(JSON.stringify(TblRow))
                             var ProdCode;
                             var BarCode;
                             var ProdName;
@@ -198,7 +199,7 @@ export default class SearchData extends Component {
                             var PriceFlag;
                             for (let i = 0; i < TblRow.length; i++) {
                                 var row = TblRow[i];
-                                console.log('TblRow=',row.ProdName)
+                                // console.log('TblRow=',row.ProdName)
                                 ProdCode =  row.ProdCode;
                                 BarCode =  row.BarCode;
                                 ProdName =  row.ProdName;
@@ -238,6 +239,25 @@ export default class SearchData extends Component {
                                 FUseSalePrice =  row.FUseSalePrice;
                                 PriceFlag =  row.PriceFlag;
                             };
+                            if(FNoCG==1||FNoSale==1||FNoYH==1||FNoPromotion==1||FNoTH==1||FNoCD==1){
+                                this.setState({
+                                    FNoCG:"是",
+                                    FNoSale:"是",
+                                    FNoYH:"是",
+                                    FNoPromotion:"是",
+                                    FNoTH:"是",
+                                    FNoCD:"是",
+                                })
+                            }else{
+                                this.setState({
+                                    FNoCG:"否",
+                                    FNoSale:"否",
+                                    FNoYH:"否",
+                                    FNoPromotion:"否",
+                                    FNoTH:"否",
+                                    FNoCD:"否",
+                                })
+                            }
                             this.setState({
                                 ProdCode:ProdCode,
                                 BarCode:BarCode,
@@ -269,15 +289,8 @@ export default class SearchData extends Component {
                                 VipPrice3:VipPrice3,
                                 PsPrice:PsPrice,
                                 WPrice:WPrice,
-                                FNoCG:FNoCG,
-                                FNoSale:FNoSale,
-                                FNoYH:FNoYH,
-                                FNoPromotion:FNoPromotion,
-                                FNoTH:FNoTH,
-                                FNoCD:FNoCD,
                                 FUseSalePrice:FUseSalePrice,
                                 PriceFlag:PriceFlag,
-                                Search:""
                             })
                         }else{}
                     }),(err)=>{
@@ -316,6 +329,11 @@ export default class SearchData extends Component {
         });
     }
 
+    onSubmitEditing(){
+        this.inputOnBlur();
+
+    }
+
     render() {
         return (
             <View style={styles.container}>
@@ -334,6 +352,7 @@ export default class SearchData extends Component {
                             })
                             this.inputOnBlur(value)
                         }}
+                        onSubmitEditing={this.onSubmitEditing.bind(this)}
                     />
                     <Image source={require("../images/2.png")} style={styles.SearchImage}></Image>
                     <TouchableOpacity onPress={this.Close.bind(this)} style={styles.Right1}>
@@ -370,7 +389,7 @@ export default class SearchData extends Component {
                             <View style={styles.RowList}>
                                 <View style={styles.LeftList}>
                                     <Text style={styles.name}>库存数量：</Text>
-                                    <Text style={styles.right}>{this.state.KCcount}</Text>
+                                    <Text style={styles.right}>{this.state.Kccount}</Text>
                                 </View>
                                 <View style={styles.LeftList}>
                                     <Text style={styles.name}>进价：</Text>
@@ -420,6 +439,8 @@ export default class SearchData extends Component {
                                     <Text style={styles.name}>品类编码：</Text>
                                     <Text style={styles.right}>{this.state.DepCode}</Text>
                                 </View>
+                            </View>
+                            <View style={styles.RowList}>
                                 <View style={styles.LeftList}>
                                     <Text style={styles.name}>品类名称：</Text>
                                     <Text style={styles.right}>{this.state.DepName}</Text>
@@ -430,6 +451,8 @@ export default class SearchData extends Component {
                                     <Text style={styles.name}>品牌编码：</Text>
                                     <Text style={styles.right}>{this.state.BrandCode}</Text>
                                 </View>
+                            </View>
+                            <View style={styles.RowList}>
                                 <View style={styles.LeftList}>
                                     <Text style={styles.name}>品牌名称：</Text>
                                     <Text style={styles.right}>{this.state.BrandName}</Text>

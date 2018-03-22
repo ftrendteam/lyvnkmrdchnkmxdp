@@ -80,6 +80,7 @@ export default class Index extends Component {
             Page:"",
             data:"",
             ShopNumber:"",
+            ShopNumber1:"",
             ShopCar1:"",
             usercode:"",
             License:"",
@@ -97,6 +98,7 @@ export default class Index extends Component {
             ShopNumber:"",
             pressStatus:0,
             PressStatus:0,
+            Zero:"",
             nomore: true,
             isloading:true,
             show:false,
@@ -112,7 +114,7 @@ export default class Index extends Component {
             NewData:false,
             DataComplete:false,
             depcode:this.props.DepCode ? this.props.DepCode : "",
-            dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
+            dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => true,}),
         };
         this.dataRows = [];
         this.productData = [];
@@ -124,15 +126,15 @@ export default class Index extends Component {
     }
 
     History(){
-            if(this.state.head=="销售"||this.state.head=="标签打印"){
-                ToastAndroid.show('暂不支持该业务', ToastAndroid.SHORT)
-            }else{
-                var nextRoute={
-                    name:"主页",
-                    component:HistoricalDocument
-                };
-                this.props.navigator.push(nextRoute)
-            }
+        if(this.state.head=="销售"||this.state.head=="标签打印"){
+            ToastAndroid.show('暂不支持该业务', ToastAndroid.SHORT)
+        }else{
+            var nextRoute={
+                name:"主页",
+                component:HistoricalDocument
+            };
+            this.props.navigator.push(nextRoute)
+        }
     }
 
     ShopList(){
@@ -161,7 +163,7 @@ export default class Index extends Component {
     }
     //二维码扫描
     Code(){
-      NativeModules.RNScannerAndroid.openScanner();
+        NativeModules.RNScannerAndroid.openScanner();
     }
     //扫码方法
     Device(){
@@ -220,7 +222,7 @@ export default class Index extends Component {
                                                 reqDetailCode:"App_Client_CurrProdQry",
                                                 ClientCode:this.state.ClientCode,
                                                 sDateTime:Date.parse(new Date()),
-                                                Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
+                                                Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" +"PosControlCs"
                                                 username:tags,
                                                 usercode:this.state.Usercode,
                                                 SuppCode:rows.item(0).SuppCode,
@@ -229,7 +231,7 @@ export default class Index extends Component {
                                                 ProdCode:datas,
                                                 OrgFormno:this.state.OrgFormno,
                                                 FormType:this.state.FormType,
-                                            };
+                                        };
                                             FetchUtil.post(this.state.LinkUrl,JSON.stringify(params)).then((data)=>{
                                                 var countm=JSON.stringify(data.countm);
                                                 var ShopPrice=JSON.stringify(data.ShopPrice);
@@ -321,7 +323,9 @@ export default class Index extends Component {
                                         reqDetailCode: "App_Client_CurrProdQry",
                                         ClientCode: this.state.ClientCode,
                                         sDateTime: Date.parse(new Date()),
-                                        Sign: NetUtils.MD5("App_PosReq" + "##" + "App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs") + '',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
+                                        Sign: NetUtils.MD5("App_PosReq" + "##" +
+                                            "App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs") +
+                                        '',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
                                         username: tags,
                                         usercode: this.state.Usercode,
                                         SuppCode: rows.item(0).SuppCode,
@@ -498,6 +502,7 @@ export default class Index extends Component {
             }
             this.setState({
                 dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
+                ShopNumber1:row.ShopNumber,
                 isloading:true,
                 ShopCar1:ShopCar1
             })
@@ -543,7 +548,7 @@ export default class Index extends Component {
         dbAdapter.selectShopInfoAllCountm().then((rows)=>{
             var ShopCar = rows.item(0).countm;
             this.setState({
-                shopcar:ShopCar
+                shopcar:ShopCar,
             });
         });
     }
@@ -621,16 +626,34 @@ export default class Index extends Component {
     _renderItem(item,index){
         return(
             <View style={styles.Border}>
-                <View style={styles.AddNumber} ref="goodsCodeOrName">
-                    {
-                        (item.item.ShopNumber==0)?
-                            null:
-                            <TouchableOpacity style={styles.Subtraction} onPress={()=>this.Countm(item)}>
-                                <Text style={styles.Number}>{item.item.ShopNumber}</Text>
-                                <View style={styles.subtraction}><Text style={styles.Reduction}>-</Text></View>
-                            </TouchableOpacity>
-                    }
-                </View>
+                {
+                    (this.state.head=="实时盘点单"||this.state.head=="商品盘点单")?
+                        <View style={styles.AddNumber} ref="goodsCodeOrName">
+                            {
+                                (item.item.ShopNumber===""||this.state.Zero=="0")?
+                                    null:
+                                    <TouchableOpacity style={styles.Subtraction} onPress={() =>this.Countm(item)}>
+                                        <Text style={styles.Number}>{item.item.ShopNumber}</Text>
+                                        {
+                                            (item.item.ShopNumber=="0")?
+                                                null:
+                                                <View style={styles.subtraction}><Text style={styles.Reduction}>-</Text></View>
+                                        }
+                                    </TouchableOpacity>
+                            }
+                        </View>
+                        :
+                        <View style={styles.AddNumber} ref="goodsCodeOrName">
+                            {
+                                (item.item.ShopNumber==""||item.item.ShopNumber=="0")?
+                                    null:
+                                    <TouchableOpacity style={styles.Subtraction} onPress={() =>this.Countm(item)}>
+                                        <Text style={styles.Number}>{item.item.ShopNumber}</Text>
+                                        <View style={styles.subtraction}><Text style={styles.Reduction}>-</Text></View>
+                                    </TouchableOpacity>
+                            }
+                        </View>
+                }
                 <TouchableOpacity onPress={()=>this.OrderDetails(item)}>
                     <View style={styles.Image}>
                         <Image source={require("../images/image.png")}></Image>
@@ -644,30 +667,39 @@ export default class Index extends Component {
     //修改商品数量增减查询
     Countm(item){
         //调取数量
-        // alert(this.state.ShopNumber);
-        // if(this.state.ShopNumber=="0"||this.state.shopcar==""){
-        //     alert("数量不能为0")
-        // }else{
-            dbAdapter.upDataShopInfoCountmSub(item.item.ProdCode).then((rows)=>{});
-            item.item.ShopNumber=item.item.ShopNumber-1;
-            let select =0;
+        // if(this.state.ShopNumber=="0"){
+        //     this.setState({
+        //         Zero:0,
+        //     })
+        //     return;
+        // }else {
+            dbAdapter.upDataShopInfoCountmSub(item.item.ProdCode).then((rows) => {
+            });
+            item.item.ShopNumber = item.item.ShopNumber - 1;
+            let select = 0;
             for (let i = 0; i < this.dataRows.length; i++) {
                 if (item.item.DepCode1 == this.dataRows[i].DepCode) {//判断当前品类是否相等
                     select = i;
                     let ShopNumber = this.dataRows[i].ShopNumber;
                     this.dataRows[i].ShopNumber = ShopNumber - 1;
+                    this.setState({
+                        dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
+                    })
                 }
             }
-            if(item.item.ShopNumber=="0"){
-                // alert(this.state.ShopNumber)
-                dbAdapter.deteleShopInfo(item.item.ProdCode).then((rows)=>{});
-                this.setState({
-                    ShopCar1:0,
-                    ShopNumber:0,
-                })
+            if (item.item.ShopNumber == "0") {
+                if(this.state.head!=="实时盘点单"||this.state.head!=="商品盘点单"){
+                    dbAdapter.deteleShopInfo(item.item.ProdCode).then((rows) => {});
+                    this.setState({
+                        ShopCar1: 0,
+                        ShopNumber: 0,
+                        Zero:0,
+                    })
+                }
             }
-            this._fetch1();
         // }
+        // this._fetch();
+        this._fetch1();
     }
 
     _separator = () => {
@@ -735,7 +767,8 @@ export default class Index extends Component {
                         reqDetailCode:"App_Client_CurrProdQry",
                         ClientCode:this.state.ClientCode,
                         sDateTime:Date.parse(new Date()),
-                        Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
+                        Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_CurrProdQry" + "##"
+                            + Date.parse(new Date()) + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode +"##" + sDateTime + "##" + "PosControlCs"
                         username:tags,
                         usercode:this.state.Usercode,
                         SuppCode:item.item.SuppCode,
@@ -1345,7 +1378,7 @@ export default class Index extends Component {
                 }
             })
 
-            Storage.save('YdCountm','3');
+            Storage.save('YdCountm','5');
             Storage.save('BQNumber','3');
             Storage.save('Document', "标签打印");
             Storage.save('Name','标签打印');
@@ -1855,14 +1888,18 @@ export default class Index extends Component {
                 <View style={styles.header}>
                     <View style={styles.cont}>
                         <TouchableOpacity onPress={this._rightButtonClick.bind(this)}>
-                            <Image source={require("../images/1_12.png")} style={styles.HeaderImage}></Image>
+                            <Image source={require("../images/1_12.png")} style=
+                                {styles.HeaderImage}></Image>
                         </TouchableOpacity>
                         <Text style={styles.HeaderList}>{this.state.head}</Text>
                         <TouchableOpacity onPress={this.Code.bind(this)} style={styles.onclick}>
-                            <Image source={require("../images/1_05.png")} style={styles.HeaderImage}></Image>
+                            <Image source={require("../images/1_05.png")} style=
+                                {styles.HeaderImage}></Image>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={this.pressPush.bind(this)} style={styles.onclick}>
-                            <Image source={require("../images/1_08.png")} style={styles.HeaderImage}></Image>
+                        <TouchableOpacity onPress={this.pressPush.bind(this)} style=
+                            {styles.onclick}>
+                            <Image source={require("../images/1_08.png")} style=
+                                {styles.HeaderImage}></Image>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -1900,31 +1937,38 @@ export default class Index extends Component {
                             null :
                             <TouchableOpacity style={styles.Home} onPress={this.History.bind(this)}><Image source={require("../images/1_300.png")}></Image><Text style={styles.home1}>历史单据查询</Text></TouchableOpacity>
                     }
-                    <TouchableOpacity style={styles.Home}><Image source={require("../images/1_31.png")}></Image><Text style={styles.home2}>商品</Text></TouchableOpacity>
+                    <TouchableOpacity style={styles.Home}><Image source={require
+                    ("../images/1_31.png")}></Image><Text style={styles.home2}>商品
+                    </Text></TouchableOpacity>
                     {
                         (this.state.head=="商品查询")?
                             null:
-                            <TouchableOpacity style={styles.Home} onPress={this.ShopList.bind(this)}>
+                            <TouchableOpacity style={styles.Home} onPress={this.ShopList.bind
+                            (this)}>
                                 <View>
                                     <Image source={require("../images/1_322.png")}>
                                         {
                                             (this.state.shopcar==0)?
                                                 null:
-                                                <Text style={[{position:"absolute", right:-200,}]}>{this.state.shopcar}</Text>
+                                                <Text style={[{position:"absolute", right:-200,}]}>
+                                                    {this.state.shopcar}</Text>
                                         }
                                         {
                                             (this.state.shopcar>0)?
-                                                <Text style={[styles.ShopCar,{paddingTop:3,}]}>{this.state.shopcar}</Text>:null
+                                                <Text style={[styles.ShopCar,{paddingTop:3,}]}>
+                                                    {this.state.shopcar}</Text>:null
                                         }
                                         {
                                             (this.state.shopcar<999)?
                                                 null:
-                                                <Text style={[styles.ShopCar,{width:30,height:30,top:11,lineHeight:21,}]}>{this.state.shopcar}</Text>
+                                                <Text style={[styles.ShopCar,
+                                                    {width:30,height:30,top:11,lineHeight:21,}]}>{this.state.shopcar}</Text>
                                         }
                                         {
                                             (this.state.shopcar>999)?
                                                 <View>
-                                                    <Text style={[styles.ShopCar,{width:30,height:30,top:11,lineHeight:23}]}>{this.state.shopcar}</Text>
+                                                    <Text style={[styles.ShopCar,
+                                                        {width:30,height:30,top:11,lineHeight:23}]}>{this.state.shopcar}</Text>
                                                     <Text style={styles.Add}>
                                                         +
                                                     </Text>
@@ -1944,9 +1988,11 @@ export default class Index extends Component {
                     onRequestClose={() => {}} >
                     <ScrollView style={styles.modalStyle}>
                         <View style={styles.ModalTitle}>
-                            <TouchableOpacity style={styles.ModalLeft} onPress={this.ChuMo.bind(this)}>
+                            <TouchableOpacity style={styles.ModalLeft} onPress={this.ChuMo.bind
+                            (this)}>
                                 <View>
-                                    <Image source = {this.state.pressStatus =='pressin' ? require("../images/1_42.png") : require("../images/1_43.png")} />
+                                    <Image source = {this.state.pressStatus =='pressin' ? require
+                                    ("../images/1_42.png") : require("../images/1_43.png")} />
                                 </View>
                                 <View>
                                     <Text style={styles.ModalImage}>
@@ -1960,9 +2006,11 @@ export default class Index extends Component {
                             <View style={styles.ModalLeft1}>
                                 <Image source={require("../images/1_47.png")} />
                             </View>
-                            <TouchableOpacity style={styles.ModalLeft} onPress={this.SaoMa.bind(this)}>
+                            <TouchableOpacity style={styles.ModalLeft} onPress={this.SaoMa.bind
+                            (this)}>
                                 <View style={[{marginLeft:14}]}>
-                                    <Image source = {this.state.PressStatus =='Pressin' ? require("../images/1_42.png") : require("../images/1_43.png")}  />
+                                    <Image source = {this.state.PressStatus =='Pressin' ? require
+                                    ("../images/1_42.png") : require("../images/1_43.png")}  />
                                 </View>
                                 <View>
                                     <Text style={styles.ModalImage}>
@@ -1976,7 +2024,8 @@ export default class Index extends Component {
                         </View>
                         <View style={styles.ModalCont}>
                             <View style={styles.ModalHead}>
-                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.YaoHuo.bind(this)}>
+                                <TouchableOpacity style={[styles.ModalHeadImage,
+                                    {borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.YaoHuo.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_25.png")} />
                                     </Text>
@@ -1984,7 +2033,8 @@ export default class Index extends Component {
                                         要货
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.PSShouHuo.bind(this)}>
+                                <TouchableOpacity style={[styles.ModalHeadImage,
+                                    {borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.PSShouHuo.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_28.png")} />
                                     </Text>
@@ -1992,7 +2042,8 @@ export default class Index extends Component {
                                         配送收货
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.ModalHeadImage} onPress={this.SSPanDian.bind(this)}>
+                                <TouchableOpacity style={styles.ModalHeadImage} onPress=
+                                    {this.SSPanDian.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_29.png")} />
                                     </Text>
@@ -2002,10 +2053,12 @@ export default class Index extends Component {
                                 </TouchableOpacity>
                             </View>
                             <View style={styles.ModalLine}>
-                                <Image source={require("../images/1_48.png")} style={styles.ModalImageLine} />
+                                <Image source={require("../images/1_48.png")} style=
+                                    {styles.ModalImageLine} />
                             </View>
                             <View style={styles.ModalHead}>
-                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.SPPanDian.bind(this)}>
+                                <TouchableOpacity style={[styles.ModalHeadImage,
+                                    {borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.SPPanDian.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_36.png")} />
                                     </Text>
@@ -2013,7 +2066,8 @@ export default class Index extends Component {
                                         商品盘点
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.SunYi.bind(this)}>
+                                <TouchableOpacity style={[styles.ModalHeadImage,
+                                    {borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.SunYi.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_38.png")} />
                                     </Text>
@@ -2021,7 +2075,8 @@ export default class Index extends Component {
                                         损溢
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.ModalHeadImage} onPress={this.SPCaiGou.bind(this)}>
+                                <TouchableOpacity style={styles.ModalHeadImage} onPress=
+                                    {this.SPCaiGou.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_40.png")} />
                                     </Text>
@@ -2031,10 +2086,12 @@ export default class Index extends Component {
                                 </TouchableOpacity>
                             </View>
                             <View style={styles.ModalLine}>
-                                <Image source={require("../images/1_48.png")} style={styles.ModalImageLine} />
+                                <Image source={require("../images/1_48.png")} style=
+                                    {styles.ModalImageLine} />
                             </View>
                             <View style={styles.ModalHead}>
-                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.SPYanShou.bind(this)}>
+                                <TouchableOpacity style={[styles.ModalHeadImage,
+                                    {borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.SPYanShou.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_44.png")} />
                                     </Text>
@@ -2042,7 +2099,8 @@ export default class Index extends Component {
                                         商品验收
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.XPCaiGou.bind(this)}>
+                                <TouchableOpacity style={[styles.ModalHeadImage,
+                                    {borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.XPCaiGou.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_45.png")} />
                                     </Text>
@@ -2050,7 +2108,8 @@ export default class Index extends Component {
                                         协配采购
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.ModalHeadImage} onPress={this.XPShouHuo.bind(this)}>
+                                <TouchableOpacity style={styles.ModalHeadImage} onPress=
+                                    {this.XPShouHuo.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_46.png")} />
                                     </Text>
@@ -2060,18 +2119,12 @@ export default class Index extends Component {
                                 </TouchableOpacity>
                             </View>
                             <View style={styles.ModalLine}>
-                                <Image source={require("../images/1_48.png")} style={styles.ModalImageLine} />
+                                <Image source={require("../images/1_48.png")} style=
+                                    {styles.ModalImageLine} />
                             </View>
                             <View style={[styles.ModalHead,{marginBottom:10}]}>
-                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.Sell.bind(this)}>
-                                    <Text style={styles.ModalHeadImage1}>
-                                        <Image source={require("../images/1_57.png")} />
-                                    </Text>
-                                    <Text style={styles.ModalHeadText}>
-                                        销售
-                                    </Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.StateMent.bind(this)}>
+                                <TouchableOpacity style={[styles.ModalHeadImage,
+                                    {borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.StateMent.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1-60.png")} />
                                     </Text>
@@ -2079,7 +2132,8 @@ export default class Index extends Component {
                                         报表
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.ModalHeadImage} onPress={this.StockEnquiries.bind(this)}>
+                                <TouchableOpacity  style={[styles.ModalHeadImage, {borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress=
+                                    {this.StockEnquiries.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_58.png")} />
                                     </Text>
@@ -2087,12 +2141,7 @@ export default class Index extends Component {
                                         库存查询
                                     </Text>
                                 </TouchableOpacity>
-                            </View>
-                            <View style={styles.ModalLine}>
-                                <Image source={require("../images/1_48.png")} style={styles.ModalImageLine} />
-                            </View>
-                            <View style={[styles.ModalHead,{marginBottom:10}]}>
-                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.ShopSearch.bind(this)}>
+                                <TouchableOpacity style={styles.ModalHeadImage} onPress={this.ShopSearch.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_58.png")} />
                                     </Text>
@@ -2100,12 +2149,26 @@ export default class Index extends Component {
                                         商品查询
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.BQbutton.bind(this)}>
+                            </View>
+                            <View style={styles.ModalLine}>
+                                <Image source={require("../images/1_48.png")} style=
+                                    {styles.ModalImageLine} />
+                            </View>
+                            <View style={[styles.ModalHead,{marginBottom:10}]}>
+                                <TouchableOpacity style={[styles.ModalHeadImage, {borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.BQbutton.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_60.png")} />
                                     </Text>
                                     <Text style={styles.ModalHeadText}>
                                         标签打印
+                                    </Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={this.UpData.bind(this)} style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]}>
+                                    <Text style={styles.ModalHeadImage1}>
+                                        <Image source={require("../images/1_59.png")} />
+                                    </Text>
+                                    <Text style={styles.ModalHeadText}>
+                                        数据更新
                                     </Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity style={styles.ModalHeadImage} onPress={this.pullOut.bind(this)}>
@@ -2114,19 +2177,6 @@ export default class Index extends Component {
                                     </Text>
                                     <Text style={styles.ModalHeadText}>
                                         退出账号
-                                    </Text>
-                                </TouchableOpacity>
-                            </View>
-                            <View style={styles.ModalLine}>
-                                <Image source={require("../images/1_48.png")} style={styles.ModalImageLine} />
-                            </View>
-                            <View style={[styles.ModalHead,{marginBottom:10}]}>
-                                <TouchableOpacity onPress={this.UpData.bind(this)} style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]}>
-                                    <Text style={styles.ModalHeadImage1}>
-                                        <Image source={require("../images/1_59.png")} />
-                                    </Text>
-                                    <Text style={styles.ModalHeadText}>
-                                        数据更新
                                     </Text>
                                 </TouchableOpacity>
                             </View>
@@ -2141,9 +2191,11 @@ export default class Index extends Component {
                     onRequestClose={() => {}} >
                     <ScrollView style={styles.modalStyle}>
                         <View style={styles.ModalTitle}>
-                            <TouchableOpacity style={styles.ModalLeft} onPress={this.YeWu.bind(this)}>
+                            <TouchableOpacity style={styles.ModalLeft} onPress={this.YeWu.bind
+                            (this)}>
                                 <View>
-                                    <Image source = {this.state.pressStatus =='pressin' ? require("../images/1_42.png") : require("../images/1_43.png")} />
+                                    <Image source = {this.state.pressStatus =='pressin' ? require
+                                    ("../images/1_42.png") : require("../images/1_43.png")} />
                                 </View>
                                 <View>
                                     <Text style={styles.ModalImage}>
@@ -2157,9 +2209,11 @@ export default class Index extends Component {
                             <View style={styles.ModalLeft1}>
                                 <Image source={require("../images/1_47.png")} />
                             </View>
-                            <TouchableOpacity style={styles.ModalLeft} onPress={this.ShouYin.bind(this)}>
+                            <TouchableOpacity style={styles.ModalLeft} onPress={this.ShouYin.bind
+                            (this)}>
                                 <View style={[{marginLeft:14}]}>
-                                    <Image source = {this.state.PressStatus =='Pressin' ? require("../images/1_42.png") : require("../images/1_43.png")}  />
+                                    <Image source = {this.state.PressStatus =='Pressin' ? require
+                                    ("../images/1_42.png") : require("../images/1_43.png")}  />
                                 </View>
                                 <View>
                                     <Text style={styles.ModalImage}>
@@ -2173,7 +2227,8 @@ export default class Index extends Component {
                         </View>
                         <View style={styles.ModalCont}>
                             <View style={styles.ModalHead}>
-                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.YaoHuo1.bind(this)}>
+                                <TouchableOpacity style={[styles.ModalHeadImage,
+                                    {borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.YaoHuo1.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_25.png")} />
                                     </Text>
@@ -2181,7 +2236,8 @@ export default class Index extends Component {
                                         要货
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.PSShouHuo1.bind(this)}>
+                                <TouchableOpacity style={[styles.ModalHeadImage,
+                                    {borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.PSShouHuo1.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_28.png")} />
                                     </Text>
@@ -2189,7 +2245,8 @@ export default class Index extends Component {
                                         配送收货
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.ModalHeadImage} onPress={this.SSPanDian1.bind(this)}>
+                                <TouchableOpacity style={styles.ModalHeadImage} onPress=
+                                    {this.SSPanDian1.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_29.png")} />
                                     </Text>
@@ -2199,10 +2256,12 @@ export default class Index extends Component {
                                 </TouchableOpacity>
                             </View>
                             <View style={styles.ModalLine}>
-                                <Image source={require("../images/1_48.png")} style={styles.ModalImageLine} />
+                                <Image source={require("../images/1_48.png")} style=
+                                    {styles.ModalImageLine} />
                             </View>
                             <View style={styles.ModalHead}>
-                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.SPPanDian1.bind(this)}>
+                                <TouchableOpacity style={[styles.ModalHeadImage,
+                                    {borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.SPPanDian1.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_36.png")} />
                                     </Text>
@@ -2210,7 +2269,8 @@ export default class Index extends Component {
                                         商品盘点
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.SunYi1.bind(this)}>
+                                <TouchableOpacity style={[styles.ModalHeadImage,
+                                    {borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.SunYi1.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_38.png")} />
                                     </Text>
@@ -2218,7 +2278,8 @@ export default class Index extends Component {
                                         损溢
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.ModalHeadImage} onPress={this.SPCaiGou1.bind(this)}>
+                                <TouchableOpacity style={styles.ModalHeadImage} onPress=
+                                    {this.SPCaiGou1.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_40.png")} />
                                     </Text>
@@ -2228,10 +2289,12 @@ export default class Index extends Component {
                                 </TouchableOpacity>
                             </View>
                             <View style={styles.ModalLine}>
-                                <Image source={require("../images/1_48.png")} style={styles.ModalImageLine} />
+                                <Image source={require("../images/1_48.png")} style=
+                                    {styles.ModalImageLine} />
                             </View>
                             <View style={styles.ModalHead}>
-                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.SPYanShou1.bind(this)}>
+                                <TouchableOpacity style={[styles.ModalHeadImage,
+                                    {borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.SPYanShou1.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_44.png")} />
                                     </Text>
@@ -2239,7 +2302,8 @@ export default class Index extends Component {
                                         商品验收
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.XPCaiGou1.bind(this)}>
+                                <TouchableOpacity style={[styles.ModalHeadImage,
+                                    {borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.XPCaiGou1.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_45.png")} />
                                     </Text>
@@ -2247,7 +2311,8 @@ export default class Index extends Component {
                                         协配采购
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.ModalHeadImage} onPress={this.XPShouHuo1.bind(this)}>
+                                <TouchableOpacity style={styles.ModalHeadImage} onPress=
+                                    {this.XPShouHuo1.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_46.png")} />
                                     </Text>
@@ -2257,10 +2322,12 @@ export default class Index extends Component {
                                 </TouchableOpacity>
                             </View>
                             <View style={styles.ModalLine}>
-                                <Image source={require("../images/1_48.png")} style={styles.ModalImageLine} />
+                                <Image source={require("../images/1_48.png")} style=
+                                    {styles.ModalImageLine} />
                             </View>
                             <View style={[styles.ModalHead,{marginBottom:10}]}>
-                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.Sell1.bind(this)}>
+                                <TouchableOpacity style={[styles.ModalHeadImage,
+                                    {borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.Sell1.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_57.png")} />
                                     </Text>
@@ -2268,7 +2335,8 @@ export default class Index extends Component {
                                         销售
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.pullOut1.bind(this)}>
+                                <TouchableOpacity style={[styles.ModalHeadImage,
+                                    {borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.pullOut1.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_56.png")} />
                                     </Text>
@@ -2276,7 +2344,8 @@ export default class Index extends Component {
                                         退出账号
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.ModalHeadImage}></TouchableOpacity>
+                                <TouchableOpacity style={styles.ModalHeadImage}
+                                ></TouchableOpacity>
                             </View>
                         </View>
                     </ScrollView>
@@ -2289,9 +2358,11 @@ export default class Index extends Component {
                     onRequestClose={() => {}} >
                     <ScrollView style={styles.modalStyle}>
                         <View style={styles.ModalTitle}>
-                            <TouchableOpacity style={styles.ModalLeft} onPress={this.YeWu1.bind(this)}>
+                            <TouchableOpacity style={styles.ModalLeft} onPress={this.YeWu1.bind
+                            (this)}>
                                 <View>
-                                    <Image source = {this.state.pressStatus =='pressin' ? require("../images/1_42.png") : require("../images/1_43.png")} />
+                                    <Image source = {this.state.pressStatus =='pressin' ? require
+                                    ("../images/1_42.png") : require("../images/1_43.png")} />
                                 </View>
                                 <View>
                                     <Text style={styles.ModalImage}>
@@ -2305,9 +2376,11 @@ export default class Index extends Component {
                             <View style={styles.ModalLeft1}>
                                 <Image source={require("../images/1_47.png")} />
                             </View>
-                            <TouchableOpacity style={styles.ModalLeft} onPress={this.ShouYin1.bind(this)}>
+                            <TouchableOpacity style={styles.ModalLeft} onPress={this.ShouYin1.bind
+                            (this)}>
                                 <View style={[{marginLeft:14}]}>
-                                    <Image source = {this.state.PressStatus =='Pressin' ? require("../images/1_42.png") : require("../images/1_43.png")}  />
+                                    <Image source = {this.state.PressStatus =='Pressin' ? require
+                                    ("../images/1_42.png") : require("../images/1_43.png")}  />
                                 </View>
                                 <View>
                                     <Text style={styles.ModalImage}>
@@ -2334,14 +2407,16 @@ export default class Index extends Component {
                     visible={this.state.emptydata}
                     onShow={() => {}}
                     onRequestClose={() => {}} >
-                    <Image source={require("../images/background.png")} style={[styles.ModalStyle,{justifyContent: 'center',alignItems: 'center',}]}>
+                    <Image source={require("../images/background.png")} style=
+                        {[styles.ModalStyle,{justifyContent: 'center',alignItems: 'center',}]}>
                         <View style={styles.ModalStyleCont}>
                             <View style={styles.ModalStyleTitle}>
                                 <Text style={styles.ModalTitleText}>
                                     请选择单据
                                 </Text>
                             </View>
-                            <TouchableOpacity onPress={this.Emptydata.bind(this)} style={styles.Button}>
+                            <TouchableOpacity onPress={this.Emptydata.bind(this)} style=
+                                {styles.Button}>
                                 <Text style={styles.ModalTitleText}>
                                     好的
                                 </Text>
@@ -2354,7 +2429,8 @@ export default class Index extends Component {
                     visible={this.state.Promp}
                     onShow={() => {}}
                     onRequestClose={() => {}} >
-                    <Image source={require("../images/background.png")} style={[styles.ModalStyle,{justifyContent: 'center',alignItems: 'center',}]}>
+                    <Image source={require("../images/background.png")} style=
+                        {[styles.ModalStyle,{justifyContent: 'center',alignItems: 'center',}]}>
                         <View style={styles.ModalStyleCont}>
                             <View style={styles.ModalStyleTitle}>
                                 <Text style={styles.ModalTitleText}>
@@ -2374,14 +2450,16 @@ export default class Index extends Component {
                     visible={this.state.Promp1}
                     onShow={() => {}}
                     onRequestClose={() => {}} >
-                    <Image source={require("../images/background.png")} style={[styles.ModalStyle,{justifyContent: 'center',alignItems: 'center',}]}>
+                    <Image source={require("../images/background.png")} style=
+                        {[styles.ModalStyle,{justifyContent: 'center',alignItems: 'center',}]}>
                         <View style={styles.ModalStyleCont}>
                             <View style={styles.ModalStyleTitle}>
                                 <Text style={styles.ModalTitleText}>
                                     请将模式改为触摸
                                 </Text>
                             </View>
-                            <TouchableOpacity onPress={this.Mode1.bind(this)} style={styles.Button}>
+                            <TouchableOpacity onPress={this.Mode1.bind(this)} style=
+                                {styles.Button}>
                                 <Text style={styles.ModalTitleText}>
                                     好的
                                 </Text>
@@ -2394,7 +2472,8 @@ export default class Index extends Component {
                     visible={this.state.Permissions}
                     onShow={() => {}}
                     onRequestClose={() => {}} >
-                    <Image source={require("../images/background.png")} style={[styles.ModalStyle,{justifyContent: 'center',alignItems: 'center',}]}>
+                    <Image source={require("../images/background.png")} style=
+                        {[styles.ModalStyle,{justifyContent: 'center',alignItems: 'center',}]}>
                         <View style={styles.ModalStyleCont}>
                             <View style={styles.ModalStyleTitle}>
                                 <Text style={styles.ModalTitleText}>
@@ -2414,14 +2493,16 @@ export default class Index extends Component {
                     visible={this.state.Permissions1}
                     onShow={() => {}}
                     onRequestClose={() => {}} >
-                    <Image source={require("../images/background.png")} style={[styles.ModalStyle,{justifyContent: 'center',alignItems: 'center',}]}>
+                    <Image source={require("../images/background.png")} style=
+                        {[styles.ModalStyle,{justifyContent: 'center',alignItems: 'center',}]}>
                         <View style={styles.ModalStyleCont}>
                             <View style={styles.ModalStyleTitle}>
                                 <Text style={styles.ModalTitleText}>
                                     该店不是配送中心,不能进行该业务
                                 </Text>
                             </View>
-                            <TouchableOpacity onPress={this.MoDe1.bind(this)} style={styles.Button}>
+                            <TouchableOpacity onPress={this.MoDe1.bind(this)} style=
+                                {styles.Button}>
                                 <Text style={styles.ModalTitleText}>
                                     好的
                                 </Text>
@@ -2434,14 +2515,16 @@ export default class Index extends Component {
                     visible={this.state.Permissions2}
                     onShow={() => {}}
                     onRequestClose={() => {}} >
-                    <Image source={require("../images/background.png")} style={[styles.ModalStyle,{justifyContent: 'center',alignItems: 'center',}]}>
+                    <Image source={require("../images/background.png")} style=
+                        {[styles.ModalStyle,{justifyContent: 'center',alignItems: 'center',}]}>
                         <View style={styles.ModalStyleCont}>
                             <View style={styles.ModalStyleTitle}>
                                 <Text style={styles.ModalTitleText}>
                                     该机构没有采购权
                                 </Text>
                             </View>
-                            <TouchableOpacity onPress={this.MoDe2.bind(this)} style={styles.Button}>
+                            <TouchableOpacity onPress={this.MoDe2.bind(this)} style=
+                                {styles.Button}>
                                 <Text style={styles.ModalTitleText}>
                                     好的
                                 </Text>
@@ -2457,7 +2540,8 @@ export default class Index extends Component {
                     onRequestClose={() => {}} >
                     <View style={styles.LoadCenter}>
                         <View style={styles.loading}>
-                            <ActivityIndicator key="1" color="#ffffff" size="large" style={styles.activity}></ActivityIndicator>
+                            <ActivityIndicator key="1" color="#ffffff" size="large" style=
+                                {styles.activity}></ActivityIndicator>
                             <Text style={styles.TextLoading}>更新数据中...</Text>
                         </View>
                     </View>
@@ -2467,14 +2551,16 @@ export default class Index extends Component {
                     visible={this.state.DataComplete}
                     onShow={() => {}}
                     onRequestClose={() => {}} >
-                    <Image source={require("../images/background.png")} style={[styles.ModalStyle,{justifyContent: 'center',alignItems: 'center',}]}>
+                    <Image source={require("../images/background.png")} style=
+                        {[styles.ModalStyle,{justifyContent: 'center',alignItems: 'center',}]}>
                         <View style={styles.ModalStyleCont}>
                             <View style={styles.ModalStyleTitle}>
                                 <Text style={styles.ModalTitleText}>
                                     数据更新完毕
                                 </Text>
                             </View>
-                            <TouchableOpacity onPress={this.Datacomplete.bind(this)} style={styles.Button}>
+                            <TouchableOpacity onPress={this.Datacomplete.bind(this)} style=
+                                {styles.Button}>
                                 <Text style={styles.ModalTitleText}>
                                     确定
                                 </Text>
@@ -2834,21 +2920,21 @@ const styles = StyleSheet.create({
     },
     LoadCenter:{
         flex:1,
-            justifyContent: 'center',
-            alignItems: 'center',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     loading:{
         paddingLeft:15,
-            paddingRight:15,
-            paddingTop:15,
-            paddingBottom:15,
-            backgroundColor:"#000000",
-            opacity:0.8,
-            borderRadius:5,
+        paddingRight:15,
+        paddingTop:15,
+        paddingBottom:15,
+        backgroundColor:"#000000",
+        opacity:0.8,
+        borderRadius:5,
     },
     TextLoading:{
         fontSize:17,
-            color:"#ffffff"
+        color:"#ffffff"
     },
     activity:{
         marginBottom:5,

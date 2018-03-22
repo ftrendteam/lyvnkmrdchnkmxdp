@@ -119,7 +119,7 @@ export default class GoodsDetails extends Component {
         if(this.state.Number==""||this.state.BQNumber==1){
             // alert(this.state.Number)
             this.setState({
-                Number:parseInt(this.state.Number)+1,
+                Number:1,
                 BQNumber:parseInt(this.state.BQNumber)+1,
                 numberFormat2:this.state.ShopPrice,
             });
@@ -167,8 +167,7 @@ export default class GoodsDetails extends Component {
         if(this.state.name==null) {
             alert("请选择单据")
         }
-        if(this.state.name=="实时盘点单"){
-            alert("1111")
+        if(this.state.name=="实时盘点单"||this.state.name=="商品盘点单"){
             var shopInfoData = [];
             var shopInfo = {};
             shopInfo.Pid = this.state.Pid;
@@ -324,7 +323,7 @@ export default class GoodsDetails extends Component {
                     <View style={styles.left1}>
                         <Text style={[styles.left,{marginTop:4}]}>数量</Text>
                         {
-                            (this.state.YdCountm == 3) ?
+                            (this.state.YdCountm == 5) ?
                                 <TextInput
                                     style={styles.Number}
                                     autoFocus={true}
@@ -356,7 +355,7 @@ export default class GoodsDetails extends Component {
                     </View>
                 </View>
                 {
-                    (this.state.YdCountm==1||this.state.YdCountm==3)?
+                    (this.state.YdCountm==1||this.state.YdCountm==5)?
                     <View style={styles.List}>
                         <View style={styles.left2}>
                             <Text style={styles.left}>现在库存</Text>
@@ -383,7 +382,7 @@ export default class GoodsDetails extends Component {
                     </View>
                 </View>
                 {
-                    (this.state.YdCountm == 3) ?
+                    (this.state.YdCountm == 5) ?
                         null:
                         <View style={styles.List}>
                             <View style={styles.left2}>
@@ -413,7 +412,7 @@ export default class GoodsDetails extends Component {
                         </View>
                 }
                 {
-                    (this.state.YdCountm == 3) ?
+                    (this.state.YdCountm == 5) ?
                         <TouchableOpacity style={styles.button} onPress={this.PressPop.bind(this)}>
                             <Text style={styles.ButtonText}>确定</Text>
                         </TouchableOpacity>

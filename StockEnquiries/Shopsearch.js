@@ -122,7 +122,6 @@ export default class Shopsearch extends Component {
                             var PriceFlag;
                             for (let i = 0; i < TblRow.length; i++) {
                                 var row = TblRow[i];
-                                console.log('TblRow=',row.ProdName)
                                 ProdCode =  row.ProdCode;
                                 BarCode =  row.BarCode;
                                 ProdName =  row.ProdName;
@@ -162,6 +161,25 @@ export default class Shopsearch extends Component {
                                 FUseSalePrice =  row.FUseSalePrice;
                                 PriceFlag =  row.PriceFlag;
                             };
+                            if(FNoCG==1||FNoSale==1||FNoYH==1||FNoPromotion==1||FNoTH==1||FNoCD==1){
+                                this.setState({
+                                    FNoCG:"是",
+                                    FNoSale:"是",
+                                    FNoYH:"是",
+                                    FNoPromotion:"是",
+                                    FNoTH:"是",
+                                    FNoCD:"是",
+                                })
+                            }else{
+                                this.setState({
+                                    FNoCG:"否",
+                                    FNoSale:"否",
+                                    FNoYH:"否",
+                                    FNoPromotion:"否",
+                                    FNoTH:"否",
+                                    FNoCD:"否",
+                                })
+                            }
                             this.setState({
                                 ProdCode:ProdCode,
                                 BarCode:BarCode,
@@ -193,12 +211,6 @@ export default class Shopsearch extends Component {
                                 VipPrice3:VipPrice3,
                                 PsPrice:PsPrice,
                                 WPrice:WPrice,
-                                FNoCG:FNoCG,
-                                FNoSale:FNoSale,
-                                FNoYH:FNoYH,
-                                FNoPromotion:FNoPromotion,
-                                FNoTH:FNoTH,
-                                FNoCD:FNoCD,
                                 FUseSalePrice:FUseSalePrice,
                                 PriceFlag:PriceFlag,
                             })
@@ -272,7 +284,7 @@ export default class Shopsearch extends Component {
                 <View style={styles.RowList}>
                     <View style={styles.LeftList}>
                         <Text style={styles.name}>库存数量：</Text>
-                        <Text style={styles.right}>{this.state.KCcount}</Text>
+                        <Text style={styles.right}>{this.state.Kccount}</Text>
                     </View>
                     <View style={styles.LeftList}>
                         <Text style={styles.name}>进价：</Text>
@@ -322,6 +334,8 @@ export default class Shopsearch extends Component {
                         <Text style={styles.name}>品类编码：</Text>
                         <Text style={styles.right}>{this.state.DepCode}</Text>
                     </View>
+                </View>
+                <View style={styles.RowList}>
                     <View style={styles.LeftList}>
                         <Text style={styles.name}>品类名称：</Text>
                         <Text style={styles.right}>{this.state.DepName}</Text>
@@ -332,6 +346,8 @@ export default class Shopsearch extends Component {
                         <Text style={styles.name}>品牌编码：</Text>
                         <Text style={styles.right}>{this.state.BrandCode}</Text>
                     </View>
+                </View>
+                <View style={styles.RowList}>
                     <View style={styles.LeftList}>
                         <Text style={styles.name}>品牌名称：</Text>
                         <Text style={styles.right}>{this.state.BrandName}</Text>

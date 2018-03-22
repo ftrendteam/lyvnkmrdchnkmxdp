@@ -120,11 +120,19 @@ export default class Search extends Component {
                                     var ShopPrice = JSON.stringify(data.ShopPrice);
                                     if (data.retcode == 1) {
                                         var ShopCar = rows.item(0).ProdName;
+                                        if(rows.item(0).ShopNumber==0){
+                                            this.setState({
+                                                Number1:"",
+                                            })
+                                        }else{
+                                            this.setState({
+                                                Number1:rows.item(0).ShopNumber,
+                                            })
+                                        }
                                         this.setState({
                                             ProdName: rows.item(0).ProdName,
                                             ShopPrice: rows.item(0).ShopPrice,
                                             Pid: rows.item(0).Pid,
-                                            Number1:"",
                                             Remark: rows.item(0).ShopRemark,
                                             prototal: rows.item(0).prototal,
                                             ProdCode: rows.item(0).ProdCode,
@@ -137,15 +145,9 @@ export default class Search extends Component {
                                             modal:1,
                                         })
                                         Storage.get('YdCountm').then((ydcountm) => {
-                                            if (ydcountm == 2 && countm != 0) {//原单数量
-                                                if (this.state.Number1 == 0) {
-                                                    this.setState({
-                                                        Number1:countm
-                                                    })
-                                                }
-                                            }else if(this.state.Number1 == 0){
+                                            if (ydcountm == 2) {//原单数量
                                                 this.setState({
-                                                    Number1:""
+                                                    Number1:countm
                                                 })
                                             }
                                             this.setState({
@@ -155,7 +157,7 @@ export default class Search extends Component {
 
                                         Storage.get('YuanDan').then((tags) => {
                                             if (tags == "1") {
-                                                if (this.state.Number == "1" && !this.state.isFrist) {
+                                                if (this.state.Number == "" && !this.state.isFrist) {
                                                     this.setState({
                                                         Number: this.state.ydcountm
                                                     })
@@ -215,11 +217,19 @@ export default class Search extends Component {
                                     var ShopPrice = JSON.stringify(data.ShopPrice);
                                     if (data.retcode == 1) {
                                         var ShopCar = rows.item(0).ProdName;
+                                        if(rows.item(0).ShopNumber==0){
+                                            this.setState({
+                                                Number1:"",
+                                            })
+                                        }else{
+                                            this.setState({
+                                                Number1:rows.item(0).ShopNumber,
+                                            })
+                                        }
                                         this.setState({
                                             ProdName: rows.item(0).ProdName,
                                             ShopPrice: rows.item(0).ShopPrice,
                                             Pid: rows.item(0).Pid,
-                                            Number1:1,
                                             Remark: rows.item(0).ShopRemark,
                                             prototal: rows.item(0).ShopAmount,
                                             ProdCode: rows.item(0).ProdCode,
@@ -232,15 +242,9 @@ export default class Search extends Component {
                                             modal:1,
                                         })
                                         Storage.get('YdCountm').then((ydcountm) => {
-                                            if (ydcountm == 2 && countm != 0) {//原单数量
-                                                if (this.state.Number1 == 0) {
-                                                    this.setState({
-                                                        Number1:countm,
-                                                    })
-                                                }
-                                            }else if(this.state.Number1 == 0){
+                                            if (ydcountm == 2) {//原单数量
                                                 this.setState({
-                                                    Number1:""
+                                                    Number1:countm,
                                                 })
                                             }
                                             this.setState({
@@ -250,7 +254,7 @@ export default class Search extends Component {
 
                                         Storage.get('YuanDan').then((tags) => {
                                             if (tags == "1") {
-                                                if (this.state.Number == "1" && !this.state.isFrist) {
+                                                if (this.state.Number == "" && !this.state.isFrist) {
                                                     this.setState({
                                                         Number: this.state.ydcountm
                                                     })
@@ -350,6 +354,7 @@ export default class Search extends Component {
         this.Modal();
         dbAdapter.selectAidCode(value, 1).then((rows) => {
             this.dataRows = [];
+            console.log("row==",rows.length)
             for (let i = 0; i < rows.length; i++) {
                 var row = rows.item(i);
                 this.dataRows.push(row);
@@ -382,50 +387,51 @@ export default class Search extends Component {
             })
         })
         //商品查询
-        Storage.get('userName').then((tags) => {
-            let params = {
-                reqCode: "App_PosReq",
-                reqDetailCode: "App_Client_CurrProdQry",
-                ClientCode: this.state.ClientCode,
-                sDateTime: Date.parse(new Date()),
-                Sign: NetUtils.MD5("App_PosReq" + "##" + "App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs") + '',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
-                username: tags,
-                usercode: this.state.Usercode,
-                SuppCode: rowData.SuppCode,
-                ShopCode: this.state.ShopCode,
-                ChildShopCode: this.state.ChildShopCode,
-                ProdCode: rowData.ProdCode,
-                OrgFormno: this.state.OrgFormno,
-                FormType: this.state.FormType,
-            };
-            FetchUtil.post(this.state.LinkUrl, JSON.stringify(params)).then((data) => {
-                var countm = JSON.stringify(data.countm);
-                var ShopPrice = JSON.stringify(data.ShopPrice);
-                if (data.retcode == 1) {
-                    this.setState({
-                        ProdName: rowData.ProdName,
-                        ShopPrice: rowData.StdPrice,
-                        Pid: rowData.Pid,
-                        Number1: rowData.ShopNumber,
-                        Remark: rowData.ShopRemark,
-                        prototal: rowData.prototal,
-                        ProdCode: rowData.ProdCode,
-                        DepCode: rowData.DepCode1,
-                        SuppCode: rowData.SuppCode,
-                        BarCode: rowData.BarCode,
-                        ydcountm: countm,
-                        Search:"",
-                        Number1:"",
-                        modal:1,
-                    })
-                    this.Modal();
-                } else {
-                    alert(JSON.stringify(data))
-                }
-            }, (err) => {
-                alert("网络请求失败");
+        // dbAdapter.selectAidCode(reminder, 1).then((rows) => {
+            Storage.get('userName').then((tags) => {
+                let params = {
+                    reqCode: "App_PosReq",
+                    reqDetailCode: "App_Client_CurrProdQry",
+                    ClientCode: this.state.ClientCode,
+                    sDateTime: Date.parse(new Date()),
+                    Sign: NetUtils.MD5("App_PosReq" + "##" + "App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs") + '',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
+                    username: tags,
+                    usercode: this.state.Usercode,
+                    SuppCode: rowData.SuppCode,
+                    ShopCode: this.state.ShopCode,
+                    ChildShopCode: this.state.ChildShopCode,
+                    ProdCode: rowData.ProdCode,
+                    OrgFormno: this.state.OrgFormno,
+                    FormType: this.state.FormType,
+                };
+                FetchUtil.post(this.state.LinkUrl, JSON.stringify(params)).then((data) => {
+                    var countm = JSON.stringify(data.countm);
+                    var ShopPrice = JSON.stringify(data.ShopPrice);
+                    if (data.retcode == 1) {
+                        this.setState({
+                            ProdName: rowData.ProdName,
+                            ShopPrice: rowData.StdPrice,
+                            Pid: rowData.Pid,
+                            Number1: rowData.ShopNumber,
+                            Remark: rowData.ShopRemark,
+                            prototal: rowData.prototal,
+                            ProdCode: rowData.ProdCode,
+                            DepCode: rowData.DepCode1,
+                            SuppCode: rowData.SuppCode,
+                            BarCode: rowData.BarCode,
+                            ydcountm: countm,
+                            Search:"",
+                            modal:1,
+                        })
+                        this.Modal();
+                    } else {
+                        alert(JSON.stringify(data))
+                    }
+                }, (err) => {
+                    alert("网络请求失败");
+                })
             })
-        })
+        // })
     }
 
     Modal() {
@@ -487,7 +493,7 @@ export default class Search extends Component {
     pressPop() {
         if (this.state.name == null) {
             alert("请选择单据")
-        } else if (this.state.Number1 == 0) {
+        } else if (this.state.Number1 == 0||this.state.Number1 == "") {
             ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
         } else {
             // alert(this.state.Remark);
@@ -514,7 +520,6 @@ export default class Search extends Component {
                 numberFormat2: "",
                 Remark: "",
                 ProdName: "",
-                Number1: "",
                 modal:"",
             })
         }
@@ -523,7 +528,7 @@ export default class Search extends Component {
     PressPop() {
         if (this.state.name == null) {
             alert("请选择单据")
-        } else if (this.state.Number1 == 0) {
+        } else if (this.state.Number1 == 0||this.state.Number1 == "") {
             ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
         } else {
             // alert(this.state.Remark);
@@ -550,7 +555,6 @@ export default class Search extends Component {
                 numberFormat2: "",
                 Remark: "",
                 ProdName: "",
-                Number1: "",
                 modal:"",
             })
         }
@@ -598,6 +602,7 @@ export default class Search extends Component {
                                     this.setState({
                                         Search: value
                                     })
+                                    console.log("shenmegui=",value)
                                     this.inputOnBlur(value)
                                 }}
                             />

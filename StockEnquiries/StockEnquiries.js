@@ -50,9 +50,11 @@ export default class StockEnquiries extends Component {
             this.Device();
         });
     }
+
     Code(){
         RNScannerAndroid.openScanner();
     }
+
     Device() {
         DeviceEventEmitter.addListener("code", (reminder) => {
             this.setState({
@@ -94,7 +96,7 @@ export default class StockEnquiries extends Component {
 
     _renderRow(rowData, sectionID, rowID){
         return(
-            <TouchableOpacity style={styles.DataList}>
+            <View style={styles.DataList}>
                 <View style={[styles.coding,{paddingLeft:10,}]}>
                     <Text style={styles.prod_name}>{rowData.prod_name}</Text>
                     <Text style={[styles.prod_name,{color:"#666666"}]}>{rowData.prod_code}</Text>
@@ -105,7 +107,7 @@ export default class StockEnquiries extends Component {
                 <View style={styles.name}>
                     <Text style={styles.codingText}>{rowData.kc_count}</Text>
                 </View>
-            </TouchableOpacity>
+            </View>
         )
 
     }
@@ -120,7 +122,6 @@ export default class StockEnquiries extends Component {
     _onEndEditing(){
         this._textInput.blur();
     }
-
 
     render() {
         return (
