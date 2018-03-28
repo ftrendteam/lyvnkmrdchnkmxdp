@@ -711,7 +711,7 @@ export default class Search extends Component {
                                 {
                                     (this.state.BQNumber == 3)?
                                         <TouchableOpacity style={styles.button} onPress={this.PressPop.bind(this)}>
-                                            <Text style={styles.ButtonText}>确定1</Text>
+                                            <Text style={styles.ButtonText}>确定</Text>
                                         </TouchableOpacity>
                                         :
                                         <TouchableOpacity style={styles.button} onPress={this.pressPop.bind(this)}>

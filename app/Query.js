@@ -61,32 +61,6 @@ export default class Query extends Component {
         });
     }
 
-    // pressPush(){
-    //     var str=this.state.sCode1;
-    //     if(this.state.sCode1==""){
-    //         alert("请选择原始单号");
-    //     }else{
-    //         var nextRoute={
-    //             name:"主页",
-    //             component:Search
-    //         };
-    //         this.props.navigator.push(nextRoute);
-    //
-    //         var date = new Date();
-    //         var data=JSON.stringify(date.getTime());
-    //         Storage.delete('YuanDan');
-    //         Storage.delete('Screen');
-    //         Storage.save('OrgFormno',str);
-    //         Storage.save('Date',data);
-    //         Storage.save('Name','商品盘点单');
-    //         Storage.save('FormType','PCYW');
-    //         Storage.save('valueOf','App_Client_ProPSSH');
-    //         Storage.save('history','App_Client_ProPSSHQ');
-    //         Storage.save('historyClass','App_Client_ProPSSHDetailQ');
-    //         Storage.save('ProYH','ProPC');
-    //     }
-    // }
-
     Home(){
         if(this.state.Disting=="0") {
             var str=this.state.sCode1;
@@ -100,10 +74,17 @@ export default class Query extends Component {
                     component:Index
                 };
                 this.props.navigator.push(nextRoute);
+                Storage.delete('OrgFormno');
+                Storage.delete('Screen');
+                Storage.delete('scode');
+                Storage.delete('shildshop');
+                Storage.delete('StateMent');
+                Storage.delete('BQNumber');
                 Storage.delete('YuanDan');
+                Storage.save('YdCountm', '3');
                 Storage.save('OrgFormno',str);
                 Storage.save('Date',data);
-                Storage.save('Name','商品盘点单');
+                Storage.save('Name','商品盘点');
                 Storage.save('valueOf','App_Client_ProPC');
                 Storage.save('history','App_Client_ProPCQ');
                 Storage.save('historyClass','App_Client_ProPCDetailQ');
@@ -122,10 +103,17 @@ export default class Query extends Component {
                     component: Search
                 };
                 this.props.navigator.push(nextRoute);
+                Storage.delete('OrgFormno');
+                Storage.delete('Screen');
+                Storage.delete('scode');
+                Storage.delete('shildshop');
+                Storage.delete('StateMent');
+                Storage.delete('BQNumber');
                 Storage.delete('YuanDan');
+                Storage.save('YdCountm', '3');
                 Storage.save('OrgFormno', str);
                 Storage.save('Date', data);
-                Storage.save('Name', '商品盘点单');
+                Storage.save('Name', '商品盘点');
                 Storage.save('valueOf', 'App_Client_ProPC');
                 Storage.save('history', 'App_Client_ProPCQ');
                 Storage.save('historyClass', 'App_Client_ProPCDetailQ');
@@ -225,7 +213,7 @@ const styles = StyleSheet.create({
     },
     listleft:{
         width:60,
-        marginTop:4,
+        marginTop:6,
     },
     listLeftText:{
         color:"#333333",

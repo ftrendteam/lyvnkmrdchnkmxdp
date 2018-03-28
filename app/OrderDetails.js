@@ -80,9 +80,9 @@ export default class GoodsDetails extends Component {
     }
 
     GoodsDetails(){
-        if(this.state.DataName=="销售"){
+        if(this.state.DataName=="移动销售"){
             var nextRoute={
-                name:"销售",
+                name:"移动销售",
                 component:Sell,
             };
             this.props.navigator.push(nextRoute);
@@ -167,7 +167,7 @@ export default class GoodsDetails extends Component {
         if(this.state.name==null) {
             alert("请选择单据")
         }
-        if(this.state.name=="实时盘点单"||this.state.name=="商品盘点单"){
+        if(this.state.name=="实时盘点"||this.state.name=="商品盘点"){
             var shopInfoData = [];
             var shopInfo = {};
             shopInfo.Pid = this.state.Pid;
@@ -184,9 +184,9 @@ export default class GoodsDetails extends Component {
             shopInfoData.push(shopInfo);
             //调用插入表方法
             dbAdapter.insertShopInfo(shopInfoData);
-            if(this.state.DataName=="销售"){
+            if(this.state.DataName=="移动销售"){
                 var nextRoute={
-                    name:"销售",
+                    name:"移动销售",
                     component:Sell,
                 };
                 this.props.navigator.push(nextRoute);
@@ -229,9 +229,9 @@ export default class GoodsDetails extends Component {
                 shopInfoData.push(shopInfo);
                 //调用插入表方法
                 dbAdapter.insertShopInfo(shopInfoData);
-                if(this.state.DataName=="销售"){
+                if(this.state.DataName=="移动销售"){
                     var nextRoute={
-                        name:"销售",
+                        name:"移动销售",
                         component:Sell,
                     };
                     this.props.navigator.push(nextRoute);

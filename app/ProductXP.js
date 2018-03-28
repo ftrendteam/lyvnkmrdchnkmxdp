@@ -109,7 +109,13 @@ export default class ProductCG extends Component {
                     component:Index,
                 };
                 this.props.navigator.push(nextRoute);
-                Storage.save('Name','协配采购单');
+                Storage.delete('OrgFormno');
+                Storage.delete('scode');
+                Storage.delete('shildshop');
+                Storage.delete('StateMent');
+                Storage.delete('BQNumber');
+                Storage.save('YdCountm', '3');
+                Storage.save('Name','协配采购');
                 Storage.save('FormType','XPCGYW');
                 Storage.save('valueOf','App_Client_ProXPCG');
                 Storage.save('history','App_Client_ProXPCGQ');
@@ -137,7 +143,13 @@ export default class ProductCG extends Component {
                     component:Search,
                 };
                 this.props.navigator.push(nextRoute);
-                Storage.save('Name','协配采购单');
+                Storage.delete('OrgFormno');
+                Storage.delete('scode');
+                Storage.delete('shildshop');
+                Storage.delete('StateMent');
+                Storage.delete('BQNumber');
+                Storage.save('YdCountm', '3');
+                Storage.save('Name','协配采购');
                 Storage.save('FormType','XPCGYW');
                 Storage.save('valueOf','App_Client_ProXPCG');
                 Storage.save('history','App_Client_ProXPCGQ');
@@ -249,7 +261,7 @@ const styles = StyleSheet.create({
     },
     listleft:{
         width:70,
-        marginTop:4,
+        marginTop:6,
     },
     listLeftText:{
         color:"#333333",

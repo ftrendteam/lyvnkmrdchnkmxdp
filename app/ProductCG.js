@@ -87,9 +87,14 @@ export default class ProductCG extends Component {
                     component:Index,
                 };
                 this.props.navigator.push(nextRoute);
+                Storage.delete('OrgFormno');
+                Storage.delete('scode');
+                Storage.delete('shildshop');
+                Storage.delete('StateMent');
+                Storage.delete('BQNumber');
                 Storage.delete('YuanDan');
                 Storage.delete('Screen');
-                Storage.save('Name','商品采购单');
+                Storage.save('Name','商品采购');
                 Storage.save('FormType','CGYW');
                 Storage.save('valueOf','App_Client_ProCG');
                 Storage.save('history','App_Client_ProCGQ');
@@ -112,9 +117,14 @@ export default class ProductCG extends Component {
                     component:Search,
                 };
                 this.props.navigator.push(nextRoute);
+                Storage.delete('OrgFormno');
+                Storage.delete('scode');
+                Storage.delete('shildshop');
+                Storage.delete('StateMent');
+                Storage.delete('BQNumber');
                 Storage.delete('YuanDan');
                 Storage.delete('Screen');
-                Storage.save('Name','商品采购单');
+                Storage.save('Name','商品采购');
                 Storage.save('FormType','CGYW');
                 Storage.save('valueOf','App_Client_ProCG');
                 Storage.save('history','App_Client_ProCGQ');

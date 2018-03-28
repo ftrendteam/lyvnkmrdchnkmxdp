@@ -209,7 +209,7 @@ export default class Distrition_list extends Component {
                     />
                     <Image source={require("../images/2.png")} style={styles.SearchImage} />
                     <View style={styles.Right}>
-                        <TouchableOpacity style={styles.Text1}><Text style={styles.Text} onPress={this.Return.bind(this)}>取消</Text></TouchableOpacity>
+                        <TouchableOpacity style={styles.Text1} onPress={this.Return.bind(this)}><Text style={styles.Text}>取消</Text></TouchableOpacity>
                     </View>
                 </View>
                 <View>
@@ -218,7 +218,7 @@ export default class Distrition_list extends Component {
                             <Text style={styles.codingText}>单据号</Text>
                         </View>
                         {
-                            (this.state.invoice=="商品验收单"||this.state.invoice=="协配收货单")?
+                            (this.state.invoice=="商品验收"||this.state.invoice=="协配收货")?
                                 <View style={styles.name}>
                                     <Text style={styles.codingText}>供应商</Text>
                                 </View>:null

@@ -406,7 +406,7 @@ export default class ShoppingCart extends Component {
                     <Text style={[styles.Price,styles.Name1]}>{rowData.ShopPrice}</Text>
                 </View>
                 {
-                    (this.state.Document=="标签打印")?
+                    (this.state.Document=="标签采集")?
                         null:
                         <View style={styles.RowList1}>
                             <Text style={[styles.SmallScale,styles.Name1]}>{rowData.ShopAmount}</Text>
@@ -457,7 +457,7 @@ export default class ShoppingCart extends Component {
 
     History(){
         Storage.get('Name').then((tags)=> {
-            if(tags=="销售"||tags=="标签打印"){
+            if(tags=="移动销售"||tags=="标签采集"){
                 ToastAndroid.show('暂不支持该业务', ToastAndroid.SHORT)
             }else{
                 var nextRoute = {
@@ -554,6 +554,13 @@ export default class ShoppingCart extends Component {
         });
     }
 
+    SCreenBod(){
+        this.setState({
+            SUbmit:'',
+        });
+        this.ScreenBod();
+    }
+
     //提交
     submit(){
         this.setState({
@@ -625,7 +632,7 @@ export default class ShoppingCart extends Component {
                                     this.screen.push(detail);
                                 }
                             }
-                            if(this.screen==""||this.state.OrgFormno==null){
+                            if(this.screen==""){
                                 FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
                                     if(data.retcode == 1){
                                         if(this.state.Screen!=="1"||this.state.Screen!=="2"||this.screen==""||scode==null){
@@ -646,6 +653,9 @@ export default class ShoppingCart extends Component {
                                 this.Wait();
                                 this.ScreenBod();
                             }
+                            this.setState({
+                                SUbmit:'',
+                            })
                         }else{
                             FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
                                 if(data.retcode == 1){
@@ -653,6 +663,9 @@ export default class ShoppingCart extends Component {
                                         this.Wait();
                                         this.Succeed();
                                     }
+                                    this.setState({
+                                        SUbmit:'',
+                                    })
                                 }else{
                                     this.Wait();
                                     alert(JSON.stringify(data))
@@ -718,6 +731,9 @@ export default class ShoppingCart extends Component {
                         if (data.retcode == 1) {
                             this.ScreenBod();
                             this.Succeed();
+                            this.setState({
+                                SUbmit:'',
+                            })
                         } else {
                             alert(JSON.stringify(data))
                         }
@@ -846,7 +862,7 @@ export default class ShoppingCart extends Component {
                 this.props.navigator.push(nextRoute);
                 this.DataSource();
             }
-            if(tags=="损溢单"){
+            if(tags=="商品损溢"){
                 this.Succeed();
                 var nextRoute={
                     name:"SunYi",
@@ -855,7 +871,7 @@ export default class ShoppingCart extends Component {
                 this.props.navigator.push(nextRoute);
                 this.DataSource();
             }
-            if(tags=="要货单"||tags=="实时盘点单"||tags=="标签打印"){
+            if(tags=="门店要货"||tags=="实时盘点"||tags=="标签采集"){
                 this.DataSource();
                 this.Succeed();
             }
@@ -937,7 +953,7 @@ export default class ShoppingCart extends Component {
                         <Text style={styles.Number}>数量</Text>
                         <Text style={styles.Price}>单价</Text>
                         {
-                            (this.state.Document=="标签打印")?
+                            (this.state.Document=="标签采集")?
                                 null
                                 :
                                 <Text style={styles.SmallScale}>小计</Text>
@@ -967,7 +983,7 @@ export default class ShoppingCart extends Component {
                             <Text style={styles.ClientType}>{this.state.ShopNumber}</Text>
                         </Text>
                         {
-                            (this.state.Document=="标签打印")?
+                            (this.state.Document=="标签采集")?
                                 null
                                 :
                                 <Text style={styles.ClientText}>
@@ -1141,7 +1157,7 @@ export default class ShoppingCart extends Component {
                             />
                         </View>
                         <View style={styles.Determine}>
-                            <TouchableOpacity style={styles.Cancel} onPress={this.ScreenBod.bind(this)}>
+                            <TouchableOpacity style={styles.Cancel} onPress={this.SCreenBod.bind(this)}>
                                 <Text style={styles.CancelText}>
                                     取消
                                 </Text>
@@ -1348,6 +1364,7 @@ const styles = StyleSheet.create({
         flexDirection:"row",
         height:48,
         paddingTop:15,
+        overflow:"hidden",
     },
     Goods:{
         flexDirection:"row",
@@ -1413,8 +1430,6 @@ const styles = StyleSheet.create({
         paddingTop:13,
         paddingBottom:13,
         backgroundColor:"#ff4e4e",
-        borderTopLeftRadius:5,
-        borderTopRightRadius:5,
         flexDirection:'row',
     },
     DanText:{

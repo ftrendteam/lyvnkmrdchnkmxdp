@@ -121,8 +121,14 @@ export default class ProductCG extends Component {
                     component:Index,
                 };
                 this.props.navigator.push(nextRoute);
+                Storage.delete('OrgFormno');
+                Storage.delete('scode');
+                Storage.delete('shildshop');
+                Storage.delete('StateMent');
+                Storage.delete('BQNumber');
+                Storage.save('YdCountm', '2');
                 Storage.save('OrgFormno',str2);
-                Storage.save('Name','协配收货单');
+                Storage.save('Name','协配收货');
                 Storage.save('FormType','XPYSYW');
                 Storage.save('valueOf','App_Client_ProXPYS');
                 Storage.save('history','App_Client_ProXPYSQ');
@@ -152,8 +158,14 @@ export default class ProductCG extends Component {
                     component: Search,
                 };
                 this.props.navigator.push(nextRoute);
+                Storage.delete('OrgFormno');
+                Storage.delete('scode');
+                Storage.delete('shildshop');
+                Storage.delete('StateMent');
+                Storage.delete('BQNumber');
+                Storage.save('YdCountm', '2');
                 Storage.save('OrgFormno', str2);
-                Storage.save('Name', '协配收货单');
+                Storage.save('Name', '协配收货');
                 Storage.save('FormType', 'XPYSYW');
                 Storage.save('valueOf', 'App_Client_ProXPYS');
                 Storage.save('history', 'App_Client_ProXPYSQ');
@@ -282,7 +294,7 @@ const styles = StyleSheet.create({
     },
     listleft:{
         width:70,
-        marginTop:4,
+        marginTop:6,
     },
     listLeftText:{
         color:"#333333",

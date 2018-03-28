@@ -122,7 +122,7 @@ export default class ProductXP_list extends Component {
                     />
                     <Image source={require("../images/2.png")} style={styles.SearchImage} />
                     <View style={styles.Right}>
-                        <TouchableOpacity style={styles.Text1}><Text style={styles.Text} onPress={this.Return.bind(this)}>取消</Text></TouchableOpacity>
+                        <TouchableOpacity style={styles.Text1} onPress={this.Return.bind(this)}><Text style={styles.Text}>取消</Text></TouchableOpacity>
                     </View>
                 </View>
                 <View>

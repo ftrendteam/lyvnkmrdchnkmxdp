@@ -180,7 +180,7 @@ export  default class RequestBodyUtils {
     return JSON.stringify({
       'reqCode': 'App_PosReq'  //固定内容
       , 'reqDetailCode': reqDetailCode,
-      //固定内容 App_Client_ProYHQ 要货单
+      //固定内容 App_Client_ProYHQ 门店要货
       //App_Client_ProPSSHQ配送收货单
       //App_Client_ProPCQ商品盘点单
       //App_Client_ProCurrPCQ实时盘点
@@ -194,7 +194,7 @@ export  default class RequestBodyUtils {
   /***
    * 单据详情查询
    * ClientCode传入固定内容
-   *  App_Client_ProYHDetailQ 要货单
+   *  App_Client_ProYHDetailQ 门店要货
    *  App_Client_ProPSSHDetailQ配送收货单
    *  App_Client_ProPCDetailQ商品盘点单
    *  App_Client_ProCurrPCDetailQ实时盘点

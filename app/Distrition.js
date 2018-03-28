@@ -96,11 +96,17 @@ export default class Distrition extends Component {
                 component:Index
             };
             this.props.navigator.push(nextRoute);
+            Storage.delete('OrgFormno');
+            Storage.delete('scode');
+            Storage.delete('shildshop');
+            Storage.delete('StateMent');
+            Storage.delete('BQNumber');
+            Storage.save('YdCountm', '2');
             Storage.save('YuanDan','1');
             Storage.save('OrgFormno',str);
             Storage.save("scode",str);
             Storage.save('Date',this.state.active);
-            Storage.save('Name','配送收货单');
+            Storage.save('Name','配送收货');
             Storage.save('FormType','PSSHYW');
             Storage.save('valueOf','App_Client_ProPSSH');
             Storage.save('history','App_Client_ProPSSHQ');
@@ -124,7 +130,7 @@ export default class Distrition extends Component {
             Storage.save('OrgFormno',str);
             Storage.save("scode",str);
             Storage.save('Date',this.state.active);
-            Storage.save('Name','配送收货单');
+            Storage.save('Name','配送收货');
             Storage.save('FormType','PSSHYW');
             Storage.save('valueOf','App_Client_ProPSSH');
             Storage.save('history','App_Client_ProPSSHQ');
@@ -227,7 +233,7 @@ const styles = StyleSheet.create({
     },
     listleft:{
         width:60,
-        marginTop:4,
+        marginTop:6,
     },
     listLeftText:{
         color:"#333333",

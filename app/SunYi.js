@@ -62,7 +62,14 @@ export default class SunYi extends Component {
                 component:Index
             };
             this.props.navigator.push(nextRoute);
-            Storage.save('Name','损溢单');
+            Storage.delete('OrgFormno');
+            Storage.delete('scode');
+            Storage.delete('shildshop');
+            Storage.delete('YuanDan');
+            Storage.delete('Screen');
+            Storage.delete('StateMent');
+            Storage.delete('BQNumber');
+            Storage.save('Name','商品损溢');
             Storage.save('FormType','SYYW');
             Storage.save('ProYH','ProSY');
             Storage.save('YdCountm','3');
@@ -82,7 +89,16 @@ export default class SunYi extends Component {
                 component:Search
             };
             this.props.navigator.push(nextRoute);
-            Storage.save('Name','损溢单');
+            Storage.delete('OrgFormno');
+            Storage.delete('scode');
+            Storage.delete('shildshop');
+            Storage.delete('YuanDan');
+            Storage.delete('Screen');
+            Storage.delete('StateMent');
+            Storage.delete('BQNumber');
+            Storage.save("invoice", "商品损溢");
+            Storage.save('Document', "商品损溢");
+            Storage.save('Name','商品损溢');
             Storage.save('FormType','SYYW');
             Storage.save('ProYH','ProSY');
             Storage.save('YdCountm','3');
@@ -106,7 +122,16 @@ export default class SunYi extends Component {
                 component:Index
             };
             this.props.navigator.push(nextRoute);
-            Storage.save('Name','损溢单');
+            Storage.delete('OrgFormno');
+            Storage.delete('scode');
+            Storage.delete('shildshop');
+            Storage.delete('YuanDan');
+            Storage.delete('Screen');
+            Storage.delete('StateMent');
+            Storage.delete('BQNumber');
+            Storage.save("invoice", "商品损溢");
+            Storage.save('Document', "商品损溢");
+            Storage.save('Name','商品损溢');
             Storage.save('FormType','SYYW');
             Storage.save('ProYH','ProSY');
             Storage.save('YdCountm','3');
@@ -126,7 +151,14 @@ export default class SunYi extends Component {
                 component:Search
             };
             this.props.navigator.push(nextRoute);
-            Storage.save('Name','损溢单');
+            Storage.delete('OrgFormno');
+            Storage.delete('scode');
+            Storage.delete('shildshop');
+            Storage.delete('YuanDan');
+            Storage.delete('Screen');
+            Storage.delete('StateMent');
+            Storage.delete('BQNumber');
+            Storage.save('Name','商品损溢');
             Storage.save('FormType','SYYW');
             Storage.save('ProYH','ProSY');
             Storage.save('YdCountm','3');

@@ -63,20 +63,28 @@ export default class ProductCG_list extends Component {
 
     Search(value){
         //if(value>=3){
-            for (let i = 0; i < this.dataRows.length; i++) {
-                // let temp = this.dataRows[0];
-                let dataRow = this.dataRows[i];
-                if (((dataRow.sCode + "").indexOf(value) >= 0)) {
-                    // this.dataRows[0] = dataRow;
-                    // this.dataRows[i] = temp;
-                    var str = this.dataRows.splice(i,1);
-                    this.dataRows.unshift(str[0]);
-                    break;
+            if(value==""){
+                this.setState({
+                    dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
+                })
+            }else{
+                var str;
+                for (let i = 0; i < this.dataRows.length; i++) {
+                    // let temp = this.dataRows[0];
+                    let dataRow = this.dataRows[i];
+                    // alert(JSON.stringify(dataRow))
+                    if (((dataRow.sCode + "").indexOf(value) >= 0)||((dataRow.sname + "").indexOf(value) >= 0)) {
+                        // this.dataRows[0] = dataRow;
+                        // this.dataRows[i] = temp;
+                        str = this.dataRows.splice(i,1);
+                        // this.dataRows.unshift(str[0]);
+                        break;
+                    }
                 }
+                this.setState({
+                    dataSource: this.state.dataSource.cloneWithRows(str),
+                })
             }
-            this.setState({
-                dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
-            })
         //}
     }
 
@@ -120,7 +128,7 @@ export default class ProductCG_list extends Component {
                     />
                     <Image source={require("../images/2.png")} style={styles.SearchImage} />
                     <View style={styles.Right}>
-                        <TouchableOpacity style={styles.Text1}><Text style={styles.Text} onPress={this.Return.bind(this)}>取消</Text></TouchableOpacity>
+                        <TouchableOpacity style={styles.Text1} onPress={this.Return.bind(this)}><Text style={styles.Text}>取消</Text></TouchableOpacity>
                     </View>
                 </View>
                 <View>

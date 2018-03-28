@@ -135,7 +135,7 @@ export default class Enquiries extends Component {
                     <Text style={styles.ContLeft1}>{this.state.reqDetailCode}</Text>
                 </View>
                 {
-                    (this.state.name=="商品采购单"||this.state.name=="商品验收单"||this.state.name=="协配采购单"||this.state.name=="协配收货单")?
+                    (this.state.name=="商品采购"||this.state.name=="商品验收"||this.state.name=="协配采购"||this.state.name=="协配收货")?
                     <View style={styles.ContList}>
                         <Text style={[styles.ContLeft,{marginTop:7,}]}>供应商编码</Text>
                         <TextInput

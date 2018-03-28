@@ -4,7 +4,7 @@
  * @flow
  */
 
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import {
     AppRegistry,
     StyleSheet,
@@ -31,7 +31,7 @@ import HistoricalDocument from "./HistoricalDocument";//历史单据
 import ShoppingCart from "./ShoppingCart";//清单
 import admin from "./admin";//登录页==用户编码
 import OrderDetails from "./OrderDetails";//商品详情页，数量增加
-import SunYi from "./SunYi";//损益单
+import SunYi from "./SunYi";//损溢单
 import Search from "./Search";//搜索
 import Query from "./Query";//盘点单
 import Distrition from "./Distrition";//配送单
@@ -51,6 +51,7 @@ import DBAdapter from "../adapter/DBAdapter";//接口页面
 import Storage from '../utils/Storage';//保存 获取
 import DeCodePrePrint18 from "../utils/DeCodePrePrint18";//商品扫码
 import SideMenu from 'react-native-side-menu';
+
 var {NativeModules} = require('react-native');
 var RNScannerAndroid = NativeModules.RNScannerAndroid;
 
@@ -60,60 +61,60 @@ let updata = new UpData();
 let decodepreprint = new DeCodePrePrint18();
 
 let db;
-let page =1;
+let page = 1;
 let total = 0;
 let totalPage = 0;
 const lastDepCode = "";
-let  listener;
+let listener;
 export default class Index extends Component {
-    constructor(props){
+    constructor(props) {
         super(props);
         this.state = {
-            currentindex:0,
-            isPress:true,
-            pickedDate:"",
-            pid:"",
-            DepCode:"",
-            head:"",
-            shopcar:"",
-            Counmnmber:"",
-            Page:"",
-            data:"",
-            ShopNumber:"",
-            ShopNumber1:"",
-            ShopCar1:"",
-            usercode:"",
-            License:"",
-            username:"",
-            active:"",
-            ClientCode:"",
-            Usercode:"",
-            SuppCode:"",
-            ShopCode:"",
-            ChildShopCode:"",
-            OrgFormno:"",
-            FormType:"",
-            LinkUrl:"",
-            Disting:"",
-            ShopNumber:"",
-            pressStatus:0,
-            PressStatus:0,
-            Zero:"",
+            currentindex: 0,
+            isPress: true,
+            pickedDate: "",
+            pid: "",
+            DepCode: "",
+            head: "",
+            shopcar: "",
+            Counmnmber: "",
+            Page: "",
+            data: "",
+            ShopNumber: "",
+            ShopNumber1: "",
+            ShopCar1: "",
+            usercode: "",
+            License: "",
+            username: "",
+            active: "",
+            ClientCode: "",
+            Usercode: "",
+            SuppCode: "",
+            ShopCode: "",
+            ChildShopCode: "",
+            OrgFormno: "",
+            FormType: "",
+            LinkUrl: "",
+            Disting: "",
+            ShopNumber: "",
+            pressStatus: 0,
+            PressStatus: 0,
+            Zero: "",
             nomore: true,
-            isloading:true,
-            show:false,
-            Show:false,
-            Promp:false,
-            Promp1:false,
-            Permissions:false,
-            Permissions1:false,
-            Permissions2:false,
-            statement:false,
-            receiving:false,
-            emptydata:false,
-            NewData:false,
-            DataComplete:false,
-            depcode:this.props.DepCode ? this.props.DepCode : "",
+            isloading: true,
+            show: false,
+            Show: false,
+            Promp: false,
+            Promp1: false,
+            Permissions: false,
+            Permissions1: false,
+            Permissions2: false,
+            statement: false,
+            receiving: false,
+            emptydata: false,
+            NewData: false,
+            DataComplete: false,
+            depcode: this.props.DepCode ? this.props.DepCode : "",
             dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => true,}),
         };
         this.dataRows = [];
@@ -125,62 +126,65 @@ export default class Index extends Component {
         }
     }
 
-    History(){
-        if(this.state.head=="销售"||this.state.head=="标签打印"){
+    History() {
+        if (this.state.head == "移动销售" || this.state.head == "标签采集") {
             ToastAndroid.show('暂不支持该业务', ToastAndroid.SHORT)
-        }else{
-            var nextRoute={
-                name:"主页",
-                component:HistoricalDocument
+        } else {
+            var nextRoute = {
+                name: "主页",
+                component: HistoricalDocument
             };
             this.props.navigator.push(nextRoute)
         }
     }
 
-    ShopList(){
-        Storage.get('Name').then((tags)=>{
-            if(this.state.head=="销售"){
+    ShopList() {
+        Storage.get('Name').then((tags) => {
+            if (this.state.head == "移动销售") {
 
-                var nextRoute={
-                    name:"Sell",
-                    component:Sell
+                var nextRoute = {
+                    name: "Sell",
+                    component: Sell
                 };
                 DeviceEventEmitter.removeAllListeners();
                 this.props.navigator.push(nextRoute);
-            }else{
-                var nextRoute={
-                    name:"主页",
-                    component:ShoppingCart
+            } else {
+                var nextRoute = {
+                    name: "主页",
+                    component: ShoppingCart
                 };
                 this.props.navigator.push(nextRoute)
             }
         })
 
     }
+
     //单据onclick事件
     _rightButtonClick() {
         this._setModalVisible();
     }
+
     //二维码扫描
-    Code(){
+    Code() {
         NativeModules.RNScannerAndroid.openScanner();
     }
+
     //扫码方法
-    Device(){
+    Device() {
         DeviceEventEmitter.addListener("code", (reminder) => {
             var title = this.state.head;
-            decodepreprint.init(reminder,dbAdapter);
-            if(title ==null){
+            decodepreprint.init(reminder, dbAdapter);
+            if (title == null) {
                 this._Emptydata();
-            }else{
-                if(reminder.length==18&&decodepreprint.deCodePreFlag()){
-                    decodepreprint.deCodeProdCode().then((datas)=>{
-                        dbAdapter.selectProdCode(datas,1).then((rows)=>{
-                            dbAdapter.selectAidCode(reminder,1).then((rows)=>{
-                                if(rows.length==0){
+            } else {
+                if (reminder.length == 18 && decodepreprint.deCodePreFlag()) {
+                    decodepreprint.deCodeProdCode().then((datas) => {
+                        dbAdapter.selectProdCode(datas, 1).then((rows) => {
+                            dbAdapter.selectAidCode(reminder, 1).then((rows) => {
+                                if (rows.length == 0) {
                                     alert("该商品不存在")
-                                }else {
-                                    if(this.state.head=="销售"){
+                                } else {
+                                    if (this.state.head == "移动销售") {
                                         var shopnumber = 0;
                                         var shopAmount = 0;
                                         for (let i = 0; i < rows.length; i++) {
@@ -189,84 +193,84 @@ export default class Index extends Component {
                                             this.props.navigator.push({
                                                 component: OrderDetails,
                                                 params: {
-                                                    ProdName:row.ProdName,
-                                                    ShopPrice:row.StdPrice,
-                                                    Pid:row.Pid,
-                                                    countm:row.ShopNumber,
-                                                    promemo:row.ShopRemark,
-                                                    prototal:row.ShopAmount,
-                                                    ProdCode:row.ProdCode,
-                                                    DepCode:row.DepCode1,
-                                                    SuppCode:row.SuppCode,
-                                                    ydcountm:"",
+                                                    ProdName: row.ProdName,
+                                                    ShopPrice: row.StdPrice,
+                                                    Pid: row.Pid,
+                                                    countm: row.ShopNumber,
+                                                    promemo: row.ShopRemark,
+                                                    prototal: row.ShopAmount,
+                                                    ProdCode: row.ProdCode,
+                                                    DepCode: row.DepCode1,
+                                                    SuppCode: row.SuppCode,
+                                                    ydcountm: "",
                                                     BarCode: row.BarCode,
                                                 }
                                             })
                                         }
-                                    } else{
-                                        Storage.get('FormType').then((tags)=>{
+                                    } else {
+                                        Storage.get('FormType').then((tags) => {
                                             this.setState({
-                                                FormType:tags
+                                                FormType: tags
                                             })
                                         })
 
                                         Storage.get('LinkUrl').then((tags) => {
                                             this.setState({
-                                                LinkUrl:tags
+                                                LinkUrl: tags
                                             })
                                         })
                                         //商品查询
-                                        Storage.get('userName').then((tags)=>{
+                                        Storage.get('userName').then((tags) => {
                                             let params = {
-                                                reqCode:"App_PosReq",
-                                                reqDetailCode:"App_Client_CurrProdQry",
-                                                ClientCode:this.state.ClientCode,
-                                                sDateTime:Date.parse(new Date()),
-                                                Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" +"PosControlCs"
-                                                username:tags,
-                                                usercode:this.state.Usercode,
-                                                SuppCode:rows.item(0).SuppCode,
-                                                ShopCode:this.state.ShopCode,
-                                                ChildShopCode:this.state.ChildShopCode,
-                                                ProdCode:datas,
-                                                OrgFormno:this.state.OrgFormno,
-                                                FormType:this.state.FormType,
-                                        };
-                                            FetchUtil.post(this.state.LinkUrl,JSON.stringify(params)).then((data)=>{
-                                                var countm=JSON.stringify(data.countm);
-                                                var ShopPrice=JSON.stringify(data.ShopPrice);
-                                                if(data.retcode == 1){
+                                                reqCode: "App_PosReq",
+                                                reqDetailCode: "App_Client_CurrProdQry",
+                                                ClientCode: this.state.ClientCode,
+                                                sDateTime: Date.parse(new Date()),
+                                                Sign: NetUtils.MD5("App_PosReq" + "##" + "App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs") + '',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" +"PosControlCs"
+                                                username: tags,
+                                                usercode: this.state.Usercode,
+                                                SuppCode: rows.item(0).SuppCode,
+                                                ShopCode: this.state.ShopCode,
+                                                ChildShopCode: this.state.ChildShopCode,
+                                                ProdCode: datas,
+                                                OrgFormno: this.state.OrgFormno,
+                                                FormType: this.state.FormType,
+                                            };
+                                            FetchUtil.post(this.state.LinkUrl, JSON.stringify(params)).then((data) => {
+                                                var countm = JSON.stringify(data.countm);
+                                                var ShopPrice = JSON.stringify(data.ShopPrice);
+                                                if (data.retcode == 1) {
                                                     var ShopCar = rows.item(0).ProdName;
-                                                    if(this.state.head=="商品查询"){
+                                                    if (this.state.head == "商品查询") {
                                                         this.props.navigator.push({
-                                                            component:Shopsearch,
-                                                            params:{
-                                                                ProdCode:rows.item(0).ProdCode,
-                                                                DepCode:rows.item(0).DepCode1,
+                                                            component: Shopsearch,
+                                                            params: {
+                                                                ProdCode: rows.item(0).ProdCode,
+                                                                DepCode: rows.item(0).DepCode1,
                                                             }
                                                         })
-                                                    }else{
+                                                    } else {
                                                         this.props.navigator.push({
-                                                            component:OrderDetails,
-                                                            params:{
-                                                                ProdName:rows.item(0).ProdName,
-                                                                ShopPrice:ShopPrice,
-                                                                Pid:rows.item(0).Pid,
-                                                                countm:rows.item(0).ShopNumber,
-                                                                promemo:rows.item(0).promemo,
-                                                                prototal:rows.item(0).prototal,
-                                                                ProdCode:rows.item(0).ProdCode,
-                                                                DepCode:rows.item(0).DepCode1,
-                                                                SuppCode:rows.item(0).SuppCode,
-                                                                ydcountm:countm,
+                                                            component: OrderDetails,
+                                                            params: {
+                                                                ProdName: rows.item(0).ProdName,
+                                                                ShopPrice: ShopPrice,
+                                                                Pid: rows.item(0).Pid,
+                                                                countm: rows.item(0).ShopNumber,
+                                                                promemo: rows.item(0).promemo,
+                                                                prototal: rows.item(0).prototal,
+                                                                ProdCode: rows.item(0).ProdCode,
+                                                                DepCode: rows.item(0).DepCode1,
+                                                                SuppCode: rows.item(0).SuppCode,
+                                                                ydcountm: countm,
                                                                 BarCode: rows.item(0).BarCode,
                                                             }
                                                         })
                                                     }
-                                                }else{
+                                                } else {
                                                     alert(JSON.stringify(data))
                                                 }
-                                            },(err)=>{
+                                            }, (err) => {
                                                 alert("网络请求失败");
                                             })
                                         })
@@ -276,12 +280,12 @@ export default class Index extends Component {
                             })
                         })
                     })
-                }else{
-                    dbAdapter.selectAidCode(reminder,1).then((rows)=>{
-                        if(rows.length==0){
+                } else {
+                    dbAdapter.selectAidCode(reminder, 1).then((rows) => {
+                        if (rows.length == 0) {
                             alert("该商品不存在")
-                        }else {
-                            if (this.state.head == "销售") {
+                        } else {
+                            if (this.state.head == "移动销售") {
                                 var shopnumber = 0;
                                 var shopAmount = 0;
                                 for (let i = 0; i < rows.length; i++) {
@@ -290,16 +294,16 @@ export default class Index extends Component {
                                     this.props.navigator.push({
                                         component: OrderDetails,
                                         params: {
-                                            ProdName:row.ProdName,
-                                            ShopPrice:row.StdPrice,
-                                            Pid:row.Pid,
-                                            countm:row.ShopNumber,
-                                            promemo:row.ShopRemark,
-                                            prototal:row.ShopAmount,
-                                            ProdCode:row.ProdCode,
-                                            DepCode:row.DepCode1,
-                                            SuppCode:row.SuppCode,
-                                            ydcountm:"",
+                                            ProdName: row.ProdName,
+                                            ShopPrice: row.StdPrice,
+                                            Pid: row.Pid,
+                                            countm: row.ShopNumber,
+                                            promemo: row.ShopRemark,
+                                            prototal: row.ShopAmount,
+                                            ProdCode: row.ProdCode,
+                                            DepCode: row.DepCode1,
+                                            SuppCode: row.SuppCode,
+                                            ydcountm: "",
                                             BarCode: row.BarCode,
                                         }
                                     })
@@ -340,15 +344,15 @@ export default class Index extends Component {
                                         var ShopPrice = JSON.stringify(data.ShopPrice);
                                         if (data.retcode == 1) {
                                             var ShopCar = rows.item(0).ProdName;
-                                            if(this.state.head=="商品查询"){
+                                            if (this.state.head == "商品查询") {
                                                 this.props.navigator.push({
-                                                    component:Shopsearch,
-                                                    params:{
-                                                        ProdCode:rows.item(0).ProdCode,
-                                                        DepCode:rows.item(0).DepCode1,
+                                                    component: Shopsearch,
+                                                    params: {
+                                                        ProdCode: rows.item(0).ProdCode,
+                                                        DepCode: rows.item(0).DepCode1,
                                                     }
                                                 })
-                                            }else{
+                                            } else {
                                                 this.props.navigator.push({
                                                     component: OrderDetails,
                                                     params: {
@@ -383,17 +387,17 @@ export default class Index extends Component {
     }
 
     //搜索
-    pressPush(){
-        if(this.state.head=="商品查询"){
-            var nextRoute={
-                name:"主页",
-                component:SearchData
+    pressPush() {
+        if (this.state.head == "商品查询") {
+            var nextRoute = {
+                name: "主页",
+                component: SearchData
             };
             this.props.navigator.push(nextRoute);
-        }else{
-            var nextRoute={
-                name:"主页",
-                component:Search
+        } else {
+            var nextRoute = {
+                name: "主页",
+                component: Search
             };
             this.props.navigator.push(nextRoute);
         }
@@ -401,30 +405,30 @@ export default class Index extends Component {
     }
 
     //页面执行方法
-    componentDidMount(){
-        Storage.save("num","1");
+    componentDidMount() {
+        Storage.save("num", "1");
         InteractionManager.runAfterInteractions(() => {
 
             this.Storage();
             this._fetch();
             this.Device();
-            if(lastDepCode ==1){
-                page= 1;
+            if (lastDepCode == 1) {
+                page = 1;
             }
-            Storage.get('Disting').then((tags)=>{
+            Storage.get('Disting').then((tags) => {
                 this.setState({
-                    Disting:tags,
+                    Disting: tags,
                 })
 
-                if(this.state.Disting=="0"){
+                if (this.state.Disting == "0") {
                     this.setState({
-                        pressStatus:'pressin',
-                        PressStatus:'0',
+                        pressStatus: 'pressin',
+                        PressStatus: '0',
                     });
-                }else if(this.state.Disting=="1"){
+                } else if (this.state.Disting == "1") {
                     this.setState({
-                        PressStatus:'Pressin',
-                        pressStatus:0
+                        PressStatus: 'Pressin',
+                        pressStatus: 0
                     });
                 }
             })
@@ -432,52 +436,52 @@ export default class Index extends Component {
         });
     }
 
-    Storage(){
+    Storage() {
         Storage.get('Name').then((tags) => {
             this.setState({
-                head:tags
+                head: tags
             })
         });
 
         Storage.get('username').then((tags) => {
             this.setState({
-                username:tags
+                username: tags
             })
         });
 
-        Storage.get('ClientCode').then((tags)=>{
+        Storage.get('ClientCode').then((tags) => {
             this.setState({
-                ClientCode:tags
+                ClientCode: tags
             })
         })
 
-        Storage.get('Usercode').then((tags)=>{
+        Storage.get('Usercode').then((tags) => {
             this.setState({
-                Usercode:tags
+                Usercode: tags
             })
         })
 
-        Storage.get('code').then((tags)=>{
+        Storage.get('code').then((tags) => {
             this.setState({
-                ShopCode:tags
+                ShopCode: tags
             })
         })
 
-        Storage.get('shildshop').then((tags)=>{
+        Storage.get('shildshop').then((tags) => {
             this.setState({
-                ChildShopCode:tags
+                ChildShopCode: tags
             })
         })
 
-        Storage.get('OrgFormno').then((tags)=>{
+        Storage.get('OrgFormno').then((tags) => {
             this.setState({
-                OrgFormno:tags
+                OrgFormno: tags
             })
         })
 
         Storage.get('username').then((tags) => {
             this.setState({
-                usercode:tags
+                usercode: tags
             })
 
         });
@@ -485,77 +489,79 @@ export default class Index extends Component {
     }
 
     //获取左侧商品品类信息、商品总数、触发第一个列表
-    _fetch(){
+    _fetch() {
         let ShopCar1 = 0;
-        dbAdapter.selectTDepSet('1').then((rows)=>{
-            for(let i =0;i<rows.length;i++){
+        dbAdapter.selectTDepSet('1').then((rows) => {
+            for (let i = 0; i < rows.length; i++) {
                 var row = rows.item(i);
                 this.dataRows.push(row);
                 var ShopCar = rows.item(0).DepCode;
-                ShopCar1 = row.ShopNumber+ShopCar1;
+                ShopCar1 = row.ShopNumber + ShopCar1;
             }
-            if(this.state.depcode == "") {
+            if (this.state.depcode == "") {
                 this.setState({
-                    depcode :ShopCar,
+                    depcode: ShopCar,
                 })
                 lastDepCode = this.state.depcode;
             }
             this.setState({
-                dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
-                ShopNumber1:row.ShopNumber,
-                isloading:true,
-                ShopCar1:ShopCar1
+                dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
+                ShopNumber1: row.ShopNumber,
+                isloading: true,
+                ShopCar1: ShopCar1
             })
             //触发第一个左侧品类
-            let priductData=[];
-            dbAdapter.selectProduct(this.state.depcode,page,1).then((rows)=>{
-                if(lastDepCode !==""){
-                    page= 1;
+            let priductData = [];
+            dbAdapter.selectProduct(this.state.depcode, page, 1).then((rows) => {
+                if (lastDepCode !== "") {
+                    page = 1;
                 }
-                for(let i =0;i<rows.length;i++){
+                for (let i = 0; i < rows.length; i++) {
                     var row = rows.item(i);
                     priductData.push(row);
                 }
                 total = this.state.Page;
                 totalPage = total % 15 == 0 ? total / 15 : Math.floor(total / 15) + 1;
-                this.productData=priductData;
+                this.productData = priductData;
                 this.setState({
-                    currentindex:this.state.depcode,
-                    data:priductData,
-                    isloading:false,
+                    currentindex: this.state.depcode,
+                    data: priductData,
+                    isloading: false,
                 });
             });
         });
         //获取商品总数
-        dbAdapter.selectProduct1(1,1).then((rows)=>{
-            for(let i =0;i<rows.length;i++){
+        dbAdapter.selectProduct1(1, 1).then((rows) => {
+            for (let i = 0; i < rows.length; i++) {
                 var row = rows.item(i);
-            };
+            }
+            ;
             var priductdata = JSON.stringify(row.countn);
             this.setState({
-                Page:priductdata,
+                Page: priductdata,
             })
         });
         this._fetch1();
     }
 
-    _fetch1(){
-        dbAdapter.selectShopInfo("1").then((rows)=>{
-            for(let i =0;i<rows.length;i++){
+    _fetch1() {
+        dbAdapter.selectShopInfo("1").then((rows) => {
+            for (let i = 0; i < rows.length; i++) {
                 var row = rows.item(i);
             }
         });
-        dbAdapter.selectShopInfoAllCountm().then((rows)=>{
+        dbAdapter.selectShopInfoAllCountm().then((rows) => {
             var ShopCar = rows.item(0).countm;
             this.setState({
-                shopcar:ShopCar,
+                shopcar: ShopCar,
             });
         });
     }
 
-    _renderRow(rowData, sectionID, rowID){
+    _renderRow(rowData, sectionID, rowID) {
         return (
-            <TouchableOpacity onPress={() => this._pressRow(rowData)} key={rowData.DepCode} style={this.state.currentindex==rowData.DepCode ? styles.clickes : styles.click}>
+            <TouchableOpacity onPress={() => this._pressRow(rowData)} key={rowData.DepCode}
+                              style={this.state.currentindex == rowData.DepCode ? styles.clickes : styles.click}>
                 {
                     (rowData.ShopNumber == 0) ?
                         null :
@@ -571,47 +577,48 @@ export default class Index extends Component {
     }
 
     //商品品类获取品类下商品
-    _pressRow(rowData){
-        if(lastDepCode ==""){
+    _pressRow(rowData) {
+        if (lastDepCode == "") {
             lastDepCode = rowData.DepCode;
         }
-        if(lastDepCode!==''){
-            page= 1;
+        if (lastDepCode !== '') {
+            page = 1;
         }
-        dbAdapter.selectProduct1(rowData.DepCode,1).then((rows)=>{
-            for(let i =0;i<rows.length;i++){
+        dbAdapter.selectProduct1(rowData.DepCode, 1).then((rows) => {
+            for (let i = 0; i < rows.length; i++) {
                 var row = rows.item(i);
             }
             var priductdata = JSON.stringify(row.countn);
             this.setState({
-                Page:priductdata,
+                Page: priductdata,
             })
         });
-        let priductData=[];
+        let priductData = [];
         var DEPCODE = (rowData.DepCode);
         this.setState({
-            depcode:DEPCODE,
-            isloading:true,
+            depcode: DEPCODE,
+            isloading: true,
         })
-        dbAdapter.selectProduct(rowData.DepCode,page,1).then((rows)=>{
-            for(let i =0;i<rows.length;i++){
+        dbAdapter.selectProduct(rowData.DepCode, page, 1).then((rows) => {
+            for (let i = 0; i < rows.length; i++) {
                 var row = rows.item(i);
                 priductData.push(row);
             };
             total = this.state.Page;
             totalPage = total % 15 == 0 ? total / 15 : Math.floor(total / 15) + 1;
-            this.productData=priductData;
+            this.productData = priductData;
+            console.log('priductData=',priductData)
             this.setState({
-                data:priductData,
-                isloading:false,
-                currentindex:rowData.DepCode
+                data: priductData,
+                isloading: false,
+                currentindex: rowData.DepCode
             })
-            if(totalPage==0){
+            if (totalPage == 0) {
                 this.setState({
                     nomore: false,
                 })
             }
-            if(totalPage>0){
+            if (totalPage > 0) {
                 this.setState({
                     nomore: true,
                 })
@@ -623,20 +630,20 @@ export default class Index extends Component {
         //alert(endTime-startTime);
     }
 
-    _renderItem(item,index){
-        return(
+    _renderItem(item, index) {
+        return (
             <View style={styles.Border}>
                 {
-                    (this.state.head=="实时盘点单"||this.state.head=="商品盘点单")?
+                    (this.state.head == "实时盘点" || this.state.head == "商品盘点") ?
                         <View style={styles.AddNumber} ref="goodsCodeOrName">
                             {
-                                (item.item.ShopNumber===""||this.state.Zero=="0")?
-                                    null:
-                                    <TouchableOpacity style={styles.Subtraction} onPress={() =>this.Countm(item)}>
+                                (item.item.ShopNumber === "" || this.state.Zero == "0") ?
+                                    null :
+                                    <TouchableOpacity style={styles.Subtraction} onPress={() => this.Countm(item)}>
                                         <Text style={styles.Number}>{item.item.ShopNumber}</Text>
                                         {
-                                            (item.item.ShopNumber=="0")?
-                                                null:
+                                            (item.item.ShopNumber == "0") ?
+                                                null :
                                                 <View style={styles.subtraction}><Text style={styles.Reduction}>-</Text></View>
                                         }
                                     </TouchableOpacity>
@@ -645,16 +652,16 @@ export default class Index extends Component {
                         :
                         <View style={styles.AddNumber} ref="goodsCodeOrName">
                             {
-                                (item.item.ShopNumber==""||item.item.ShopNumber=="0")?
-                                    null:
-                                    <TouchableOpacity style={styles.Subtraction} onPress={() =>this.Countm(item)}>
+                                (item.item.ShopNumber == "" || item.item.ShopNumber == "0") ?
+                                    null :
+                                    <TouchableOpacity style={styles.Subtraction} onPress={() => this.Countm(item)}>
                                         <Text style={styles.Number}>{item.item.ShopNumber}</Text>
                                         <View style={styles.subtraction}><Text style={styles.Reduction}>-</Text></View>
                                     </TouchableOpacity>
                             }
                         </View>
                 }
-                <TouchableOpacity onPress={()=>this.OrderDetails(item)}>
+                <TouchableOpacity onPress={() => this.OrderDetails(item)}>
                     <View style={styles.Image}>
                         <Image source={require("../images/image.png")}></Image>
                     </View>
@@ -665,7 +672,7 @@ export default class Index extends Component {
     }
 
     //修改商品数量增减查询
-    Countm(item){
+    Countm(item) {
         //调取数量
         // if(this.state.ShopNumber=="0"){
         //     this.setState({
@@ -673,145 +680,149 @@ export default class Index extends Component {
         //     })
         //     return;
         // }else {
-            dbAdapter.upDataShopInfoCountmSub(item.item.ProdCode).then((rows) => {
-            });
-            item.item.ShopNumber = item.item.ShopNumber - 1;
-            let select = 0;
-            for (let i = 0; i < this.dataRows.length; i++) {
-                if (item.item.DepCode1 == this.dataRows[i].DepCode) {//判断当前品类是否相等
-                    select = i;
-                    let ShopNumber = this.dataRows[i].ShopNumber;
-                    this.dataRows[i].ShopNumber = ShopNumber - 1;
-                    this.setState({
-                        dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
-                    })
-                }
+        dbAdapter.upDataShopInfoCountmSub(item.item.ProdCode).then((rows) => {
+        });
+        item.item.ShopNumber = item.item.ShopNumber - 1;
+        let select = 0;
+        for (let i = 0; i < this.dataRows.length; i++) {
+            if (item.item.DepCode1 == this.dataRows[i].DepCode) {//判断当前品类是否相等
+                select = i;
+                let ShopNumber = this.dataRows[i].ShopNumber;
+                this.dataRows[i].ShopNumber = ShopNumber - 1;
+                this.setState({
+                    dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
+                })
             }
-            if (item.item.ShopNumber == "0") {
-                if(this.state.head!=="实时盘点单"||this.state.head!=="商品盘点单"){
-                    dbAdapter.deteleShopInfo(item.item.ProdCode).then((rows) => {});
-                    this.setState({
-                        ShopCar1: 0,
-                        ShopNumber: 0,
-                        Zero:0,
-                    })
-                }
+        }
+        if (item.item.ShopNumber == "0") {
+            if (this.state.head !== "实时盘点" || this.state.head !== "商品盘点") {
+                dbAdapter.deteleShopInfo(item.item.ProdCode).then((rows) => {
+                });
+                this.setState({
+                    ShopCar1: 0,
+                    ShopNumber: 0,
+                    Zero: 0,
+                })
             }
+        }
         // }
         // this._fetch();
         this._fetch1();
     }
 
     _separator = () => {
-        return <View style={{height:1,backgroundColor:'#f5f5f5'}}/>;
+        return <View style={{height: 1, backgroundColor: '#f5f5f5'}}/>;
     }
 
     _createEmptyView() {
         return (
             <View style={styles.footerView}>
                 {
-                    this.state.nomore ?[<ActivityIndicator key="1"></ActivityIndicator>,<Text key="2" style={styles.fontColorGray}>加载中</Text>]:<Text style={styles.nomore}>没有更多了</Text>
+                    this.state.nomore ? [<ActivityIndicator key="1"></ActivityIndicator>,
+                            <Text key="2" style={styles.fontColorGray}>加载中</Text>] :
+                        <Text style={styles.nomore}>没有更多了</Text>
                 }
             </View>
         );
     }
 
     //商品查询
-    OrderDetails(item){
+    OrderDetails(item) {
         var title = this.state.head;
-        Storage.get('FormType').then((tags)=>{
+        Storage.get('FormType').then((tags) => {
             this.setState({
-                FormType:tags
+                FormType: tags
             })
         })
 
         Storage.get('LinkUrl').then((tags) => {
             this.setState({
-                LinkUrl:tags
+                LinkUrl: tags
             })
         })
 
-        if(title ==null){
+        if (title == null) {
             this._Emptydata();
-        }else{
+        } else {
             //商品查询
-            if(this.state.head=="销售"){
-                dbAdapter.selectAidCode(item.item.ProdCode,1).then((rows)=>{
+            if (this.state.head == "移动销售") {
+                dbAdapter.selectAidCode(item.item.ProdCode, 1).then((rows) => {
                     var shopnumber = 0;
                     var shopAmount = 0;
                     for (let i = 0; i < rows.length; i++) {
                         var row = rows.item(i);
                         var ShopPrice = row.ShopPrice;
                         this.props.navigator.push({
-                            component:OrderDetails,
-                            params:{
-                                ProdName:item.item.ProdName,
-                                ShopPrice:row.StdPrice,
-                                Pid:item.item.Pid,
-                                countm:item.item.ShopNumber,
-                                promemo:item.item.ShopRemark,
-                                prototal:item.item.ShopAmount,
-                                ProdCode:item.item.ProdCode,
-                                DepCode:item.item.DepCode1,
-                                SuppCode:item.item.SuppCode,
-                                ydcountm:"",
-                                BarCode:item.item.BarCode,
+                            component: OrderDetails,
+                            params: {
+                                ProdName: item.item.ProdName,
+                                ShopPrice: row.StdPrice,
+                                Pid: item.item.Pid,
+                                countm: item.item.ShopNumber,
+                                promemo: item.item.ShopRemark,
+                                prototal: item.item.ShopAmount,
+                                ProdCode: item.item.ProdCode,
+                                DepCode: item.item.DepCode1,
+                                SuppCode: item.item.SuppCode,
+                                ydcountm: "",
+                                BarCode: item.item.BarCode,
                             }
                         })
-                    };
+                    }
+                    ;
                 })
-            }else{
-                Storage.get('userName').then((tags)=>{
+            } else {
+                Storage.get('userName').then((tags) => {
                     let params = {
-                        reqCode:"App_PosReq",
-                        reqDetailCode:"App_Client_CurrProdQry",
-                        ClientCode:this.state.ClientCode,
-                        sDateTime:Date.parse(new Date()),
-                        Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_CurrProdQry" + "##"
-                            + Date.parse(new Date()) + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode +"##" + sDateTime + "##" + "PosControlCs"
-                        username:tags,
-                        usercode:this.state.Usercode,
-                        SuppCode:item.item.SuppCode,
-                        ShopCode:this.state.ShopCode,
-                        ChildShopCode:this.state.ChildShopCode,
-                        ProdCode:item.item.ProdCode,
-                        OrgFormno:this.state.OrgFormno,
-                        FormType:this.state.FormType,
+                        reqCode: "App_PosReq",
+                        reqDetailCode: "App_Client_CurrProdQry",
+                        ClientCode: this.state.ClientCode,
+                        sDateTime: Date.parse(new Date()),
+                        Sign: NetUtils.MD5("App_PosReq" + "##" + "App_Client_CurrProdQry" + "##"
+                            + Date.parse(new Date()) + "##" + "PosControlCs") + '',//reqCode + "##" + reqDetailCode +"##" + sDateTime + "##" + "PosControlCs"
+                        username: tags,
+                        usercode: this.state.Usercode,
+                        SuppCode: item.item.SuppCode,
+                        ShopCode: this.state.ShopCode,
+                        ChildShopCode: this.state.ChildShopCode,
+                        ProdCode: item.item.ProdCode,
+                        OrgFormno: this.state.OrgFormno,
+                        FormType: this.state.FormType,
                     };
-                    FetchUtil.post(this.state.LinkUrl,JSON.stringify(params)).then((data)=>{
-                        var countm=JSON.stringify(data.countm);
-                        var ShopPrice=JSON.stringify(data.ShopPrice);
-                        if(data.retcode == 1){
-                            if(this.state.head=="商品查询"){
+                    FetchUtil.post(this.state.LinkUrl, JSON.stringify(params)).then((data) => {
+                        var countm = JSON.stringify(data.countm);
+                        var ShopPrice = JSON.stringify(data.ShopPrice);
+                        if (data.retcode == 1) {
+                            if (this.state.head == "商品查询") {
                                 this.props.navigator.push({
-                                    component:Shopsearch,
-                                    params:{
-                                        ProdCode:item.item.ProdCode,
-                                        DepCode:item.item.DepCode1,
+                                    component: Shopsearch,
+                                    params: {
+                                        ProdCode: item.item.ProdCode,
+                                        DepCode: item.item.DepCode1,
                                     }
                                 })
-                            }else{
+                            } else {
                                 this.props.navigator.push({
-                                    component:OrderDetails,
-                                    params:{
-                                        ProdName:item.item.ProdName,
-                                        ShopPrice:ShopPrice,
-                                        Pid:item.item.Pid,
-                                        countm:item.item.ShopNumber,
-                                        promemo:item.item.promemo,
-                                        prototal:item.item.prototal,
-                                        ProdCode:item.item.ProdCode,
-                                        DepCode:item.item.DepCode1,
-                                        SuppCode:item.item.SuppCode,
-                                        ydcountm:countm,
-                                        BarCode:item.item.BarCode,
+                                    component: OrderDetails,
+                                    params: {
+                                        ProdName: item.item.ProdName,
+                                        ShopPrice: ShopPrice,
+                                        Pid: item.item.Pid,
+                                        countm: item.item.ShopNumber,
+                                        promemo: item.item.promemo,
+                                        prototal: item.item.prototal,
+                                        ProdCode: item.item.ProdCode,
+                                        DepCode: item.item.DepCode1,
+                                        SuppCode: item.item.SuppCode,
+                                        ydcountm: countm,
+                                        BarCode: item.item.BarCode,
                                     }
                                 })
                             }
-                        }else{
+                        } else {
                             alert(JSON.stringify(data))
                         }
-                    },(err)=>{
+                    }, (err) => {
                         alert("网络请求失败");
                     })
                 })
@@ -821,39 +832,39 @@ export default class Index extends Component {
     }
 
     //单据功能分类
-    ChuMo(){
-        Storage.save("Disting","0");
-        Storage.get('Disting').then((tags)=>{
+    ChuMo() {
+        Storage.save("Disting", "0");
+        Storage.get('Disting').then((tags) => {
             this.setState({
-                Disting:tags,
+                Disting: tags,
             })
         })
         this.setState({
-            pressStatus:'pressin',
-            PressStatus:'0',
+            pressStatus: 'pressin',
+            PressStatus: '0',
         });
     }
 
-    SaoMa(){
-        Storage.save("Disting","1");
-        Storage.get('Disting').then((tags)=>{
+    SaoMa() {
+        Storage.save("Disting", "1");
+        Storage.get('Disting').then((tags) => {
             this.setState({
-                Disting:tags
+                Disting: tags
             })
         })
         this.setState({
-            PressStatus:'Pressin',
-            pressStatus:0
+            PressStatus: 'Pressin',
+            pressStatus: 0
         });
     }
 
-    YaoHuo(){
-        if(this.state.ShopCar1>0){
+    YaoHuo() {
+        if (this.state.ShopCar1 > 0) {
             this._setModalVisible();
             alert("商品未提交")
-        }else if(this.state.username==null){
+        } else if (this.state.username == null) {
             this._setModalVisible();
-        }else{
+        } else {
             Storage.delete('OrgFormno');
             Storage.delete('scode');
             Storage.delete('shildshop');
@@ -862,93 +873,84 @@ export default class Index extends Component {
             Storage.delete('StateMent');
             Storage.delete('BQNumber');
             Storage.get('code').then((tags) => {
-                dbAdapter.isYHPSXP(tags).then((rows)=>{
-                    if(rows.length>=1){
-                        dbAdapter.selectUserRight(this.state.usercode,"K0801").then((rows)=>{
-                            if(rows==true){
-                                if(this.state.Disting=="0"){
+                dbAdapter.isYHPSXP(tags).then((rows) => {
+                    if (rows.length >= 1) {
+                        dbAdapter.selectUserRight(this.state.usercode, "K0801").then((rows) => {
+                            if (rows == true) {
+                                if (this.state.Disting == "0") {
                                     var date = new Date();
-                                    var data=JSON.stringify(date.getTime());
-                                    Storage.save('Name','要货单');
-                                    Storage.save('Document', "要货单");
-                                    Storage.save('FormType','YWYW');
-                                    Storage.save('ProYH','ProYH');
-                                    Storage.save('YdCountm','1');
-                                    var invoice = "要货单";
+                                    var data = JSON.stringify(date.getTime());
+                                    Storage.save('Name', '门店要货');
+                                    Storage.save('Document', "门店要货");
+                                    Storage.save('FormType', 'YWYW');
+                                    Storage.save('ProYH', 'ProYH');
+                                    Storage.save('YdCountm', '1');
+                                    var invoice = "门店要货";
                                     this.setState({
-                                        head:invoice,
-                                        active:data,
+                                        head: invoice,
+                                        active: data,
                                     });
-                                    Storage.save('Date',this.state.active);
+                                    Storage.save('Date', this.state.active);
                                     this._setModalVisible();
-                                }else if(this.state.Disting=="1"){
+                                } else if (this.state.Disting == "1") {
                                     var date = new Date();
-                                    var data=JSON.stringify(date.getTime());
-                                    Storage.save('Name','要货单');
-                                    Storage.save('Document', "要货单");
-                                    Storage.save('FormType','YWYW');
-                                    Storage.save('ProYH','ProYH');
-                                    Storage.save('YdCountm','1');
-                                    Storage.save('Date',this.state.active);
-                                    var invoice = "要货单";
+                                    var data = JSON.stringify(date.getTime());
+                                    Storage.save('Name', '门店要货');
+                                    Storage.save('Document', "门店要货");
+                                    Storage.save('FormType', 'YWYW');
+                                    Storage.save('ProYH', 'ProYH');
+                                    Storage.save('YdCountm', '1');
+                                    Storage.save('Date', this.state.active);
+                                    var invoice = "门店要货";
                                     this.setState({
-                                        head:invoice,
-                                        active:data,
+                                        head: invoice,
+                                        active: data,
                                     });
-                                    var nextRoute={
-                                        name:"主页",
-                                        component:Search
+                                    var nextRoute = {
+                                        name: "主页",
+                                        component: Search
                                     };
                                     this.props.navigator.push(nextRoute);
                                     DeviceEventEmitter.removeAllListeners();
                                     this._setModalVisible();
-                                }else{
+                                } else {
                                     this.Promp();
                                 }
                             }
                         })
-                    }else{
+                    } else {
                         this.Permissions()
                     }
                 })
             });
 
             //将内容保存到本地数据库
-            Storage.save('valueOf','App_Client_ProYH');
-            Storage.save('history','App_Client_ProYHQ');
-            Storage.save('historyClass','App_Client_ProYHDetailQ');
+            Storage.save('valueOf', 'App_Client_ProYH');
+            Storage.save('history', 'App_Client_ProYHQ');
+            Storage.save('historyClass', 'App_Client_ProYHDetailQ');
         }
     }
 
-    SunYi(){
-        if(this.state.ShopCar1>0){
+    SunYi() {
+        if (this.state.ShopCar1 > 0) {
             this._setModalVisible();
             alert("商品未提交")
-        }else if(this.state.username==null){
+        } else if (this.state.username == null) {
             this._setModalVisible();
-        }else {
-            Storage.delete('OrgFormno');
-            Storage.delete('scode');
-            Storage.delete('shildshop');
-            Storage.delete('YuanDan');
-            Storage.delete('Screen');
-            Storage.delete('StateMent');
-            Storage.delete('BQNumber');
-            dbAdapter.selectUserRight(this.state.usercode,"K0604").then((rows) => {
+        } else {
+            dbAdapter.selectUserRight(this.state.usercode, "K0604").then((rows) => {
                 if (rows == true) {
-                    if(this.state.Disting=="0"||this.state.Disting=="1") {
-                        Storage.save("invoice", "损溢单");
-                        Storage.save('Document', "损溢单");
+                    if (this.state.Disting == "0" || this.state.Disting == "1") {
                         var nextRoute = {
-                            name: "损溢",
+                            name: "商品损溢",
                             component: SunYi
                         };
                         this.props.navigator.push(nextRoute);
                         this._setModalVisible();
-                        if(this.state.Disting=="1"){
+                        if (this.state.Disting == "1") {
                             DeviceEventEmitter.removeAllListeners();
                         }
-                    }else{
+                    } else {
                         this.Promp();
                     }
                 }
@@ -956,61 +958,61 @@ export default class Index extends Component {
         }
     }
 
-    SSPanDian(){
-        if(this.state.ShopCar1>0){
+    SSPanDian() {
+        if (this.state.ShopCar1 > 0) {
             this._setModalVisible();
             alert("商品未提交")
-        }else if(this.state.username==null){
+        } else if (this.state.username == null) {
             this._setModalVisible();
-        }else {
+        } else {
             Storage.delete('OrgFormno');
             Storage.delete('shildshop');
             Storage.delete('YuanDan');
             Storage.delete('StateMent');
             Storage.delete('BQNumber');
-            dbAdapter.selectUserRight(this.state.usercode,"K0611").then((rows) => {
+            dbAdapter.selectUserRight(this.state.usercode, "K0611").then((rows) => {
                 if (rows == true) {
-                    if(this.state.Disting=="0") {
+                    if (this.state.Disting == "0") {
                         var date = new Date();
                         var data = JSON.stringify(date.getTime());
-                        Storage.save('Name', '实时盘点单');
-                        Storage.save('Document', "实时盘点单");
+                        Storage.save('Name', '实时盘点');
+                        Storage.save('Document', "实时盘点");
                         Storage.save('FormType', 'CUPCYW');
                         Storage.save('ProYH', 'ProCurrPC');
                         Storage.save('YdCountm', '1');
-                        Storage.save('Screen','2');
-                        Storage.save("scode","1");
-                        var invoice = "实时盘点单";
+                        Storage.save('Screen', '2');
+                        Storage.save("scode", "1");
+                        var invoice = "实时盘点";
                         this.setState({
                             head: invoice,
                             active: data,
                         });
                         Storage.save('Date', this.state.active);
                         this._setModalVisible();
-                    }else if(this.state.Disting=="1"){
+                    } else if (this.state.Disting == "1") {
                         var date = new Date();
                         var data = JSON.stringify(date.getTime());
-                        Storage.save('Name', '实时盘点单');
-                        Storage.save('Document', "实时盘点单");
+                        Storage.save('Name', '实时盘点');
+                        Storage.save('Document', "实时盘点");
                         Storage.save('FormType', 'CUPCYW');
                         Storage.save('ProYH', 'ProCurrPC');
                         Storage.save('YdCountm', '1');
-                        Storage.save('Screen','2');
-                        Storage.save("scode","1");
-                        var invoice = "实时盘点单";
+                        Storage.save('Screen', '2');
+                        Storage.save("scode", "1");
+                        var invoice = "实时盘点";
                         this.setState({
                             head: invoice,
                             active: data,
                         });
                         Storage.save('Date', this.state.active);
-                        var nextRoute={
-                            name:"主页",
-                            component:Search
+                        var nextRoute = {
+                            name: "主页",
+                            component: Search
                         };
                         this.props.navigator.push(nextRoute);
                         DeviceEventEmitter.removeAllListeners();
                         this._setModalVisible();
-                    }else{
+                    } else {
                         this.Promp();
                     }
                 }
@@ -1021,33 +1023,27 @@ export default class Index extends Component {
         }
     }
 
-    SPPanDian(){
-        if(this.state.ShopCar1>0){
+    SPPanDian() {
+        if (this.state.ShopCar1 > 0) {
             this._setModalVisible();
             alert("商品未提交")
-        }else if(this.state.username==null){
+        } else if (this.state.username == null) {
             this._setModalVisible();
-        }else {
-            Storage.delete('OrgFormno');
-            Storage.delete('scode');
-            Storage.delete('shildshop');
-            Storage.delete('StateMent');
-            Storage.delete('BQNumber');
-            dbAdapter.selectUserRight(this.state.usercode,"K0607").then((rows) => {
+        } else {
+            dbAdapter.selectUserRight(this.state.usercode, "K0607").then((rows) => {
                 if (rows == true) {
-                    if(this.state.Disting=="0"||this.state.Disting=="1") {
-                        Storage.save('invoice', '商品盘点单');
-                        Storage.save('YdCountm', '3');
+                    if (this.state.Disting == "0" || this.state.Disting == "1") {
+                        Storage.save('invoice', '商品盘点');
                         var nextRoute = {
                             name: "主页",
                             component: Query
                         };
                         this.props.navigator.push(nextRoute);
                         this._setModalVisible();
-                        if(this.state.Disting=="1"){
+                        if (this.state.Disting == "1") {
                             DeviceEventEmitter.removeAllListeners();
                         }
-                    }else{
+                    } else {
                         this.Promp();
                     }
                 }
@@ -1056,159 +1052,27 @@ export default class Index extends Component {
 
     }
 
-    PSShouHuo(){
-        if(this.state.ShopCar1>0){
+    PSShouHuo() {
+        if (this.state.ShopCar1 > 0) {
             this._setModalVisible();
             alert("商品未提交")
-        }else if(this.state.username==null){
+        } else if (this.state.username == null) {
             this._setModalVisible();
-        }else {
-            Storage.delete('OrgFormno');
-            Storage.delete('scode');
-            Storage.delete('shildshop');
-            Storage.delete('StateMent');
-            Storage.delete('BQNumber');
+        } else {
             Storage.get('code').then((tags) => {
-                dbAdapter.isYHPSXP(tags).then((rows)=>{
-                    if(rows.length>=1){
-                        dbAdapter.selectUserRight(this.state.usercode,"K0802").then((rows) => {
+                dbAdapter.isYHPSXP(tags).then((rows) => {
+                    if (rows.length >= 1) {
+                        dbAdapter.selectUserRight(this.state.usercode, "K0802").then((rows) => {
                             if (rows == true) {
-                                if(this.state.Disting=="0"||this.state.Disting=="1") {
-                                    Storage.save("invoice", "配送收货单");
-                                    Storage.save('YdCountm', '2');
+                                if (this.state.Disting == "0" || this.state.Disting == "1") {
+                                    Storage.save("invoice", "配送收货");
                                     var nextRoute = {
                                         name: "主页",
                                         component: Distrition
                                     };
                                     this.props.navigator.push(nextRoute);
                                     this._setModalVisible();
-                                    if(this.state.Disting=="1"){
-                                        DeviceEventEmitter.removeAllListeners();
-                                    }
-                                }else{
-                                    this.Promp();
-                                }
-                            }
-                        })
-                    }else{
-                        this.Permissions()
-                    }
-                })
-            });
-        }
-
-    }
-
-    SPCaiGou(){
-        if(this.state.ShopCar1>0){
-            this._setModalVisible();
-            alert("商品未提交")
-        }else if(this.state.username==null){
-            this._setModalVisible();
-        }else {
-            Storage.delete('OrgFormno');
-            Storage.delete('scode');
-            Storage.delete('shildshop');
-            Storage.delete('StateMent');
-            Storage.delete('BQNumber');
-            Storage.get('code').then((tags) => {
-                dbAdapter.isCGYS(tags).then((rows)=>{
-                    if(rows.length>=1) {
-                        dbAdapter.selectUserRight(this.state.usercode,"K0504").then((rows) => {
-                            if (rows == true) {
-                                if(this.state.Disting=="0"||this.state.Disting=="1") {
-                                    Storage.save("invoice", "商品采购单");
-                                    var nextRoute = {
-                                        name: "主页",
-                                        component: ProductCG
-                                    };
-                                    this.props.navigator.push(nextRoute);
-                                    this._setModalVisible();
-                                    if(this.state.Disting=="1"){
-                                        DeviceEventEmitter.removeAllListeners();
-                                    }
-                                }else{
-                                    this.Promp();
-                                }
-                            }
-                        })
-                    }else{
-                        this.Permissions2()
-                    }
-                })
-            });
-        }
-    }
-
-    SPYanShou(){
-        if(this.state.ShopCar1>0){
-            this._setModalVisible();
-            alert("商品未提交")
-        }else if(this.state.username==null){
-            this._setModalVisible();
-        }else {
-            Storage.delete('OrgFormno');
-            Storage.delete('scode');
-            Storage.delete('shildshop');
-            Storage.delete('StateMent');
-            Storage.delete('BQNumber');
-            Storage.get('code').then((tags) => {
-                dbAdapter.isCGYS(tags).then((rows)=>{
-                    if(rows.length>=1) {
-                        dbAdapter.selectUserRight(this.state.usercode,"K0505").then((rows) => {
-                            if (rows == true) {
-                                if(this.state.Disting=="0"||this.state.Disting=="1") {
-                                    Storage.save("invoice", "商品验收单");
-                                    Storage.save('YdCountm', '2');
-                                    var nextRoute = {
-                                        name: "主页",
-                                        component: ProductYS
-                                    };
-                                    this.props.navigator.push(nextRoute);
-                                    this._setModalVisible();
-                                    if(this.state.Disting=="1"){
-                                        DeviceEventEmitter.removeAllListeners();
-                                    }
-                                }else{
-                                    this.Promp();
-                                }
-                            }
-                        })
-                    }else{
-                        this.Permissions2()
-                    }
-                })
-            });
-        }
-    }
-
-    XPCaiGou(){
-        if(this.state.ShopCar1>0){
-            this._setModalVisible();
-            alert("商品未提交")
-        }else if(this.state.username==null){
-            this._setModalVisible();
-        }else {
-            Storage.delete('OrgFormno');
-            Storage.delete('scode');
-            Storage.delete('shildshop');
-            Storage.delete('StateMent');
-            Storage.delete('BQNumber');
-            Storage.get('code').then((tags) => {
-                dbAdapter.isXPCG(tags).then((rows)=>{
-                    if(rows.length>=1) {
-                        dbAdapter.selectUserRight(this.state.usercode, "K0707").then((rows) => {
-                            if (rows == true) {
-                                if (this.state.Disting == "0" || this.state.Disting == "1") {
-                                    Storage.save("invoice", "协配采购单");
-                                    Storage.save('YdCountm', '3');
-                                    var nextRoute = {
-                                        name: "主页",
-                                        component: ProductXP
-                                    };
-                                    this.props.navigator.push(nextRoute);
-                                    this._setModalVisible();
-                                    if(this.state.Disting=="1"){
+                                    if (this.state.Disting == "1") {
                                         DeviceEventEmitter.removeAllListeners();
                                     }
                                 } else {
@@ -1216,7 +1080,116 @@ export default class Index extends Component {
                                 }
                             }
                         })
-                    }else{
+                    } else {
+                        this.Permissions()
+                    }
+                })
+            });
+        }
+
+    }
+
+    SPCaiGou() {
+        if (this.state.ShopCar1 > 0) {
+            this._setModalVisible();
+            alert("商品未提交")
+        } else if (this.state.username == null) {
+            this._setModalVisible();
+        } else {
+            Storage.get('code').then((tags) => {
+                dbAdapter.isCGYS(tags).then((rows) => {
+                    if (rows.length >= 1) {
+                        dbAdapter.selectUserRight(this.state.usercode, "K0504").then((rows) => {
+                            if (rows == true) {
+                                if (this.state.Disting == "0" || this.state.Disting == "1") {
+                                    Storage.save("invoice", "商品采购");
+                                    var nextRoute = {
+                                        name: "主页",
+                                        component: ProductCG
+                                    };
+                                    this.props.navigator.push(nextRoute);
+                                    this._setModalVisible();
+                                    if (this.state.Disting == "1") {
+                                        DeviceEventEmitter.removeAllListeners();
+                                    }
+                                } else {
+                                    this.Promp();
+                                }
+                            }
+                        })
+                    } else {
+                        this.Permissions2()
+                    }
+                })
+            });
+        }
+    }
+
+    SPYanShou() {
+        if (this.state.ShopCar1 > 0) {
+            this._setModalVisible();
+            alert("商品未提交")
+        } else if (this.state.username == null) {
+            this._setModalVisible();
+        } else {
+            Storage.get('code').then((tags) => {
+                dbAdapter.isCGYS(tags).then((rows) => {
+                    if (rows.length >= 1) {
+                        dbAdapter.selectUserRight(this.state.usercode, "K0505").then((rows) => {
+                            if (rows == true) {
+                                if (this.state.Disting == "0" || this.state.Disting == "1") {
+                                    Storage.save("invoice", "商品验收");
+                                    var nextRoute = {
+                                        name: "主页",
+                                        component: ProductYS
+                                    };
+                                    this.props.navigator.push(nextRoute);
+                                    this._setModalVisible();
+                                    if (this.state.Disting == "1") {
+                                        DeviceEventEmitter.removeAllListeners();
+                                    }
+                                } else {
+                                    this.Promp();
+                                }
+                            }
+                        })
+                    } else {
+                        this.Permissions2()
+                    }
+                })
+            });
+        }
+    }
+
+    XPCaiGou() {
+        if (this.state.ShopCar1 > 0) {
+            this._setModalVisible();
+            alert("商品未提交")
+        } else if (this.state.username == null) {
+            this._setModalVisible();
+        } else {
+            Storage.get('code').then((tags) => {
+                dbAdapter.isXPCG(tags).then((rows) => {
+                    if (rows.length >= 1) {
+                        dbAdapter.selectUserRight(this.state.usercode, "K0707").then((rows) => {
+                            if (rows == true) {
+                                if (this.state.Disting == "0" || this.state.Disting == "1") {
+                                    Storage.save("invoice", "协配采购");
+                                    var nextRoute = {
+                                        name: "主页",
+                                        component: ProductXP
+                                    };
+                                    this.props.navigator.push(nextRoute);
+                                    this._setModalVisible();
+                                    if (this.state.Disting == "1") {
+                                        DeviceEventEmitter.removeAllListeners();
+                                    }
+                                } else {
+                                    this.Promp();
+                                }
+                            }
+                        })
+                    } else {
                         this.Permissions1()
                     }
                 })
@@ -1224,41 +1197,35 @@ export default class Index extends Component {
         }
     }
 
-    XPShouHuo(){
-        if(this.state.ShopCar1>0){
+    XPShouHuo() {
+        if (this.state.ShopCar1 > 0) {
             this._setModalVisible();
             alert("商品未提交")
-        }else if(this.state.username==null){
+        } else if (this.state.username == null) {
             this._setModalVisible();
-        }else {
-            Storage.delete('OrgFormno');
-            Storage.delete('scode');
-            Storage.delete('shildshop');
-            Storage.delete('StateMent');
-            Storage.delete('BQNumber');
+        } else {
             Storage.get('code').then((tags) => {
-                dbAdapter.isYHPSXP(tags).then((rows)=>{
-                    if(rows.length>=1){
-                        dbAdapter.selectUserRight(this.state.usercode,"K0803").then((rows) => {
+                dbAdapter.isYHPSXP(tags).then((rows) => {
+                    if (rows.length >= 1) {
+                        dbAdapter.selectUserRight(this.state.usercode, "K0803").then((rows) => {
                             if (rows == true) {
-                                if(this.state.Disting=="0"||this.state.Disting=="1") {
-                                    Storage.save("invoice", "协配收货单");
-                                    Storage.save('YdCountm', '2');
+                                if (this.state.Disting == "0" || this.state.Disting == "1") {
+                                    Storage.save("invoice", "协配收货");
                                     var nextRoute = {
                                         name: "主页",
                                         component: ProductSH
                                     };
                                     this.props.navigator.push(nextRoute);
                                     this._setModalVisible();
-                                    if(this.state.Disting=="1"){
+                                    if (this.state.Disting == "1") {
                                         DeviceEventEmitter.removeAllListeners();
                                     }
-                                }else{
+                                } else {
                                     this.Promp();
                                 }
                             }
                         })
-                    }else{
+                    } else {
                         this.Permissions()
                     }
                 })
@@ -1267,19 +1234,19 @@ export default class Index extends Component {
         }
     }
 
-    Sell(){
-        if(this.state.ShopCar1>0){
+    Sell() {
+        if (this.state.ShopCar1 > 0) {
             this._setModalVisible();
             alert("商品未提交")
-        }else if(this.state.username==null){
+        } else if (this.state.username == null) {
             this._setModalVisible();
-        }else {
-            if(this.state.Disting=="0"||this.state.Disting=="1") {
+        } else {
+            if (this.state.Disting == "0" || this.state.Disting == "1") {
                 NativeModules.AndroidDeviceInfo.getIMEI((IMEI) => {
                     Storage.get('Bind').then((tags) => {
-                        Storage.save("invoice", "销售");
-                        Storage.save("Name", "销售");
-                        Storage.save('YdCountm','4');
+                        Storage.save("invoice", "移动销售");
+                        Storage.save("Name", "移动销售");
+                        Storage.save('YdCountm', '4');
                         if (tags == "bindsucceed") {
                             Storage.get('ShopCode').then((ShopCode) => {
                                 Storage.get('PosCode').then((PosCode) => {
@@ -1293,14 +1260,14 @@ export default class Index extends Component {
                                     Storage.get('LinkUrl').then((linkurl) => {
                                         FetchUtil.post(linkurl, JSON.stringify(params)).then((data) => {
                                             if (data.retcode == 1) {
-                                                var invoice = "销售";
+                                                var invoice = "移动销售";
                                                 this.setState({
                                                     head: invoice,
                                                 });
                                                 this._setModalVisible();
                                             } else {
                                                 var nextRoute = {
-                                                    name: "销售",
+                                                    name: "移动销售",
                                                     component: SellData,
                                                 };
                                                 this.props.navigator.push(nextRoute);
@@ -1312,7 +1279,7 @@ export default class Index extends Component {
                             })
                         } else {
                             var nextRoute = {
-                                name: "销售",
+                                name: "移动销售",
                                 component: SellData,
                             };
                             this.props.navigator.push(nextRoute);
@@ -1320,23 +1287,22 @@ export default class Index extends Component {
                         }
                     })
                 })
-                if(this.state.Disting=="1"){
+                if (this.state.Disting == "1") {
                     DeviceEventEmitter.removeAllListeners();
                 }
-            }else{
+            } else {
                 this.Promp();
             }
         }
     }
 
-    BQbutton(){
-
-        if(this.state.ShopCar1>0){
+    BQbutton() {
+        if (this.state.ShopCar1 > 0) {
             this._setModalVisible();
             alert("商品未提交")
-        }else if(this.state.username==null){
+        } else if (this.state.username == null) {
             this._setModalVisible();
-        }else{
+        } else {
             Storage.delete('OrgFormno');
             Storage.delete('scode');
             Storage.delete('shildshop');
@@ -1344,56 +1310,56 @@ export default class Index extends Component {
             Storage.delete('Screen');
             Storage.delete('StateMent');
             Storage.delete('BQNumber');
-            dbAdapter.selectUserRight(this.state.usercode,"K0216").then((rows)=>{
-                if(rows==true){
-                    if(this.state.Disting=="0"){
+            dbAdapter.selectUserRight(this.state.usercode, "K0216").then((rows) => {
+                if (rows == true) {
+                    if (this.state.Disting == "0") {
                         var date = new Date();
-                        var data=JSON.stringify(date.getTime());
-                        var invoice = "标签打印";
+                        var data = JSON.stringify(date.getTime());
+                        var invoice = "标签采集";
                         this.setState({
-                            head:invoice,
-                            active:data,
+                            head: invoice,
+                            active: data,
                         });
                         this._setModalVisible();
-                        Storage.save('Date',this.state.active);
-                    }else if(this.state.Disting=="1"){
+                        Storage.save('Date', this.state.active);
+                    } else if (this.state.Disting == "1") {
                         var date = new Date();
-                        var data=JSON.stringify(date.getTime());
-                        var invoice = "标签打印";
+                        var data = JSON.stringify(date.getTime());
+                        var invoice = "标签采集";
                         this.setState({
-                            head:invoice,
-                            active:data,
+                            head: invoice,
+                            active: data,
                         });
-                        var nextRoute={
-                            name:"主页",
-                            component:Search
+                        var nextRoute = {
+                            name: "主页",
+                            component: Search
                         };
                         this.props.navigator.push(nextRoute);
-                        Storage.save('Date',this.state.active);
+                        Storage.save('Date', this.state.active);
                         DeviceEventEmitter.removeAllListeners();
                         this._setModalVisible();
-                    }else{
+                    } else {
                         this.Promp();
                     }
                 }
             })
 
-            Storage.save('YdCountm','5');
-            Storage.save('BQNumber','3');
-            Storage.save('Document', "标签打印");
-            Storage.save('Name','标签打印');
-            Storage.save('ProYH','BJQ');
-            Storage.save('valueOf','App_Client_BJQ');
+            Storage.save('YdCountm', '5');
+            Storage.save('BQNumber', '3');
+            Storage.save('Document', "标签采集");
+            Storage.save('Name', '标签采集');
+            Storage.save('ProYH', 'BJQ');
+            Storage.save('valueOf', 'App_Client_BJQ');
         }
     }
 
-    StockEnquiries(){
-        if(this.state.ShopCar1>0){
+    StockEnquiries() {
+        if (this.state.ShopCar1 > 0) {
             this._setModalVisible();
             alert("商品未提交")
-        }else if(this.state.username==null){
+        } else if (this.state.username == null) {
             this._setModalVisible();
-        }else{
+        } else {
             Storage.delete('OrgFormno');
             Storage.delete('scode');
             Storage.delete('shildshop');
@@ -1410,13 +1376,13 @@ export default class Index extends Component {
         }
     }
 
-    ShopSearch(){
-        if(this.state.ShopCar1>0){
+    ShopSearch() {
+        if (this.state.ShopCar1 > 0) {
             this._setModalVisible();
             alert("商品未提交")
-        }else if(this.state.username==null){
+        } else if (this.state.username == null) {
             this._setModalVisible();
-        }else{
+        } else {
             Storage.delete('OrgFormno');
             Storage.delete('scode');
             Storage.delete('shildshop');
@@ -1426,22 +1392,22 @@ export default class Index extends Component {
             Storage.delete('BQNumber');
             var invoice = "商品查询";
             this.setState({
-                head:invoice,
+                head: invoice,
             });
             this._setModalVisible();
-            Storage.save('Name','商品查询');
+            Storage.save('Name', '商品查询');
 
         }
     }
 
-    pullOut(){
+    pullOut() {
         this._setModalVisible();
-        if(this.state.ShopCar1>0){
+        if (this.state.ShopCar1 > 0) {
             alert("商品未提交")
-        }else{
-            var nextRoute={
-                name:"主页",
-                component:admin
+        } else {
+            var nextRoute = {
+                name: "主页",
+                component: admin
             };
             this.props.navigator.push(nextRoute);
             Storage.delete('Name');
@@ -1453,14 +1419,14 @@ export default class Index extends Component {
         }
     }
 
-    pullOut1(){
+    pullOut1() {
         this._StateMent();
-        if(this.state.ShopCar1>0){
+        if (this.state.ShopCar1 > 0) {
             alert("商品未提交")
-        }else{
-            var nextRoute={
-                name:"主页",
-                component:admin
+        } else {
+            var nextRoute = {
+                name: "主页",
+                component: admin
             };
             this.props.navigator.push(nextRoute);
             Storage.delete('Name');
@@ -1472,11 +1438,11 @@ export default class Index extends Component {
         }
     }
 
-    UpData(){
+    UpData() {
         this.NewData();
         Storage.get('code').then((tags) => {
             Storage.get('LinkUrl').then((LinkUrl) => {
-                updata.downLoadAllData(LinkUrl,dbAdapter,tags);
+                updata.downLoadAllData(LinkUrl, dbAdapter, tags);
                 this.NewData();
                 this.DataComplete();
             })
@@ -1484,78 +1450,78 @@ export default class Index extends Component {
     }
 
     //报表(业务及收银)
-    StateMent(){
-        Storage.get('Disting').then((tags)=>{
-            if(tags==0){
+    StateMent() {
+        Storage.get('Disting').then((tags) => {
+            if (tags == 0) {
                 this._setModalVisible();
                 this._StateMent();
                 this.YeWu();
-                Storage.save("StateMent","0");
-            }else if(tags==1){
+                Storage.save("StateMent", "0");
+            } else if (tags == 1) {
                 this.Promp1();
-            }else{
+            } else {
                 this.Promp();
             }
         })
     }
 
-    YeWu(){
-        Storage.save("Disting","0");
-        Storage.get('Disting').then((tags)=>{
+    YeWu() {
+        Storage.save("Disting", "0");
+        Storage.get('Disting').then((tags) => {
             this.setState({
-                Disting:tags,
+                Disting: tags,
             })
         })
         this.setState({
-            pressStatus:'pressin',
-            PressStatus:'0',
+            pressStatus: 'pressin',
+            PressStatus: '0',
         });
     }
 
-    ShouYin(){
-        Storage.save("Disting","1");
-        Storage.get('Disting').then((tags)=>{
+    ShouYin() {
+        Storage.save("Disting", "1");
+        Storage.get('Disting').then((tags) => {
             this.setState({
-                Disting:tags
+                Disting: tags
             })
         })
         this.setState({
-            PressStatus:'Pressin',
-            pressStatus:0
+            PressStatus: 'Pressin',
+            pressStatus: 0
         });
         this._Receiving();
         this._StateMent();
     }
 
-    YeWu1(){
-        Storage.save("Disting","0");
-        Storage.get('Disting').then((tags)=>{
+    YeWu1() {
+        Storage.save("Disting", "0");
+        Storage.get('Disting').then((tags) => {
             this.setState({
-                Disting:tags,
+                Disting: tags,
             })
         })
         this.setState({
-            pressStatus:'pressin',
-            PressStatus:'0',
+            pressStatus: 'pressin',
+            PressStatus: '0',
         });
         this._StateMent();
         this._Receiving();
     }
 
-    ShouYin1(){
-        Storage.save("Disting","1");
-        Storage.get('Disting').then((tags)=>{
+    ShouYin1() {
+        Storage.save("Disting", "1");
+        Storage.get('Disting').then((tags) => {
             this.setState({
-                Disting:tags
+                Disting: tags
             })
         })
         this.setState({
-            PressStatus:'Pressin',
-            pressStatus:0
+            PressStatus: 'Pressin',
+            pressStatus: 0
         });
     }
 
-    YaoHuo1(){
+    YaoHuo1() {
         Storage.get('code').then((tags) => {
             dbAdapter.isYHPSXP(tags).then((rows) => {
                 if (rows.length >= 1) {
@@ -1566,7 +1532,7 @@ export default class Index extends Component {
                     };
                     this.props.navigator.push(nextRoute);
                     Storage.delete('Name');
-                    Storage.save('name', '要货单');
+                    Storage.save('name', '门店要货');
                     Storage.save('history', 'App_Client_ProYHQ');
                     Storage.save('historyClass', 'App_Client_ProYHDetailQ');
                 } else {
@@ -1576,7 +1542,7 @@ export default class Index extends Component {
         })
     }
 
-    SunYi1(){
+    SunYi1() {
         this._StateMent();
         var nextRoute = {
             name: "HistoricalDocument",
@@ -1584,12 +1550,12 @@ export default class Index extends Component {
         };
         this.props.navigator.push(nextRoute);
         Storage.delete('Name');
-        Storage.save('name','损溢单');
+        Storage.save('name', '商品损溢');
         Storage.save('history', 'App_Client_ProSYQ');
         Storage.save('historyClass', 'App_Client_ProSYDetailQ');
     }
 
-    SSPanDian1(){
+    SSPanDian1() {
         this._StateMent();
         var nextRoute = {
             name: "HistoricalDocument",
@@ -1597,12 +1563,12 @@ export default class Index extends Component {
         };
         this.props.navigator.push(nextRoute);
         Storage.delete('Name');
-        Storage.save('name','实时盘点单');
+        Storage.save('name', '实时盘点');
         Storage.save('history', 'App_Client_ProCurrPCQ');
         Storage.save('historyClass', 'App_Client_ProCurrPCDetailQ');
     }
 
-    SPPanDian1(){
+    SPPanDian1() {
         this._StateMent();
         var nextRoute = {
             name: "HistoricalDocument",
@@ -1610,12 +1576,12 @@ export default class Index extends Component {
         };
         this.props.navigator.push(nextRoute);
         Storage.delete('Name');
-        Storage.save('name','商品盘点单');
+        Storage.save('name', '商品盘点');
         Storage.save('history', 'App_Client_ProPCQ');
         Storage.save('historyClass', 'App_Client_ProPCDetailQ');
     }
 
-    PSShouHuo1(){
+    PSShouHuo1() {
         Storage.get('code').then((tags) => {
             dbAdapter.isYHPSXP(tags).then((rows) => {
                 if (rows.length >= 1) {
@@ -1626,9 +1592,9 @@ export default class Index extends Component {
                     };
                     this.props.navigator.push(nextRoute);
                     Storage.delete('Name');
-                    Storage.save('name','配送收货单');
-                    Storage.save('history','App_Client_ProPSSHQ');
-                    Storage.save('historyClass','App_Client_ProPSSHDetailQ');
+                    Storage.save('name', '配送收货');
+                    Storage.save('history', 'App_Client_ProPSSHQ');
+                    Storage.save('historyClass', 'App_Client_ProPSSHDetailQ');
                 } else {
                     this.Permissions()
                 }
@@ -1636,10 +1602,10 @@ export default class Index extends Component {
         })
     }
 
-    SPCaiGou1(){
+    SPCaiGou1() {
         Storage.get('code').then((tags) => {
-            dbAdapter.isCGYS(tags).then((rows)=>{
-                if(rows.length>=1) {
+            dbAdapter.isCGYS(tags).then((rows) => {
+                if (rows.length >= 1) {
                     this._StateMent();
                     var nextRoute = {
                         name: "HistoricalDocument",
@@ -1647,20 +1613,20 @@ export default class Index extends Component {
                     };
                     this.props.navigator.push(nextRoute);
                     Storage.delete('Name');
-                    Storage.save('name','商品采购单');
-                    Storage.save('history','App_Client_ProCGQ');
-                    Storage.save('historyClass','App_Client_ProCGDetailQ');
-                }else{
+                    Storage.save('name', '商品采购');
+                    Storage.save('history', 'App_Client_ProCGQ');
+                    Storage.save('historyClass', 'App_Client_ProCGDetailQ');
+                } else {
                     this.Permissions2()
                 }
             })
         });
     }
 
-    SPYanShou1(){
+    SPYanShou1() {
         Storage.get('code').then((tags) => {
-            dbAdapter.isCGYS(tags).then((rows)=>{
-                if(rows.length>=1) {
+            dbAdapter.isCGYS(tags).then((rows) => {
+                if (rows.length >= 1) {
                     this._StateMent();
                     var nextRoute = {
                         name: "HistoricalDocument",
@@ -1668,10 +1634,10 @@ export default class Index extends Component {
                     };
                     this.props.navigator.push(nextRoute);
                     Storage.delete('Name');
-                    Storage.save('name','商品验收单');
-                    Storage.save('history','App_Client_ProYSQ');
-                    Storage.save('historyClass','App_Client_ProYSDetailQ');
-                }else{
+                    Storage.save('name', '商品验收');
+                    Storage.save('history', 'App_Client_ProYSQ');
+                    Storage.save('historyClass', 'App_Client_ProYSDetailQ');
+                } else {
                     this.Permissions2()
                 }
             })
@@ -1679,10 +1645,10 @@ export default class Index extends Component {
 
     }
 
-    XPCaiGou1(){
+    XPCaiGou1() {
         Storage.get('code').then((tags) => {
-            dbAdapter.isXPCG(tags).then((rows)=>{
-                if(rows.length>=1) {
+            dbAdapter.isXPCG(tags).then((rows) => {
+                if (rows.length >= 1) {
                     this._StateMent();
                     var nextRoute = {
                         name: "HistoricalDocument",
@@ -1690,9 +1656,9 @@ export default class Index extends Component {
                     };
                     this.props.navigator.push(nextRoute);
                     Storage.delete('Name');
-                    Storage.save('name','协配采购单');
-                    Storage.save('history','App_Client_ProXPCGQ');
-                    Storage.save('historyClass','App_Client_ProXPCGDetailQ');
+                    Storage.save('name', '协配采购');
+                    Storage.save('history', 'App_Client_ProXPCGQ');
+                    Storage.save('historyClass', 'App_Client_ProXPCGDetailQ');
                 } else {
                     this.Permissions1()
                 }
@@ -1700,7 +1666,7 @@ export default class Index extends Component {
         })
     }
 
-    XPShouHuo1(){
+    XPShouHuo1() {
         Storage.get('code').then((tags) => {
             dbAdapter.isYHPSXP(tags).then((rows) => {
                 if (rows.length >= 1) {
@@ -1711,9 +1677,9 @@ export default class Index extends Component {
                     };
                     this.props.navigator.push(nextRoute);
                     Storage.delete('Name');
-                    Storage.save('name','协配收货单');
-                    Storage.save('history','App_Client_ProXPYSQ');
-                    Storage.save('historyClass','App_Client_ProXPYSDetailQ');
+                    Storage.save('name', '协配收货');
+                    Storage.save('history', 'App_Client_ProXPYSQ');
+                    Storage.save('historyClass', 'App_Client_ProXPYSDetailQ');
                 } else {
                     this.Permissions()
                 }
@@ -1721,9 +1687,10 @@ export default class Index extends Component {
         })
     }
 
-    Sell1(){
+    Sell1() {
 
     }
+
     //单据功能分类结束
 
     //FlatList加入kay值
@@ -1732,37 +1699,38 @@ export default class Index extends Component {
     }
 
     //FlatList翻页刷新列表
-    _onload(){
-        if(this.state.isloading){
+    _onload() {
+        if (this.state.isloading) {
             return true
         }
-        page=page+1;
+        page = page + 1;
         this.setState({
             nomore: true,
-            isloading:true
+            isloading: true
         });
-        if(this.state.depcode!=lastDepCode){
-            page= 1;
+        if (this.state.depcode != lastDepCode) {
+            page = 1;
         }
-        let priductData=[];
-        if(totalPage>1&&page<totalPage){
-            dbAdapter.selectProduct(this.state.depcode,page,1).then((rows)=>{
-                for(let i =0;i<rows.length;i++){
+        let priductData = [];
+        if (totalPage > 1 && page < totalPage) {
+            dbAdapter.selectProduct(this.state.depcode, page, 1).then((rows) => {
+                for (let i = 0; i < rows.length; i++) {
                     var row = rows.item(i);
                     priductData.push(row);
-                };
-                if(this.state.depcode!=lastDepCode){
-                    this.productData.splice(0,this.productData.length);
+                }
+                ;
+                if (this.state.depcode != lastDepCode) {
+                    this.productData.splice(0, this.productData.length);
                     lastDepCode = this.state.depcode;
                 }
                 this.productData = this.productData.concat(priductData);
                 this.setState({
-                    data:this.productData,
-                    isloading:false
+                    data: this.productData,
+                    isloading: false
                 });
             });
 
-        }else{
+        } else {
             this.setState({
                 nomore: false,
             });
@@ -1774,107 +1742,109 @@ export default class Index extends Component {
     _setModalVisible() {
         let isShow = this.state.show;
         this.setState({
-            show:!isShow,
+            show: !isShow,
         });
     }
 
     _StateMent() {
         let isShow = this.state.statement;
         this.setState({
-            statement:!isShow,
+            statement: !isShow,
         });
     }
 
-    _Receiving(){
+    _Receiving() {
         let isShow = this.state.receiving;
         this.setState({
-            receiving:!isShow,
+            receiving: !isShow,
         });
     }
 
     //未选择单据时
-    _Emptydata(){
+    _Emptydata() {
         let isShow = this.state.emptydata;
         this.setState({
-            emptydata:!isShow,
+            emptydata: !isShow,
         });
     }
 
-    Emptydata(){
+    Emptydata() {
         this._Emptydata();
     }
 
     //用户模式选择
-    Promp(){
+    Promp() {
         let isShow = this.state.Promp;
         this.setState({
-            Promp:!isShow,
+            Promp: !isShow,
         });
     }
 
-    Mode(){
+    Mode() {
         this.Promp()
     }
 
-    Promp1(){
+    Promp1() {
         let isShow = this.state.Promp1;
         this.setState({
-            Promp1:!isShow,
+            Promp1: !isShow,
         });
     }
 
-    Mode1(){
+    Mode1() {
         this.Promp1()
     }
 
     //单据权限弹层
-    Permissions(){
+    Permissions() {
         let isShow = this.state.Permissions;
         this.setState({
-            Permissions:!isShow,
+            Permissions: !isShow,
         });
     }
 
-    MoDe(){
+    MoDe() {
         this.Permissions()
     }
 
-    Permissions1(){
+    Permissions1() {
         let isShow = this.state.Permissions1;
         this.setState({
-            Permissions1:!isShow,
+            Permissions1: !isShow,
         });
     }
-    MoDe1(){
+
+    MoDe1() {
         this.Permissions1()
     }
 
-    Permissions2(){
+    Permissions2() {
         let isShow = this.state.Permissions2;
         this.setState({
-            Permissions2:!isShow,
+            Permissions2: !isShow,
         });
     }
-    MoDe2(){
+
+    MoDe2() {
         this.Permissions2()
     }
 
     //数据更新
-    NewData(){
+    NewData() {
         let isshow = this.state.NewData;
         this.setState({
-            NewData:!isshow,
+            NewData: !isshow,
         });
     }
 
-    DataComplete(){
+    DataComplete() {
         let isshow = this.state.DataComplete;
         this.setState({
-            DataComplete:!isshow,
+            DataComplete: !isshow,
         });
     }
 
-    Datacomplete(){
+    Datacomplete() {
         this.DataComplete();
         this._setModalVisible();
     }
@@ -1888,18 +1858,14 @@ export default class Index extends Component {
                 <View style={styles.header}>
                     <View style={styles.cont}>
                         <TouchableOpacity onPress={this._rightButtonClick.bind(this)}>
-                            <Image source={require("../images/1_12.png")} style=
-                                {styles.HeaderImage}></Image>
+                            <Image source={require("../images/1_12.png")} style={styles.HeaderImage}></Image>
                         </TouchableOpacity>
                         <Text style={styles.HeaderList}>{this.state.head}</Text>
                         <TouchableOpacity onPress={this.Code.bind(this)} style={styles.onclick}>
-                            <Image source={require("../images/1_05.png")} style=
-                                {styles.HeaderImage}></Image>
+                            <Image source={require("../images/1_05.png")} style={styles.HeaderImage}></Image>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={this.pressPush.bind(this)} style=
-                            {styles.onclick}>
-                            <Image source={require("../images/1_08.png")} style=
-                                {styles.HeaderImage}></Image>
+                        <TouchableOpacity onPress={this.pressPush.bind(this)} style={styles.onclick}>
+                            <Image source={require("../images/1_08.png")} style={styles.HeaderImage}></Image>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -1922,8 +1888,10 @@ export default class Index extends Component {
                             keyExtractor={this.keyExtractor}
                             onRefresh={this.refreshing}
                             refreshing={false}
-                            onEndReachedThreshold = {0.1}
-                            onEndReached={() =>{this._onload()}}
+                            onEndReachedThreshold={0.1}
+                            onEndReached={() => {
+                                this._onload()
+                            }}
                             getItemLayout={(data, index) => (
                                 // 120 是被渲染 item 的高度 ITEM_HEIGHT。
                                 {length: 120, offset: 120 * index, index}
@@ -1931,72 +1899,84 @@ export default class Index extends Component {
                         />
                     </View>
                 </View>
-                <View style={styles.footer}>
+
                     {
                         (this.state.head == "商品查询") ?
                             null :
-                            <TouchableOpacity style={styles.Home} onPress={this.History.bind(this)}><Image source={require("../images/1_300.png")}></Image><Text style={styles.home1}>历史单据查询</Text></TouchableOpacity>
-                    }
-                    <TouchableOpacity style={styles.Home}><Image source={require
-                    ("../images/1_31.png")}></Image><Text style={styles.home2}>商品
-                    </Text></TouchableOpacity>
-                    {
-                        (this.state.head=="商品查询")?
-                            null:
-                            <TouchableOpacity style={styles.Home} onPress={this.ShopList.bind
-                            (this)}>
-                                <View>
-                                    <Image source={require("../images/1_322.png")}>
-                                        {
-                                            (this.state.shopcar==0)?
-                                                null:
-                                                <Text style={[{position:"absolute", right:-200,}]}>
-                                                    {this.state.shopcar}</Text>
-                                        }
-                                        {
-                                            (this.state.shopcar>0)?
-                                                <Text style={[styles.ShopCar,{paddingTop:3,}]}>
-                                                    {this.state.shopcar}</Text>:null
-                                        }
-                                        {
-                                            (this.state.shopcar<999)?
-                                                null:
-                                                <Text style={[styles.ShopCar,
-                                                    {width:30,height:30,top:11,lineHeight:21,}]}>{this.state.shopcar}</Text>
-                                        }
-                                        {
-                                            (this.state.shopcar>999)?
-                                                <View>
+                            <View style={styles.footer}>
+                                <TouchableOpacity style={styles.Home} onPress={this.History.bind(this)}>
+                                    <Image source={require("../images/1_300.png")}></Image>
+                                    <Text style={styles.home1}>历史单据查询</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.Home}>
+                                    <Image source={require("../images/1_31.png")}></Image>
+                                    <Text style={styles.home2}>商品</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.Home} onPress={this.ShopList.bind(this)}>
+                                    <View>
+                                        <Image source={require("../images/1_322.png")}>
+                                            {
+                                                (this.state.shopcar == 0) ?
+                                                    null :
+                                                    <Text style={[{position: "absolute", right: -200,}]}>
+                                                        {this.state.shopcar}</Text>
+                                            }
+                                            {
+                                                (this.state.shopcar > 0) ?
+                                                    <Text style={[styles.ShopCar, {paddingTop: 3,}]}>
+                                                        {this.state.shopcar}</Text> : null
+                                            }
+                                            {
+                                                (this.state.shopcar < 999) ?
+                                                    null :
                                                     <Text style={[styles.ShopCar,
-                                                        {width:30,height:30,top:11,lineHeight:23}]}>{this.state.shopcar}</Text>
-                                                    <Text style={styles.Add}>
-                                                        +
-                                                    </Text>
-                                                </View>:null
-                                        }
-                                    </Image>
-                                </View>
-                                <Text style={styles.home1}>清单</Text>
-                            </TouchableOpacity>
+                                                        {
+                                                            width: 30,
+                                                            height: 30,
+                                                            top: 11,
+                                                            lineHeight: 21,
+                                                        }]}>{this.state.shopcar}</Text>
+                                            }
+                                            {
+                                                (this.state.shopcar > 999) ?
+                                                    <View>
+                                                        <Text style={[styles.ShopCar,
+                                                            {
+                                                                width: 30,
+                                                                height: 30,
+                                                                top: 11,
+                                                                lineHeight: 23
+                                                            }]}>{this.state.shopcar}</Text>
+                                                        <Text style={styles.Add}>
+                                                            +
+                                                        </Text>
+                                                    </View> : null
+                                            }
+                                        </Image>
+                                    </View>
+                                    <Text style={styles.home1}>清单</Text>
+                                </TouchableOpacity>
+                            </View>
                     }
-                </View>
+
                 <Modal
                     animationType='fade'
                     transparent={true}
                     visible={this.state.show}
-                    onShow={() => {}}
-                    onRequestClose={() => {}} >
+                    onShow={() => {
+                    }}
+                    onRequestClose={() => {
+                    }}>
                     <ScrollView style={styles.modalStyle}>
                         <View style={styles.ModalTitle}>
-                            <TouchableOpacity style={styles.ModalLeft} onPress={this.ChuMo.bind
-                            (this)}>
+                            <TouchableOpacity style={styles.ModalLeft} onPress={this.ChuMo.bind(this)}>
                                 <View>
-                                    <Image source = {this.state.pressStatus =='pressin' ? require
-                                    ("../images/1_42.png") : require("../images/1_43.png")} />
+                                    <Image
+                                        source={this.state.pressStatus == 'pressin' ? require("../images/1_42.png") : require("../images/1_43.png")}/>
                                 </View>
                                 <View>
                                     <Text style={styles.ModalImage}>
-                                        <Image source={require("../images/1_39.png")} />
+                                        <Image source={require("../images/1_39.png")}/>
                                     </Text>
                                     <Text style={styles.ModalText}>
                                         触摸
@@ -2004,17 +1984,16 @@ export default class Index extends Component {
                                 </View>
                             </TouchableOpacity>
                             <View style={styles.ModalLeft1}>
-                                <Image source={require("../images/1_47.png")} />
+                                <Image source={require("../images/1_47.png")}/>
                             </View>
-                            <TouchableOpacity style={styles.ModalLeft} onPress={this.SaoMa.bind
-                            (this)}>
-                                <View style={[{marginLeft:14}]}>
-                                    <Image source = {this.state.PressStatus =='Pressin' ? require
-                                    ("../images/1_42.png") : require("../images/1_43.png")}  />
+                            <TouchableOpacity style={styles.ModalLeft} onPress={this.SaoMa.bind(this)}>
+                                <View style={[{marginLeft: 14}]}>
+                                    <Image
+                                        source={this.state.PressStatus == 'Pressin' ? require("../images/1_42.png") : require("../images/1_43.png")}/>
                                 </View>
                                 <View>
                                     <Text style={styles.ModalImage}>
-                                        <Image source={require("../images/1_41.png")} />
+                                        <Image source={require("../images/1_41.png")}/>
                                     </Text>
                                     <Text style={styles.ModalText}>
                                         扫码
@@ -2024,28 +2003,29 @@ export default class Index extends Component {
                         </View>
                         <View style={styles.ModalCont}>
                             <View style={styles.ModalHead}>
-                                <TouchableOpacity style={[styles.ModalHeadImage,
-                                    {borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.YaoHuo.bind(this)}>
+                                <TouchableOpacity
+                                    style={[styles.ModalHeadImage, {borderRightWidth: 1, borderRightColor: "#f2f2f2"}]}
+                                    onPress={this.YaoHuo.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
-                                        <Image source={require("../images/1_25.png")} />
+                                        <Image source={require("../images/1_25.png")}/>
                                     </Text>
                                     <Text style={styles.ModalHeadText}>
-                                        要货
+                                        门店要货
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={[styles.ModalHeadImage,
-                                    {borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.PSShouHuo.bind(this)}>
+                                <TouchableOpacity
+                                    style={[styles.ModalHeadImage, {borderRightWidth: 1, borderRightColor: "#f2f2f2"}]}
+                                    onPress={this.PSShouHuo.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
-                                        <Image source={require("../images/1_28.png")} />
+                                        <Image source={require("../images/1_28.png")}/>
                                     </Text>
                                     <Text style={styles.ModalHeadText}>
                                         配送收货
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.ModalHeadImage} onPress=
-                                    {this.SSPanDian.bind(this)}>
+                                <TouchableOpacity style={styles.ModalHeadImage} onPress={this.SSPanDian.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
-                                        <Image source={require("../images/1_29.png")} />
+                                        <Image source={require("../images/1_29.png")}/>
                                     </Text>
                                     <Text style={styles.ModalHeadText}>
                                         实时盘点
@@ -2053,32 +2033,32 @@ export default class Index extends Component {
                                 </TouchableOpacity>
                             </View>
                             <View style={styles.ModalLine}>
-                                <Image source={require("../images/1_48.png")} style=
-                                    {styles.ModalImageLine} />
+                                <Image source={require("../images/1_48.png")} style={styles.ModalImageLine}/>
                             </View>
                             <View style={styles.ModalHead}>
-                                <TouchableOpacity style={[styles.ModalHeadImage,
-                                    {borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.SPPanDian.bind(this)}>
+                                <TouchableOpacity
+                                    style={[styles.ModalHeadImage, {borderRightWidth: 1, borderRightColor: "#f2f2f2"}]}
+                                    onPress={this.SPPanDian.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
-                                        <Image source={require("../images/1_36.png")} />
+                                        <Image source={require("../images/1_36.png")}/>
                                     </Text>
                                     <Text style={styles.ModalHeadText}>
                                         商品盘点
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={[styles.ModalHeadImage,
-                                    {borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.SunYi.bind(this)}>
+                                <TouchableOpacity
+                                    style={[styles.ModalHeadImage, {borderRightWidth: 1, borderRightColor: "#f2f2f2"}]}
+                                    onPress={this.SunYi.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
-                                        <Image source={require("../images/1_38.png")} />
+                                        <Image source={require("../images/1_38.png")}/>
                                     </Text>
                                     <Text style={styles.ModalHeadText}>
-                                        损溢
+                                        商品损溢
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.ModalHeadImage} onPress=
-                                    {this.SPCaiGou.bind(this)}>
+                                <TouchableOpacity style={styles.ModalHeadImage} onPress={this.SPCaiGou.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
-                                        <Image source={require("../images/1_40.png")} />
+                                        <Image source={require("../images/1_40.png")}/>
                                     </Text>
                                     <Text style={styles.ModalHeadText}>
                                         商品采购
@@ -2086,32 +2066,32 @@ export default class Index extends Component {
                                 </TouchableOpacity>
                             </View>
                             <View style={styles.ModalLine}>
-                                <Image source={require("../images/1_48.png")} style=
-                                    {styles.ModalImageLine} />
+                                <Image source={require("../images/1_48.png")} style={styles.ModalImageLine}/>
                             </View>
                             <View style={styles.ModalHead}>
-                                <TouchableOpacity style={[styles.ModalHeadImage,
-                                    {borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.SPYanShou.bind(this)}>
+                                <TouchableOpacity
+                                    style={[styles.ModalHeadImage, {borderRightWidth: 1, borderRightColor: "#f2f2f2"}]}
+                                    onPress={this.SPYanShou.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
-                                        <Image source={require("../images/1_44.png")} />
+                                        <Image source={require("../images/1_44.png")}/>
                                     </Text>
                                     <Text style={styles.ModalHeadText}>
                                         商品验收
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={[styles.ModalHeadImage,
-                                    {borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.XPCaiGou.bind(this)}>
+                                <TouchableOpacity
+                                    style={[styles.ModalHeadImage, {borderRightWidth: 1, borderRightColor: "#f2f2f2"}]}
+                                    onPress={this.XPCaiGou.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
-                                        <Image source={require("../images/1_45.png")} />
+                                        <Image source={require("../images/1_45.png")}/>
                                     </Text>
                                     <Text style={styles.ModalHeadText}>
                                         协配采购
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.ModalHeadImage} onPress=
-                                    {this.XPShouHuo.bind(this)}>
+                                <TouchableOpacity style={styles.ModalHeadImage} onPress={this.XPShouHuo.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
-                                        <Image source={require("../images/1_46.png")} />
+                                        <Image source={require("../images/1_46.png")}/>
                                     </Text>
                                     <Text style={styles.ModalHeadText}>
                                         协配收货
@@ -2120,22 +2100,24 @@ export default class Index extends Component {
                             </View>
                             <View style={styles.ModalLine}>
                                 <Image source={require("../images/1_48.png")} style=
-                                    {styles.ModalImageLine} />
+                                    {styles.ModalImageLine}/>
                             </View>
-                            <View style={[styles.ModalHead,{marginBottom:10}]}>
-                                <TouchableOpacity style={[styles.ModalHeadImage,
-                                    {borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.StateMent.bind(this)}>
+                            <View style={[styles.ModalHead, {marginBottom: 10}]}>
+                                <TouchableOpacity
+                                    style={[styles.ModalHeadImage, {borderRightWidth: 1, borderRightColor: "#f2f2f2"}]}
+                                    onPress={this.StateMent.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
-                                        <Image source={require("../images/1-60.png")} />
+                                        <Image source={require("../images/1-60.png")}/>
                                     </Text>
                                     <Text style={styles.ModalHeadText}>
-                                        报表
+                                        单据报表
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity  style={[styles.ModalHeadImage, {borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress=
-                                    {this.StockEnquiries.bind(this)}>
+                                <TouchableOpacity
+                                    style={[styles.ModalHeadImage, {borderRightWidth: 1, borderRightColor: "#f2f2f2"}]}
+                                    onPress={this.StockEnquiries.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
-                                        <Image source={require("../images/1_58.png")} />
+                                        <Image source={require("../images/1_58.png")}/>
                                     </Text>
                                     <Text style={styles.ModalHeadText}>
                                         库存查询
@@ -2143,7 +2125,7 @@ export default class Index extends Component {
                                 </TouchableOpacity>
                                 <TouchableOpacity style={styles.ModalHeadImage} onPress={this.ShopSearch.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
-                                        <Image source={require("../images/1_58.png")} />
+                                        <Image source={require("../images/1_58.png")}/>
                                     </Text>
                                     <Text style={styles.ModalHeadText}>
                                         商品查询
@@ -2151,32 +2133,54 @@ export default class Index extends Component {
                                 </TouchableOpacity>
                             </View>
                             <View style={styles.ModalLine}>
-                                <Image source={require("../images/1_48.png")} style=
-                                    {styles.ModalImageLine} />
+                                <Image source={require("../images/1_48.png")} style={styles.ModalImageLine}/>
                             </View>
-                            <View style={[styles.ModalHead,{marginBottom:10}]}>
-                                <TouchableOpacity style={[styles.ModalHeadImage, {borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.BQbutton.bind(this)}>
+                            <View style={[styles.ModalHead, {marginBottom: 10}]}>
+                                <TouchableOpacity
+                                    style={[styles.ModalHeadImage, {borderRightWidth: 1, borderRightColor: "#f2f2f2"}]}
+                                    onPress={this.BQbutton.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
-                                        <Image source={require("../images/1_60.png")} />
+                                        <Image source={require("../images/1_60.png")}/>
                                     </Text>
                                     <Text style={styles.ModalHeadText}>
-                                        标签打印
+                                        标签采集
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity onPress={this.UpData.bind(this)} style={[styles.ModalHeadImage,{borderRightWidth:1,borderRightColor:"#f2f2f2"}]}>
+                                <TouchableOpacity
+                                    style={[styles.ModalHeadImage, {borderRightWidth: 1, borderRightColor: "#f2f2f2"}]}
+                                    onPress={this.Sell1.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
-                                        <Image source={require("../images/1_59.png")} />
+                                        <Image source={require("../images/1_57.png")}/>
                                     </Text>
                                     <Text style={styles.ModalHeadText}>
-                                        数据更新
+                                        移动销售
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.ModalHeadImage} onPress={this.pullOut.bind(this)}>
+                                <TouchableOpacity
+                                    style={[styles.ModalHeadImage, {borderRightWidth: 1, borderRightColor: "#f2f2f2"}]}
+                                    onPress=
+                                        {this.pullOut.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
-                                        <Image source={require("../images/1_56.png")} />
+                                        <Image source={require("../images/1_56.png")}/>
                                     </Text>
                                     <Text style={styles.ModalHeadText}>
                                         退出账号
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={styles.ModalLine}>
+                                <Image source={require("../images/1_48.png")} style={styles.ModalImageLine}/>
+                            </View>
+                            <View style={[styles.ModalHead, {marginBottom: 10}]}>
+                                <TouchableOpacity onPress={this.UpData.bind(this)} style={[styles.ModalHeadImage, {
+                                    borderRightWidth: 1,
+                                    borderRightColor: "#f2f2f2"
+                                }]}>
+                                    <Text style={styles.ModalHeadImage1}>
+                                        <Image source={require("../images/1_59.png")}/>
+                                    </Text>
+                                    <Text style={styles.ModalHeadText}>
+                                        数据更新
                                     </Text>
                                 </TouchableOpacity>
                             </View>
@@ -2187,19 +2191,21 @@ export default class Index extends Component {
                     animationType='fade'//业务
                     transparent={true}
                     visible={this.state.statement}
-                    onShow={() => {}}
-                    onRequestClose={() => {}} >
+                    onShow={() => {
+                    }}
+                    onRequestClose={() => {
+                    }}>
                     <ScrollView style={styles.modalStyle}>
                         <View style={styles.ModalTitle}>
                             <TouchableOpacity style={styles.ModalLeft} onPress={this.YeWu.bind
                             (this)}>
                                 <View>
-                                    <Image source = {this.state.pressStatus =='pressin' ? require
-                                    ("../images/1_42.png") : require("../images/1_43.png")} />
+                                    <Image source={this.state.pressStatus == 'pressin' ? require
+                                    ("../images/1_42.png") : require("../images/1_43.png")}/>
                                 </View>
                                 <View>
                                     <Text style={styles.ModalImage}>
-                                        <Image source={require("../images/1_39.png")} />
+                                        <Image source={require("../images/1_39.png")}/>
                                     </Text>
                                     <Text style={styles.ModalText}>
                                         业务
@@ -2207,17 +2213,17 @@ export default class Index extends Component {
                                 </View>
                             </TouchableOpacity>
                             <View style={styles.ModalLeft1}>
-                                <Image source={require("../images/1_47.png")} />
+                                <Image source={require("../images/1_47.png")}/>
                             </View>
                             <TouchableOpacity style={styles.ModalLeft} onPress={this.ShouYin.bind
                             (this)}>
-                                <View style={[{marginLeft:14}]}>
-                                    <Image source = {this.state.PressStatus =='Pressin' ? require
-                                    ("../images/1_42.png") : require("../images/1_43.png")}  />
+                                <View style={[{marginLeft: 14}]}>
+                                    <Image source={this.state.PressStatus == 'Pressin' ? require
+                                    ("../images/1_42.png") : require("../images/1_43.png")}/>
                                 </View>
                                 <View>
                                     <Text style={styles.ModalImage}>
-                                        <Image source={require("../images/1_41.png")} />
+                                        <Image source={require("../images/1_41.png")}/>
                                     </Text>
                                     <Text style={styles.ModalText}>
                                         收银
@@ -2228,18 +2234,20 @@ export default class Index extends Component {
                         <View style={styles.ModalCont}>
                             <View style={styles.ModalHead}>
                                 <TouchableOpacity style={[styles.ModalHeadImage,
-                                    {borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.YaoHuo1.bind(this)}>
+                                    {borderRightWidth: 1, borderRightColor: "#f2f2f2"}]}
+                                                  onPress={this.YaoHuo1.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
-                                        <Image source={require("../images/1_25.png")} />
+                                        <Image source={require("../images/1_25.png")}/>
                                     </Text>
                                     <Text style={styles.ModalHeadText}>
-                                        要货
+                                        门店要货
                                     </Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity style={[styles.ModalHeadImage,
-                                    {borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.PSShouHuo1.bind(this)}>
+                                    {borderRightWidth: 1, borderRightColor: "#f2f2f2"}]}
+                                                  onPress={this.PSShouHuo1.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
-                                        <Image source={require("../images/1_28.png")} />
+                                        <Image source={require("../images/1_28.png")}/>
                                     </Text>
                                     <Text style={styles.ModalHeadText}>
                                         配送收货
@@ -2248,7 +2256,7 @@ export default class Index extends Component {
                                 <TouchableOpacity style={styles.ModalHeadImage} onPress=
                                     {this.SSPanDian1.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
-                                        <Image source={require("../images/1_29.png")} />
+                                        <Image source={require("../images/1_29.png")}/>
                                     </Text>
                                     <Text style={styles.ModalHeadText}>
                                         实时盘点
@@ -2257,31 +2265,33 @@ export default class Index extends Component {
                             </View>
                             <View style={styles.ModalLine}>
                                 <Image source={require("../images/1_48.png")} style=
-                                    {styles.ModalImageLine} />
+                                    {styles.ModalImageLine}/>
                             </View>
                             <View style={styles.ModalHead}>
                                 <TouchableOpacity style={[styles.ModalHeadImage,
-                                    {borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.SPPanDian1.bind(this)}>
+                                    {borderRightWidth: 1, borderRightColor: "#f2f2f2"}]}
+                                                  onPress={this.SPPanDian1.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
-                                        <Image source={require("../images/1_36.png")} />
+                                        <Image source={require("../images/1_36.png")}/>
                                     </Text>
                                     <Text style={styles.ModalHeadText}>
                                         商品盘点
                                     </Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity style={[styles.ModalHeadImage,
-                                    {borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.SunYi1.bind(this)}>
+                                    {borderRightWidth: 1, borderRightColor: "#f2f2f2"}]}
+                                                  onPress={this.SunYi1.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
-                                        <Image source={require("../images/1_38.png")} />
+                                        <Image source={require("../images/1_38.png")}/>
                                     </Text>
                                     <Text style={styles.ModalHeadText}>
-                                        损溢
+                                        商品损溢
                                     </Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity style={styles.ModalHeadImage} onPress=
                                     {this.SPCaiGou1.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
-                                        <Image source={require("../images/1_40.png")} />
+                                        <Image source={require("../images/1_40.png")}/>
                                     </Text>
                                     <Text style={styles.ModalHeadText}>
                                         商品采购
@@ -2290,22 +2300,24 @@ export default class Index extends Component {
                             </View>
                             <View style={styles.ModalLine}>
                                 <Image source={require("../images/1_48.png")} style=
-                                    {styles.ModalImageLine} />
+                                    {styles.ModalImageLine}/>
                             </View>
                             <View style={styles.ModalHead}>
                                 <TouchableOpacity style={[styles.ModalHeadImage,
-                                    {borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.SPYanShou1.bind(this)}>
+                                    {borderRightWidth: 1, borderRightColor: "#f2f2f2"}]}
+                                                  onPress={this.SPYanShou1.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
-                                        <Image source={require("../images/1_44.png")} />
+                                        <Image source={require("../images/1_44.png")}/>
                                     </Text>
                                     <Text style={styles.ModalHeadText}>
                                         商品验收
                                     </Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity style={[styles.ModalHeadImage,
-                                    {borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.XPCaiGou1.bind(this)}>
+                                    {borderRightWidth: 1, borderRightColor: "#f2f2f2"}]}
+                                                  onPress={this.XPCaiGou1.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
-                                        <Image source={require("../images/1_45.png")} />
+                                        <Image source={require("../images/1_45.png")}/>
                                     </Text>
                                     <Text style={styles.ModalHeadText}>
                                         协配采购
@@ -2314,7 +2326,7 @@ export default class Index extends Component {
                                 <TouchableOpacity style={styles.ModalHeadImage} onPress=
                                     {this.XPShouHuo1.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
-                                        <Image source={require("../images/1_46.png")} />
+                                        <Image source={require("../images/1_46.png")}/>
                                     </Text>
                                     <Text style={styles.ModalHeadText}>
                                         协配收货
@@ -2323,29 +2335,21 @@ export default class Index extends Component {
                             </View>
                             <View style={styles.ModalLine}>
                                 <Image source={require("../images/1_48.png")} style=
-                                    {styles.ModalImageLine} />
+                                    {styles.ModalImageLine}/>
                             </View>
-                            <View style={[styles.ModalHead,{marginBottom:10}]}>
+                            <View style={[styles.ModalHead, {marginBottom: 10}]}>
                                 <TouchableOpacity style={[styles.ModalHeadImage,
-                                    {borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.Sell1.bind(this)}>
+                                    {borderRightWidth: 1, borderRightColor: "#f2f2f2"}]}
+                                                  onPress={this.pullOut1.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
-                                        <Image source={require("../images/1_57.png")} />
-                                    </Text>
-                                    <Text style={styles.ModalHeadText}>
-                                        销售
-                                    </Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity style={[styles.ModalHeadImage,
-                                    {borderRightWidth:1,borderRightColor:"#f2f2f2"}]} onPress={this.pullOut1.bind(this)}>
-                                    <Text style={styles.ModalHeadImage1}>
-                                        <Image source={require("../images/1_56.png")} />
+                                        <Image source={require("../images/1_56.png")}/>
                                     </Text>
                                     <Text style={styles.ModalHeadText}>
                                         退出账号
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.ModalHeadImage}
-                                ></TouchableOpacity>
+                                <TouchableOpacity style={styles.ModalHeadImage}></TouchableOpacity>
+                                <TouchableOpacity style={styles.ModalHeadImage}></TouchableOpacity>
                             </View>
                         </View>
                     </ScrollView>
@@ -2354,19 +2358,21 @@ export default class Index extends Component {
                     animationType='fade'//收银
                     transparent={true}
                     visible={this.state.receiving}
-                    onShow={() => {}}
-                    onRequestClose={() => {}} >
+                    onShow={() => {
+                    }}
+                    onRequestClose={() => {
+                    }}>
                     <ScrollView style={styles.modalStyle}>
                         <View style={styles.ModalTitle}>
                             <TouchableOpacity style={styles.ModalLeft} onPress={this.YeWu1.bind
                             (this)}>
                                 <View>
-                                    <Image source = {this.state.pressStatus =='pressin' ? require
-                                    ("../images/1_42.png") : require("../images/1_43.png")} />
+                                    <Image source={this.state.pressStatus == 'pressin' ? require
+                                    ("../images/1_42.png") : require("../images/1_43.png")}/>
                                 </View>
                                 <View>
                                     <Text style={styles.ModalImage}>
-                                        <Image source={require("../images/1_39.png")} />
+                                        <Image source={require("../images/1_39.png")}/>
                                     </Text>
                                     <Text style={styles.ModalText}>
                                         业务
@@ -2374,17 +2380,17 @@ export default class Index extends Component {
                                 </View>
                             </TouchableOpacity>
                             <View style={styles.ModalLeft1}>
-                                <Image source={require("../images/1_47.png")} />
+                                <Image source={require("../images/1_47.png")}/>
                             </View>
                             <TouchableOpacity style={styles.ModalLeft} onPress={this.ShouYin1.bind
                             (this)}>
-                                <View style={[{marginLeft:14}]}>
-                                    <Image source = {this.state.PressStatus =='Pressin' ? require
-                                    ("../images/1_42.png") : require("../images/1_43.png")}  />
+                                <View style={[{marginLeft: 14}]}>
+                                    <Image source={this.state.PressStatus == 'Pressin' ? require
+                                    ("../images/1_42.png") : require("../images/1_43.png")}/>
                                 </View>
                                 <View>
                                     <Text style={styles.ModalImage}>
-                                        <Image source={require("../images/1_41.png")} />
+                                        <Image source={require("../images/1_41.png")}/>
                                     </Text>
                                     <Text style={styles.ModalText}>
                                         收银
@@ -2405,10 +2411,12 @@ export default class Index extends Component {
                 <Modal
                     transparent={true}
                     visible={this.state.emptydata}
-                    onShow={() => {}}
-                    onRequestClose={() => {}} >
+                    onShow={() => {
+                    }}
+                    onRequestClose={() => {
+                    }}>
                     <Image source={require("../images/background.png")} style=
-                        {[styles.ModalStyle,{justifyContent: 'center',alignItems: 'center',}]}>
+                        {[styles.ModalStyle, {justifyContent: 'center', alignItems: 'center',}]}>
                         <View style={styles.ModalStyleCont}>
                             <View style={styles.ModalStyleTitle}>
                                 <Text style={styles.ModalTitleText}>
@@ -2427,10 +2435,12 @@ export default class Index extends Component {
                 <Modal
                     transparent={true}
                     visible={this.state.Promp}
-                    onShow={() => {}}
-                    onRequestClose={() => {}} >
+                    onShow={() => {
+                    }}
+                    onRequestClose={() => {
+                    }}>
                     <Image source={require("../images/background.png")} style=
-                        {[styles.ModalStyle,{justifyContent: 'center',alignItems: 'center',}]}>
+                        {[styles.ModalStyle, {justifyContent: 'center', alignItems: 'center',}]}>
                         <View style={styles.ModalStyleCont}>
                             <View style={styles.ModalStyleTitle}>
                                 <Text style={styles.ModalTitleText}>
@@ -2448,10 +2458,12 @@ export default class Index extends Component {
                 <Modal
                     transparent={true}
                     visible={this.state.Promp1}
-                    onShow={() => {}}
-                    onRequestClose={() => {}} >
+                    onShow={() => {
+                    }}
+                    onRequestClose={() => {
+                    }}>
                     <Image source={require("../images/background.png")} style=
-                        {[styles.ModalStyle,{justifyContent: 'center',alignItems: 'center',}]}>
+                        {[styles.ModalStyle, {justifyContent: 'center', alignItems: 'center',}]}>
                         <View style={styles.ModalStyleCont}>
                             <View style={styles.ModalStyleTitle}>
                                 <Text style={styles.ModalTitleText}>
@@ -2470,10 +2482,12 @@ export default class Index extends Component {
                 <Modal
                     transparent={true}
                     visible={this.state.Permissions}
-                    onShow={() => {}}
-                    onRequestClose={() => {}} >
+                    onShow={() => {
+                    }}
+                    onRequestClose={() => {
+                    }}>
                     <Image source={require("../images/background.png")} style=
-                        {[styles.ModalStyle,{justifyContent: 'center',alignItems: 'center',}]}>
+                        {[styles.ModalStyle, {justifyContent: 'center', alignItems: 'center',}]}>
                         <View style={styles.ModalStyleCont}>
                             <View style={styles.ModalStyleTitle}>
                                 <Text style={styles.ModalTitleText}>
@@ -2491,10 +2505,12 @@ export default class Index extends Component {
                 <Modal
                     transparent={true}
                     visible={this.state.Permissions1}
-                    onShow={() => {}}
-                    onRequestClose={() => {}} >
+                    onShow={() => {
+                    }}
+                    onRequestClose={() => {
+                    }}>
                     <Image source={require("../images/background.png")} style=
-                        {[styles.ModalStyle,{justifyContent: 'center',alignItems: 'center',}]}>
+                        {[styles.ModalStyle, {justifyContent: 'center', alignItems: 'center',}]}>
                         <View style={styles.ModalStyleCont}>
                             <View style={styles.ModalStyleTitle}>
                                 <Text style={styles.ModalTitleText}>
@@ -2513,10 +2529,12 @@ export default class Index extends Component {
                 <Modal
                     transparent={true}
                     visible={this.state.Permissions2}
-                    onShow={() => {}}
-                    onRequestClose={() => {}} >
+                    onShow={() => {
+                    }}
+                    onRequestClose={() => {
+                    }}>
                     <Image source={require("../images/background.png")} style=
-                        {[styles.ModalStyle,{justifyContent: 'center',alignItems: 'center',}]}>
+                        {[styles.ModalStyle, {justifyContent: 'center', alignItems: 'center',}]}>
                         <View style={styles.ModalStyleCont}>
                             <View style={styles.ModalStyleTitle}>
                                 <Text style={styles.ModalTitleText}>
@@ -2536,8 +2554,10 @@ export default class Index extends Component {
                     animationType='fade'
                     transparent={true}
                     visible={this.state.NewData}
-                    onShow={() => {}}
-                    onRequestClose={() => {}} >
+                    onShow={() => {
+                    }}
+                    onRequestClose={() => {
+                    }}>
                     <View style={styles.LoadCenter}>
                         <View style={styles.loading}>
                             <ActivityIndicator key="1" color="#ffffff" size="large" style=
@@ -2549,10 +2569,12 @@ export default class Index extends Component {
                 <Modal
                     transparent={true}
                     visible={this.state.DataComplete}
-                    onShow={() => {}}
-                    onRequestClose={() => {}} >
+                    onShow={() => {
+                    }}
+                    onRequestClose={() => {
+                    }}>
                     <Image source={require("../images/background.png")} style=
-                        {[styles.ModalStyle,{justifyContent: 'center',alignItems: 'center',}]}>
+                        {[styles.ModalStyle, {justifyContent: 'center', alignItems: 'center',}]}>
                         <View style={styles.ModalStyleCont}>
                             <View style={styles.ModalStyleTitle}>
                                 <Text style={styles.ModalTitleText}>
@@ -2574,369 +2596,369 @@ export default class Index extends Component {
 }
 
 const styles = StyleSheet.create({
-    container:{
-        flex:1,
-        backgroundColor:"#f2f2f2",
+    container: {
+        flex: 1,
+        backgroundColor: "#f2f2f2",
     },
-    login:{
-        marginLeft:60,
-        marginRight:60,
-        marginTop:40,
-        paddingTop:12,
-        paddingBottom:12,
-        backgroundColor:"#f47882",
-        color:"#ffffff",
-        borderRadius:3,
-        textAlign:"center",
-        fontSize:20,
+    login: {
+        marginLeft: 60,
+        marginRight: 60,
+        marginTop: 40,
+        paddingTop: 12,
+        paddingBottom: 12,
+        backgroundColor: "#f47882",
+        color: "#ffffff",
+        borderRadius: 3,
+        textAlign: "center",
+        fontSize: 20,
     },
-    header:{
-        height:60,
-        backgroundColor:"#ff4e4e",
-        paddingTop:10,
+    header: {
+        height: 60,
+        backgroundColor: "#ff4e4e",
+        paddingTop: 10,
     },
-    cont:{
-        flexDirection:"row",
-        paddingLeft:16,
-        paddingRight:16,
+    cont: {
+        flexDirection: "row",
+        paddingLeft: 16,
+        paddingRight: 16,
     },
-    onclick:{
-        marginLeft:18,
+    onclick: {
+        marginLeft: 18,
     },
-    HeaderImage1:{
-        marginRight:25,
-        marginTop:5,
+    HeaderImage1: {
+        marginRight: 25,
+        marginTop: 5,
     },
-    HeaderList:{
-        flex:6,
-        textAlign:"center",
-        color:"#ffffff",
-        fontSize:22,
-        marginTop:3,
+    HeaderList: {
+        flex: 6,
+        textAlign: "center",
+        color: "#ffffff",
+        fontSize: 22,
+        marginTop: 3,
     },
-    scrollview:{
-        width:130,
-        backgroundColor:"#ffffff",
-        flex:2,
+    scrollview: {
+        width: 130,
+        backgroundColor: "#ffffff",
+        flex: 2,
     },
-    Active:{
-        color:"#333333",
-        textAlign:"center",
-        fontSize:16,
-        height:22,
-        overflow:"hidden",
+    Active: {
+        color: "#333333",
+        textAlign: "center",
+        fontSize: 16,
+        height: 22,
+        overflow: "hidden",
     },
-    click:{
-        borderTopWidth:1,
-        borderTopColor:"#f2f2f2",
-        borderRightColor:"#f2f2f2",
-        borderRightWidth:1,
-        paddingTop:20,
-        paddingBottom:20,
+    click: {
+        borderTopWidth: 1,
+        borderTopColor: "#f2f2f2",
+        borderRightColor: "#f2f2f2",
+        borderRightWidth: 1,
+        paddingTop: 20,
+        paddingBottom: 20,
     },
-    clickes:{
-        borderTopWidth:1,
-        borderTopColor:"#f2f2f2",
-        borderRightColor:"#f2f2f2",
-        borderRightWidth:1,
-        paddingTop:20,
-        paddingBottom:20,
-        backgroundColor:"#f2f2f2"
+    clickes: {
+        borderTopWidth: 1,
+        borderTopColor: "#f2f2f2",
+        borderRightColor: "#f2f2f2",
+        borderRightWidth: 1,
+        paddingTop: 20,
+        paddingBottom: 20,
+        backgroundColor: "#f2f2f2"
     },
-    RightList:{
-        paddingLeft:15,
-        paddingRight:15,
-        flex:4,
-        backgroundColor:"#ffffff",
+    RightList: {
+        paddingLeft: 15,
+        paddingRight: 15,
+        flex: 4,
+        backgroundColor: "#ffffff",
     },
-    RightList1:{
-        flex:4,
+    RightList1: {
+        flex: 4,
     },
-    ScrollView1:{
-        flex:1,
-        backgroundColor:"#ffffff",
-        marginLeft:5,
+    ScrollView1: {
+        flex: 1,
+        backgroundColor: "#ffffff",
+        marginLeft: 5,
     },
-    ContList:{
-        flex:22,
-        flexDirection:"row",
+    ContList: {
+        flex: 22,
+        flexDirection: "row",
     },
-    Image:{
+    Image: {
         justifyContent: 'center',
         alignItems: 'center',
     },
-    Text:{
-        textAlign:"center",
-        marginTop:10,
-        height:20,
-        fontSize:14,
-        color:"#333333"
+    Text: {
+        textAlign: "center",
+        marginTop: 10,
+        height: 20,
+        fontSize: 14,
+        color: "#333333"
     },
-    AddNumber:{
-        height:30,
+    AddNumber: {
+        height: 30,
     },
-    addnumber:{
-        height:20,
-        position:'absolute',
-        right:5,
-        top:3,
+    addnumber: {
+        height: 20,
+        position: 'absolute',
+        right: 5,
+        top: 3,
     },
-    Reduction1:{
-        color:"red",
-        position:'absolute',
-        right:4,
-        top:4,
-        fontSize:14,
+    Reduction1: {
+        color: "red",
+        position: 'absolute',
+        right: 4,
+        top: 4,
+        fontSize: 14,
     },
-    subtraction:{
-        marginRight:10,
-        marginTop:2
+    subtraction: {
+        marginRight: 10,
+        marginTop: 2
     },
-    Subtraction:{
-        position:'absolute',
-        right:5,
-        top:12,
-        flexDirection:"row",
+    Subtraction: {
+        position: 'absolute',
+        right: 5,
+        top: 12,
+        flexDirection: "row",
     },
-    Reduction:{
-        borderRadius:50,
-        backgroundColor:"red",
-        color:"#ffffff",
-        textAlign:"center",
-        lineHeight:11,
-        width:15,
-        height:15,
-        lineHeight:12,
-        fontSize:18
+    Reduction: {
+        borderRadius: 50,
+        backgroundColor: "red",
+        color: "#ffffff",
+        textAlign: "center",
+        lineHeight: 11,
+        width: 15,
+        height: 15,
+        lineHeight: 12,
+        fontSize: 18
     },
-    Number:{
-        color:"red",
-        marginRight:6,
+    Number: {
+        color: "red",
+        marginRight: 6,
     },
-    Border:{
-        borderRightWidth:1,
-        borderRightColor:"#f2f2f2",
-        flex:3,
-        paddingBottom:30,
+    Border: {
+        borderRightWidth: 1,
+        borderRightColor: "#f2f2f2",
+        flex: 3,
+        paddingBottom: 30,
     },
-    fontColorGray:{
-        textAlign:"center"
+    fontColorGray: {
+        textAlign: "center"
     },
-    nomore:{
-        textAlign:"center",
-        marginTop:20,
-        marginBottom:10,
+    nomore: {
+        textAlign: "center",
+        marginTop: 20,
+        marginBottom: 10,
     },
-    License:{
-        flex:1,
-        backgroundColor:"#333333",
-        opacity:0.8,
+    License: {
+        flex: 1,
+        backgroundColor: "#333333",
+        opacity: 0.8,
         justifyContent: 'center',
         alignItems: 'center',
     },
-    LicenseConter:{
-        width:280,
-        backgroundColor:"#ffffff",
-        borderRadius:5,
-        paddingHorizontal:50,
-        paddingVertical:20,
+    LicenseConter: {
+        width: 280,
+        backgroundColor: "#ffffff",
+        borderRadius: 5,
+        paddingHorizontal: 50,
+        paddingVertical: 20,
     },
-    LicenseText:{
-        fontSize:16,
-        color:"#323232",
-        marginLeft:40,
+    LicenseText: {
+        fontSize: 16,
+        color: "#323232",
+        marginLeft: 40,
     },
-    LicenseTextInput:{
-        width:178,
-        paddingTop:5,
-        paddingBottom:5,
-        marginTop:16,
-        marginBottom:16,
-        borderTopWidth:1,
-        borderBottomWidth:1,
-        borderRightWidth:1,
-        borderLeftWidth:1,
-        borderTopColor:"#cccccc",
-        borderBottomColor:"#cccccc",
-        borderLeftColor:"#cccccc",
-        borderRightColor:"#cccccc",
+    LicenseTextInput: {
+        width: 178,
+        paddingTop: 5,
+        paddingBottom: 5,
+        marginTop: 16,
+        marginBottom: 16,
+        borderTopWidth: 1,
+        borderBottomWidth: 1,
+        borderRightWidth: 1,
+        borderLeftWidth: 1,
+        borderTopColor: "#cccccc",
+        borderBottomColor: "#cccccc",
+        borderLeftColor: "#cccccc",
+        borderRightColor: "#cccccc",
     },
-    Determine:{
-        width:80,
-        paddingTop:5,
-        paddingBottom:5,
-        backgroundColor:"#f47882",
-        borderRadius:3,
-        marginLeft:48
+    Determine: {
+        width: 80,
+        paddingTop: 5,
+        paddingBottom: 5,
+        backgroundColor: "#f47882",
+        borderRadius: 3,
+        marginLeft: 48
     },
-    DetermineText:{
-        color:"#ffffff",
-        fontSize:16,
-        textAlign:"center"
+    DetermineText: {
+        color: "#ffffff",
+        fontSize: 16,
+        textAlign: "center"
     },
-    close:{
-        width:40,
-        height:40,
-        position:"absolute",
-        right:0,
-        top:5
+    close: {
+        width: 40,
+        height: 40,
+        position: "absolute",
+        right: 0,
+        top: 5
     },
-    CloseText:{
-        color:"#323232",
-        fontSize:22
+    CloseText: {
+        color: "#323232",
+        fontSize: 22
     },
-    footer:{
-        height:80,
-        flexDirection:"row",
-        borderTopWidth:1,
-        borderTopColor:"#f2f2f2"
+    footer: {
+        height: 80,
+        flexDirection: "row",
+        borderTopWidth: 1,
+        borderTopColor: "#f2f2f2"
     },
-    source:{
-        flexDirection:"row",
-        flex:1,
+    source: {
+        flexDirection: "row",
+        flex: 1,
     },
-    Home:{
-        flex:1,
+    Home: {
+        flex: 1,
         alignItems: 'center',
-        paddingTop:10,
-        backgroundColor:"#ffffff",
+        paddingTop: 10,
+        backgroundColor: "#ffffff",
     },
-    home1:{
-        color:'#999999',
-        fontSize:16,
-        marginTop:5,
-        flex:1,
+    home1: {
+        color: '#999999',
+        fontSize: 16,
+        marginTop: 5,
+        flex: 1,
     },
-    home2:{
-        color:'#ff4e4e',
-        fontSize:16,
-        marginTop:5,
-        flex:1,
+    home2: {
+        color: '#ff4e4e',
+        fontSize: 16,
+        marginTop: 5,
+        flex: 1,
     },
-    ShopCar:{
-        width:25,
-        height:25,
-        backgroundColor:"#ffba00",
-        color:"#ffffff",
-        textAlign:"center",
-        borderRadius:50,
-        position:"absolute",
-        top:10,
-        right:-42,
+    ShopCar: {
+        width: 25,
+        height: 25,
+        backgroundColor: "#ffba00",
+        color: "#ffffff",
+        textAlign: "center",
+        borderRadius: 50,
+        position: "absolute",
+        top: 10,
+        right: -42,
     },
-    Add:{
-        position:"absolute",
-        right:-50,
-        top:5,
-        color:"#ff4e4e",
-        fontWeight:"bold"
+    Add: {
+        position: "absolute",
+        right: -50,
+        top: 5,
+        color: "#ff4e4e",
+        fontWeight: "bold"
     },
-    modalStyle:{
-        flex:1,
-        backgroundColor:"#ffffff",
+    modalStyle: {
+        flex: 1,
+        backgroundColor: "#ffffff",
     },
-    ModalTitle:{
-        paddingTop:14,
-        paddingBottom:14,
-        paddingLeft:14,
-        paddingRight:14,
-        flexDirection:"row",
-        backgroundColor:"#ff4e4f"
+    ModalTitle: {
+        paddingTop: 14,
+        paddingBottom: 14,
+        paddingLeft: 14,
+        paddingRight: 14,
+        flexDirection: "row",
+        backgroundColor: "#ff4e4f"
     },
-    ModalLeft:{
-        flex:1,
+    ModalLeft: {
+        flex: 1,
     },
-    ModalLeft1:{
-        width:2,
-        marginTop:14,
+    ModalLeft1: {
+        width: 2,
+        marginTop: 14,
     },
-    ModalImage:{
-        textAlign:"center"
+    ModalImage: {
+        textAlign: "center"
     },
-    ModalText:{
-        marginTop:16,
-        fontSize:20,
-        color:"#ffffff",
-        textAlign:"center"
+    ModalText: {
+        marginTop: 16,
+        fontSize: 20,
+        color: "#ffffff",
+        textAlign: "center"
     },
-    ModalCont:{
-        paddingTop:14,
-        paddingBottom:14,
-        paddingLeft:14,
-        paddingRight:14,
+    ModalCont: {
+        paddingTop: 14,
+        paddingBottom: 14,
+        paddingLeft: 14,
+        paddingRight: 14,
     },
-    ModalHead:{
-        flexDirection:"row"
+    ModalHead: {
+        flexDirection: "row"
     },
-    ModalHeadImage:{
-        flex:1,
-        paddingBottom:10,
+    ModalHeadImage: {
+        flex: 1,
+        paddingBottom: 10,
     },
-    ModalHeadImage1:{
-        textAlign:"center",
-        marginTop:10,
+    ModalHeadImage1: {
+        textAlign: "center",
+        marginTop: 10,
     },
-    ModalHeadText:{
-        textAlign:"center",
-        fontSize:18,
-        color:"#666666",
-        marginTop:5,
+    ModalHeadText: {
+        textAlign: "center",
+        fontSize: 18,
+        color: "#666666",
+        marginTop: 5,
     },
-    ModalLine:{
-        height:2,
+    ModalLine: {
+        height: 2,
     },
-    ModalImageLine:{
-        width:null,
+    ModalImageLine: {
+        width: null,
     },
-    ModalStyle:{
-        flex:1,
+    ModalStyle: {
+        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        width:null,
-        height:null,
+        width: null,
+        height: null,
     },
-    ModalStyleCont:{
-        height:130,
-        paddingTop:30,
-        paddingLeft:10,
-        paddingRight:10,
-        borderRadius:5,
-        backgroundColor:"#ffffff",
+    ModalStyleCont: {
+        height: 130,
+        paddingTop: 30,
+        paddingLeft: 10,
+        paddingRight: 10,
+        borderRadius: 5,
+        backgroundColor: "#ffffff",
     },
-    ModalStyleTitle:{
-        height:40,
-        paddingLeft:80,
-        paddingRight:80,
-        borderBottomWidth:1,
-        borderBottomColor:"#f5f5f5",
+    ModalStyleTitle: {
+        height: 40,
+        paddingLeft: 80,
+        paddingRight: 80,
+        borderBottomWidth: 1,
+        borderBottomColor: "#f5f5f5",
     },
-    ModalTitleText:{
-        fontSize:16,
-        color:"#333333",
-        textAlign:"center",
+    ModalTitleText: {
+        fontSize: 16,
+        color: "#333333",
+        textAlign: "center",
     },
-    Button:{
-        paddingTop:20,
+    Button: {
+        paddingTop: 20,
     },
-    LoadCenter:{
-        flex:1,
+    LoadCenter: {
+        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
     },
-    loading:{
-        paddingLeft:15,
-        paddingRight:15,
-        paddingTop:15,
-        paddingBottom:15,
-        backgroundColor:"#000000",
-        opacity:0.8,
-        borderRadius:5,
+    loading: {
+        paddingLeft: 15,
+        paddingRight: 15,
+        paddingTop: 15,
+        paddingBottom: 15,
+        backgroundColor: "#000000",
+        opacity: 0.8,
+        borderRadius: 5,
     },
-    TextLoading:{
-        fontSize:17,
-        color:"#ffffff"
+    TextLoading: {
+        fontSize: 17,
+        color: "#ffffff"
     },
-    activity:{
-        marginBottom:5,
+    activity: {
+        marginBottom: 5,
     },
 });

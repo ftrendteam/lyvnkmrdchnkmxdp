@@ -144,7 +144,7 @@ export default class StockEnquiries extends Component {
                             onEndEditing={()=>{this._onEndEditing()}}
                             autofocus="{true}"
                             returnKeyType="search"
-                            placeholder="搜索相关单号"
+                            placeholder="搜索相关产品名称"
                             placeholderColor="#323232"
                             underlineColorAndroid='transparent'
                             style={styles.Search}

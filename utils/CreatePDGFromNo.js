@@ -7,7 +7,7 @@ export default class CreatePDGFromNo {
   /***
    * 创建单据请求的单号
    * @param fromFlag 单据标识 标识哪个单据
-   *        ProYH 要货单
+   *        ProYH 门店要货
    *        ProPSSH配送收货单
    *        ProPC商品盘点单
    *        ProCurrPC实时盘点

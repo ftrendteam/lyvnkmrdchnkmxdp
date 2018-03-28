@@ -44,6 +44,7 @@ export default class  login extends Component{
             focus: true
         })
     }
+
     pressPush(){
         if(this.state.ClientCode == ""){
             ToastAndroid.show('请输入商户号', ToastAndroid.SHORT)
@@ -53,6 +54,7 @@ export default class  login extends Component{
             ToastAndroid.show('请输入密码', ToastAndroid.SHORT)
             return;
         }
+        this._setModalVisible();
         NativeModules.AndroidDeviceInfo.getIMEI((IMEI)=>{
             let params = {
                 reqCode:"App_PosReq",
@@ -65,8 +67,7 @@ export default class  login extends Component{
                 SignIMEI1:NetUtils.MD5("1q2w3e4r%"+IMEI)+'',
                 SignIMEI2:NetUtils.MD5("1q2w3e4r%"+"")+'',
                 Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_Qry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
-            };
-            this._setModalVisible();
+            }
             FetchUtil.post('http://register.smartpos.top:8091/WebService/FTrendWs.asmx/FMJsonInterfaceByDownToPos',JSON.stringify(params)).then((data)=>{
                 if(data.retcode == 1){
                     DetailInfo = JSON.stringify(data.DetailInfo);// 在这里从接口取出要保存的数据，然后执行save方法
@@ -79,12 +80,10 @@ export default class  login extends Component{
                        var Items=Url.replace('/WEBSERVICE/FTRENDWS.ASMX?WSDL',"");
                        var NullItems=Items.replace(/\s/g, "");
                        Storage.save('Url',NullItems);
-                       // console.log('NullItems=',NullItems)
                        var data='/FMJsonInterfaceByDownToPos';
                        var date=items+'/FMJsonInterfaceByDownToPos';//拼接字符
                        var replace = date.replace(/\s/g, "");
                        Storage.save('LinkUrl',replace);
-                       // console.log('LinkUrl1=',replace)
                     }
                     RNAndroidIMEI.getAndroidIMEI();
                     Storage.save('ClientCode',this.state.ClientCode);
@@ -97,13 +96,15 @@ export default class  login extends Component{
                     ToastAndroid.show('登录成功', ToastAndroid.SHORT);
                 }else{
                    this._setModalVisible();
-                   alert(JSON.stringify(data));
+                   if(data.msg == "没有对应的商户号信息"||data.msg == "传入的密码不对"){
+                       this._ErrorModalVisible()
+                   }
                 }
             },(err)=>{
                 this._setModalVisible();
                 alert("网络请求失败");
             })
-        });
+        })
     }
 
     LoginError(){
@@ -118,9 +119,9 @@ export default class  login extends Component{
     }
 
     _ErrorModalVisible(){
-        let isshow = this.state.ErrorShow;
+        let isShow = this.state.ErrorShow;
         this.setState({
-            ErrorShow:!isshow,
+            ErrorShow:!isShow,
         });
     }
     onSubmitEditing(){
@@ -177,6 +178,7 @@ export default class  login extends Component{
                                             })
                                         }}
                                         onSubmitEditing={this.onSubmitEditing.bind(this)}
+                                        onEndEditing = {this.onSubmitEditing.bind(this)}
                                     />
                             }
                             <Image source={require("../images/1_11.png")} style={styles.TextImage1}></Image>
@@ -257,9 +259,8 @@ export default class  login extends Component{
                         </Modal>
                     </ScrollView>
                 </Image>
-        </ScrollView>
-
-        );
+            </ScrollView>
+        )
     }
 }
 const styles = StyleSheet.create({
