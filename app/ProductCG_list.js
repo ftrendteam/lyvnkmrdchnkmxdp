@@ -63,10 +63,12 @@ export default class ProductCG_list extends Component {
 
     Search(value){
         //if(value>=3){
-            if(value==""){
+            if(value!==""){
                 this.setState({
-                    dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
-                })
+                    dataSource: this.state.dataSource.cloneWithRows(str),
+                });
+
+                this.fetch();
             }else{
                 var str;
                 for (let i = 0; i < this.dataRows.length; i++) {

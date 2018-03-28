@@ -265,7 +265,6 @@ export default class Pay extends Component {
                     Datafasle=false;
                 }
             }
-            console.log('Datafasle=',Datafasle)
             if(Datafasle==false){
                 //分组促销
                 new Promise.all(BGPromotion).then((rows) => {

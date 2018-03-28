@@ -447,7 +447,7 @@ export default class Sell extends Component {
                     }
                 };
                 this.props.navigator.push(nextRoute);
-            }else if(this.state.name=="销售"){
+            }else if(this.state.name=="移动销售"){
                 var dataRows=this.dataRow;
                 var nextRoute = {
                     name: "Pay",

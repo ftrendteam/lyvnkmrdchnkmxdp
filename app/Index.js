@@ -141,7 +141,6 @@ export default class Index extends Component {
     ShopList() {
         Storage.get('Name').then((tags) => {
             if (this.state.head == "移动销售") {
-
                 var nextRoute = {
                     name: "Sell",
                     component: Sell
@@ -2148,7 +2147,7 @@ export default class Index extends Component {
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     style={[styles.ModalHeadImage, {borderRightWidth: 1, borderRightColor: "#f2f2f2"}]}
-                                    onPress={this.Sell1.bind(this)}>
+                                    onPress={this.Sell.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_57.png")}/>
                                     </Text>
