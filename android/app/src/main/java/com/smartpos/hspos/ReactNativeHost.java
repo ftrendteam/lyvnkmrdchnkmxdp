@@ -11,7 +11,7 @@ import com.lwansbrough.RCTCamera.RCTCameraPackage;
 import java.util.Arrays;
 import java.util.List;
 import org.pgsqlite.SQLitePluginPackage;
-
+import com.smartpos.hspos.pay.MYRequestReactPackage;
 public class ReactNativeHost extends com.facebook.react.ReactNativeHost {
     protected ReactNativeHost(Application application) {
         super(application);
@@ -34,7 +34,8 @@ public class ReactNativeHost extends com.facebook.react.ReactNativeHost {
                 new JSAndroidIMEIReactPackage(),
                 new MainReactPackage(),
                 new JSUpApkReactPackage(),
-                new JSDeviceInfo()
+                new JSDeviceInfo(),
+                new MYRequestReactPackage()
 
         );
     }

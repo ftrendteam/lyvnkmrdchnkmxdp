@@ -156,6 +156,7 @@ dependencies {
     compile 'com.squareup.okio:okio:1.13.0'
     compile 'com.acker:simplezxing:1.5'
     compile files('libs/platform_sdk_v2.3.706.jar')
+    compile files('libs/miyajavapos.jar')
 
 }
 
