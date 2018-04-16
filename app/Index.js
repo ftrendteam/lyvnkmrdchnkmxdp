@@ -2714,7 +2714,7 @@ export default class Index extends Component {
                     }}
                     onRequestClose={() => {
                     }}>
-                    <Image source={require("../images/backgreact-round.png")} style={[styles.ModalStyle, {justifyContent: 'center', alignItems: 'center',}]}>
+                    <Image source={require("../images/background.png")} style={[styles.ModalStyle, {justifyContent: 'center', alignItems: 'center',}]}>
                         <View style={styles.ModalStyleCont}>
                             <View style={styles.ModalStyleTitle}>
                                 <Text style={styles.ModalTitleText}>
