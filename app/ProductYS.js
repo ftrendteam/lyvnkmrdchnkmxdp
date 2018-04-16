@@ -1,7 +1,5 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
+ *商品验收第二分页
  */
 
 import React, { Component } from 'react';
@@ -107,6 +105,7 @@ export default class ProductCG extends Component {
                 Storage.delete('shildshop');
                 Storage.delete('StateMent');
                 Storage.delete('BQNumber');
+                Storage.delete('YdCountm');
                 Storage.save('YdCountm', '2');
                 Storage.save('OrgFormno',str1);
                 Storage.save('Name','商品验收');
@@ -120,6 +119,9 @@ export default class ProductCG extends Component {
                 Storage.save('Date',data);
                 Storage.save("scode",str);
                 Storage.save('Document', "商品验收");
+                if(this.state.suppcode1==""){
+                    Storage.save('Modify', '1');
+                }
             }
         }else if(this.state.Disting=="1"){
             var date = new Date();
@@ -141,6 +143,7 @@ export default class ProductCG extends Component {
                 Storage.delete('shildshop');
                 Storage.delete('StateMent');
                 Storage.delete('BQNumber');
+                Storage.delete('YdCountm');
                 Storage.save('YdCountm', '2');
                 Storage.save('OrgFormno',str1);
                 Storage.save('Name','商品验收');
@@ -154,6 +157,9 @@ export default class ProductCG extends Component {
                 Storage.save('Date',data);
                 Storage.save("scode",str);
                 Storage.save('Document', "商品验收");
+                if(this.state.suppcode1==""){
+                    Storage.save('Modify', '1');
+                }
             }
         }
     }

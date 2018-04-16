@@ -53,7 +53,6 @@ export default class ProductXP_list extends Component {
                     var row = rows.item(i);
                     this.dataRows.push(row);
                 }
-
                 this.setState({
                     dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
                 })

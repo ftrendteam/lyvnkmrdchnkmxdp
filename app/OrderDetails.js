@@ -1,7 +1,5 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
+ * 商品详情选择商品数量
  */
 
 import React, {Component} from 'react';
@@ -41,6 +39,11 @@ export default class GoodsDetails extends Component {
             YdCountm:"",
             shuliang:"",
             numberFormat2:"",
+            Modify:"",
+            OnPrice:"",
+            Total:"",
+            Price:"",
+            OrderDetails:1,
             BQNumber:this.props.countm ? this.props.countm : 1,
         }
     }
@@ -61,6 +64,13 @@ export default class GoodsDetails extends Component {
                 YdCountm:tags
             })
         })
+
+        Storage.get('Modify').then((tags) => {
+            this.setState({
+                Modify: tags
+            })
+        })
+
         Storage.get('YuanDan').then((tags)=>{
             if(tags==1){
                 if(this.state.ydcountm>0){
@@ -114,17 +124,155 @@ export default class GoodsDetails extends Component {
         })
     }
 
+    onNumber(){
+        var ShopPrice = (this.state.Number * this.state.ShopPrice);
+        this.setState({
+            numberFormat2: NumberUtils.numberFormat2(ShopPrice),
+        })
+        if(this.state.name=="商品采购"||this.state.name=="协配采购"||this.state.Modify==1){
+            this.setState({
+                OnPrice:1,
+                PriceText:1
+            });
+        }else{
+            var x = this.state.Number;//获取数量的数字
+            var y = String(x).indexOf(".") + 1;//获取小数点的位置
+            if(y > 0) {
+                alert("数量不能含有小数");
+            }else if(this.state.name=="商品配送"&&this.state.ydcountm==0){
+                alert("库存为0，该商品不能进行配送")
+            } else {
+                if(this.state.name=="实时盘点"||this.state.name=="商品盘点"){
+                    var shopInfoData = [];
+                    var shopInfo = {};
+                    shopInfo.Pid = this.state.Pid;
+                    shopInfo.ProdCode=this.state.ProdCode;
+                    shopInfo.prodname = this.state.ProdName;
+                    shopInfo.countm = this.state.Number;
+                    shopInfo.ShopPrice = this.state.ShopPrice;
+                    if(this.state.YdCountm == 5){
+                        shopInfo.prototal = "0";
+                    }else{
+                        shopInfo.prototal = NumberUtils.numberFormat2(ShopPrice);
+                    }
+                    shopInfo.promemo = this.state.Remark;
+                    shopInfo.DepCode = this.state.DepCode;
+                    shopInfo.ydcountm = this.state.ydcountm;
+                    shopInfo.SuppCode = this.state.SuppCode;
+                    shopInfo.BarCode = this.state.BarCode;
+                    shopInfoData.push(shopInfo);
+                    //调用插入表方法
+                    dbAdapter.insertShopInfo(shopInfoData);
+                    if(this.state.DataName=="移动销售"){
+                        var nextRoute={
+                            name:"移动销售",
+                            component:Sell,
+                        };
+                        this.props.navigator.push(nextRoute);
+                    }else if(this.state.ShoppData=="0"){
+                        var nextRoute={
+                            name:"清单",
+                            component:ShoppingCart,
+                            params:{
+                                DepCode:this.state.DepCode,
+                            }
+                        };
+                        this.props.navigator.push(nextRoute);
+                    }else{
+                        var nextRoute={
+                            name:"主页",
+                            component:Index,
+                            params:{
+                                DepCode:this.state.DepCode,
+                            }
+                        };
+                        this.props.navigator.push(nextRoute);
+                    }
+                }else{
+                    if(this.state.Number==0){
+                        ToastAndroid.show('商品数量不能为空', ToastAndroid.SHORT);
+                    }else{
+                        var shopInfoData = [];
+                        var shopInfo = {};
+                        shopInfo.Pid = this.state.Pid;
+                        shopInfo.ProdCode=this.state.ProdCode;
+                        shopInfo.prodname = this.state.ProdName;
+                        shopInfo.countm = this.state.Number;
+                        shopInfo.ShopPrice = this.state.ShopPrice;
+                        if(this.state.YdCountm == 5){
+                            shopInfo.prototal = "0";
+                        }else{
+                            shopInfo.prototal = NumberUtils.numberFormat2(ShopPrice);
+                        }
+                        shopInfo.promemo = this.state.Remark;
+                        shopInfo.DepCode = this.state.DepCode;
+                        shopInfo.ydcountm = this.state.ydcountm;
+                        shopInfo.SuppCode = this.state.SuppCode;
+                        shopInfo.BarCode = this.state.BarCode;
+                        shopInfoData.push(shopInfo);
+                        //调用插入表方法
+                        dbAdapter.insertShopInfo(shopInfoData);
+                        if(this.state.DataName=="移动销售"){
+                            var nextRoute={
+                                name:"移动销售",
+                                component:Sell,
+                            };
+                            this.props.navigator.push(nextRoute);
+                        }else if(this.state.ShoppData=="0"){
+                            var nextRoute={
+                                name:"清单",
+                                component:ShoppingCart,
+                                params:{
+                                    DepCode:this.state.DepCode,
+                                }
+                            };
+                            this.props.navigator.push(nextRoute);
+                        }else{
+                            var nextRoute={
+                                name:"主页",
+                                component:Index,
+                                params:{
+                                    DepCode:this.state.DepCode,
+                                }
+                            };
+                            this.props.navigator.push(nextRoute);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    NumberButton(){
+        this.setState({
+            PriceText:"",
+            Total:"",
+            OnPrice:"",
+        })
+    }
+
+    PriceButton(){
+        this.setState({
+            OnPrice:1,
+            Total:"",
+        });
+    }
+
+    NumberFormat(){
+        this.setState({
+            OnPrice:1,
+        });
+    }
+
     add(){
         // var Number1=this.state.Number;
-        if(this.state.Number==""||this.state.BQNumber==1){
-            // alert(this.state.Number)
+        if(this.state.Number==""){
             this.setState({
                 Number:1,
                 BQNumber:parseInt(this.state.BQNumber)+1,
                 numberFormat2:this.state.ShopPrice,
             });
         }else{
-            // alert("yt")
             let numberFormat2 = NumberUtils.numberFormat2((parseInt(this.state.Number)+1)*(this.state.ShopPrice));
             this.setState({
                 Number:parseInt(this.state.Number)+1,
@@ -163,56 +311,163 @@ export default class GoodsDetails extends Component {
         })
     }
 
-    pressPop(){
-        if(this.state.name==null) {
-            alert("请选择单据")
-        }
-        if(this.state.name=="实时盘点"||this.state.name=="商品盘点"){
-            var shopInfoData = [];
-            var shopInfo = {};
-            shopInfo.Pid = this.state.Pid;
-            shopInfo.ProdCode=this.state.ProdCode;
-            shopInfo.prodname = this.state.ProdName;
-            shopInfo.countm = this.state.Number;
-            shopInfo.ShopPrice = this.state.ShopPrice;
-            shopInfo.prototal =(this.state.Number)*(this.state.ShopPrice);//金额
-            shopInfo.promemo = this.state.Remark;
-            shopInfo.DepCode = this.state.DepCode;
-            shopInfo.ydcountm = this.state.ydcountm;
-            shopInfo.SuppCode = this.state.SuppCode;
-            shopInfo.BarCode = this.state.BarCode;
-            shopInfoData.push(shopInfo);
-            //调用插入表方法
-            dbAdapter.insertShopInfo(shopInfoData);
-            if(this.state.DataName=="移动销售"){
-                var nextRoute={
-                    name:"移动销售",
-                    component:Sell,
-                };
-                this.props.navigator.push(nextRoute);
-            }else if(this.state.ShoppData=="0"){
-                var nextRoute={
-                    name:"清单",
-                    component:ShoppingCart,
-                    params:{
-                        DepCode:this.state.DepCode,
-                    }
-                };
-                this.props.navigator.push(nextRoute);
-            }else{
-                var nextRoute={
-                    name:"主页",
-                    component:Index,
-                    params:{
-                        DepCode:this.state.DepCode,
-                    }
-                };
-                this.props.navigator.push(nextRoute);
-            }
+    onEndEditing(){
+        if(this.state.Number==""){
+            this.setState({
+                numberFormat2:"0.00",
+            });
         }else{
-            if(this.state.Number==0){
-                ToastAndroid.show('商品数量不能为空', ToastAndroid.SHORT);
-            }else{
+            let numberFormat2 = NumberUtils.numberFormat2((parseInt(this.state.Number))*(this.state.ShopPrice));
+            this.setState({
+                numberFormat2:numberFormat2,
+                Total:1,
+                OnPrice:""
+            });
+        }
+    }
+
+    TotalButton(){
+        if(this.state.Number==""){
+            alert("请先添加商品数量");
+            this.setState({
+                numberFormat2:"0.00"
+            })
+        }else{
+            var Modify=NumberUtils.numberFormat2(this.state.numberFormat2/this.state.Number);
+            this.setState({
+                ShopPrice:Modify,
+            })
+            if(this.state.OrderDetails==1){
+                var x = this.state.Number;//获取数量的数字
+                var y = String(x).indexOf(".") + 1;//获取小数点的位置
+                if(y > 0) {
+                    alert("数量不能含有小数");
+                } else {
+                    if(this.state.name=="实时盘点"||this.state.name=="商品盘点"){
+                        var shopInfoData = [];
+                        var shopInfo = {};
+                        shopInfo.Pid = this.state.Pid;
+                        shopInfo.ProdCode=this.state.ProdCode;
+                        shopInfo.prodname = this.state.ProdName;
+                        shopInfo.countm = this.state.Number;
+                        shopInfo.ShopPrice = Modify;
+                        if(this.state.YdCountm == 5){
+                            shopInfo.prototal = "0";
+                        }else{
+                            shopInfo.prototal = this.state.numberFormat2;
+                        }
+                        shopInfo.promemo = this.state.Remark;
+                        shopInfo.DepCode = this.state.DepCode;
+                        shopInfo.ydcountm = this.state.ydcountm;
+                        shopInfo.SuppCode = this.state.SuppCode;
+                        shopInfo.BarCode = this.state.BarCode;
+                        shopInfoData.push(shopInfo);
+                        //调用插入表方法
+                        dbAdapter.insertShopInfo(shopInfoData);
+                        if(this.state.DataName=="移动销售"){
+                            var nextRoute={
+                                name:"移动销售",
+                                component:Sell,
+                            };
+                            this.props.navigator.push(nextRoute);
+                        }else if(this.state.ShoppData=="0"){
+                            var nextRoute={
+                                name:"清单",
+                                component:ShoppingCart,
+                                params:{
+                                    DepCode:this.state.DepCode,
+                                }
+                            };
+                            this.props.navigator.push(nextRoute);
+                        }else{
+                            var nextRoute={
+                                name:"主页",
+                                component:Index,
+                                params:{
+                                    DepCode:this.state.DepCode,
+                                }
+                            };
+                            this.props.navigator.push(nextRoute);
+                        }
+                    }else{
+                        if(this.state.Number==0){
+                            ToastAndroid.show('商品数量不能为空', ToastAndroid.SHORT);
+                        }else{
+                            var shopInfoData = [];
+                            var shopInfo = {};
+                            shopInfo.Pid = this.state.Pid;
+                            shopInfo.ProdCode=this.state.ProdCode;
+                            shopInfo.prodname = this.state.ProdName;
+                            shopInfo.countm = this.state.Number;
+                            shopInfo.ShopPrice = Modify;
+                            if(this.state.YdCountm == 5){
+                                shopInfo.prototal = "0";
+                            }else{
+                                shopInfo.prototal = this.state.numberFormat2;
+                            }
+                            shopInfo.promemo = this.state.Remark;
+                            shopInfo.DepCode = this.state.DepCode;
+                            shopInfo.ydcountm = this.state.ydcountm;
+                            shopInfo.SuppCode = this.state.SuppCode;
+                            shopInfo.BarCode = this.state.BarCode;
+                            shopInfoData.push(shopInfo);
+                            //调用插入表方法
+                            dbAdapter.insertShopInfo(shopInfoData);
+                            if(this.state.DataName=="移动销售"){
+                                var nextRoute={
+                                    name:"移动销售",
+                                    component:Sell,
+                                };
+                                this.props.navigator.push(nextRoute);
+                            }else if(this.state.ShoppData=="0"){
+                                var nextRoute={
+                                    name:"清单",
+                                    component:ShoppingCart,
+                                    params:{
+                                        DepCode:this.state.DepCode,
+                                    }
+                                };
+                                this.props.navigator.push(nextRoute);
+                            }else{
+                                var nextRoute={
+                                    name:"主页",
+                                    component:Index,
+                                    params:{
+                                        DepCode:this.state.DepCode,
+                                    }
+                                };
+                                this.props.navigator.push(nextRoute);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    numberFormat2(){
+        if(this.state.Number==""){
+            alert("请先添加商品数量");
+            this.setState({
+                numberFormat2:"0.00"
+            })
+        }else{
+            var Modify=NumberUtils.numberFormat2(this.state.numberFormat2/this.state.Number);
+            this.setState({
+                ShopPrice:Modify,
+            })
+        }
+    }
+
+    pressPop(){
+        var x = this.state.Number;//获取数量的数字
+        var y = String(x).indexOf(".") + 1;//获取小数点的位置
+        if(y > 0) {
+            alert("数量不能含有小数");
+        } else if(this.state.name=="商品配送"&&this.state.ydcountm==0){
+            alert("库存为0，该商品不能进行配送")
+        } else {
+            if(this.state.name=="实时盘点"||this.state.name=="商品盘点"){
                 var shopInfoData = [];
                 var shopInfo = {};
                 shopInfo.Pid = this.state.Pid;
@@ -220,7 +475,11 @@ export default class GoodsDetails extends Component {
                 shopInfo.prodname = this.state.ProdName;
                 shopInfo.countm = this.state.Number;
                 shopInfo.ShopPrice = this.state.ShopPrice;
-                shopInfo.prototal =(this.state.Number)*(this.state.ShopPrice);//金额
+                if(this.state.YdCountm == 5){
+                    shopInfo.prototal = "0";
+                }else{
+                    shopInfo.prototal = this.state.numberFormat2;
+                }
                 shopInfo.promemo = this.state.Remark;
                 shopInfo.DepCode = this.state.DepCode;
                 shopInfo.ydcountm = this.state.ydcountm;
@@ -254,50 +513,56 @@ export default class GoodsDetails extends Component {
                     };
                     this.props.navigator.push(nextRoute);
                 }
-            }
-        }
-    }
-
-    PressPop(){
-        if(this.state.name==null) {
-            alert("请选择单据")
-        }else if(this.state.BQNumber==""||this.state.BQNumber==0){
-            ToastAndroid.show('商品数量不能为空', ToastAndroid.SHORT);
-        }else{
-            var shopInfoData = [];
-            var shopInfo = {};
-            shopInfo.Pid = this.state.Pid;
-            shopInfo.ProdCode=this.state.ProdCode;
-            shopInfo.prodname = this.state.ProdName;
-            shopInfo.countm = this.state.BQNumber;
-            shopInfo.ShopPrice = this.state.ShopPrice;
-            shopInfo.prototal ="0";//金额
-            shopInfo.promemo = this.state.Remark;
-            shopInfo.DepCode = this.state.DepCode;
-            shopInfo.ydcountm = this.state.ydcountm;
-            shopInfo.SuppCode = this.state.SuppCode;
-            shopInfo.BarCode = this.state.BarCode;
-            shopInfoData.push(shopInfo);
-            //调用插入表方法
-            dbAdapter.insertShopInfo(shopInfoData);
-            if(this.state.ShoppData=="0"){
-                var nextRoute={
-                    name:"清单",
-                    component:ShoppingCart,
-                    params:{
-                        DepCode:this.state.DepCode,
-                    }
-                };
-                this.props.navigator.push(nextRoute);
             }else{
-                var nextRoute={
-                    name:"主页",
-                    component:Index,
-                    params:{
-                        DepCode:this.state.DepCode,
+                if(this.state.Number==0||this.state.BQNumber<1){
+                    ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
+                }else{
+                    var shopInfoData = [];
+                    var shopInfo = {};
+                    shopInfo.Pid = this.state.Pid;
+                    shopInfo.ProdCode=this.state.ProdCode;
+                    shopInfo.prodname = this.state.ProdName;
+                    shopInfo.countm = this.state.Number;
+                    shopInfo.ShopPrice = this.state.ShopPrice;
+                    if(this.state.YdCountm == 5){
+                        shopInfo.prototal = "0";
+                    }else{
+                        shopInfo.prototal = this.state.numberFormat2;
                     }
-                };
-                this.props.navigator.push(nextRoute);
+                    shopInfo.promemo = this.state.Remark;
+                    shopInfo.DepCode = this.state.DepCode;
+                    shopInfo.ydcountm = this.state.ydcountm;
+                    shopInfo.SuppCode = this.state.SuppCode;
+                    shopInfo.BarCode = this.state.BarCode;
+                    shopInfoData.push(shopInfo);
+                    //调用插入表方法
+                    dbAdapter.insertShopInfo(shopInfoData);
+                    if(this.state.DataName=="移动销售"){
+                        var nextRoute={
+                            name:"移动销售",
+                            component:Sell,
+                        };
+                        this.props.navigator.push(nextRoute);
+                    }else if(this.state.ShoppData=="0"){
+                        var nextRoute={
+                            name:"清单",
+                            component:ShoppingCart,
+                            params:{
+                                DepCode:this.state.DepCode,
+                            }
+                        };
+                        this.props.navigator.push(nextRoute);
+                    }else{
+                        var nextRoute={
+                            name:"主页",
+                            component:Index,
+                            params:{
+                                DepCode:this.state.DepCode,
+                            }
+                        };
+                        this.props.navigator.push(nextRoute);
+                    }
+                }
             }
         }
     }
@@ -319,33 +584,46 @@ export default class GoodsDetails extends Component {
                     <Text style={styles.left}>名称</Text>
                     <Text style={styles.right}>{this.state.ProdName}</Text>
                 </View>
-                <View style={[styles.List,{paddingTop:12}]}>
+                <View style={styles.List}>
                     <View style={styles.left1}>
-                        <Text style={[styles.left,{marginTop:4}]}>数量</Text>
+                        <Text style={styles.left}>数量</Text>
                         {
                             (this.state.YdCountm == 5) ?
-                                <TextInput
-                                    style={styles.Number}
-                                    autoFocus={true}
-                                    underlineColorAndroid='transparent'
-                                    keyboardType="numeric"
-                                    value={this.state.BQNumber.toString()}
-                                    placeholderTextColor="#333333"
-                                    onChangeText={(value)=>{this.setState({BQNumber:value})}}
-                                    onSubmitEditing={this.onSubmitEditing.bind(this)}
-                                    onEndEditing = {this.onSubmitEditing.bind(this)}
-                                />:
-                                <TextInput
-                                    style={styles.Number}
-                                    autoFocus={true}
-                                    underlineColorAndroid='transparent'
-                                    keyboardType="numeric"
-                                    value={this.state.Number.toString()}
-                                    placeholderTextColor="#333333"
-                                    onChangeText={(value)=>{this.setState({Number:value})}}
-                                    onSubmitEditing={this.onSubmitEditing.bind(this)}
-                                    onEndEditing = {this.onSubmitEditing.bind(this)}
-                                />
+                                <View style={styles.onPrice}>
+                                    <TextInput
+                                        style={styles.Number}
+                                        autoFocus={true}
+                                        underlineColorAndroid='transparent'
+                                        keyboardType="numeric"
+                                        value={this.state.BQNumber.toString()}
+                                        placeholderTextColor="#333333"
+                                        onChangeText={(value)=>{this.setState({BQNumber:value})}}
+                                        onSubmitEditing={this.onSubmitEditing.bind(this)}
+                                        onEndEditing = {this.onSubmitEditing.bind(this)}
+                                    />
+                                </View>
+                                :
+                                <View style={styles.onPrice}>
+                                    {
+                                        (this.state.PriceText == 1) ?
+                                            <TouchableOpacity onPress={this.NumberButton.bind(this)}>
+                                                <Text style={styles.PriceText}>{this.state.Number}</Text>
+                                            </TouchableOpacity>
+                                            :
+                                            <TextInput
+                                                style={styles.Number}
+                                                returnKeyType='search'
+                                                autoFocus={true}
+                                                underlineColorAndroid='transparent'
+                                                keyboardType="numeric"
+                                                value={this.state.Number.toString()}
+                                                placeholderTextColor="#333333"
+                                                onChangeText={(value)=>{this.setState({Number:value})}}
+                                                onSubmitEditing={this.onNumber.bind(this)}
+                                                onEndEditing = {this.onSubmitEditing.bind(this)}
+                                            />
+                                    }
+                                </View>
                         }
                     </View>
                     <View style={styles.right1}>
@@ -364,7 +642,7 @@ export default class GoodsDetails extends Component {
                     </View>:null
                 }
                 {
-                    (this.state.YdCountm==2)?
+                    (this.state.YdCountm==2||this.state.name=="商品配送")?
                         <View style={styles.List}>
                             <View style={styles.left2}>
                                 <Text style={styles.left}>原单数量</Text>
@@ -374,8 +652,46 @@ export default class GoodsDetails extends Component {
                 }
                 <View style={styles.List}>
                     <View style={styles.left2}>
-                        <Text style={styles.left}>单价</Text>
-                        <Text style={styles.Price1}>{this.state.ShopPrice}</Text>
+                        {
+                            (this.state.name=="商品配送")?
+                                <Text style={styles.left}>配送单价</Text>
+                                :
+                                <Text style={styles.left}>单价</Text>
+                        }
+
+                        {
+                            (this.state.name=="商品采购"||this.state.name=="协配采购"||this.state.Modify==1)?
+                                <View style={styles.onPrice}>
+                                    {
+                                        (this.state.OnPrice==1)?
+                                            <TextInput
+                                                autoFocus={true}
+                                                returnKeyType='search'
+                                                style={styles.Number}
+                                                underlineColorAndroid='transparent'
+                                                keyboardType="numeric"
+                                                value={this.state.ShopPrice.toString()}
+                                                placeholderTextColor="#333333"
+                                                onChangeText={(value)=>{
+                                                    this.setState({
+                                                        ShopPrice:value
+                                                    })
+                                                }}
+                                                onSubmitEditing={this.onEndEditing.bind(this)}
+                                                onEndEditing = {this.onEndEditing.bind(this)}
+                                            />
+                                            :
+                                            <TouchableOpacity onPress={this.PriceButton.bind(this)}>
+                                                <Text style={styles.PriceText}>{this.state.ShopPrice}</Text>
+                                            </TouchableOpacity>
+
+                                    }
+                                </View>
+                                :
+                                <View>
+                                    <Text style={styles.Price1}>{this.state.ShopPrice}</Text>
+                                </View>
+                        }
                     </View>
                     <View style={styles.right2}>
                         <Text style={styles.price}>元/件</Text>
@@ -386,8 +702,43 @@ export default class GoodsDetails extends Component {
                         null:
                         <View style={styles.List}>
                             <View style={styles.left2}>
-                                <Text style={styles.left}>金额</Text>
-                                <Text style={styles.Price1}>{this.state.numberFormat2}</Text>
+                                {
+                                    (this.state.name=="商品配送")?
+                                        <Text style={styles.left}>配送金额</Text>
+                                        :
+                                        <Text style={styles.left}>金额</Text>
+                                }
+
+                                {
+                                    (this.state.name=="商品采购"||this.state.name=="商品验收"||this.state.name=="协配采购")?
+                                        <View style={styles.onPrice}>
+                                            {
+                                                (this.state.Total == 1) ?
+                                                    <TextInput
+                                                        autoFocus={true}
+                                                        returnKeyType='search'
+                                                        style={styles.Number}
+                                                        underlineColorAndroid='transparent'
+                                                        keyboardType="numeric"
+                                                        value={this.state.numberFormat2.toString()}
+                                                        placeholderTextColor="#333333"
+                                                        onChangeText={(value)=>{
+                                                            this.setState({
+                                                                numberFormat2:value
+                                                            })
+                                                        }}
+                                                        onSubmitEditing={this.TotalButton.bind(this)}
+                                                        onEndEditing = {this.numberFormat2.bind(this)}
+                                                    />
+                                                    :
+                                                    <TouchableOpacity onPress={this.NumberFormat.bind(this)}>
+                                                        <Text style={styles.PriceText}>{this.state.numberFormat2}</Text>
+                                                    </TouchableOpacity>
+                                            }
+                                        </View>
+                                        :
+                                        <Text style={styles.Price1}>{this.state.numberFormat2}</Text>
+                                }
                             </View>
                             <View style={styles.right2}>
                                 <Text style={styles.price}>元</Text>
@@ -401,9 +752,9 @@ export default class GoodsDetails extends Component {
                             <View style={styles.left2}>
                                 <Text style={[styles.left,{marginTop:9,}]}>备注</Text>
                                 <TextInput
-                                    style={styles.Number1}
+                                    style={[styles.Number1,{fontSize:14}]}
                                     placeholder="暂无备注"
-                                    placeholderTextColor="#333333"
+                                    placeholderTextColor="#999999"
                                     maxLength={50}
                                     value={this.state.Remark.toString()}
                                     underlineColorAndroid='transparent'
@@ -411,16 +762,9 @@ export default class GoodsDetails extends Component {
                             </View>
                         </View>
                 }
-                {
-                    (this.state.YdCountm == 5) ?
-                        <TouchableOpacity style={styles.button} onPress={this.PressPop.bind(this)}>
-                            <Text style={styles.ButtonText}>确定</Text>
-                        </TouchableOpacity>
-                        :
-                        <TouchableOpacity style={styles.button} onPress={this.pressPop.bind(this)}>
-                            <Text style={styles.ButtonText}>确定</Text>
-                        </TouchableOpacity>
-                }
+                <TouchableOpacity style={styles.button} onPress={this.pressPop.bind(this)}>
+                    <Text style={styles.ButtonText}>确定</Text>
+                </TouchableOpacity>
             </View>
         </ScrollView>
       </ScrollView>
@@ -490,6 +834,9 @@ const styles = StyleSheet.create({
   right1:{
       flexDirection:"row",
       flex:1,
+      position:"absolute",
+      right:5,
+      top:5
   },
   left2:{
     flexDirection:"row",
@@ -512,9 +859,20 @@ const styles = StyleSheet.create({
     color:"#333333",
     fontWeight:"200",
     paddingLeft:5,
-    flex:1,
+    paddingTop:0,
     marginLeft:5,
     marginBottom:4,
+    flex:1,
+  },
+  PriceText:{
+    color:"#333333",
+    fontSize:16,
+    fontWeight:"200",
+    marginLeft:10,
+    marginBottom:4,
+  },
+  onPrice:{
+      flex:1
   },
   Number1:{
     fontSize:16,

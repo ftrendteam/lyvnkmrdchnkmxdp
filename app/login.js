@@ -1,3 +1,7 @@
+/**
+ * 第一登陆页面（商户号）
+ */
+
 import React, { Component } from 'react';
 import {
     AppRegistry,
@@ -92,13 +96,12 @@ export default class  login extends Component{
                     this.props.navigator.push({
                         component:admin,
                     });
-                    this._setModalVisible();
                     ToastAndroid.show('登录成功', ToastAndroid.SHORT);
+                    this._setModalVisible();
                 }else{
                    this._setModalVisible();
-                   if(data.msg == "没有对应的商户号信息"||data.msg == "传入的密码不对"){
-                       this._ErrorModalVisible()
-                   }
+                   var msg=data.msg;
+                   alert(JSON.stringify(msg))
                 }
             },(err)=>{
                 this._setModalVisible();

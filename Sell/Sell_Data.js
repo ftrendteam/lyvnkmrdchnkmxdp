@@ -1,7 +1,5 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
+ * 移动销售第二分页
  */
 
 import React, { Component } from 'react';

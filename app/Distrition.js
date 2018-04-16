@@ -1,7 +1,5 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow1
+ * 配送收货第二分页
  */
 
 import React, { Component } from 'react';
@@ -101,6 +99,8 @@ export default class Distrition extends Component {
             Storage.delete('shildshop');
             Storage.delete('StateMent');
             Storage.delete('BQNumber');
+            Storage.delete('YdCountm');
+            Storage.delete('Modify');
             Storage.save('YdCountm', '2');
             Storage.save('YuanDan','1');
             Storage.save('OrgFormno',str);
@@ -126,6 +126,14 @@ export default class Distrition extends Component {
                 component:Search
             };
             this.props.navigator.push(nextRoute);
+            Storage.delete('OrgFormno');
+            Storage.delete('scode');
+            Storage.delete('shildshop');
+            Storage.delete('StateMent');
+            Storage.delete('BQNumber');
+            Storage.delete('YdCountm');
+            Storage.delete('Modify');
+            Storage.save('YdCountm', '2');
             Storage.save('YuanDan','1');
             Storage.save('OrgFormno',str);
             Storage.save("scode",str);

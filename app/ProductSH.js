@@ -1,7 +1,5 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
+ * 协配收货第二分页
  */
 
 import React, { Component } from 'react';
@@ -75,17 +73,6 @@ export default class ProductCG extends Component {
         });
     }
 
-    Monclick(){
-        var nextRoute={
-            name:"ProductXP_list",
-            component:ProductXP_list,
-            params: {
-                reloadShopname:(shopname)=>this._reloadShopname(shopname)
-            }
-        };
-        this.props.navigator.push(nextRoute)
-    }
-
     _reloadShopname(shopname) {
         shopname = String(shopname);
         this.setState({
@@ -123,9 +110,9 @@ export default class ProductCG extends Component {
                 this.props.navigator.push(nextRoute);
                 Storage.delete('OrgFormno');
                 Storage.delete('scode');
-                Storage.delete('shildshop');
                 Storage.delete('StateMent');
                 Storage.delete('BQNumber');
+                Storage.delete('YdCountm');
                 Storage.save('YdCountm', '2');
                 Storage.save('OrgFormno',str2);
                 Storage.save('Name','协配收货');
@@ -138,11 +125,12 @@ export default class ProductCG extends Component {
                 Storage.save('Screen','1');
                 Storage.save('shopPandian','App_Client_NOYSXPCGQ');
                 Storage.save('Date',data);
-                Storage.save('Date',data);
                 Storage.save("scode",str);
                 Storage.save('shildshop',str1);
                 Storage.save('Document', "协配收货");
-
+                if(this.state.suppcode1==""){
+                    Storage.save('Modify', '1');
+                }
             }
         }else if(this.state.Disting=="1"){
             var date = new Date();
@@ -160,9 +148,9 @@ export default class ProductCG extends Component {
                 this.props.navigator.push(nextRoute);
                 Storage.delete('OrgFormno');
                 Storage.delete('scode');
-                Storage.delete('shildshop');
                 Storage.delete('StateMent');
                 Storage.delete('BQNumber');
+                Storage.delete('YdCountm');
                 Storage.save('YdCountm', '2');
                 Storage.save('OrgFormno', str2);
                 Storage.save('Name', '协配收货');
@@ -175,10 +163,12 @@ export default class ProductCG extends Component {
                 Storage.save('Screen', '1');
                 Storage.save('shopPandian', 'App_Client_NOYSXPCGQ');
                 Storage.save('Date', data);
-                Storage.save('Date', data);
                 Storage.save("scode", str);
                 Storage.save('shildshop', str1);
                 Storage.save('Document', "协配收货");
+                if(this.state.suppcode1==""){
+                    Storage.save('Modify', '1');
+                }
             }
         }
 
@@ -191,7 +181,8 @@ export default class ProductCG extends Component {
             component:Distrition_list,
             params: {
                 SearchShopname:(Suppcode)=>this.SearchShopname(Suppcode),
-                SearchShopname1:(Suppcode1)=>this.SearchShopname1(Suppcode1)
+                SearchShopname1:(Suppcode1)=>this.SearchShopname1(Suppcode1),
+                // reloadShopname:(shopname)=>this._reloadShopname(shopname)
             }
         };
         this.props.navigator.push(nextRoute)
@@ -247,7 +238,7 @@ export default class ProductCG extends Component {
                             placeholderTextColor="#cccccc"
                         />
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.listimages} onPress={this.Monclick.bind(this)}>
+                    <TouchableOpacity style={styles.listimages} onPress={this.Search.bind(this)}>
                         <Image source={require("../images/2_03.png")} style={styles.Image}></Image>
                     </TouchableOpacity>
                 </View>

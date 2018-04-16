@@ -1,7 +1,5 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
+ * 商品查询（搜索）
  */
 
 import React, { Component } from 'react';
@@ -93,7 +91,7 @@ export default class SearchData extends Component {
             if (reminder.length == 18 && decodepreprint.deCodePreFlag()) {
                 decodepreprint.deCodeProdCode().then((datas) => {
                     dbAdapter.selectProdCode(datas, 1).then((rows) => {
-
+                        this.ClickButton()
                     })
                 });
             } else {
@@ -101,7 +99,163 @@ export default class SearchData extends Component {
                     if (rows.length == 0) {
                         alert("该商品不存在")
                     } else {
-
+                        Storage.get('code').then((ShopCode) => {
+                            Storage.get('Usercode').then((Usercode) => {
+                                Storage.get('LinkUrl').then((linkurl) => {
+                                    let params = {
+                                        TblName: "BasicInfoProd",
+                                        reqCode: "product",
+                                        ShopCode: ShopCode,
+                                        Code: rows.item(0).ProdCode,
+                                        UserCode: Usercode,
+                                    };
+                                    // alert(JSON.stringify(params))
+                                    FetchUtil.post(linkurl, JSON.stringify(params)).then((data) => {
+                                        // console.log(JSON.stringify(data))
+                                        if(data.retcode == 1){
+                                            var TblRow = data.TblRow;
+                                            // alert(JSON.stringify(TblRow))
+                                            var ProdCode;
+                                            var BarCode;
+                                            var ProdName;
+                                            var ShortName;
+                                            var Kccount;
+                                            var Oprice;
+                                            var Cost;
+                                            var OutOprice;
+                                            var OutCost;
+                                            var Price;
+                                            var Total;
+                                            var SuppCode;
+                                            var SuppName;
+                                            var DepCode;
+                                            var DepName;
+                                            var BrandCode;
+                                            var BrandName;
+                                            var Coprice;
+                                            var AidCode;
+                                            var OtherCode;
+                                            var Spec;
+                                            var ProdAdr;
+                                            var Unit;
+                                            var PUnit;
+                                            var PUnitAmt;
+                                            var VipPrice1;
+                                            var VipPrice2;
+                                            var VipPrice3;
+                                            var PsPrice;
+                                            var WPrice;
+                                            var FNoCG;
+                                            var FNoSale;
+                                            var FNoYH;
+                                            var FNoPromotion;
+                                            var FNoTH;
+                                            var FNoCD;
+                                            var FUseSalePrice;
+                                            var PriceFlag;
+                                            for (let i = 0; i < TblRow.length; i++) {
+                                                var row = TblRow[i];
+                                                // console.log('TblRow=',row.ProdName)
+                                                ProdCode =  row.ProdCode;
+                                                BarCode =  row.BarCode;
+                                                ProdName =  row.ProdName;
+                                                ShortName =  row.ShortName;
+                                                Kccount =  row.KCcount;
+                                                Oprice =  row.Oprice;
+                                                Cost =  row.Cost;
+                                                OutOprice =  row.OutOprice;
+                                                OutCost =  row.OutCost;
+                                                Price =  row.Price;
+                                                Total =  row.Total;
+                                                SuppCode =  row.SuppCode;
+                                                SuppName =  row.SuppName;
+                                                DepCode =  row.DepCode;
+                                                DepName =  row.DepName;
+                                                BrandCode =  row.BrandCode;
+                                                BrandName =  row.BrandName;
+                                                Coprice =  row.Coprice;
+                                                AidCode =  row.AidCode;
+                                                OtherCode =  row.OtherCode;
+                                                Spec =  row.Spec;
+                                                ProdAdr =  row.ProdAdr;
+                                                Unit =  row.Unit;
+                                                PUnit =  row.PUnit;
+                                                PUnitAmt =  row.PUnitAmt;
+                                                VipPrice1 =  row.VipPrice1;
+                                                VipPrice2 =  row.VipPrice2;
+                                                VipPrice3 =  row.VipPrice3;
+                                                PsPrice =  row.PsPrice;
+                                                WPrice =  row.WPrice;
+                                                FNoCG =  row.FNoCG;
+                                                FNoSale =  row.FNoSale;
+                                                FNoYH =  row.FNoYH;
+                                                FNoPromotion =  row.FNoPromotion;
+                                                FNoTH =  row.FNoTH;
+                                                FNoCD =  row.FNoCD;
+                                                FUseSalePrice =  row.FUseSalePrice;
+                                                PriceFlag =  row.PriceFlag;
+                                            };
+                                            if(FNoCG==1||FNoSale==1||FNoYH==1||FNoPromotion==1||FNoTH==1||FNoCD==1){
+                                                this.setState({
+                                                    FNoCG:"是",
+                                                    FNoSale:"是",
+                                                    FNoYH:"是",
+                                                    FNoPromotion:"是",
+                                                    FNoTH:"是",
+                                                    FNoCD:"是",
+                                                })
+                                            }else{
+                                                this.setState({
+                                                    FNoCG:"否",
+                                                    FNoSale:"否",
+                                                    FNoYH:"否",
+                                                    FNoPromotion:"否",
+                                                    FNoTH:"否",
+                                                    FNoCD:"否",
+                                                })
+                                            }
+                                            this.setState({
+                                                ProdCode:ProdCode,
+                                                BarCode:BarCode,
+                                                ProdName:ProdName,
+                                                ShortName:ShortName,
+                                                Kccount:Kccount,
+                                                Oprice:Oprice,
+                                                Cost:Cost,
+                                                OutOprice:OutOprice,
+                                                OutCost:OutCost,
+                                                Price:Price,
+                                                Total:Total,
+                                                SuppCode:SuppCode,
+                                                SuppName:SuppName,
+                                                DepCode:DepCode,
+                                                DepName:DepName,
+                                                BrandCode:BrandCode,
+                                                BrandName:BrandName,
+                                                Coprice:Coprice,
+                                                AidCode:AidCode,
+                                                OtherCode:OtherCode,
+                                                Spec:Spec,
+                                                ProdAdr:ProdAdr,
+                                                Unit:Unit,
+                                                PUnit:PUnit,
+                                                PUnitAmt:PUnitAmt,
+                                                VipPrice1:VipPrice1,
+                                                VipPrice2:VipPrice2,
+                                                VipPrice3:VipPrice3,
+                                                PsPrice:PsPrice,
+                                                WPrice:WPrice,
+                                                FUseSalePrice:FUseSalePrice,
+                                                PriceFlag:PriceFlag,
+                                                Search:""
+                                            })
+                                        }else{}
+                                    },(err)=>{
+                                        alert("网络请求失败");
+                                    })
+                                })
+                            })
+                        })
                     }
                 })
             }
@@ -291,11 +445,12 @@ export default class SearchData extends Component {
                                 WPrice:WPrice,
                                 FUseSalePrice:FUseSalePrice,
                                 PriceFlag:PriceFlag,
+                                Search:""
                             })
                         }else{}
-                    }),(err)=>{
+                    },(err)=>{
                         alert("网络请求失败");
-                    }
+                    })
                 })
             })
         })

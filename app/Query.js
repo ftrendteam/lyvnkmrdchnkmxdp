@@ -1,7 +1,5 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
+ * 商品盘点第二分页
  */
 
 import React, { Component } from 'react';
@@ -81,6 +79,8 @@ export default class Query extends Component {
                 Storage.delete('StateMent');
                 Storage.delete('BQNumber');
                 Storage.delete('YuanDan');
+                Storage.delete('YdCountm');
+                Storage.delete('Modify');
                 Storage.save('YdCountm', '3');
                 Storage.save('OrgFormno',str);
                 Storage.save('Date',data);
@@ -110,6 +110,8 @@ export default class Query extends Component {
                 Storage.delete('StateMent');
                 Storage.delete('BQNumber');
                 Storage.delete('YuanDan');
+                Storage.delete('YdCountm');
+                Storage.delete('Modify');
                 Storage.save('YdCountm', '3');
                 Storage.save('OrgFormno', str);
                 Storage.save('Date', data);
