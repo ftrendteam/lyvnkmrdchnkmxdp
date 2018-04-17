@@ -1,7 +1,5 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
+ * 商品查询
  */
 
 import React, { Component } from 'react';
@@ -216,9 +214,9 @@ export default class Shopsearch extends Component {
                             })
 
                         }else{}
-                    }),(err)=>{
+                    },(err)=>{
                         alert("网络请求失败");
-                    }
+                    })
                 })
             })
         })

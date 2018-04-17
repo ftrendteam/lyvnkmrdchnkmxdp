@@ -1,7 +1,5 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
+ * 商品配送
  */
 
 import React, { Component } from 'react';
@@ -10,28 +8,28 @@ import {
     StyleSheet,
     Text,
     View,
+    Image,
     TextInput,
     TouchableOpacity,
-    Image
 } from 'react-native';
-import Index from "./Index";
-import Home from "./Home";
-import Search from "./Search";
-import ProductCG_list from "./ProductCG_list";
-import ProductXP_list from "./ProductXP_list";
-import NetUtils from "../utils/NetUtils";
+import Index from "../app/Index";
+import Search from "../app/Search";
+import JiGou from "./JiGou";
+import YHDan from "./YHDan";
+import CKu from "./CKu";
 import Storage from '../utils/Storage';
 import ModalDropdown from 'native';
-export default class ProductCG extends Component {
+
+export default class PSDan extends Component {
     constructor(props){
         super(props);
         this.state = {
-            show:false,
-            Number:"",
-            sCode1:"",
-            shopname1:"",
-            active:"",
-        };
+            invoice:"",
+            JiGou:'',
+            YHDan:'',
+            Disting:'',
+            CKu:"001"
+        }
     }
 
     componentDidMount(){
@@ -40,14 +38,12 @@ export default class ProductCG extends Component {
                 invoice:tags
             })
         })
-
         Storage.get('Disting').then((tags)=>{
             this.setState({
                 Disting:tags
             })
         })
     }
-
     Return(){
         var nextRoute={
             name:"Index",
@@ -55,102 +51,106 @@ export default class ProductCG extends Component {
         };
         this.props.navigator.push(nextRoute)
     }
-
-    onclick(){
+//机构
+    JiGouOnclick(){
         var nextRoute={
-            name:"ProductCG_list",
-            component:ProductCG_list,
+            name:"JiGou",
+            component:JiGou,
             params: {
-                reloadView:(sCode)=>this._reloadView(sCode)
+                reloadShopname:(JiGou)=>this._reloadShopname(JiGou)
             }
         };
         this.props.navigator.push(nextRoute)
     }
 
-    _reloadView(sCode) {
-        sCode = String(sCode);
+    _reloadShopname(JiGou) {
+        JiGou = String(JiGou);
         this.setState({
-            sCode1:sCode,
+            JiGou:JiGou,
         });
     }
-
-    Monclick(){
+//要货单
+    YHOnclick(){
         var nextRoute={
-            name:"ProductXP_list",
-            component:ProductXP_list,
+            name:"YHDan",
+            component:YHDan,
             params: {
-                reloadShopname:(shopname)=>this._reloadShopname(shopname)
+                YHDan:(YHDan)=>this._YHDan(YHDan),
+                JiGou: this.state.JiGou,
             }
         };
         this.props.navigator.push(nextRoute)
     }
 
-    _reloadShopname(shopname) {
-        shopname = String(shopname);
+    _YHDan(YHDan) {
+        YHDan = String(YHDan);
         this.setState({
-            shopname1:shopname,
+            YHDan:YHDan,
+        });
+    }
+//仓库
+    CKOclick(){
+        if(this.state.JiGou==''){
+            alert("请先选择机构号")
+        }else{
+            var nextRoute={
+                name:"CKu",
+                component:CKu,
+                params: {
+                    CKu:(CKu)=>this._CKu(CKu),
+                    JiGou: this.state.JiGou,
+                }
+            };
+            this.props.navigator.push(nextRoute)
+        }
+    }
+
+    _CKu(CKu) {
+        CKu = String(CKu);
+        this.setState({
+            CKu:CKu,
         });
     }
 
     Button(){
-        if(this.state.Disting=="0") {
-            var date = new Date();
-            var data=JSON.stringify(date.getTime());
-            var str=this.state.sCode1;
-            var str1=this.state.shopname1;
-            if(this.state.sCode1==""){
-                alert("请选择供应商")
-            }else if(this.state.shopname1==""){
-                alert("请选择机构信息")
+        if(this.state.Disting=="0"){
+            if(this.state.JiGou==''){
+                alert("机构号不能为空")
+            }else if(this.state.CKu==''){
+                alert("仓库不能为空")
             }else{
-                Storage.delete('YuanDan');
-                Storage.delete('Screen');
                 var nextRoute={
                     name:"Index",
                     component:Index,
                 };
                 this.props.navigator.push(nextRoute);
-                Storage.save('Name','协配采购单');
-                Storage.save('FormType','XPCGYW');
-                Storage.save('valueOf','App_Client_ProXPCG');
-                Storage.save('history','App_Client_ProXPCGQ');
-                Storage.save('historyClass','App_Client_ProXPCGDetailQ');
-                Storage.save('ProYH','ProXPCG');
-                Storage.save('Date',data);
-                Storage.save("scode",str);
-                Storage.save('shildshop',str1);
-                Storage.save('Document', "协配采购");
             }
         }else if(this.state.Disting=="1"){
-            var date = new Date();
-            var data=JSON.stringify(date.getTime());
-            var str=this.state.sCode1;
-            var str1=this.state.shopname1;
-            if(this.state.sCode1==""){
-                alert("请选择供应商")
-            }else if(this.state.shopname1==""){
-                alert("请选择机构信息")
+            if(this.state.JiGou==''){
+                alert("机构号不能为空")
+            }else if(this.state.CKu==''){
+                alert("仓库不能为空")
             }else{
-                Storage.delete('YuanDan');
-                Storage.delete('Screen');
                 var nextRoute={
                     name:"Search",
                     component:Search,
                 };
                 this.props.navigator.push(nextRoute);
-                Storage.save('Name','协配采购单');
-                Storage.save('FormType','XPCGYW');
-                Storage.save('valueOf','App_Client_ProXPCG');
-                Storage.save('history','App_Client_ProXPCGQ');
-                Storage.save('historyClass','App_Client_ProXPCGDetailQ');
-                Storage.save('ProYH','ProXPCG');
-                Storage.save('Date',data);
-                Storage.save("scode",str);
-                Storage.save('shildshop',str1);
-                Storage.save('Document', "协配采购");
             }
         }
-
+        Storage.delete('OrgFormno');
+        Storage.delete('scode');
+        Storage.delete('shildshop');
+        Storage.delete('StateMent');
+        Storage.delete('BQNumber');
+        Storage.delete('YuanDan');
+        Storage.delete('Screen');
+        Storage.delete('YdCountm');
+        Storage.delete('Modify');
+        Storage.save('Name','商品配送');
+        Storage.save('valueOf','App_Client_ProPS');
+        Storage.save('history','App_Client_ProPSQ');
+        Storage.save('historyClass','App_Client_ProPSDetailQ');
     }
 
     render() {
@@ -167,14 +167,56 @@ export default class ProductCG extends Component {
                 </View>
                 <View style={styles.ContList}>
                     <View style={styles.listleft}>
-                        <Text style={styles.listLeftText}>供应商:</Text>
+                        <Text style={styles.listLeftText}>机构:</Text>
                     </View>
-                    <TouchableOpacity style={styles.listcont} onPress={this.onclick.bind(this)}>
+                    <TouchableOpacity style={styles.listcont} onPress={this.JiGouOnclick.bind(this)}>
                         <TextInput
                             style={styles.TextInput1}
                             autofocus={true}
                             editable={false}
-                            defaultValue ={this.state.sCode1}
+                            defaultValue ={this.state.JiGou}
+                            numberoflines={1}
+                            placeholder="请选择机构"
+                            textalign="center"
+                            underlineColorAndroid='transparent'
+                            placeholderTextColor="#cccccc"
+                        />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={this.JiGouOnclick.bind(this)}>
+                        <Image source={require("../images/2_03.png")}></Image>
+                    </TouchableOpacity>
+                </View>
+                <View style={styles.ContList}>
+                    <View style={styles.listleft}>
+                        <Text style={styles.listLeftText}>要货单:</Text>
+                    </View>
+                    <TouchableOpacity style={styles.listcont} onPress={this.YHOnclick.bind(this)}>
+                        <TextInput
+                            style={styles.TextInput1}
+                            autofocus={true}
+                            editable={false}
+                            defaultValue ={this.state.YHDan}
+                            numberoflines={1}
+                            placeholder="请选择要货单"
+                            textalign="center"
+                            underlineColorAndroid='transparent'
+                            placeholderTextColor="#cccccc"
+                        />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={this.YHOnclick.bind(this)}>
+                        <Image source={require("../images/2_03.png")}></Image>
+                    </TouchableOpacity>
+                </View>
+                <View style={styles.ContList}>
+                    <View style={styles.listleft}>
+                        <Text style={styles.listLeftText}>仓库:</Text>
+                    </View>
+                    <TouchableOpacity style={styles.listcont} onPress={this.CKOclick.bind(this)}>
+                        <TextInput
+                            style={styles.TextInput1}
+                            autofocus={true}
+                            editable={false}
+                            value ={this.state.CKu}
                             numberoflines={1}
                             placeholder="请选择供应商"
                             textalign="center"
@@ -182,29 +224,8 @@ export default class ProductCG extends Component {
                             placeholderTextColor="#cccccc"
                         />
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.listimages} onPress={this.onclick.bind(this)}>
-                        <Image source={require("../images/2_03.png")} style={styles.Image}></Image>
-                    </TouchableOpacity>
-                </View>
-                <View style={styles.ContList}>
-                    <View style={styles.listleft}>
-                        <Text style={styles.listLeftText}>机构:</Text>
-                    </View>
-                    <TouchableOpacity style={styles.listcont} onPress={this.Monclick.bind(this)}>
-                        <TextInput
-                            style={styles.TextInput1}
-                            autofocus={true}
-                            editable={false}
-                            defaultValue ={this.state.shopname1}
-                            numberoflines={1}
-                            placeholder="请选择机构信息"
-                            textalign="center"
-                            underlineColorAndroid='transparent'
-                            placeholderTextColor="#cccccc"
-                        />
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.listimages} onPress={this.Monclick.bind(this)}>
-                        <Image source={require("../images/2_03.png")} style={styles.Image}></Image>
+                    <TouchableOpacity onPress={this.CKOclick.bind(this)}>
+                        <Image source={require("../images/2_03.png")}></Image>
                     </TouchableOpacity>
                 </View>
                 <TouchableOpacity style={styles.button} onPress={this.Button.bind(this)}>
@@ -239,10 +260,10 @@ const styles = StyleSheet.create({
         marginTop:3,
     },
     ContList:{
-        height:55,
+        height:58,
         paddingLeft:25,
         paddingRight:15,
-        paddingTop:15,
+        paddingTop:12,
         backgroundColor:"#ffffff",
         flexDirection:"row",
         borderBottomWidth:1,
@@ -250,7 +271,7 @@ const styles = StyleSheet.create({
     },
     listleft:{
         width:70,
-        marginTop:4,
+        marginTop:6,
     },
     listLeftText:{
         color:"#333333",
@@ -269,7 +290,8 @@ const styles = StyleSheet.create({
     TextInput1:{
         paddingLeft:5,
         paddingRight:5,
-        marginBottom:2,
+        paddingTop:5,
+        marginBottom:5,
         fontSize:16,
         color:"#333333"
     },
@@ -288,6 +310,3 @@ const styles = StyleSheet.create({
         textAlign:"center"
     }
 });
-
-
-

@@ -1,7 +1,5 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow1
+ * 历史单据
  */
 
 import React, { Component } from 'react';
@@ -115,7 +113,6 @@ export default class HistoricalDocument extends Component {
       });
   }
   _get(){
-
       Storage.get('StateMent').then((tags) => {
           if(tags==0){
               Storage.get('name').then((tags) => {
@@ -145,6 +142,12 @@ export default class HistoricalDocument extends Component {
               Userpwd: tags
           });
      });
+
+      Storage.get('ClientCode').then((tags)=>{
+          this.setState({
+              ClientCode:tags
+          })
+      })
   }
   _dpSearch(){
       //url获取

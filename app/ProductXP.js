@@ -1,7 +1,5 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
+ * 协配采购第二分页
  */
 
 import React, { Component } from 'react';
@@ -114,6 +112,8 @@ export default class ProductCG extends Component {
                 Storage.delete('shildshop');
                 Storage.delete('StateMent');
                 Storage.delete('BQNumber');
+                Storage.delete('YdCountm');
+                Storage.delete('Modify');
                 Storage.save('YdCountm', '3');
                 Storage.save('Name','协配采购');
                 Storage.save('FormType','XPCGYW');
@@ -148,6 +148,8 @@ export default class ProductCG extends Component {
                 Storage.delete('shildshop');
                 Storage.delete('StateMent');
                 Storage.delete('BQNumber');
+                Storage.delete('YdCountm');
+                Storage.delete('Modify');
                 Storage.save('YdCountm', '3');
                 Storage.save('Name','协配采购');
                 Storage.save('FormType','XPCGYW');

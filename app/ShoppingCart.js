@@ -1,7 +1,5 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
+ * 提交清单
  */
 
 import React, { Component } from 'react';
@@ -81,7 +79,7 @@ export default class ShoppingCart extends Component {
             LinkUrl:"",
             Document:"",
             SUbmit:"",
-            BeiZhu:"暂无备注",
+            BeiZhu:"",
             dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
             ds:new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
         };
@@ -154,6 +152,7 @@ export default class ShoppingCart extends Component {
             this.ds=[];
             this.DataShop=[];
             for(let i =0;i<rows.length;i++){
+                var serial=i+1;
                 var row = rows.item(i);
                 var prodname = row.prodname;
                 var number = row.ShopNumber;
@@ -168,13 +167,19 @@ export default class ShoppingCart extends Component {
                 shopnumber += Number(row.ShopNumber);
                 this.ds.push(row);
                 var DataShop = {
+                    'serial':serial,
                     'prodname':prodname,
                     'barCode':barCode,
                     'prodcode': prodcode,
+                    'shopnumber':number,
                     'countm': countm,
                     'ProPrice': ProPrice,
                     'promemo': promemo,
                     'ydcountm': ydcountm,
+                    'ShopAmount':row.ShopAmount,
+                    'SuppCode':row.SuppCode,
+                    'Pid':row.pid,
+                    'DepCode':row.DepCode,
                 }
                 this.DataShop.push(DataShop);
             }
@@ -185,8 +190,8 @@ export default class ShoppingCart extends Component {
                 this.setState({
                     number1:number,
                     ShopNumber:shopnumber,//数量
-                    ShopAmount:shopAmount,//总金额
-                    ds:this.state.ds.cloneWithRows(this.ds)
+                    ShopAmount:NumberUtils.numberFormat2(shopAmount),//总金额
+                    ds:this.state.ds.cloneWithRows(this.DataShop)
                 })
                 this.modal();
             }
@@ -306,6 +311,7 @@ export default class ShoppingCart extends Component {
                                             SuppCode:rows.item(0).SuppCode,
                                             ydcountm:countm,
                                             BarCode: rows.item(0).BarCode,
+                                            ShoppData:"0",
                                         }
                                     })
                                 }else{
@@ -323,7 +329,6 @@ export default class ShoppingCart extends Component {
                     if(rows.length==0){
                         alert("该商品不存在")
                     }else{
-
                         Storage.get('FormType').then((tags)=>{
                             this.setState({
                                 FormType:tags
@@ -371,6 +376,7 @@ export default class ShoppingCart extends Component {
                                             SuppCode:rows.item(0).SuppCode,
                                             ydcountm:countm,
                                             BarCode: rows.item(0).BarCode,
+                                            ShoppData:"0",
                                         }
                                     })
                                 }else{
@@ -390,20 +396,23 @@ export default class ShoppingCart extends Component {
     renderRow(rowData, sectionID, rowID){
         return (
             <TouchableOpacity style={styles.ShopList} onPress={()=>this.OrderDetails(rowData)}>
-                <View style={styles.RowList}>
+                <View style={[styles.RowList,{paddingLeft:30,}]}>
+                    <View style={styles.serial}>
+                        <Text style={styles.SerialText}>{rowData.serial}.</Text>
+                    </View>
                     {
-                        (rowData.ProdCode=="")?
-                            <Text style={[styles.Name,styles.Name1]}>{rowData.ProdCode}</Text>
+                        (rowData.prodcode=="")?
+                            <Text style={[styles.Name,styles.Name1]}>{rowData.prodcode}</Text>
                             :
-                            <Text style={[styles.Name,styles.Name1]}>{rowData.BarCode}</Text>
+                            <Text style={[styles.Name,styles.Name1]}>{rowData.barCode}</Text>
                     }
-                    <Text style={[styles.Name,styles.Name1]}>{rowData.ProdName}</Text>
+                    <Text style={[styles.Name,styles.Name1]}>{rowData.prodname}</Text>
                 </View>
                 <View style={styles.RowList1}>
-                    <Text style={[styles.Number,styles.Name1]}>{rowData.ShopNumber}(件)</Text>
+                    <Text style={[styles.Number,styles.Name1]}>{rowData.shopnumber}</Text>
                 </View>
                 <View style={styles.RowList1}>
-                    <Text style={[styles.Price,styles.Name1]}>{rowData.ShopPrice}</Text>
+                    <Text style={[styles.Price,styles.Name1]}>{rowData.ProPrice}</Text>
                 </View>
                 {
                     (this.state.Document=="标签采集")?
@@ -443,7 +452,7 @@ export default class ShoppingCart extends Component {
             this.setState({
                 number1:number,
                 ShopNumber:shopnumber,//数量
-                ShopAmount:shopAmount,//总金额
+                ShopAmount:NumberUtils.numberFormat2(shopAmount),//总金额
                 ds:this.state.ds.cloneWithRows(this.ds)
             })
         });
@@ -512,10 +521,11 @@ export default class ShoppingCart extends Component {
                 SuppCode:rowData.SuppCode,
                 ShopCode:this.state.ShopCode,
                 ChildShopCode:this.state.ChildShopCode,
-                ProdCode:rowData.ProdCode,
+                ProdCode:rowData.prodcode,
                 OrgFormno:this.state.OrgFormno,
                 FormType:this.state.FormType,
             };
+
             FetchUtils.post(this.state.LinkUrl,JSON.stringify(params)).then((data)=>{
                 var countm=JSON.stringify(data.countm);
                 var ShopPrice=JSON.stringify(data.ShopPrice);
@@ -523,11 +533,11 @@ export default class ShoppingCart extends Component {
                     this.props.navigator.push({
                         component:OrderDetails,
                         params:{
-                            ProdName:rowData.ProdName,
-                            ShopPrice:rowData.ShopPrice,
-                            countm:rowData.ShopNumber,
+                            ProdName:rowData.prodname,
+                            ShopPrice:rowData.ProPrice,
+                            countm:rowData.shopnumber,
                             Pid:rowData.pid,
-                            ProdCode:rowData.ProdCode,
+                            ProdCode:rowData.prodcode,
                             DepCode:rowData.DepCode,
                             ydcountm:countm,
                             ShoppData:"0",
@@ -727,6 +737,7 @@ export default class ShoppingCart extends Component {
                         },
                         DetailInfo2: this.DataShop,
                     };
+                    // console.log('qqqq=',JSON.stringify(params))
                     FetchUtils.post(this.state.linkurl, JSON.stringify(params)).then((data) => {
                         if (data.retcode == 1) {
                             this.ScreenBod();
@@ -892,7 +903,7 @@ export default class ShoppingCart extends Component {
             ShopAmount:price,
             shopcar:"",
             active:data,
-            BeiZhu:"暂无备注",
+            BeiZhu:"",
         })
         Storage.save('Date',this.state.active);
     }
@@ -906,7 +917,7 @@ export default class ShoppingCart extends Component {
             ShopNumber:price,
             ShopAmount:price,
             shopcar:"",
-            BeiZhu:"暂无备注",
+            BeiZhu:"",
         })
         this.DeleteData();
     }
@@ -1002,8 +1013,6 @@ export default class ShoppingCart extends Component {
                                 style={styles.DocumentsNote1}
                                 autofocus={true}
                                 editable={false}
-                                placeholder="暂无备注"
-                                placeholderTextColor="#333333"
                                 defaultValue ={this.state.BeiZhu}
                                 textalign="center"
                                 underlineColorAndroid='transparent'
@@ -1154,6 +1163,7 @@ export default class ShoppingCart extends Component {
                                 dataSource={this.state.dataSource}
                                 showsVerticalScrollIndicator={true}
                                 renderRow={this._Screen.bind(this)}
+                                enableEmptySections={true}
                             />
                         </View>
                         <View style={styles.Determine}>
@@ -1206,9 +1216,9 @@ export default class ShoppingCart extends Component {
                     onShow={() => {}}
                     onRequestClose={() => {}}>
                     <View style={[styles.modalStyle,{justifyContent: 'center',alignItems: 'center',}]}>
-                        <View style={[styles.ModalView,{borderRadius:5,paddingBottom:20,width:300,backgroundColor:"#ffffff"}]}>
-                            <View style={styles.ModalStyleTitle}>
-                                <Text style={styles.ModalTitleText}>是否清空全部商品？</Text>
+                        <View style={[styles.ModalView,{borderRadius:5,paddingBottom:50,width:300,backgroundColor:"#ffffff"}]}>
+                            <View style={styles.DanJu}>
+                                <View style={styles.danju}><Text style={styles.DanText}>是否清空全部商品？</Text></View>
                             </View>
                             <View style={styles.Row}>
                                 <TouchableOpacity onPress={this.DataButton.bind(this)} style={styles.DataButton}>
@@ -1240,34 +1250,35 @@ export default class ShoppingCart extends Component {
                 </Modal>
             </View>
         );
-    }l
+    }
 }
 
 const styles = StyleSheet.create({
-    ModalStyleTitle:{
-        paddingTop:20,
-        paddingBottom:20,
-        borderBottomWidth:1,
-        borderBottomColor:"#f5f5f5",
-    },
     ModalTitleText:{
         fontSize:16,
-        color:"#333333",
+        color:"#ffffff",
         textAlign:"center",
     },
     Row:{
         flexDirection:"row",
+        marginTop:50,
+        paddingLeft:20,
+        paddingRight:20,
     },
     DataButton:{
         flex:1,
-        marginRight:20,
-        paddingTop:25,
-        paddingBottom:15,
+        marginRight:35,
+        paddingTop:8,
+        paddingBottom:8,
+        borderRadius:3,
+        backgroundColor:"#ff4e4e",
     },
     CloseButton:{
         flex:1,
-        paddingTop:25,
-        paddingBottom:15,
+        paddingTop:8,
+        paddingBottom:8,
+        borderRadius:3,
+        backgroundColor:"#ff4e4e",
     },
     container:{
         flex:1,
@@ -1304,6 +1315,16 @@ const styles = StyleSheet.create({
     RowList:{
         flex:2,
     },
+    serial:{
+        position:"absolute",
+        top:5,
+        left:4,
+    },
+    SerialText:{
+        borderRadius: 50,
+        color: "#000000",
+        fontSize:14,
+    },
     RowList1:{
         flex:1,
     },
@@ -1331,8 +1352,7 @@ const styles = StyleSheet.create({
         color:"#333333",
     },
     ShopList:{
-        paddingLeft:25,
-        paddingRight:25,
+        paddingRight:10,
         paddingTop:18,
         paddingBottom:18,
         backgroundColor:"#ffffff",
@@ -1362,8 +1382,7 @@ const styles = StyleSheet.create({
     },
     Client:{
         flexDirection:"row",
-        height:48,
-        paddingTop:15,
+        paddingBottom:5,
         overflow:"hidden",
     },
     Goods:{
@@ -1374,11 +1393,10 @@ const styles = StyleSheet.create({
     },
     Combined:{
         flexDirection:"row",
-        height:48,
-        paddingTop:15
     },
     Combinedleft:{
-      flex:1,
+        flex:1,
+        paddingTop:5,
     },
     Combinedright:{
         flex:1,
@@ -1412,19 +1430,19 @@ const styles = StyleSheet.create({
         color:"#666666"
     },
     DocumentsNote1:{
+        marginTop:3,
         flex:4,
-        color:"#666666"
+        color:"#777777"
     },
     Submit:{
         backgroundColor:"#ff4e4e",
-        paddingTop:15,
-        paddingBottom:15,
+        paddingTop:10,
+        paddingBottom:10,
         flex:2,
     },
     ModalStyle: {
         flex:1,
         backgroundColor:"#F2F2F2",
-
     },
     DanJu:{
         paddingTop:13,
@@ -1472,7 +1490,7 @@ const styles = StyleSheet.create({
     viewStyle:{
         backgroundColor:"#fffce6",
         paddingLeft:25,
-        height:150,
+        height:120,
     },
     leftView:{
         flexDirection:'row',

@@ -1,7 +1,5 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow1
+ * 历史单据根据时间查询搜索历史单据商品
  */
 
 import React, { Component } from 'react';

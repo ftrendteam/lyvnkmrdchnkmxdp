@@ -1,7 +1,5 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
+ * 第二用户编码登录页
  */
 
 import React, { Component } from 'react';
@@ -201,7 +199,7 @@ export default class admin extends Component {
             NewEdition:!isshow,
         });
     }
-    //版本自动更新弹框over
+    //版本自动更新弹框
     //登录
     pressPush(){
         //等待对话框 显示隐藏
@@ -220,6 +218,7 @@ export default class admin extends Component {
             <ActivityIndicator key="1"></ActivityIndicator>
         }
         NativeModules.AndroidDeviceInfo.getIMEI((IMEI)=>{
+            console.log(IMEI)
             Storage.get('IMEI').then((tags) => {
                 if(IMEI==tags){
                     var code = ""+this.state.sCode1.replace(/(^\s+)|(\s+$)/g, "");//获取到之后前面加""+
@@ -229,7 +228,7 @@ export default class admin extends Component {
                     str2 = str1[1];
                     this._setModalVisible();
                     dbAdapter.isLogin(Usercode, this.state.UserPwd, str2).then((isLogin)=>{
-                        if(isLogin){
+                        if(isLogin==true){
                             var strin = this.state.sCode1;
                             strjj = ""+strin;
                             code = strjj.substring(strjj.indexOf('_') + 1,strjj.length).replace(/(^\s+)|(\s+$)/g, "");
@@ -252,6 +251,7 @@ export default class admin extends Component {
                         }
                     },(err)=>{
                         this._setModalVisible();
+                        this._ErrorModalVisible();
                     });
                 }else{
                     alert("当前商户名不同，该机器无法运行")
@@ -351,6 +351,7 @@ render() {
                                         })
                                     }}
                                     onSubmitEditing={this.onSubmitEditing.bind(this)}
+                                    onEndEditing = {this.onSubmitEditing.bind(this)}
                                 />
                                 :
                                 <TextInput
@@ -370,6 +371,7 @@ render() {
                                         })
                                     }}
                                     onSubmitEditing={this.onSubmitEditing.bind(this)}
+                                    onEndEditing = {this.onSubmitEditing.bind(this)}
                                 />
                         }
                         <Image source={require("../images/1_07.png")} style={styles.TextImage1}></Image>

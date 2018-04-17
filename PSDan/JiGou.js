@@ -13,118 +13,126 @@ import {
     Image,
     TextInput,
     ListView,
+    FlatList,
     TouchableOpacity,
-    InteractionManager
+    InteractionManager,
 } from 'react-native';
-import Index from "./Index";
 import DBAdapter from "../adapter/DBAdapter";
 import Storage from '../utils/Storage';
 
 let dbAdapter = new DBAdapter();
 let db;
-export default class StockEnquiries extends Component {
+
+export default class JiGou extends Component {
     constructor(props){
         super(props);
         this.state = {
             search:"",
-            dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => true,}),
+            show:false,
+            dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => true}),
         };
         this.dataRows = [];
     }
-
     componentDidMount(){
         InteractionManager.runAfterInteractions(() => {
-            dbAdapter.selectAllData("tsuppset").then((rows)=>{
+            Storage.get('invoice').then((tags)=>{
+                this.setState({
+                    invoice:tags
+                })
+            })
+
+
+            this.fetch();
+        });
+    }
+
+    fetch(){
+        Storage.get('code').then((tags)=>{
+            dbAdapter.selectXPShopCode(tags).then((rows)=>{
                 for(let i =0;i<rows.length;i++){
                     var row = rows.item(i);
                     this.dataRows.push(row);
                 }
-
                 this.setState({
                     dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
                 })
             })
-        });
+        })
     }
 
     Return(){
-        var nextRoute={
-            name:"Index",
-            component:Index
-        };
-        this.props.navigator.push(nextRoute)
+        this.props.navigator.pop();
     }
 
-    SearchButton(){
+    Search(value){
         for (let i = 0; i < this.dataRows.length; i++) {
-            // let temp = this.dataRows[0];
+            let temp = this.dataRows[0];
             let dataRow = this.dataRows[i];
-            if (((dataRow.sCode + "").indexOf(this.state.search) >= 0)) {
-                // this.dataRows[0] = dataRow;
-                // this.dataRows[i] = temp;
-                var str = this.dataRows.splice(i,1);
-                this.dataRows.unshift(str[0]);
+            if (((dataRow.shopcode + "").indexOf(value) >= 0)) {
+                this.dataRows[0] = dataRow;
+                this.dataRows[i] = temp;
                 break;
             }
         }
         this.setState({
             dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
         })
+
     }
 
+    pressPop(rowData){
+        var Data=rowData.shopcode;
+        if(this.props.reloadShopname){
+            this.props.reloadShopname(Data)
+        }
+        this.props.navigator.pop();
+    }
 
     _renderRow(rowData, sectionID, rowID){
         return(
-            <TouchableOpacity style={styles.DataList}>
+            <TouchableOpacity style={styles.header} onPress={()=>this.pressPop(rowData)}>
                 <View style={styles.coding}>
-                    <Text style={styles.codingText}>{rowData.sCode}</Text>
+                    <Text style={styles.codingText}>{rowData.shopcode}</Text>
                 </View>
                 <View style={styles.name}>
-                    <Text style={styles.codingText}>{rowData.sname}</Text>
+                    <Text style={styles.codingText}>{rowData.shopname}</Text>
                 </View>
             </TouchableOpacity>
         )
 
     }
-
     render() {
         return (
             <View style={styles.container}>
-                <View style={styles.header}>
-                    <View style={styles.cont}>
-                        <TouchableOpacity onPress={this.Return.bind(this)}>
-                            <Image source={require("../images/2_01.png")} style={styles.HeaderImage}></Image>
-                        </TouchableOpacity>
-                        <Text style={styles.HeaderList}>库存查询</Text>
+                <View style={styles.Title}>
+                    <TextInput
+                        autofocus="{true}"
+                        returnKeyType="search"
+                        placeholder="搜索相关单号"
+                        placeholderColor="#323232"
+                        underlineColorAndroid='transparent'
+                        style={styles.Search}
+                        onChangeText={(value)=>{
+                            this.setState({
+                                search:value
+                            })
+                            this.Search(value)
+                        }}
+                    />
+                    <Image source={require("../images/2.png")} style={styles.SearchImage} />
+                    <View style={styles.Right}>
+                        <TouchableOpacity style={styles.Text1} onPress={this.Return.bind(this)}><Text style={styles.Text}>取消</Text></TouchableOpacity>
                     </View>
                 </View>
-                <View style={styles.ContList}>
-                    <View style={styles.Title}>
-                        <TextInput
-                            autofocus="{true}"
-                            returnKeyType="search"
-                            placeholder="搜索相关单号"
-                            placeholderColor="#323232"
-                            underlineColorAndroid='transparent'
-                            style={styles.Search}
-                            onChangeText={(value)=>{
-                                this.setState({
-                                    search:value
-                                })
-                            }}
-                        />
-                        <Image source={require("../images/2.png")} style={styles.SearchImage} />
-                        <View style={styles.Right}>
-                            <TouchableOpacity style={styles.Text1}><Text style={styles.Text} onPress={this.SearchButton.bind(this)}>搜索</Text></TouchableOpacity>
-                        </View>
-                    </View>
+                <View>
                     <View style={styles.head}>
                         <View style={styles.coding}>
-                            <Text style={styles.codingText}>编码</Text>
+                            <Text style={styles.codingText}>机构号</Text>
                         </View>
                         <View style={styles.name}>
                             <Text style={styles.codingText}>名称</Text>
                         </View>
+
                     </View>
                     <ListView
                         style={styles.scrollview}
@@ -141,30 +149,12 @@ export default class StockEnquiries extends Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#ffffff',
-    },
-    header:{
-        height:60,
-        backgroundColor:"#ff4e4e",
-        paddingTop:10,
-    },
-    cont:{
-        flexDirection:"row",
-        paddingLeft:16,
-        paddingRight:16,
-    },
-    HeaderList:{
-        flex:6,
-        textAlign:"center",
-        paddingRight:50,
-        color:"#ffffff",
-        fontSize:22,
-        marginTop:3,
+        backgroundColor: '#f2f2f2',
     },
     Title:{
-        backgroundColor:"#e7e7e7",
+        backgroundColor:"#ff4e4e",
         paddingLeft:16,
-        paddingRight:5,
+        paddingRight:16,
         paddingTop:15,
         paddingBottom:15,
         flexDirection:"row",
@@ -186,14 +176,14 @@ const styles = StyleSheet.create({
         flex:1,
     },
     Right:{
-        width:70,
+        width:60,
         flexDirection:"row",
         paddingTop:3,
-        paddingLeft:8
+        paddingLeft:6
     },
     Text:{
         fontSize:18,
-        color:"#ff4e4e",
+        color:"#ffffff",
         paddingTop:5,
         paddingLeft:10,
     },
@@ -203,11 +193,10 @@ const styles = StyleSheet.create({
         paddingBottom:13,
         paddingLeft:25,
         paddingRight:25,
-        backgroundColor:"#f2f2f2"
     },
     coding:{
         flex:1,
-        paddingLeft:12,
+        paddingLeft:12
     },
     codingText:{
         color:"#333333",
@@ -218,15 +207,7 @@ const styles = StyleSheet.create({
     name:{
         flex:1,
     },
-    coding:{
-        flex:1,
-        paddingLeft:12
-    },
-    codingText1:{
-        color:"#333333",
-        fontSize:16,
-    },
-    DataList:{
+    header:{
         flexDirection:"row",
         paddingLeft:25,
         paddingRight:25,
@@ -236,14 +217,14 @@ const styles = StyleSheet.create({
         borderBottomWidth:1,
         borderBottomColor:"#f2f2f2",
     },
+    coding:{
+        flex:1,
+        paddingLeft:12
+    },
     name:{
         flex:1,
     },
-    nameText1:{
-        color:"#333333",
-        fontSize:16,
-    },
     scrollview:{
-        marginBottom:180,
+        marginBottom:120,
     }
 });

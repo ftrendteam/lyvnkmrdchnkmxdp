@@ -1,7 +1,5 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow1
+ * 历史单据 每比单据详情列表
  */
 import React, { Component } from 'react';
 import {
@@ -10,6 +8,7 @@ import {
   Text,
   View,
   Image,
+  ScrollView,
   ListView,
   ToastAndroid,
   TouchableOpacity,
@@ -96,7 +95,6 @@ export default class GoodsDetails extends Component {
                  if(data.retcode == 1){
                     var numbercode = data.DetailInfo1.storecode;
                     var numbershop = data.DetailInfo1.childshop;
-
                     var DetailInfo2 = data.DetailInfo2;
                     var shopnumber = 0;
                     for(let i =0;i<DetailInfo2.length;i++){
@@ -126,11 +124,22 @@ export default class GoodsDetails extends Component {
 
    _renderRow(rowData, sectionID, rowID){
         return (
-            <View style={styles.ShopList1}>
-                <Text style={styles.Name1}>{rowData.prodname}</Text>
-                <Text style={styles.Name1}>{rowData.prototal}</Text>
-                <Text style={styles.Name1}>{rowData.countm}</Text>
-            </View>
+            <ScrollView style={styles.shoprow} horizontal={true}>
+                <View style={styles.Direction}>
+                    <View style={[styles.ShopList1,{width:70,}]}>
+                        <Text style={styles.Name1}>{rowData.prodname}</Text>
+                    </View>
+                    <View style={[styles.ShopList1,{width:70,}]}>
+                        <Text style={styles.Name1}>{rowData.prototal}</Text>
+                    </View>
+                    <View style={[styles.ShopList1,{width:70,}]}>
+                        <Text style={styles.Name1}>{rowData.countm}</Text>
+                    </View>
+                    <View style={styles.ShopList1}>
+                        <Text style={styles.Name1}>{rowData.promemo}</Text>
+                    </View>
+                </View>
+            </ScrollView>
         );
    }
   render() {
@@ -188,9 +197,9 @@ export default class GoodsDetails extends Component {
         </View>
         <View style={styles.ShopCont}>
             <View style={styles.ShopList}>
-                <Text style={styles.Name}>名称</Text>
-                <Text style={styles.Name}>金额</Text>
-                <Text style={styles.Name}>数量</Text>
+                <Text style={[styles.Name,{width:70,}]}>名称</Text>
+                <Text style={[styles.Name,{width:70,}]}>金额</Text>
+                <Text style={[styles.Name,{width:705,}]}>数量</Text>
             </View>
             <ListView
             style={styles.listViewStyle}
@@ -262,29 +271,34 @@ const styles = StyleSheet.create({
        fontSize:16,
        textAlign:"center"
    },
+    shoprow:{
+        flex:1,
+    },
+    Direction:{
+        paddingLeft:25,
+        paddingTop:20,
+        paddingBottom:20,
+        height:61,
+        flexDirection:"row",
+        backgroundColor:"#ffffff",
+        borderBottomWidth:1,
+        borderBottomColor:"#f2f2f2",
+    },
    ShopList1:{
-    paddingLeft:25,
-    paddingRight:25,
-    paddingTop:20,
-    paddingBottom:20,
-    height:61,
-    backgroundColor:"#ffffff",
-    flexDirection:"row",
-    borderBottomWidth:1,
-    borderBottomColor:"#f2f2f2",
-    overflow:"hidden"
+        marginRight:25,
+        overflow:"hidden",
+        flex:1
    },
    Name1:{
-    flex:1,
-    color:"#333333",
-    fontSize:16,
-    textAlign:"center",
-    overflow:"hidden"
+        flex:1,
+        color:"#333333",
+        fontSize:16,
+        textAlign:"center"
    },
    ContList:{
-   paddingBottom:50,
+        paddingBottom:50,
    },
    listViewStyle:{
-    marginBottom:280,
+        marginBottom:280,
    }
 });

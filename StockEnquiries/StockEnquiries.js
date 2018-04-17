@@ -1,7 +1,5 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
+ * 库存查询
  */
 
 import React, { Component } from 'react';
@@ -90,6 +88,8 @@ export default class StockEnquiries extends Component {
                     dataSource:this.state.dataSource.cloneWithRows(this.dataRows)
                 })
                 this.ModalShow();
+            },(err)=>{
+                alert("网络请求失败");
             })
         })
     }

@@ -18,40 +18,64 @@ import {
     InteractionManager,
 } from 'react-native';
 import DBAdapter from "../adapter/DBAdapter";
-import Storage from '../utils/Storage';
 import NetUtils from "../utils/NetUtils";
+import FetchUtils from "../utils/FetchUtils";
+import Storage from '../utils/Storage';
 
 let dbAdapter = new DBAdapter();
 let db;
 
-export default class PickedDate_list extends Component {
+export default class CKu extends Component {
     constructor(props){
         super(props);
         this.state = {
+            JiGou:this.props.JiGou ? this.props.JiGou : "",
             search:"",
             show:false,
-            dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => true,}),
+            dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => true}),
         };
         this.dataRows = [];
-        this.pickerData=[];
     }
     componentDidMount(){
         InteractionManager.runAfterInteractions(() => {
+            Storage.get('invoice').then((tags)=>{
+                this.setState({
+                    invoice:tags
+                })
+            })
             this.fetch();
         });
     }
 
     fetch(){
-        Storage.get('Usercode').then((tags) => {
-            dbAdapter.selectTUserShopData(tags).then((rows)=>{
-                for(let i =0;i<rows.length;i++){
-                    var row = rows.item(i);
-                    this.dataRows.push(row);
-                }
-                this.setState({
-                    dataSource:this.state.dataSource.cloneWithRows(this.dataRows)
+        Storage.get('LinkUrl').then((LinkUrl) => {
+            Storage.get('ClientCode').then((ClientCode)=>{
+                let params = {
+                    reqCode:"App_PosReq",
+                    reqDetailCode:"App_Client_ShopStoreQ",
+                    ClientCode:ClientCode,
+                    sDateTime:"2017-08-09 12:12" +
+                    ":12",
+                    ShopCode:this.state.JiGou,
+                    Sign:NetUtils.MD5("App_PosReq" + "##" +'App_Client_ShopStoreQ' + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',
+                };
+                console.log(JSON.stringify(params))
+                FetchUtils.post(LinkUrl,JSON.stringify(params)).then((data)=>{
+                    if(data.retcode == 1){
+                        var DetailInfo = data.DetailInfo;
+                        this.dataRows = this.dataRows.concat(DetailInfo);
+                        console.log('aaaa',this.dataRows)
+                        this.setState({
+                            dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
+                        })
+                    }else{
+                        alert(JSON.stringify(data))
+                    }
+                },(err)=>{
+                    alert("网络请求失败");
                 })
             })
+
         })
     }
 
@@ -60,36 +84,37 @@ export default class PickedDate_list extends Component {
     }
 
     Search(value){
-        //if(value>=3){
-            for (let i = 0; i < this.dataRows.length; i++) {
-                let dataRow = this.dataRows[i];
-                if (((dataRow.shopcode + "").indexOf(value) >= 0)) {
-                    var str = this.dataRows.splice(i,1);
-                    this.dataRows.unshift(str[0])
-                    break;
-                }
+        for (let i = 0; i < this.dataRows.length; i++) {
+            let temp = this.dataRows[0];
+            let dataRow = this.dataRows[i];
+            if (((dataRow.storecode + "").indexOf(value) >= 0)) {
+                this.dataRows[0] = dataRow;
+                this.dataRows[i] = temp;
+                break;
             }
-            this.setState({
-                dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
-            })
-        //}
+        }
+        this.setState({
+            dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
+        })
+
     }
 
     pressPop(rowData){
-        if(this.props.reloadView){
-            this.props.reloadView(rowData.shopname+'_'+rowData.shopcode)
+        var Data=rowData.storecode;
+        if(this.props.YHDan){
+            this.props.YHDan(Data)
         }
         this.props.navigator.pop();
     }
 
     _renderRow(rowData, sectionID, rowID){
         return(
-            <TouchableOpacity style={styles.DataList} onPress={()=>this.pressPop(rowData)}>
+            <TouchableOpacity style={styles.header} onPress={()=>this.pressPop(rowData)}>
                 <View style={styles.coding}>
-                    <Text style={styles.codingText}>{rowData.shopcode}</Text>
+                    <Text style={styles.codingText}>{rowData.storecode}</Text>
                 </View>
-                <View style={styles.name}>
-                    <Text style={styles.codingText}>{rowData.shopname}</Text>
+                <View style={styles.coding}>
+                    <Text style={styles.codingText}>{rowData.storename}</Text>
                 </View>
             </TouchableOpacity>
         )
@@ -100,12 +125,12 @@ export default class PickedDate_list extends Component {
             <View style={styles.container}>
                 <View style={styles.Title}>
                     <TextInput
-                        style={styles.Search}
                         autofocus="{true}"
                         returnKeyType="search"
-                        placeholder="搜索机构编码"
-                        placeholderTextColor="#bcbdc1"
+                        placeholder="搜索相关单号"
+                        placeholderColor="#323232"
                         underlineColorAndroid='transparent'
+                        style={styles.Search}
                         onChangeText={(value)=>{
                             this.setState({
                                 search:value
@@ -115,16 +140,16 @@ export default class PickedDate_list extends Component {
                     />
                     <Image source={require("../images/2.png")} style={styles.SearchImage} />
                     <View style={styles.Right}>
-                        <TouchableOpacity style={styles.Text1}><Text style={styles.Text} onPress={this.Return.bind(this)}>取消</Text></TouchableOpacity>
+                        <TouchableOpacity style={styles.Text1} onPress={this.Return.bind(this)}><Text style={styles.Text}>取消</Text></TouchableOpacity>
                     </View>
                 </View>
                 <View>
                     <View style={styles.head}>
                         <View style={styles.coding}>
-                            <Text style={styles.codingText}>编码</Text>
+                            <Text style={styles.codingText}>仓库号</Text>
                         </View>
-                        <View style={styles.name}>
-                            <Text style={styles.codingText}>机构名称</Text>
+                        <View style={styles.coding}>
+                            <Text style={styles.codingText}>仓库名称</Text>
                         </View>
                     </View>
                     <ListView
@@ -174,20 +199,12 @@ const styles = StyleSheet.create({
         paddingTop:3,
         paddingLeft:6
     },
-    HeaderImage1:{
-        flex:1,
-        marginLeft:20,
-    },
-    Text1:{
-        flex:1
-    },
     Text:{
         fontSize:18,
         color:"#ffffff",
         paddingTop:5,
         paddingLeft:10,
     },
-
     head:{
         flexDirection:"row",
         paddingTop:13,
@@ -208,16 +225,15 @@ const styles = StyleSheet.create({
     name:{
         flex:1,
     },
-    DataList:{
+    header:{
         flexDirection:"row",
-        paddingTop:13,
-        paddingBottom:13,
         paddingLeft:25,
         paddingRight:25,
+        paddingTop:13,
+        paddingBottom:13,
         backgroundColor:"#ffffff",
         borderBottomWidth:1,
         borderBottomColor:"#f2f2f2",
-        overflow:"hidden"
     },
     coding:{
         flex:1,
@@ -227,6 +243,6 @@ const styles = StyleSheet.create({
         flex:1,
     },
     scrollview:{
-        marginBottom:140
+        marginBottom:120,
     }
 });

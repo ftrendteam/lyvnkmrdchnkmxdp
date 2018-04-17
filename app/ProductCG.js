@@ -1,7 +1,5 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
+ * 商品采购第二分页
  */
 
 import React, { Component } from 'react';
@@ -94,6 +92,8 @@ export default class ProductCG extends Component {
                 Storage.delete('BQNumber');
                 Storage.delete('YuanDan');
                 Storage.delete('Screen');
+                Storage.delete('YdCountm');
+                Storage.delete('Modify');
                 Storage.save('Name','商品采购');
                 Storage.save('FormType','CGYW');
                 Storage.save('valueOf','App_Client_ProCG');
@@ -124,6 +124,8 @@ export default class ProductCG extends Component {
                 Storage.delete('BQNumber');
                 Storage.delete('YuanDan');
                 Storage.delete('Screen');
+                Storage.delete('YdCountm');
+                Storage.delete('Modify');
                 Storage.save('Name','商品采购');
                 Storage.save('FormType','CGYW');
                 Storage.save('valueOf','App_Client_ProCG');
@@ -234,6 +236,7 @@ const styles = StyleSheet.create({
     TextInput1:{
         paddingLeft:5,
         paddingRight:5,
+        paddingTop:5,
         marginBottom:5,
         fontSize:16,
         color:"#333333"

@@ -1,7 +1,5 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
+ * 损溢第二分页
  */
 
 import React, { Component } from 'react';
@@ -69,6 +67,7 @@ export default class SunYi extends Component {
             Storage.delete('Screen');
             Storage.delete('StateMent');
             Storage.delete('BQNumber');
+            Storage.delete('Modify');
             Storage.save('Name','商品损溢');
             Storage.save('FormType','SYYW');
             Storage.save('ProYH','ProSY');
@@ -96,6 +95,7 @@ export default class SunYi extends Component {
             Storage.delete('Screen');
             Storage.delete('StateMent');
             Storage.delete('BQNumber');
+            Storage.delete('Modify');
             Storage.save("invoice", "商品损溢");
             Storage.save('Document', "商品损溢");
             Storage.save('Name','商品损溢');
@@ -129,6 +129,8 @@ export default class SunYi extends Component {
             Storage.delete('Screen');
             Storage.delete('StateMent');
             Storage.delete('BQNumber');
+            Storage.delete('YdCountm');
+            Storage.delete('Modify');
             Storage.save("invoice", "商品损溢");
             Storage.save('Document', "商品损溢");
             Storage.save('Name','商品损溢');
@@ -158,6 +160,8 @@ export default class SunYi extends Component {
             Storage.delete('Screen');
             Storage.delete('StateMent');
             Storage.delete('BQNumber');
+            Storage.delete('YdCountm');
+            Storage.delete('Modify');
             Storage.save('Name','商品损溢');
             Storage.save('FormType','SYYW');
             Storage.save('ProYH','ProSY');

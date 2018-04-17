@@ -18,18 +18,21 @@ import {
     InteractionManager,
 } from 'react-native';
 import DBAdapter from "../adapter/DBAdapter";
+import NetUtils from "../utils/NetUtils";
+import FetchUtils from "../utils/FetchUtils";
 import Storage from '../utils/Storage';
 
 let dbAdapter = new DBAdapter();
 let db;
 
-export default class ProductCG_list extends Component {
+export default class YHDan extends Component {
     constructor(props){
         super(props);
         this.state = {
+            JiGou:this.props.JiGou ? this.props.JiGou : "",
             search:"",
             show:false,
-            dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => true,}),
+            dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => true}),
         };
         this.dataRows = [];
     }
@@ -45,14 +48,41 @@ export default class ProductCG_list extends Component {
     }
 
     fetch(){
-        dbAdapter.selectAllData("tsuppset").then((rows)=>{
-            for(let i =0;i<rows.length;i++){
-                var row = rows.item(i);
-                this.dataRows.push(row);
-            }
+        Storage.get('LinkUrl').then((LinkUrl) => {
+            Storage.get('username').then((username) => {
+                Storage.get('userpwd').then((usercode) => {
+                    Storage.get('code').then((code) => {
+                        Storage.get('ClientCode').then((ClientCode)=>{
+                            let params = {
+                                reqCode:"App_PosReq",
+                                reqDetailCode:"App_Client_NOYHQ",
+                                ClientCode:ClientCode,
+                                sDateTime:"2017-08-09 12:12:12",
+                                username:username,
+                                usercode:usercode,
+                                shopcode:code,
+                                detailshopcode:this.state.JiGou,
+                                Sign:NetUtils.MD5("App_PosReq" + "##" +'App_Client_NOYHQ' + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',
+                            };
+                            console.log(JSON.stringify(params))
+                            FetchUtils.post(LinkUrl,JSON.stringify(params)).then((data)=>{
+                                if(data.retcode == 1){
+                                    var DetailInfo = data.DetailInfo;
+                                    this.dataRows = this.dataRows.concat(DetailInfo);
+                                    console.log('aaaa',this.dataRows)
+                                    this.setState({
+                                        dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
+                                    })
+                                }else{
+                                    alert(JSON.stringify(data))
+                                }
+                            },(err)=>{
+                                alert("网络请求失败");
+                            })
+                        })
 
-            this.setState({
-                dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
+                    })
+                })
             })
         })
     }
@@ -62,27 +92,25 @@ export default class ProductCG_list extends Component {
     }
 
     Search(value){
-        //if(value>=3){
-            for (let i = 0; i < this.dataRows.length; i++) {
-                // let temp = this.dataRows[0];
-                let dataRow = this.dataRows[i];
-                if (((dataRow.sCode + "").indexOf(value) >= 0)) {
-                    // this.dataRows[0] = dataRow;
-                    // this.dataRows[i] = temp;
-                    var str = this.dataRows.splice(i,1);
-                    this.dataRows.unshift(str[0]);
-                    break;
-                }
+        for (let i = 0; i < this.dataRows.length; i++) {
+            let temp = this.dataRows[0];
+            let dataRow = this.dataRows[i];
+            if (((dataRow.Formno + "").indexOf(value) >= 0)) {
+                this.dataRows[0] = dataRow;
+                this.dataRows[i] = temp;
+                break;
             }
-            this.setState({
-                dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
-            })
-        //}
+        }
+        this.setState({
+            dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
+        })
+
     }
 
     pressPop(rowData){
-        if(this.props.reloadView){
-            this.props.reloadView(rowData.sCode)
+        var Data=rowData.Formno;
+        if(this.props.YHDan){
+            this.props.YHDan(Data)
         }
         this.props.navigator.pop();
     }
@@ -91,10 +119,7 @@ export default class ProductCG_list extends Component {
         return(
             <TouchableOpacity style={styles.header} onPress={()=>this.pressPop(rowData)}>
                 <View style={styles.coding}>
-                    <Text style={styles.codingText}>{rowData.sCode}</Text>
-                </View>
-                <View style={styles.name}>
-                    <Text style={styles.codingText}>{rowData.sname}</Text>
+                    <Text style={styles.codingText}>{rowData.Formno}</Text>
                 </View>
             </TouchableOpacity>
         )
@@ -120,16 +145,13 @@ export default class ProductCG_list extends Component {
                     />
                     <Image source={require("../images/2.png")} style={styles.SearchImage} />
                     <View style={styles.Right}>
-                        <TouchableOpacity style={styles.Text1}><Text style={styles.Text} onPress={this.Return.bind(this)}>取消</Text></TouchableOpacity>
+                        <TouchableOpacity style={styles.Text1} onPress={this.Return.bind(this)}><Text style={styles.Text}>取消</Text></TouchableOpacity>
                     </View>
                 </View>
                 <View>
                     <View style={styles.head}>
                         <View style={styles.coding}>
-                            <Text style={styles.codingText}>编码</Text>
-                        </View>
-                        <View style={styles.name}>
-                            <Text style={styles.codingText}>名称</Text>
+                            <Text style={styles.codingText}>要货单号</Text>
                         </View>
                     </View>
                     <ListView
@@ -219,18 +241,10 @@ const styles = StyleSheet.create({
         flex:1,
         paddingLeft:12
     },
-    codingText1:{
-        color:"#333333",
-        fontSize:16,
-    },
     name:{
         flex:1,
     },
-    nameText1:{
-        color:"#333333",
-        fontSize:16,
-    },
     scrollview:{
-        marginBottom:180,
+        marginBottom:120,
     }
 });
