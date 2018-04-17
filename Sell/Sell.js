@@ -296,7 +296,6 @@ export default class Sell extends Component {
 
     deteleShopInfo(rowData, sectionID, rowID){
         dbAdapter.deteleShopInfo(rowData.ProdCode).then((rows)=>{
-            console.log('ytttt=',rows)
             if(rows==true){
                 dbAdapter.selectShopInfo().then((rows)=>{
                     var shopnumber = 0;

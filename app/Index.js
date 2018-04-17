@@ -1383,6 +1383,7 @@ export default class Index extends Component {
                                         BindMAC: "",
                                         SysGuid: IMEI,
                                     }
+                                    console.log('1=',JSON.stringify(params))
                                     Storage.get('LinkUrl').then((linkurl) => {
                                         FetchUtil.post(linkurl, JSON.stringify(params)).then((data) => {
                                             Storage.save("invoice", "移动销售");
@@ -1409,6 +1410,9 @@ export default class Index extends Component {
                                 })
                             })
                         } else {
+                            Storage.save("invoice", "移动销售");
+                            Storage.save("Name", "移动销售");
+                            Storage.save('YdCountm', '4');
                             var nextRoute = {
                                 name: "移动销售",
                                 component: SellData,

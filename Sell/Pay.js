@@ -15,6 +15,7 @@ import {
     TextInput,
     ScrollView,
     ToastAndroid,
+    ActivityIndicator,
     TouchableOpacity
 } from 'react-native';
 import Index from "../app/Index";
@@ -38,6 +39,9 @@ import Swiper from 'react-native-swiper';
 import DBAdapter from "../adapter/DBAdapter";
 
 let dbAdapter = new DBAdapter();
+var {NativeModules} = require('react-native');
+var RNScannerAndroid = NativeModules.RNScannerAndroid;
+
 export default class Pay extends Component {
     constructor(props) {
         super(props);
@@ -48,6 +52,8 @@ export default class Pay extends Component {
             ModalShow: false,
             NewAllPrice:false,
             MZPrice:false,
+            Barcode:false,
+            WaitLoading:false,
             CardFaceNo: "",
             CardPwd: "",
             name: "",
@@ -67,6 +73,12 @@ export default class Pay extends Component {
             NewPrice:"",
             discount:"",
             ShopPrice:"",
+            barcode:"",
+            MiYaMerchID:"",
+            MiYaKeyCode:"",
+            MiYaIP:"",
+            points:"",
+            evenNumber:1,
             VipCardNo: this.props.VipCardNo ? this.props.VipCardNo : "",
             JfBal: this.props.JfBal ? this.props.JfBal : "",
             BalanceTotal: this.props.BalanceTotal ? this.props.BalanceTotal : "",
@@ -124,6 +136,19 @@ export default class Pay extends Component {
         let isShow = this.state.MZPrice;
         this.setState({
             MZPrice: !isShow,
+        })
+    }
+
+    Barcode(){
+        let isShow = this.state.Barcode;
+        this.setState({
+            Barcode: !isShow,
+        })
+    }
+    WaitLoading(){
+        let isShow = this.state.WaitLoading;
+        this.setState({
+            WaitLoading: !isShow,
         })
     }
 //整单优惠
@@ -229,6 +254,46 @@ export default class Pay extends Component {
                 name: tags
             })
         })
+        // Storage.delete('EvenNumber');
+        Storage.get('EvenNumber').then((evenNumber) => {
+            if(evenNumber==null){
+                this.setState({
+                    evenNumber: 1
+                })
+            }else{
+                this.setState({
+                    evenNumber: Number(evenNumber)+1,
+                })
+            }
+        })
+
+        Storage.get('ShopCode').then((ShopCode) => {
+            Storage.get('PosCode').then((PosCode) => {
+                dbAdapter.SelectPosOpt(ShopCode,PosCode,'PosPaySet').then((rows) => {
+                    let priductData = [];
+                    for (let i = 0; i < rows.length; i++) {
+                        var row = rows.item(i);
+                    }
+                    var OptValue=row.OptValue;
+                    var len=OptValue.length;
+                    var lastOptValue=OptValue.substring(0,len-1);
+                    var result=lastOptValue.split(",");
+                    for(var i=0;i<result.length;i++){
+                        dbAdapter.selectPayInfo(result[i]).then((rows) => {
+                            for(var i=0;i<rows.length;i++){
+                                var row = rows.item(i);
+                                priductData.push(row);
+                            }
+                            this.productData = priductData;
+                            this.setState({
+                                data: priductData,
+                            })
+                        })
+                    }
+
+                });
+            })
+        })
         this.dbadapter();
     }
 //促销价及四舍五入
@@ -281,7 +346,6 @@ export default class Pay extends Component {
                     var FenzuAmount = 0;
                     for(let i = 0;i<this.state.dataRows.length;i++) {
                         var Rows = this.state.dataRows[i];
-                        console.log('分组=',Rows);
                         this.DisCount.push(Rows);
                         Fenzu = Rows.ShopAmount;
                         FenzuAmount += Fenzu;
@@ -298,7 +362,6 @@ export default class Pay extends Component {
                     var ManJian = 0;
                     for(let i = 0;i<this.state.dataRows.length;i++) {
                         var Rows = this.state.dataRows[i];
-                        console.log('满减=',Rows);
                         this.DisCount.push(Rows);
                         Manjian = Rows.ShopAmount;
                         ManJian += Manjian;
@@ -312,12 +375,10 @@ export default class Pay extends Component {
 
                 //满赠促销
                 MZPromotionManger.mzPromotion("*",this.state.dataRows,dbAdapter).then((rows)=>{
-                    console.log('rows=',rows)
                     var Manze = 0;
                     var ManZe = 0;
                     for(let i = 0;i<this.state.dataRows.length;i++) {
-                        var Rows = this.state.dataRows[i];
-                        console.log('满赠=',Rows);
+                        var Rows = this.state.dataRows[i];;
                         this.DisCount.push(Rows);
                         Manze = Rows.ShopAmount;
                         shopAmount += Manze;
@@ -473,22 +534,9 @@ export default class Pay extends Component {
                     amount:this.state.ShopAmount,
                     VipPrice:vipData,
                 })
-                // console.log("123")
             }
         })
 
-        dbAdapter.selectAllData("payInfo").then((rows) => {
-            let priductData = [];
-            for (let i = 0; i < rows.length; i++) {
-                var row = rows.item(i);
-                priductData.push(row);
-            }
-            this.productData = priductData;
-            this.setState({
-                data: priductData,
-            })
-            // console.log("456")
-        });
     }
 
     Return() {
@@ -595,7 +643,8 @@ export default class Pay extends Component {
                         this.Total()
                     }
                 }
-            } else if (item.item.PayCode == "00") {
+            }
+            else if (item.item.PayCode == "00") {
                 if (this.state.Seles == "R") {
                     var payTotal = Number(this.state.amount) + Number(this.state.payments);
                     this.state.payments += -(Number(this.state.amount));
@@ -724,10 +773,102 @@ export default class Pay extends Component {
                         }
                     }
                     this.restorage();
-                };
-            };
-        };
-    };
+                }
+            }
+            else if(item.item.PayCode == "0Q"){
+                if (this.state.Seles == "R") {
+
+
+                } else if (this.state.Seles == "T") {
+                    if (this.state.amount > Number(this.state.Total) && this.state.Total < 0) {
+                        this.ModalShow()
+                    } else {
+                        dbAdapter.selectPosOpt('MiYaMerchID').then((rows) => {
+                            for (let i = 0; i < rows.length; i++) {
+                                var row = rows.item(i);
+                                var MiYaMerchID=row.OptValue;
+                            }
+                            this.setState({
+                                MiYaMerchID:MiYaMerchID
+                            })
+                        })
+
+                        dbAdapter.selectPosOpt('MiYaKeyCode').then((rows) => {
+                            for (let i = 0; i < rows.length; i++) {
+                                var row = rows.item(i);
+                                var MiYaKeyCode=row.OptValue;
+                            }
+                            this.setState({
+                                MiYaKeyCode:MiYaKeyCode
+                            })
+                        })
+
+                        dbAdapter.selectPosOpt('MiYaIP').then((data) => {
+                            for (let i = 0; i < data.length; i++) {
+                                var datas = data.item(i);
+                                var MiYaIP=datas.OptValue;
+                            }
+                            this.setState({
+                                MiYaIP:MiYaIP
+                            })
+                        })
+
+                        var points=this.state.amount*100;
+                        this.setState({
+                            points:1,
+                        })
+
+                        this.Barcode();
+                    }
+                }
+            }
+        }
+    }
+
+    BarcodeButton(){
+        if(this.state.barcode==""){
+            alert("请输入付款吗")
+        }else{
+            this.WaitLoading();
+            var space = "";
+            var EvenNumber=this.state.evenNumber;
+            var dates = new Date();
+            var years = dates.getFullYear();
+            var months = dates.getMonth()+1;
+            var days = dates.getDate();
+            if(months<10){
+                months = "0"+months;
+            }
+            if(days<10){
+                days = "0"+days;
+            }
+            Storage.save('EvenNumber',JSON.stringify(EvenNumber));
+            if(EvenNumber<10){
+                EvenNumber = "0"+EvenNumber;
+            }else if(EvenNumber>99){
+                Storage.delete('EvenNumber');
+                EvenNumber = "0"+1;
+            }
+            var time =years+space+months+space+days+this.state.numform+EvenNumber;
+            NativeModules.AndroidMYRequest.doPay(this.state.MiYaMerchID,time,this.state.points+"",this.state.barcode,this.state.MiYaKeyCode,this.state.MiYaIP,"9191",(data)=>{
+                this.WaitLoading();
+                var Points=this.state.points/100;
+                var points = BigDecimalUtils.add(this.state.payments, Points, 2);
+                var Total = (BigDecimalUtils.subtract(this.state.ShopAmount, points, 2));
+                this.setState({
+                    payments:points,
+                    ShopAmount:Total,
+                })
+                alert(data);
+                this.Barcode();
+                this.restorage();
+            });
+        }
+    }
+
+    CloseBarcode(){
+        this.Barcode();
+    }
 
 //保存流水表及detail表
     restorage() {
@@ -1792,6 +1933,63 @@ export default class Pay extends Component {
                             </View>
                         </View>
                     </Modal>
+
+                    <Modal
+                        transparent={true}
+                        visible={this.state.Barcode}
+                        onShow={() => {}}
+                        onRequestClose={() => {}}>
+                        <View style={styles.MemberBounces}>
+                            <View style={styles.Cont}>
+                                <View style={styles.BouncesTitle}>
+                                    <Text style={[styles.TitleText, {fontSize: 18}]}>米雅支付</Text>
+                                </View>
+                                <View style={[styles.MemberCont,{height:120,}]}>
+                                    <View style={styles.MemberView}>
+                                        <View style={[styles.Card,{width:70,}]}>
+                                            <Text style={styles.CardText}>支付条码：</Text>
+                                        </View>
+                                        <View style={styles.CardNumber}>
+                                            <TextInput
+                                                returnKeyType='search'
+                                                keyboardType="numeric"
+                                                textalign="center"
+                                                underlineColorAndroid='transparent'
+                                                placeholderTextColor="#bcbdc1"
+                                                style={styles.CardTextInput}
+                                                onChangeText={(value) => {
+                                                    this.setState({
+                                                        barcode: value
+                                                    })
+                                                }}
+                                            />
+                                        </View>
+                                    </View>
+                                    <View style={styles.MemberButton}>
+                                        <TouchableOpacity onPress={this.CloseBarcode.bind(this)} style={[styles.MemberClose, {marginRight: 15,}]}>
+                                            <Text style={styles.TitleText}>取消</Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity onPress={this.BarcodeButton.bind(this)} style={styles.MemberClose}>
+                                            <Text style={styles.TitleText}>确定</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
+                            </View>
+                        </View>
+                    </Modal>
+                    <Modal
+                        animationType='fade'
+                        transparent={true}
+                        visible={this.state.WaitLoading}
+                        onShow={() => {}}
+                        onRequestClose={() => {}} >
+                        <View style={styles.LoadCenter}>
+                            <View style={styles.loading}>
+                                <ActivityIndicator key="1" color="#ffffff" size="large" style={styles.activity}></ActivityIndicator>
+                                <Text style={styles.TextLoading}>加载中</Text>
+                            </View>
+                        </View>
+                    </Modal>
                 </ScrollView>
             </View>
         );
@@ -2178,5 +2376,26 @@ const styles = StyleSheet.create({
     },
     Button: {
         paddingTop: 20,
+    },
+    LoadCenter:{
+        flex:1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    loading:{
+        paddingLeft:15,
+        paddingRight:15,
+        paddingTop:15,
+        paddingBottom:15,
+        backgroundColor:"#000000",
+        opacity:0.8,
+        borderRadius:5,
+    },
+    TextLoading:{
+        fontSize:17,
+        color:"#ffffff"
+    },
+    activity:{
+        marginBottom:5,
     },
 });
