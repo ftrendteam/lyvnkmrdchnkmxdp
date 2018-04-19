@@ -37,7 +37,6 @@ export default class DownLoadBasicData {
         'poscode': posCode,
       });
       FetchUtils.post(url, requestBody).then((response) => {
-        //console.log("caonidaye=",response);
         if ((response != "" && response.retcode == 1)) {
           let tblRow = response.TblRow;
           dbAdapter.insertKgtuser(tblRow);
@@ -56,8 +55,7 @@ export default class DownLoadBasicData {
           'shopcode': shopCode,
           'poscode': posCode,
         });
-        new Promise.all([FetchUtils.post(url, requestBody), DownLoadBasicData.downLaodkgtuser(url, shopCode, dbAdapter, posCode),
-          DownLoadBasicData.downLoadTdschead(url, shopCode, dbAdapter, posCode)]).then((values) => {
+        new Promise.all([FetchUtils.post(url, requestBody), DownLoadBasicData.downLaodkgtuser(url, shopCode, dbAdapter, posCode), DownLoadBasicData.downLoadTdschead(url, shopCode, dbAdapter, posCode)]).then((values) => {
           if (values.length == 3) {
             if (values[0] != "" && values[0].retcode == 1) {
               let tblRow3 = values[0].TblRow3;
@@ -131,6 +129,7 @@ export default class DownLoadBasicData {
     await FetchUtils.post(url, requestBody).then((response) => {
       if ((response != "" && response.retcode == 1)) {
         let tblRow1 = response.TblRow1;
+        console.log("tblRow1=",tblRow1)
         dbAdapter.insertPayInfo(tblRow1);
         
       }

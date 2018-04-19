@@ -483,6 +483,22 @@ export default class DBAdapter extends SQLiteOpenHelper {
             });
         });
     }
+    //PosPaySet 当前支付方式
+    SelectPosOpt=(shopCode,posCode,optName)=>{
+        return new Promise((resolve, reject) => {
+            db.transaction((tx) => {
+                tx.executeSql("select * from posopt where shopcode='"+shopCode+"' and poscode='"+posCode+"' and optname='"+optName+"'", [], (tx, results) => {
+                    try {
+                        resolve(results.rows);
+                    } catch (err) {
+                        reject(0);
+                    }
+                });
+            }, (error) => {
+                this._errorCB('transaction', error);
+            });
+        });
+    }
 
     /***
      * 修改某个商品的数量-1
@@ -1091,6 +1107,18 @@ export default class DBAdapter extends SQLiteOpenHelper {
 
     }
 
+    selectPayInfo=(payCode)=>{
+        return new Promise((resolve, reject) => {
+            db.transaction((tx) => {
+                tx.executeSql("select * from payInfo where PayCode='"+payCode+"'", [], (tx, results) => {
+                        resolve((results.rows));
+                    }, (error) => {
+                        console.log("err===", error);
+                    }
+                );
+            });
+        });
+    }
     /***
      * 查询协配采购单中的机构号
      * @param dbName 表明
