@@ -40,7 +40,7 @@ public class MYPay {
             String retcode = (String) requsetMap.get("RETCODE");
             String retmsg = (String) requsetMap.get("RETMSG");
             if("00PAYSUCCESS".equals(retcode+retmsg)){
-                String paymentplatform = (String) map.get
+                String paymentplatform = (String) requsetMap.get
                             ("PAYMENTPLATFORM");
                 return paymentplatform+"-"+"支付成功";
             }else{
@@ -85,7 +85,7 @@ public class MYPay {
             String retcode = (String) requsetMap.get("RETCODE");
             String retmsg = (String) requsetMap.get("RETMSG");
             if("00REFUNDSUCCESS".equals(retcode+retmsg)){
-            String paymentplatform = (String) map.get
+            String paymentplatform = (String) requsetMap.get
                                         ("PAYMENTPLATFORM");
                 return paymentplatform+"-"+"退款成功!";
             }else{
