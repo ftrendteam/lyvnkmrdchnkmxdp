@@ -362,6 +362,7 @@ export default class Search extends Component {
             console.log("row==",rows.length)
             for (let i = 0; i < rows.length; i++) {
                 var row = rows.item(i);
+                console.log("rilegoule=",row.ShopNumber)
                 this.dataRows.push(row);
             }
             this.setState({

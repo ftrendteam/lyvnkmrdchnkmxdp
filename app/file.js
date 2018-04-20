@@ -38,13 +38,13 @@ export default class file extends Component {
        Storage.get('FirstTime').then((tags) => {
            Storage.get('FirstTime1').then((FirstTime1) => {
                 if(tags == 1&&FirstTime1==2){
-                    this._setModalVisible();
+                    //this._setModalVisible();
                     var nextRoute={
                         name:"主页",
                         component:Index
                     };
                     this.props.navigator.push(nextRoute);
-                    this._setModalVisible();
+                    //this._setModalVisible();
                     ToastAndroid.show('登录成功', ToastAndroid.SHORT);
                 }else if(tags == 1){
                     var nextRoute={

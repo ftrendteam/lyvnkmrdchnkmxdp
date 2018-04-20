@@ -9,7 +9,7 @@ export default class BigDecimalUtils {
    * @return {string}
    */
   static divide = (a, b, degree) => {
-    degree = BigDecimalUtils.isZero(degree);
+    //degree = BigDecimalUtils.isZero(degree);
     return  (Number(a) / Number(b)).toFixed(degree);
   }
   

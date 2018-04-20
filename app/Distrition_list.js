@@ -232,6 +232,7 @@ export default class Distrition_list extends Component {
                             </View>:
                             <ListView
                                 style={styles.scrollview}
+                                enableEmptySections = {true}
                                 dataSource={this.state.dataSource}
                                 showsVerticalScrollIndicator={true}
                                 renderRow={this._renderRow.bind(this)}

@@ -129,6 +129,7 @@ export default class PickedDate_list extends Component {
                     <ListView
                         style={styles.scrollview}
                         dataSource={this.state.dataSource}
+                        enableEmptySections = {true}
                         showsVerticalScrollIndicator={true}
                         renderRow={this._renderRow.bind(this)}
                     />

@@ -21,15 +21,14 @@ import {
 } from 'react-native';
 import Index from "./Index";
 import PickedDate_list from "./PickedDate_list";
-import DataUtils from "../utils/DataUtils";
+
 import NetUtils from "../utils/NetUtils";
 import FetchUtil from "../utils/FetchUtils";
 import UpData from "../utils/UpData";
 import DBAdapter from "../adapter/DBAdapter";
 import Storage from "../utils/Storage";
-import Picker from 'react-native-picker';
-import ModalDropdown from 'react-native-modal-dropdown';
-
+import DeCodePrePrint from "../utils/DeCodePrePrint";
+let deCodePrePrint = new DeCodePrePrint();
 var {NativeModules} = require('react-native');
 let dbAdapter = new DBAdapter();
 let updata = new UpData();
@@ -87,6 +86,7 @@ export default class admin extends Component {
                 linkurl:tags
             })
         })
+      NativeModules.AndroidMYRequest.doPay("","","","","","","",()=>{});
         Storage.get('Url').then((tags) => {
             //apk版本自动更新
             FetchUtil.post(tags+"/Default2.aspx?jsonStr={'TblName':'AndroidYWVersion'}").then((data) => {//获取最新apk版本号
@@ -212,7 +212,29 @@ export default class admin extends Component {
             return;
         }
         if(this.state.sCode1 == ""){
-            ToastAndroid.show('请选择机构信息', ToastAndroid.SHORT)
+            //ToastAndroid.show('请选择机构222信息', ToastAndroid.SHORT)
+          deCodePrePrint.deCodeProdCode("2700005001231",dbAdapter).then((code)=>{
+            });
+          deCodePrePrint.deCodeTotile("2700005001231",dbAdapter).then((pric)=>{
+              alert(pric)
+          });
+          //NativeModules.AndroidPrintInterface.print("asdfasdfasdf\n");
+          //NativeModules.AndroidPrintInterface.print("asdfasdfasdf\n");
+          //NativeModules.AndroidPrintInterface.print("asdfasdfasdf\n");
+          //NativeModules.AndroidPrintInterface.print("asdfasdfasdf\n");
+          //NativeModules.AndroidPrintInterface.startPrint();
+          //NativeModules.AndroidReadCardInterface.open();
+          //this.interval=setInterval(() => {
+          //  //  console.log('把一个定时器的引用挂在this上');
+          //  NativeModules.AndroidReadCardInterface.read("FFFFFFFFFFFF",(card)=>{
+          //      if(card!==""){
+          //        alert(card);
+          //        NativeModules.AndroidReadCardInterface.close();
+          //        this.interval && clearInterval(this.interval);
+          //      }
+          //  });
+          //}, 500);
+         
             return;
         }else{
             <ActivityIndicator key="1"></ActivityIndicator>

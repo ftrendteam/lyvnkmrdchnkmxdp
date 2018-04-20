@@ -29,7 +29,7 @@ export default class DPPromotionManager {
           let item = formTypes.item(i);
           let formNo = item.FormNo;
           DPPromotionManager.isContainCustType(cardTypeCode,dbAdapter,prodCode,formNo).then((result)=>{
-            // console.log("result=",result)
+             console.log("result=",result)
             if (result) {
               dbAdapter.selectTDscProd(prodCode).then((tDscProdBeans) => {
                 if (tDscProdBeans != null) {
@@ -72,6 +72,7 @@ export default class DPPromotionManager {
                   productBean.ShopAmount = Number(shopNewTotal);
                   console.log("dp=",productBean.ShopAmount)
                   //productBean.ShopPrice = dscPrice;
+                  dbAdapter.updateShopInfoFormType(productBean.pid)
                   resolve(productBean);
                   // console.log('ccc=',productBean)
                 }else{

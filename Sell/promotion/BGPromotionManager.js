@@ -23,7 +23,7 @@ export default class BGPromotionManager {
               let dtBrand = tdscheadBean.dtBrand;
               new Promise.all([PromotionUtils.isTDscExceptShop(prodCode, dbAdapter), PromotionUtils.custAndDate(custTypeCode, dbAdapter,formNo)]).then((results) => {
                 if (results.length != 0 && !results[0] == true && results[1].length != 0) {//表示不是非促销商品
-                  console.log("tdscheadBean=",tdscheadBean)
+                  //console.log("tdscheadBean=",tdscheadBean)
                   if ("1" == tdscheadBean.dtAll) {
                     //System.out.println("1");
                     let dscValue = tdscheadBean.DscValue;

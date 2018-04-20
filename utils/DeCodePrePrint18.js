@@ -145,7 +145,6 @@ export default class DeCodePrePrint18 {
               // 标识位+prodCode+价格长度
               strWeight = StringUtils.subStr(2 + Number(strLength) + (18 - 1 - 2 - Number(strLength) - Number(strWeightLen)), 18 - 1, deCode);
             }
-            
             let douWeight = parseFloat(Number(strWeight) * Number(strWeightQTR)).toFixed(fixed);
             resolve(douWeight);
           });

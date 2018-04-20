@@ -17,7 +17,7 @@ export default class GSPromotionsManger {
     let promises = [];
     return new Promise((resolve, reject) => {
       dbAdapter.selectTdscHead("GS").then((tdscheadBeans) => {//获取所有的组合促销单号
-        if(tdscheadBeans.length==0){
+        if (tdscheadBeans.length == 0) {
           resolve(false);
           return;
         }
@@ -64,7 +64,6 @@ export default class GSPromotionsManger {
                       //shopList.add(productBeans.get(i));
                       GSPromotionsManger.initData(autoMulti, formNo, dbAdapter).then((result) => {
                         resolve(true);
-                          console.log('result=',result)
                       });
                     }
                   }
@@ -103,12 +102,11 @@ export default class GSPromotionsManger {
                         for (let j = 0; j < results[i].length; j++) {
                           shopList.push(results[i].item(j));
                           GSPromotionsManger.number = BigDecimalUtils.add(results[i].item(j).countm, GSPromotionsManger.number, 2);
-                          console.log("dsdfasdfas=",results[i].item(j));
+                          //console.log("dsdfasdfas=",results[i].item(j));
                         }
                         if (results[i].length != 0) {
                           GSPromotionsManger.initData(autoMulti, formNo, dbAdapter, productBeans).then((result) => {
                             resolve(true);
-                            console.log('result1=',result)
                           });
                         }
                       }
@@ -124,66 +122,66 @@ export default class GSPromotionsManger {
     
     
   }
-
-    static initData(autoMulti, formNo, dbAdapter, productBeans) {
-        return new Promise((resolve, reject) => {
-            dbAdapter.selectTDscGroupPrice(formNo).then((tDscGroupPrices) => {
-                //console.log("b=", autoMulti, formNo)
-                //console.log("b=", tDscGroupPrices)
-                if (tDscGroupPrices.length == 0) {
-                    resolve(false);
+  
+  static initData(autoMulti, formNo, dbAdapter, productBeans) {
+    return new Promise((resolve, reject) => {
+      dbAdapter.selectTDscGroupPrice(formNo).then((tDscGroupPrices) => {
+        //console.log("b=", autoMulti, formNo)
+        //console.log("b=", tDscGroupPrices)
+        if (tDscGroupPrices.length == 0) {
+          resolve(false);
+        }
+        
+        if ("1" == autoMulti) {//自动倍数
+          //System.out.println("1-1");
+          let count = 0;
+          //let size = shopList.length;
+          //console.log(tDscGroupPriceBean)
+          for (let i = tDscGroupPrices.length - 1; i >= 0; i--) {
+            let tDscGroupPriceBean = tDscGroupPrices.item(i);
+            let groupCountN = tDscGroupPriceBean.GroupCountN;
+            let groupTotal = tDscGroupPriceBean.GroupTotal;
+            count++;
+            //if (GSPromotionsManger.number - groupCountN * count >= groupCountN) {
+            for (let j = 0; j < shopList.length; j++) {
+                let shopListPro = shopList[j];
+              if (shopListPro.countm >= groupCountN) {
+                let remainder = shopListPro.countm % groupCountN;//计算是否含有小数
+                if (remainder == 0) {
+                  shopListPro.prototal = BigDecimalUtils.multiply(BigDecimalUtils.divide(shopListPro.countm, groupCountN, 2), groupTotal, 2);
+                } else {
+                  shopListPro.prototal = BigDecimalUtils.add(BigDecimalUtils.multiply(parseInt(shopListPro.countm / groupCountN), groupTotal, 2),
+                    BigDecimalUtils.multiply(remainder, shopListPro.ShopPrice, 2), 2);
                 }
-
-                if ("1" == autoMulti) {//自动倍数
-                    //System.out.println("1-1");
-                    let count = 0;
-                    //let size = shopList.length;
-                    //console.log(tDscGroupPriceBean)
-                    for (let i = tDscGroupPrices.length - 1; i >= 0; i--) {
-                        let tDscGroupPriceBean = tDscGroupPrices.item(i);
-                        let groupCountN = tDscGroupPriceBean.GroupCountN;
-                        let groupTotal = tDscGroupPriceBean.GroupTotal;
-                        count++;
-                        //if (GSPromotionsManger.number - groupCountN * count >= groupCountN) {
-                        for (let j = 0; j < shopList.length; j++) {
-                            let shopListPro = shopList[j];
-                            if (shopListPro.countm >= groupCountN) {
-                                let remainder = shopListPro.countm % groupCountN;//计算是否含有小数
-                                if (remainder == 0) {
-                                    shopListPro.prototal = BigDecimalUtils.multiply(BigDecimalUtils.divide(shopListPro.countm, groupCountN, 2), groupTotal, 2);
-                                } else {
-                                    shopListPro.prototal = BigDecimalUtils.add(BigDecimalUtils.multiply(parseInt(shopListPro.countm / groupCountN), groupTotal, 2),
-                                        BigDecimalUtils.multiply(remainder, shopListPro.ShopPrice, 2), 2);
-                                }
-                                console.log(shopListPro.prototal)
-                                for (let i = 0; i < productBeans.length; i++) {
-                                    if (productBeans[i].Pid == shopListPro.pid) {
-                                        productBeans[i].ShopAmount = Number(shopListPro.prototal);
-                                    }
-                                }
-                            }
-                            //}
-                        }
-                        resolve(true);
-                    }
-                } else if ("0" == autoMulti) {
-
-                    for (let i = tDscGroupPrices.length - 1; i >= 0; i--) {
-                        let tDscGroupPriceBean = tDscGroupPrices.item(i);
-                        let groupCountN = tDscGroupPriceBean.GroupCountN;
-                        let groupTotal = tDscGroupPriceBean.GroupTotal;
-                        console.log("wtfuck2=", GSPromotionsManger.number, groupCountN, groupTotal)
-                        if (shopList.length >= groupCountN) {
-                            for (let j = 0; j <= groupCountN; j++) {
-                                shopList[j].prototal = BigDecimalUtils.divide(groupTotal, groupCountN, 2);
-                                resolve(true);
-                                break;
-                            }
-                        }
-                    }
+                console.log(shopListPro.prototal)
+                for (let i = 0; i < productBeans.length; i++) {
+                  if (productBeans[i].Pid == shopListPro.pid) {
+                    productBeans[i].ShopAmount = shopListPro.prototal;
+                  }
                 }
-            });
-        });
-
-    }
+              }
+              //}
+            }
+            resolve(true);
+          }
+        } else if ("0" == autoMulti) {
+          
+          for (let i = tDscGroupPrices.length - 1; i >= 0; i--) {
+            let tDscGroupPriceBean = tDscGroupPrices.item(i);
+            let groupCountN = tDscGroupPriceBean.GroupCountN;
+            let groupTotal = tDscGroupPriceBean.GroupTotal;
+            console.log("wtfuck2=", GSPromotionsManger.number, groupCountN, groupTotal)
+            if (shopList.length >= groupCountN) {
+              for (let j = 0; j <= groupCountN; j++) {
+                shopList[j].prototal = BigDecimalUtils.divide(groupTotal, groupCountN, 2);
+                resolve(true);
+                break;
+              }
+            }
+          }
+        }
+      });
+    });
+    
+  }
 }
