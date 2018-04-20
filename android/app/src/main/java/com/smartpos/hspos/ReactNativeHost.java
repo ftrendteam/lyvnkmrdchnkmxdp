@@ -12,6 +12,9 @@ import java.util.Arrays;
 import java.util.List;
 import org.pgsqlite.SQLitePluginPackage;
 import com.smartpos.hspos.pay.MYRequestReactPackage;
+import com.smartpos.hspos.pay.HuiPayReactPackage;
+import com.smartpos.hspos.model.PrintModelReactPackage;
+import com.smartpos.hspos.model.ReadCardReactPackage;
 public class ReactNativeHost extends com.facebook.react.ReactNativeHost {
     protected ReactNativeHost(Application application) {
         super(application);
@@ -35,8 +38,10 @@ public class ReactNativeHost extends com.facebook.react.ReactNativeHost {
                 new MainReactPackage(),
                 new JSUpApkReactPackage(),
                 new JSDeviceInfo(),
-                new MYRequestReactPackage()
-
+                new MYRequestReactPackage(),
+                new HuiPayReactPackage(),
+                new PrintModelReactPackage(),
+                new ReadCardReactPackage()
         );
     }
 }

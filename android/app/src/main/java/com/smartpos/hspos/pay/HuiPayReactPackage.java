@@ -4,18 +4,19 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.uimanager.ViewManager;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-public class MYRequestReactPackage implements ReactPackage{
+public class HuiPayReactPackage implements ReactPackage{
 
-    public MYRequestReactPackage() {
+    public HuiPayReactPackage() {
     }
 
     @Override
     public List<NativeModule> createNativeModules(final ReactApplicationContext reactContext) {
         List<NativeModule> modules = new ArrayList<>();
-        modules.add(new JSMYRequest(reactContext));
+        modules.add(new JSHuiPay(reactContext));
         return modules;
     }
 

@@ -11,6 +11,7 @@ import com.lwansbrough.RCTCamera.RCTCameraPackage;
         import java.util.Arrays;
         import java.util.List;
 import com.smartpos.hspos.ReactNativeHost;
+import com.smartpos.utils.SystemUtils;
 public class MainApplication extends Application implements ReactApplication {
 
   private  ReactNativeHost mReactNativeHost = new ReactNativeHost(this);
