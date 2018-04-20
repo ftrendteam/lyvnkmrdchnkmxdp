@@ -100,19 +100,16 @@ export default class ProductCG extends Component {
             }else if(this.state.shopname1==""){
                 alert("请选择机构信息")
             }else{
-                Storage.delete('YuanDan');
-                Storage.delete('Screen');
                 var nextRoute={
                     name:"Index",
                     component:Index,
                 };
                 this.props.navigator.push(nextRoute);
+                Storage.delete('YuanDan');
+                Storage.delete('Screen');
                 Storage.delete('OrgFormno');
-                Storage.delete('scode');
-                Storage.delete('shildshop');
                 Storage.delete('StateMent');
                 Storage.delete('BQNumber');
-                Storage.delete('YdCountm');
                 Storage.delete('Modify');
                 Storage.save('YdCountm', '3');
                 Storage.save('Name','协配采购');
@@ -124,7 +121,6 @@ export default class ProductCG extends Component {
                 Storage.save('Date',data);
                 Storage.save("scode",str);
                 Storage.save('shildshop',str1);
-                Storage.save('Document', "协配采购");
             }
         }else if(this.state.Disting=="1"){
             var date = new Date();
@@ -136,19 +132,16 @@ export default class ProductCG extends Component {
             }else if(this.state.shopname1==""){
                 alert("请选择机构信息")
             }else{
-                Storage.delete('YuanDan');
-                Storage.delete('Screen');
                 var nextRoute={
                     name:"Search",
                     component:Search,
                 };
                 this.props.navigator.push(nextRoute);
+                Storage.delete('YuanDan');
+                Storage.delete('Screen');
                 Storage.delete('OrgFormno');
-                Storage.delete('scode');
-                Storage.delete('shildshop');
                 Storage.delete('StateMent');
                 Storage.delete('BQNumber');
-                Storage.delete('YdCountm');
                 Storage.delete('Modify');
                 Storage.save('YdCountm', '3');
                 Storage.save('Name','协配采购');
@@ -160,7 +153,6 @@ export default class ProductCG extends Component {
                 Storage.save('Date',data);
                 Storage.save("scode",str);
                 Storage.save('shildshop',str1);
-                Storage.save('Document', "协配采购");
             }
         }
 

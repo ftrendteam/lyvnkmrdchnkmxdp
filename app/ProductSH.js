@@ -108,11 +108,8 @@ export default class ProductCG extends Component {
                     component:Index,
                 };
                 this.props.navigator.push(nextRoute);
-                Storage.delete('OrgFormno');
-                Storage.delete('scode');
                 Storage.delete('StateMent');
                 Storage.delete('BQNumber');
-                Storage.delete('YdCountm');
                 Storage.save('YdCountm', '2');
                 Storage.save('OrgFormno',str2);
                 Storage.save('Name','协配收货');
@@ -127,7 +124,6 @@ export default class ProductCG extends Component {
                 Storage.save('Date',data);
                 Storage.save("scode",str);
                 Storage.save('shildshop',str1);
-                Storage.save('Document', "协配收货");
                 if(this.state.suppcode1==""){
                     Storage.save('Modify', '1');
                 }
@@ -146,26 +142,22 @@ export default class ProductCG extends Component {
                     component: Search,
                 };
                 this.props.navigator.push(nextRoute);
-                Storage.delete('OrgFormno');
-                Storage.delete('scode');
                 Storage.delete('StateMent');
                 Storage.delete('BQNumber');
-                Storage.delete('YdCountm');
                 Storage.save('YdCountm', '2');
-                Storage.save('OrgFormno', str2);
-                Storage.save('Name', '协配收货');
-                Storage.save('FormType', 'XPYSYW');
-                Storage.save('valueOf', 'App_Client_ProXPYS');
-                Storage.save('history', 'App_Client_ProXPYSQ');
-                Storage.save('historyClass', 'App_Client_ProXPYSDetailQ');
-                Storage.save('ProYH', 'ProXPYS');
-                Storage.save('YuanDan', '1');
-                Storage.save('Screen', '1');
-                Storage.save('shopPandian', 'App_Client_NOYSXPCGQ');
-                Storage.save('Date', data);
-                Storage.save("scode", str);
-                Storage.save('shildshop', str1);
-                Storage.save('Document', "协配收货");
+                Storage.save('OrgFormno',str2);
+                Storage.save('Name','协配收货');
+                Storage.save('FormType','XPYSYW');
+                Storage.save('valueOf','App_Client_ProXPYS');
+                Storage.save('history','App_Client_ProXPYSQ');
+                Storage.save('historyClass','App_Client_ProXPYSDetailQ');
+                Storage.save('ProYH','ProXPYS');
+                Storage.save('YuanDan','1');
+                Storage.save('Screen','1');
+                Storage.save('shopPandian','App_Client_NOYSXPCGQ');
+                Storage.save('Date',data);
+                Storage.save("scode",str);
+                Storage.save('shildshop',str1);
                 if(this.state.suppcode1==""){
                     Storage.save('Modify', '1');
                 }

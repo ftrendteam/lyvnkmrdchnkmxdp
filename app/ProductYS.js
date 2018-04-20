@@ -100,12 +100,9 @@ export default class ProductCG extends Component {
                     component:Index,
                 };
                 this.props.navigator.push(nextRoute);
-                Storage.delete('OrgFormno');
-                Storage.delete('scode');
                 Storage.delete('shildshop');
                 Storage.delete('StateMent');
                 Storage.delete('BQNumber');
-                Storage.delete('YdCountm');
                 Storage.save('YdCountm', '2');
                 Storage.save('OrgFormno',str1);
                 Storage.save('Name','商品验收');
@@ -118,7 +115,6 @@ export default class ProductCG extends Component {
                 Storage.save('Screen','1');
                 Storage.save('Date',data);
                 Storage.save("scode",str);
-                Storage.save('Document', "商品验收");
                 if(this.state.suppcode1==""){
                     Storage.save('Modify', '1');
                 }
@@ -138,12 +134,9 @@ export default class ProductCG extends Component {
                     component:Search,
                 };
                 this.props.navigator.push(nextRoute);
-                Storage.delete('OrgFormno');
-                Storage.delete('scode');
                 Storage.delete('shildshop');
                 Storage.delete('StateMent');
                 Storage.delete('BQNumber');
-                Storage.delete('YdCountm');
                 Storage.save('YdCountm', '2');
                 Storage.save('OrgFormno',str1);
                 Storage.save('Name','商品验收');
@@ -151,12 +144,11 @@ export default class ProductCG extends Component {
                 Storage.save('valueOf','App_Client_ProYS');
                 Storage.save('history','App_Client_ProYSQ');
                 Storage.save('historyClass','App_Client_ProYSDetailQ');
-                Storage.save('ProYH','ProCG');
+                Storage.save('ProYH','ProYS');
                 Storage.save('YuanDan','1');
                 Storage.save('Screen','1');
                 Storage.save('Date',data);
                 Storage.save("scode",str);
-                Storage.save('Document', "商品验收");
                 if(this.state.suppcode1==""){
                     Storage.save('Modify', '1');
                 }

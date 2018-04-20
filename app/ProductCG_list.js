@@ -64,6 +64,7 @@ export default class ProductCG_list extends Component {
     Search(value){
         //if(value>=3){
             this.abc=[];
+            this.DataRow=[];
             if(value==""){
                 dbAdapter.selectAllData("tsuppset").then((rows)=>{
                     for(let i =0;i<rows.length;i++){
@@ -77,19 +78,17 @@ export default class ProductCG_list extends Component {
             }else if(value!==""){
                 var str;
                 dbAdapter.selectAllData("tsuppset").then((rows)=>{
-                    for(let i =0;i<rows.length;i++){
-                        var row = rows.item(i);
-                        this.dataRows.push(row);
-                    }
                     for (let i = 0; i < this.dataRows.length; i++) {
                         // let temp = this.dataRows[0];
                         let dataRow = this.dataRows[i];
                         if (((dataRow.sCode + "").indexOf(value) >= 0)||((dataRow.sname + "").indexOf(value) >= 0)) {
                             // this.dataRows[0] = dataRow;
                             // this.dataRows[i] = temp;
-                            str = this.dataRows.splice(i,1);
-                            // this.dataRows.unshift(str[0]);//将搜索到的第一条数据展示在最上面
-                            break;
+                            str = this.dataRows.splice(i);
+                            this.dataRows.unshift(str[0]);//将搜索到的第一条数据展示在最上面
+                            // var aaa=JSON.stringify(str)
+                            // this.DataRow.push(aaa);
+                            // break;
                         }
                     }
                     this.setState({
@@ -97,7 +96,7 @@ export default class ProductCG_list extends Component {
                     })
                 })
             }
-        //}
+        // }
     }
 
     pressPop(rowData){

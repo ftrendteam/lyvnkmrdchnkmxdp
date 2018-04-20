@@ -29,6 +29,8 @@ export default class GoodsDetails extends Component {
              Number:"",
              storecode:"",
              numbershop:"",
+             name:"",
+             checktype:"",
              dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
              Formno:this.props.Formno ? this.props.Formno : "",
              FormDate:this.props.FormDate ? this.props.FormDate : "",
@@ -52,6 +54,12 @@ export default class GoodsDetails extends Component {
                   reqDetailCode: tags
               });
           });
+
+            Storage.get('Name').then((tags) => {
+                this.setState({
+                    name:tags
+                })
+            });
 
          //username
          Storage.get('username').then((tags) => {
@@ -92,9 +100,11 @@ export default class GoodsDetails extends Component {
                  prodcode:"",
              };
              FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
+                 console.log(JSON.stringify(data))
                  if(data.retcode == 1){
                     var numbercode = data.DetailInfo1.storecode;
                     var numbershop = data.DetailInfo1.childshop;
+                    var checktype = data.DetailInfo1.checktype;
                     var DetailInfo2 = data.DetailInfo2;
                     var shopnumber = 0;
                     for(let i =0;i<DetailInfo2.length;i++){
@@ -107,7 +117,8 @@ export default class GoodsDetails extends Component {
                        dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
                        Number:shopnumber,
                        storecode:numbercode,
-                       numbershop:numbershop
+                       numbershop:numbershop,
+                       checktype:checktype
                     })
                  }else{
                      alert(JSON.stringify(data))
@@ -165,9 +176,13 @@ export default class GoodsDetails extends Component {
                 </View>
             </View>
             <View style={styles.List}>
-                <View style={styles.ListLeft}>
+                <View style={[styles.ListLeft,{flex:1}]}>
                     <Text style={styles.ListText}>单据备注：</Text>
                     <Text style={styles.ListText}>{this.state.promemo}</Text>
+                </View>
+                <View style={styles.Listright}>
+                    <Text style={styles.ListText}>单据状态：</Text>
+                    <Text style={[styles.ListText,{color:"#ff4e4e"}]}>{this.state.checktype}</Text>
                 </View>
             </View>
             <View style={styles.List}>
@@ -257,6 +272,10 @@ const styles = StyleSheet.create({
         right:0,
         flexDirection:"row",
    },
+    Listright:{
+        flexDirection:"row",
+        flex:1
+    },
    ShopList:{
         paddingLeft:25,
         paddingRight:25,

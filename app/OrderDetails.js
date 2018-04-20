@@ -31,7 +31,6 @@ export default class GoodsDetails extends Component {
             ydcountm:this.props.ydcountm ? this.props.ydcountm : "",
             SuppCode:this.props.SuppCode ? this.props.SuppCode : "",
             BarCode:this.props.BarCode ? this.props.BarCode : "",
-            DataName:this.props.DataName ? this.props.DataName : "",
             ShoppData:this.props.ShoppData ? this.props.ShoppData : "",
             Price:"",
             totalPrice:"",
@@ -43,6 +42,7 @@ export default class GoodsDetails extends Component {
             OnPrice:"",
             Total:"",
             Price:"",
+            DataName:"",
             OrderDetails:1,
             BQNumber:this.props.countm ? this.props.countm : 1,
         }
@@ -56,6 +56,12 @@ export default class GoodsDetails extends Component {
         Storage.get('Name').then((tags) => {
             this.setState({
                 name: tags
+            });
+        });
+
+        Storage.get('DataName').then((tags) => {
+            this.setState({
+                DataName: tags
             });
         });
 
@@ -90,7 +96,7 @@ export default class GoodsDetails extends Component {
     }
 
     GoodsDetails(){
-        if(this.state.DataName=="移动销售"){
+        if(this.state.name=="移动销售"){
             var nextRoute={
                 name:"移动销售",
                 component:Sell,
@@ -129,7 +135,7 @@ export default class GoodsDetails extends Component {
         this.setState({
             numberFormat2: NumberUtils.numberFormat2(ShopPrice),
         })
-        if(this.state.name=="商品采购"||this.state.name=="协配采购"||this.state.Modify==1){
+        if(this.state.name=="商品采购"||this.state.name=="协配采购"||this.state.name=="移动销售"||this.state.Modify==1){
             this.setState({
                 OnPrice:1,
                 PriceText:1
@@ -163,7 +169,7 @@ export default class GoodsDetails extends Component {
                     shopInfoData.push(shopInfo);
                     //调用插入表方法
                     dbAdapter.insertShopInfo(shopInfoData);
-                    if(this.state.DataName=="移动销售"){
+                    if(this.state.name=="移动销售"){
                         var nextRoute={
                             name:"移动销售",
                             component:Sell,
@@ -212,7 +218,7 @@ export default class GoodsDetails extends Component {
                         shopInfoData.push(shopInfo);
                         //调用插入表方法
                         dbAdapter.insertShopInfo(shopInfoData);
-                        if(this.state.DataName=="移动销售"){
+                        if(this.state.name=="移动销售"){
                             var nextRoute={
                                 name:"移动销售",
                                 component:Sell,
@@ -261,16 +267,21 @@ export default class GoodsDetails extends Component {
     NumberFormat(){
         this.setState({
             OnPrice:1,
+            Total:1
         });
     }
 
     add(){
         // var Number1=this.state.Number;
-        if(this.state.Number==""){
+        if(this.state.Number==""&&this.state.name!=="标签采集"){
             this.setState({
                 Number:1,
-                BQNumber:parseInt(this.state.BQNumber)+1,
                 numberFormat2:this.state.ShopPrice,
+            });
+        }
+        else if(this.state.name=="标签采集"&&this.state.BQNumber==1){
+            this.setState({
+                BQNumber:parseInt(this.state.BQNumber)+1,
             });
         }else{
             let numberFormat2 = NumberUtils.numberFormat2((parseInt(this.state.Number)+1)*(this.state.ShopPrice));
@@ -283,7 +294,6 @@ export default class GoodsDetails extends Component {
     }
 
     subtraction(){
-        if(this.state.Number >0||this.state.BQNumber >1){
             var Number1=this.state.Number;
             var BQNumber1=this.state.BQNumber;
             this.setState({
@@ -294,10 +304,18 @@ export default class GoodsDetails extends Component {
             this.setState({
                 numberFormat2:numberFormat2,
             });
-        }else if(this.state.Number == 0||this.state.BQNumber == ""){
-            ToastAndroid.show('商品数量为0', ToastAndroid.SHORT);
+        if(this.state.Number == 1&&this.state.name!=="标签采集"){
+            ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
             this.setState({
-               Number:0
+               Number:1,
+               numberFormat2:this.state.ShopPrice,
+            });
+            return;
+        }else if(this.state.BQNumber == 1&&this.state.name=="标签采集"){
+            ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
+            this.setState({
+                BQNumber:1,
+                numberFormat2:this.state.ShopPrice,
             });
         }
     }
@@ -364,13 +382,7 @@ export default class GoodsDetails extends Component {
                         shopInfoData.push(shopInfo);
                         //调用插入表方法
                         dbAdapter.insertShopInfo(shopInfoData);
-                        if(this.state.DataName=="移动销售"){
-                            var nextRoute={
-                                name:"移动销售",
-                                component:Sell,
-                            };
-                            this.props.navigator.push(nextRoute);
-                        }else if(this.state.ShoppData=="0"){
+                        if(this.state.ShoppData=="0"){
                             var nextRoute={
                                 name:"清单",
                                 component:ShoppingCart,
@@ -380,6 +392,7 @@ export default class GoodsDetails extends Component {
                             };
                             this.props.navigator.push(nextRoute);
                         }else{
+
                             var nextRoute={
                                 name:"主页",
                                 component:Index,
@@ -398,7 +411,11 @@ export default class GoodsDetails extends Component {
                             shopInfo.Pid = this.state.Pid;
                             shopInfo.ProdCode=this.state.ProdCode;
                             shopInfo.prodname = this.state.ProdName;
-                            shopInfo.countm = this.state.Number;
+                            if(this.state.name=="标签采集"){
+                                shopInfo.countm = this.state.BQNumber;
+                            }else{
+                                shopInfo.countm = this.state.Number;
+                            }
                             shopInfo.ShopPrice = Modify;
                             if(this.state.YdCountm == 5){
                                 shopInfo.prototal = "0";
@@ -464,9 +481,9 @@ export default class GoodsDetails extends Component {
         var y = String(x).indexOf(".") + 1;//获取小数点的位置
         if(y > 0) {
             alert("数量不能含有小数");
-        } else if(this.state.name=="商品配送"&&this.state.ydcountm==0){
+        }else if(this.state.name=="商品配送"&&this.state.ydcountm==0){
             alert("库存为0，该商品不能进行配送")
-        } else {
+        }else {
             if(this.state.name=="实时盘点"||this.state.name=="商品盘点"){
                 var shopInfoData = [];
                 var shopInfo = {};
@@ -488,13 +505,7 @@ export default class GoodsDetails extends Component {
                 shopInfoData.push(shopInfo);
                 //调用插入表方法
                 dbAdapter.insertShopInfo(shopInfoData);
-                if(this.state.DataName=="移动销售"){
-                    var nextRoute={
-                        name:"移动销售",
-                        component:Sell,
-                    };
-                    this.props.navigator.push(nextRoute);
-                }else if(this.state.ShoppData=="0"){
+                if(this.state.ShoppData=="0"){
                     var nextRoute={
                         name:"清单",
                         component:ShoppingCart,
@@ -514,7 +525,9 @@ export default class GoodsDetails extends Component {
                     this.props.navigator.push(nextRoute);
                 }
             }else{
-                if(this.state.Number==0||this.state.BQNumber<1){
+                if(this.state.Number==0&&this.state.name!=="标签采集"){
+                    ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
+                } else if(this.state.BQNumber==0&&this.state.name=="标签采集"){
                     ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
                 }else{
                     var shopInfoData = [];
@@ -522,7 +535,11 @@ export default class GoodsDetails extends Component {
                     shopInfo.Pid = this.state.Pid;
                     shopInfo.ProdCode=this.state.ProdCode;
                     shopInfo.prodname = this.state.ProdName;
-                    shopInfo.countm = this.state.Number;
+                    if(this.state.name=="标签采集"){
+                        shopInfo.countm = this.state.BQNumber;
+                    }else{
+                        shopInfo.countm = this.state.Number;
+                    }
                     shopInfo.ShopPrice = this.state.ShopPrice;
                     if(this.state.YdCountm == 5){
                         shopInfo.prototal = "0";
@@ -660,7 +677,7 @@ export default class GoodsDetails extends Component {
                         }
 
                         {
-                            (this.state.name=="商品采购"||this.state.name=="协配采购"||this.state.Modify==1)?
+                            (this.state.name=="商品采购"||this.state.name=="协配采购"||this.state.name=="移动销售"||this.state.Modify==1)?
                                 <View style={styles.onPrice}>
                                     {
                                         (this.state.OnPrice==1)?
@@ -678,7 +695,7 @@ export default class GoodsDetails extends Component {
                                                     })
                                                 }}
                                                 onSubmitEditing={this.onEndEditing.bind(this)}
-                                                onEndEditing = {this.onEndEditing.bind(this)}
+                                                onEndEditing = {this.onSubmitEditing.bind(this)}
                                             />
                                             :
                                             <TouchableOpacity onPress={this.PriceButton.bind(this)}>
@@ -710,7 +727,7 @@ export default class GoodsDetails extends Component {
                                 }
 
                                 {
-                                    (this.state.name=="商品采购"||this.state.name=="商品验收"||this.state.name=="协配采购")?
+                                    (this.state.name=="商品采购"||this.state.name=="商品验收"||this.state.name=="移动销售"||this.state.name=="协配采购")?
                                         <View style={styles.onPrice}>
                                             {
                                                 (this.state.Total == 1) ?

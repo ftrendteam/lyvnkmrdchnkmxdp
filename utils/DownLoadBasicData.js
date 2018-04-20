@@ -55,10 +55,12 @@ export default class DownLoadBasicData {
           'shopcode': shopCode,
           'poscode': posCode,
         });
+        console.log("bodu=",requestBody)
         new Promise.all([FetchUtils.post(url, requestBody), DownLoadBasicData.downLaodkgtuser(url, shopCode, dbAdapter, posCode), DownLoadBasicData.downLoadTdschead(url, shopCode, dbAdapter, posCode)]).then((values) => {
           if (values.length == 3) {
             if (values[0] != "" && values[0].retcode == 1) {
               let tblRow3 = values[0].TblRow3;
+              console.log("posopt",tblRow3);
               dbAdapter.insertPosOpt(tblRow3);
             }
             if (values[2]) {
@@ -115,6 +117,7 @@ export default class DownLoadBasicData {
           resolve(true);
         } else {
           reject(false);
+          alert("1111111")
         }
       });
     });

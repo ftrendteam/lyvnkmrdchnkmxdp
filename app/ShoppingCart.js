@@ -34,6 +34,7 @@ import ProductCG from "./ProductCG";
 import ProductYS from "./ProductYS";
 import ProductXP from "./ProductXP";
 import ProductSH from "./ProductSH";
+import PSDan from "../PSDan/PSDan";//商品配送
 import DeCodePrePrint18 from "../utils/DeCodePrePrint18";
 import NetUtils from "../utils/NetUtils";
 import FetchUtils from "../utils/FetchUtils";
@@ -100,6 +101,12 @@ export default class ShoppingCart extends Component {
             this.Storage();
             this.Device();
         });
+
+        Storage.get('Name').then((tags)=>{
+            this.setState({
+                Name:tags
+            })
+        })
     }
 
     _dpSearch(){
@@ -415,7 +422,7 @@ export default class ShoppingCart extends Component {
                     <Text style={[styles.Price,styles.Name1]}>{rowData.ProPrice}</Text>
                 </View>
                 {
-                    (this.state.Document=="标签采集")?
+                    (this.state.Name=="标签采集")?
                         null:
                         <View style={styles.RowList1}>
                             <Text style={[styles.SmallScale,styles.Name1]}>{rowData.ShopAmount}</Text>
@@ -613,42 +620,72 @@ export default class ShoppingCart extends Component {
                         });
                     });
                     Storage.get('scode').then((scode)=>{
-                        let params = {
-                            reqCode: "App_PosReq",
-                            reqDetailCode: this.state.reqDetailCode,
-                            ClientCode: this.state.ClientCode,
-                            sDateTime: "2017-08-09 12:12:12",//获取当前时间转换成时间戳
-                            Sign: NetUtils.MD5("App_PosReq" + "##" +this.state.reqDetailCode + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',
-                            username: this.state.Username,
-                            usercode: this.state.Userpwd,
-                            DetailInfo1: {
-                                "ShopCode": tags,
-                                "OrgFormno": this.state.OrgFormno,
-                                "ProMemo": this.state.Remark,
-                                "SuppCode":scode,
-                                "childshop":this.state.shildshop,
-                                "pdaGuid":this.state.IMEI,
-                                "pdgFormno":this.state.ProYH+this.state.Date
-                            },
-                            DetailInfo2: this.DataShop,
-                        };
-                        if(this.state.Screen=="1"||this.state.Screen=="2"){
-                            var DetailInfo2=params.DetailInfo2;
-                            for(let i =0;i<DetailInfo2.length;i++){
-                                let detail = DetailInfo2[i];
-                                let ydcountm = detail.ydcountm;
-                                let countm = detail.countm;
-                                if(ydcountm!==countm){
-                                    this.screen.push(detail);
+                        Storage.get('CKu').then((CKu)=> {
+                            let params = {
+                                reqCode: "App_PosReq",
+                                reqDetailCode: this.state.reqDetailCode,
+                                ClientCode: this.state.ClientCode,
+                                sDateTime: "2017-08-09 12:12:12",//获取当前时间转换成时间戳
+                                Sign: NetUtils.MD5("App_PosReq" + "##" +this.state.reqDetailCode + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',
+                                username: this.state.Username,
+                                usercode: this.state.Userpwd,
+                                DetailInfo1: {
+                                    "ShopCode": tags,
+                                    "OrgFormno": this.state.OrgFormno,
+                                    "ProMemo": this.state.Remark,
+                                    "SuppCode":scode,
+                                    "childshop":this.state.shildshop,
+                                    "pdaGuid":this.state.IMEI,
+                                    "pdgFormno":this.state.ProYH+this.state.Date,
+                                    "storecode":CKu,
+                                },
+                                DetailInfo2: this.DataShop,
+                            };
+                            console.log(JSON.stringify(params))
+                            if(this.state.Screen=="1"||this.state.Screen=="2"){
+                                var DetailInfo2=params.DetailInfo2;
+                                for(let i =0;i<DetailInfo2.length;i++){
+                                    let detail = DetailInfo2[i];
+                                    let ydcountm = detail.ydcountm;
+                                    let countm = detail.countm;
+                                    if(ydcountm!==countm){
+                                        this.screen.push(detail);
+                                    }
                                 }
-                            }
-                            if(this.screen==""){
+                                if(this.screen==""){
+                                    FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
+                                        if(data.retcode == 1){
+                                            if(this.state.Screen!=="1"||this.state.Screen!=="2"||this.screen==""||scode==null){
+                                                this.Wait();
+                                                this.Succeed();
+                                            }
+                                        }else{
+                                            this.Wait();
+                                            alert(JSON.stringify(data))
+                                        }
+                                    },(err)=>{
+                                        alert("网络请求失败");
+                                    })
+                                }else{
+                                    this.setState({
+                                        dataSource:this.state.dataSource.cloneWithRows(this.screen),
+                                    })
+                                    this.Wait();
+                                    this.ScreenBod();
+                                }
+                                this.setState({
+                                    SUbmit:'',
+                                })
+                            }else{
                                 FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
                                     if(data.retcode == 1){
                                         if(this.state.Screen!=="1"||this.state.Screen!=="2"||this.screen==""||scode==null){
                                             this.Wait();
                                             this.Succeed();
                                         }
+                                        this.setState({
+                                            SUbmit:'',
+                                        })
                                     }else{
                                         this.Wait();
                                         alert(JSON.stringify(data))
@@ -656,34 +693,8 @@ export default class ShoppingCart extends Component {
                                 },(err)=>{
                                     alert("网络请求失败");
                                 })
-                            }else{
-                                this.setState({
-                                    dataSource:this.state.dataSource.cloneWithRows(this.screen),
-                                })
-                                this.Wait();
-                                this.ScreenBod();
                             }
-                            this.setState({
-                                SUbmit:'',
-                            })
-                        }else{
-                            FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
-                                if(data.retcode == 1){
-                                    if(this.state.Screen!=="1"||this.state.Screen!=="2"||this.screen==""||scode==null){
-                                        this.Wait();
-                                        this.Succeed();
-                                    }
-                                    this.setState({
-                                        SUbmit:'',
-                                    })
-                                }else{
-                                    this.Wait();
-                                    alert(JSON.stringify(data))
-                                }
-                            },(err)=>{
-                                alert("网络请求失败");
-                            })
-                        }
+                        })
                     })
                 })
             }
@@ -718,38 +729,41 @@ export default class ShoppingCart extends Component {
                     });
                 });
                 Storage.get('scode').then((scod) => {
-                    let params = {
-                        reqCode: "App_PosReq",
-                        reqDetailCode: this.state.reqDetailCode,
-                        ClientCode: this.state.ClientCode,
-                        sDateTime: "2017-08-09 12:12:12",
-                        Sign: NetUtils.MD5("App_PosReq" + "##" + this.state.reqDetailCode + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs") + '',
-                        username: this.state.Username,
-                        usercode: this.state.Userpwd,
-                        DetailInfo1: {
-                            "ShopCode": tags,
-                            "OrgFormno": this.state.OrgFormno,
-                            "ProMemo": this.state.Remark,
-                            "SuppCode": scod,
-                            "childshop": this.state.shildshop,
-                            "pdaGuid": this.state.IMEI,
-                            "pdgFormno": this.state.ProYH + this.state.Date
-                        },
-                        DetailInfo2: this.DataShop,
-                    };
-                    // console.log('qqqq=',JSON.stringify(params))
-                    FetchUtils.post(this.state.linkurl, JSON.stringify(params)).then((data) => {
-                        if (data.retcode == 1) {
-                            this.ScreenBod();
-                            this.Succeed();
-                            this.setState({
-                                SUbmit:'',
-                            })
-                        } else {
-                            alert(JSON.stringify(data))
-                        }
-                    },(err)=>{
-                        alert("网络请求失败");
+                    Storage.get('CKu').then((CKu)=> {
+                        let params = {
+                            reqCode: "App_PosReq",
+                            reqDetailCode: this.state.reqDetailCode,
+                            ClientCode: this.state.ClientCode,
+                            sDateTime: "2017-08-09 12:12:12",
+                            Sign: NetUtils.MD5("App_PosReq" + "##" + this.state.reqDetailCode + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs") + '',
+                            username: this.state.Username,
+                            usercode: this.state.Userpwd,
+                            DetailInfo1: {
+                                "ShopCode": tags,
+                                "OrgFormno": this.state.OrgFormno,
+                                "ProMemo": this.state.Remark,
+                                "SuppCode": scod,
+                                "childshop": this.state.shildshop,
+                                "pdaGuid": this.state.IMEI,
+                                "pdgFormno": this.state.ProYH + this.state.Date,
+                                "storecode":CKu
+                            },
+                            DetailInfo2: this.DataShop,
+                        };
+                        // console.log('qqqq=',JSON.stringify(params))
+                        FetchUtils.post(this.state.linkurl, JSON.stringify(params)).then((data) => {
+                            if (data.retcode == 1) {
+                                this.ScreenBod();
+                                this.Succeed();
+                                this.setState({
+                                    SUbmit:'',
+                                })
+                            } else {
+                                alert(JSON.stringify(data))
+                            }
+                        },(err)=>{
+                            alert("网络请求失败");
+                        })
                     })
                 })
             })
@@ -818,7 +832,7 @@ export default class ShoppingCart extends Component {
 
     //提交时各单据判断
     DeterMine(){
-        Storage.get('Document').then((tags)=>{
+        Storage.get('Name').then((tags)=>{
             if(tags=="商品盘点"){
                 this.Succeed();
                 var nextRoute={
@@ -878,6 +892,15 @@ export default class ShoppingCart extends Component {
                 var nextRoute={
                     name:"SunYi",
                     component:SunYi
+                };
+                this.props.navigator.push(nextRoute);
+                this.DataSource();
+            }
+            if(tags=="商品配送"){
+                this.Succeed();
+                var nextRoute={
+                    name:"PSDan",
+                    component:PSDan
                 };
                 this.props.navigator.push(nextRoute);
                 this.DataSource();
@@ -964,7 +987,7 @@ export default class ShoppingCart extends Component {
                         <Text style={styles.Number}>数量</Text>
                         <Text style={styles.Price}>单价</Text>
                         {
-                            (this.state.Document=="标签采集")?
+                            (this.state.Name=="标签采集")?
                                 null
                                 :
                                 <Text style={styles.SmallScale}>小计</Text>
@@ -994,7 +1017,7 @@ export default class ShoppingCart extends Component {
                             <Text style={styles.ClientType}>{this.state.ShopNumber}</Text>
                         </Text>
                         {
-                            (this.state.Document=="标签采集")?
+                            (this.state.Name=="标签采集")?
                                 null
                                 :
                                 <Text style={styles.ClientText}>

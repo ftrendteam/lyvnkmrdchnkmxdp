@@ -613,11 +613,14 @@ export default class Search extends Component {
     }
 
     add() {
-        if(this.state.Number1==""){
+        if(this.state.Number==""&&this.state.name!=="标签采集"){
             this.setState({
-                Number1:1,
-                BQNumber:parseInt(this.state.BQNumber)+1,
+                Number:1,
                 numberFormat2:this.state.ShopPrice,
+            });
+        } else if(this.state.name=="标签采集"&&this.state.BQNumber==1){
+            this.setState({
+                BQNumber:2,
             });
         }else{
             let numberFormat2 = NumberUtils.numberFormat2((parseInt(this.state.Number1)+1)*(this.state.ShopPrice));
@@ -816,8 +819,11 @@ export default class Search extends Component {
                     modal:"",
                 })
             }else{
-                if(this.state.Number1==0){
-                    ToastAndroid.show('商品数量不能为空', ToastAndroid.SHORT);
+                if(this.state.Number==0&&this.state.name!=="标签采集"){
+                    alert(this.state.Number)
+                    ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
+                } else if(this.state.BQNumber==0&&this.state.name=="标签采集"){
+                    ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
                 }else{
                     var shopInfoData = [];
                     var shopInfo = {};

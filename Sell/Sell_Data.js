@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
     },
     listleft:{
         width:70,
-        marginTop:6,
+        marginTop:4,
     },
     listLeftText:{
         color:"#333333",
@@ -314,6 +314,7 @@ const styles = StyleSheet.create({
     TextInput1:{
         paddingLeft:5,
         paddingRight:5,
+        paddingTop:0,
         marginBottom:2,
         fontSize:16,
         color:"#333333"

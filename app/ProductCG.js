@@ -86,13 +86,11 @@ export default class ProductCG extends Component {
                 };
                 this.props.navigator.push(nextRoute);
                 Storage.delete('OrgFormno');
-                Storage.delete('scode');
                 Storage.delete('shildshop');
                 Storage.delete('StateMent');
                 Storage.delete('BQNumber');
                 Storage.delete('YuanDan');
                 Storage.delete('Screen');
-                Storage.delete('YdCountm');
                 Storage.delete('Modify');
                 Storage.save('Name','商品采购');
                 Storage.save('FormType','CGYW');
@@ -103,7 +101,6 @@ export default class ProductCG extends Component {
                 Storage.save('YdCountm','3');
                 Storage.save('Date',data);
                 Storage.save("scode",str);
-                Storage.save('Document',"商品采购");
             }
         }else if(this.state.Disting=="1"){
             var str=this.state.sCode1;
@@ -118,13 +115,11 @@ export default class ProductCG extends Component {
                 };
                 this.props.navigator.push(nextRoute);
                 Storage.delete('OrgFormno');
-                Storage.delete('scode');
                 Storage.delete('shildshop');
                 Storage.delete('StateMent');
                 Storage.delete('BQNumber');
                 Storage.delete('YuanDan');
                 Storage.delete('Screen');
-                Storage.delete('YdCountm');
                 Storage.delete('Modify');
                 Storage.save('Name','商品采购');
                 Storage.save('FormType','CGYW');
@@ -135,7 +130,6 @@ export default class ProductCG extends Component {
                 Storage.save('YdCountm','3');
                 Storage.save('Date',data);
                 Storage.save("scode",str);
-                Storage.save('Document', "商品采购");
             }
         }
 

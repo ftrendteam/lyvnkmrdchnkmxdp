@@ -94,12 +94,9 @@ export default class Distrition extends Component {
                 component:Index
             };
             this.props.navigator.push(nextRoute);
-            Storage.delete('OrgFormno');
-            Storage.delete('scode');
             Storage.delete('shildshop');
             Storage.delete('StateMent');
             Storage.delete('BQNumber');
-            Storage.delete('YdCountm');
             Storage.delete('Modify');
             Storage.save('YdCountm', '2');
             Storage.save('YuanDan','1');
@@ -113,7 +110,6 @@ export default class Distrition extends Component {
             Storage.save('historyClass','App_Client_ProPSSHDetailQ');
             Storage.save('ProYH','ProPSSH');
             Storage.save('Screen','1');
-            Storage.save('Document', "配送收货");
         }else if(this.state.Disting=="1"){
             var date = new Date();
             var data=JSON.stringify(date.getTime());
@@ -126,12 +122,9 @@ export default class Distrition extends Component {
                 component:Search
             };
             this.props.navigator.push(nextRoute);
-            Storage.delete('OrgFormno');
-            Storage.delete('scode');
             Storage.delete('shildshop');
             Storage.delete('StateMent');
             Storage.delete('BQNumber');
-            Storage.delete('YdCountm');
             Storage.delete('Modify');
             Storage.save('YdCountm', '2');
             Storage.save('YuanDan','1');
@@ -145,7 +138,6 @@ export default class Distrition extends Component {
             Storage.save('historyClass','App_Client_ProPSSHDetailQ');
             Storage.save('ProYH','ProPSSH');
             Storage.save('Screen','1');
-            Storage.save('Document', "配送收货");
         }
     }
 

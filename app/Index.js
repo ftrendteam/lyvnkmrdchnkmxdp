@@ -446,6 +446,7 @@ export default class Index extends Component {
     }
 
     Storage() {
+        Storage.delete('DataName');
         Storage.get('Name').then((tags) => {
             this.setState({
                 head: tags
@@ -813,9 +814,11 @@ export default class Index extends Component {
                                 OrgFormno: this.state.OrgFormno,
                                 FormType: this.state.FormType,
                             };
+                            console.log(JSON.stringify(params))
                             FetchUtil.post(this.state.LinkUrl, JSON.stringify(params)).then((data) => {
                                 var countm = JSON.stringify(data.countm);
                                 var ShopPrice = JSON.stringify(data.ShopPrice);
+                                console.log(JSON.stringify(data))
                                 if (data.retcode == 1) {
                                     if (this.state.head == "商品查询") {
                                         this.props.navigator.push({
@@ -1370,7 +1373,7 @@ export default class Index extends Component {
         } else if (this.state.username == null) {
             this._setModalVisible();
         } else {
-            if (this.state.Disting == "0" || this.state.Disting == "1") {
+            if (this.state.Disting == "0" ) {
                 NativeModules.AndroidDeviceInfo.getIMEI((IMEI) => {
                     Storage.get('Bind').then((tags) => {
                         if (tags == "bindsucceed") {
@@ -1383,7 +1386,6 @@ export default class Index extends Component {
                                         BindMAC: "",
                                         SysGuid: IMEI,
                                     }
-                                    console.log('1=',JSON.stringify(params))
                                     Storage.get('LinkUrl').then((linkurl) => {
                                         FetchUtil.post(linkurl, JSON.stringify(params)).then((data) => {
                                             Storage.save("invoice", "移动销售");
@@ -1422,10 +1424,66 @@ export default class Index extends Component {
                         }
                     })
                 })
-                if (this.state.Disting == "1") {
-                    DeviceEventEmitter.removeAllListeners();
-                }
-            } else {
+                // if (this.state.Disting == "1") {
+                //     DeviceEventEmitter.removeAllListeners();
+                // }
+            } else if(this.state.Disting == "1"){
+                NativeModules.AndroidDeviceInfo.getIMEI((IMEI) => {
+                    Storage.get('Bind').then((tags) => {
+                        if (tags == "bindsucceed") {
+                            Storage.get('ShopCode').then((ShopCode) => {
+                                Storage.get('PosCode').then((PosCode) => {
+                                    let params = {
+                                        TblName: "ChkPosShopBind",
+                                        ShopCode: ShopCode,
+                                        PosCode: PosCode,
+                                        BindMAC: "",
+                                        SysGuid: IMEI,
+                                    }
+                                    Storage.get('LinkUrl').then((linkurl) => {
+                                        FetchUtil.post(linkurl, JSON.stringify(params)).then((data) => {
+                                            Storage.save("invoice", "移动销售");
+                                            Storage.save("Name", "移动销售");
+                                            Storage.save('YdCountm', '4');
+                                            if (data.retcode == 1) {
+                                                var invoice = "移动销售";
+                                                this.setState({
+                                                    head: invoice,
+                                                });
+                                                var nextRoute = {
+                                                    name: "移动销售",
+                                                    component: Sell,
+                                                };
+                                                this.props.navigator.push(nextRoute);
+                                                this._setModalVisible();
+                                            } else {
+                                                var nextRoute = {
+                                                    name: "移动销售",
+                                                    component: SellData,
+                                                };
+                                                this.props.navigator.push(nextRoute);
+                                                this._setModalVisible();
+                                            }
+                                        }, (err) => {
+                                            alert("网络请求失败");
+                                        })
+                                    })
+                                })
+                            })
+                        } else {
+                            Storage.save("invoice", "移动销售");
+                            Storage.save("Name", "移动销售");
+                            Storage.save('YdCountm', '4');
+                            var nextRoute = {
+                                name: "移动销售",
+                                component: SellData,
+                            };
+                            this.props.navigator.push(nextRoute);
+                            this._setModalVisible();
+                        }
+                    })
+                })
+            }else {
                 this.Promp();
             }
         }
@@ -1588,6 +1646,7 @@ export default class Index extends Component {
         this.NewData();
         Storage.get('code').then((tags) => {
             Storage.get('LinkUrl').then((LinkUrl) => {
+                console.log("tags",tags);
                 updata.downLoadAllData(LinkUrl, dbAdapter, tags);
                 this.NewData();
                 this.DataComplete();
@@ -1597,18 +1656,25 @@ export default class Index extends Component {
 
     //报表(业务及收银)
     StateMent() {
-        Storage.get('Disting').then((tags) => {
-            if (tags == 0) {
-                this._setModalVisible();
-                this._StateMent();
-                this.YeWu();
-                Storage.save("StateMent", "0");
-            } else if (tags == 1) {
-                this.Promp1();
-            } else {
-                this.Promp();
-            }
-        })
+        if (this.state.ShopCar1 > 0) {
+            this._setModalVisible();
+            alert("商品未提交")
+        } else if (this.state.username == null) {
+            this._setModalVisible();
+        } else {
+            Storage.get('Disting').then((tags) => {
+                if (tags == 0) {
+                    this._setModalVisible();
+                    this._StateMent();
+                    this.YeWu();
+                    Storage.save("StateMent", "0");
+                } else if (tags == 1) {
+                    this.Promp1();
+                } else {
+                    this.Promp();
+                }
+            })
+        }
     }
 
     YeWu() {
@@ -1832,7 +1898,18 @@ export default class Index extends Component {
             })
         })
     }
-
+    PSDan1(){
+        this._StateMent();
+        var nextRoute = {
+            name: "HistoricalDocument",
+            component: HistoricalDocument
+        };
+        this.props.navigator.push(nextRoute);
+        Storage.delete('Name');
+        Storage.save('name', '商品配送');
+        Storage.save('history','App_Client_ProPSQ');
+        Storage.save('historyClass','App_Client_ProPSDetailQ');
+    }
     Sell1() {
 
     }
@@ -2494,6 +2571,16 @@ export default class Index extends Component {
                             <View style={[styles.ModalHead, {marginBottom: 10}]}>
                                 <TouchableOpacity style={[styles.ModalHeadImage,
                                     {borderRightWidth: 1, borderRightColor: "#f2f2f2"}]}
+                                                  onPress={this.PSDan1.bind(this)}>
+                                    <Text style={styles.ModalHeadImage1}>
+                                        <Image source={require("../images/1_45.png")}/>
+                                    </Text>
+                                    <Text style={styles.ModalHeadText}>
+                                        商品配送
+                                    </Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={[styles.ModalHeadImage,
+                                    {borderRightWidth: 1, borderRightColor: "#f2f2f2"}]}
                                                   onPress={this.pullOut1.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_56.png")}/>
@@ -2502,7 +2589,6 @@ export default class Index extends Component {
                                         退出账号
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.ModalHeadImage}></TouchableOpacity>
                                 <TouchableOpacity style={styles.ModalHeadImage}></TouchableOpacity>
                             </View>
                         </View>
@@ -3060,7 +3146,7 @@ const styles = StyleSheet.create({
         height: null,
     },
     ModalStyleCont: {
-        height: 160,
+        height: 165,
         paddingTop: 25,
         paddingLeft: 10,
         paddingRight: 10,

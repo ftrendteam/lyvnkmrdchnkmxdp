@@ -336,6 +336,7 @@ export default class Sell extends Component {
     }
 
     ListButton(rowData){
+        Storage.save("DataName", "移动销售");
         this.props.navigator.push({
             component:GoodsDetails,
             params:{
@@ -351,7 +352,6 @@ export default class Sell extends Component {
                 promemo:"",
                 SuppCode:rowData.SuppCode,
                 BarCode:rowData.BarCode,
-                DataName:'销售',
             }
         })
     }
@@ -927,11 +927,9 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
     ShopCont: {
+        backgroundColor:"#f2f2f2",
         paddingLeft: 10,
         paddingRight: 10,
-    },
-    SwipeList:{
-
     },
     ShopList: {
         minHeight: 100,

@@ -78,6 +78,9 @@ export default class Pay extends Component {
             MiYaKeyCode:"",
             MiYaIP:"",
             points:"",
+            Pid:"",
+            PayCode:"",
+            ShopAmount:"",
             evenNumber:1,
             VipCardNo: this.props.VipCardNo ? this.props.VipCardNo : "",
             JfBal: this.props.JfBal ? this.props.JfBal : "",
@@ -183,7 +186,6 @@ export default class Pay extends Component {
                     }else if(this.state.NewPrice<=row){
                         if(this.state.discount=="1"){
                             newAllPrice = BigDecimalUtils.subtract(this.state.ShopAmount,this.state.NewPrice);
-                            console.log('newAllPrice',newAllPrice)
                             disPrice = VipPrice.disCount(this.DisCount,this.state.ShopAmount,this.state.NewPrice);
                             this.setState({
                                 ShopAmount: newAllPrice,
@@ -192,11 +194,11 @@ export default class Pay extends Component {
                             this.NewPriceButton();
                         }else if(this.state.discount=="2"){
                             disCount = BigDecimalUtils.multiply(this.state.ShopAmount,BigDecimalUtils.subtract(1,BigDecimalUtils.divide(this.state.NewPrice,100)));
-                            console.log('disCount',disCount)
+
                             disNewPrice = BigDecimalUtils.subtract(this.state.ShopAmount,disCount);
-                            console.log('disNewPrice',disNewPrice)
+
                             disPrice = VipPrice.disCount(this.DisCount,this.state.ShopAmount,disNewPrice);
-                            console.log(this.DisCount)
+
                             this.setState({
                                 ShopAmount: disCount,
                                 amount:disCount,
@@ -265,34 +267,6 @@ export default class Pay extends Component {
                     evenNumber: Number(evenNumber)+1,
                 })
             }
-        })
-
-        Storage.get('ShopCode').then((ShopCode) => {
-            Storage.get('PosCode').then((PosCode) => {
-                dbAdapter.SelectPosOpt(ShopCode,PosCode,'PosPaySet').then((rows) => {
-                    let priductData = [];
-                    for (let i = 0; i < rows.length; i++) {
-                        var row = rows.item(i);
-                    }
-                    var OptValue=row.OptValue;
-                    var len=OptValue.length;
-                    var lastOptValue=OptValue.substring(0,len-1);
-                    var result=lastOptValue.split(",");
-                    for(var i=0;i<result.length;i++){
-                        dbAdapter.selectPayInfo(result[i]).then((rows) => {
-                            for(var i=0;i<rows.length;i++){
-                                var row = rows.item(i);
-                                priductData.push(row);
-                            }
-                            this.productData = priductData;
-                            this.setState({
-                                data: priductData,
-                            })
-                        })
-                    }
-
-                });
-            })
         })
         this.dbadapter();
     }
@@ -537,6 +511,33 @@ export default class Pay extends Component {
             }
         })
 
+        Storage.get('ShopCode').then((ShopCode) => {
+            Storage.get('PosCode').then((PosCode) => {
+                dbAdapter.SelectPosOpt(ShopCode,PosCode,'PosPaySet').then((rows) => {
+                    let priductData = [];
+                    for (let i = 0; i < rows.length; i++) {
+                        var row = rows.item(i);
+                    }
+                    var OptValue=row.OptValue;
+                    var len=OptValue.length;
+                    var lastOptValue=OptValue.substring(0,len-1);
+                    var result=lastOptValue.split(",");
+                    for(var i=0;i<result.length;i++){
+                        dbAdapter.selectPayInfo(result[i]).then((rows) => {
+                            for(var i=0;i<rows.length;i++){
+                                var row = rows.item(i);
+                                priductData.push(row);
+                            }
+                            this.productData = priductData;
+                            this.setState({
+                                data: priductData,
+                            })
+                        })
+                    }
+
+                });
+            })
+        })
     }
 
     Return() {
@@ -572,12 +573,8 @@ export default class Pay extends Component {
             <View style={styles.ShopList1} onPress={() => this.OrderDetails(rowData)}>
                 <View style={styles.Row}><Text style={styles.Name}>{rowData.payName}</Text></View>
                 <View style={styles.Row}><Text style={styles.Name}>{rowData.CardFaceNo}</Text></View>
-                {
-                    (rowData.payName == "现金") ?
-                        <View style={styles.Row}><Text style={styles.Name}>{rowData.Total}</Text></View>
-                        :
-                        <View style={styles.Row}><Text style={styles.Name}>{rowData.total}</Text></View>
-                }
+
+                <View style={styles.Row}><Text style={styles.Name}>{rowData.Total}</Text></View>
                 <View style={styles.Row}><Text style={styles.Name}>{rowData.retZjf}</Text></View>
                 <View style={styles.Row}><Text style={styles.Name}>{rowData.ReferenceNo}</Text></View>
             </View>
@@ -626,200 +623,207 @@ export default class Pay extends Component {
     }
 
     HorButton(item) {
-        if (this.state.amount == "") {
-            this.LayerShow();
-        } else {
-            if (item.item.PayCode == "01") {
-                if (this.state.Seles == "R") {
-                    if (this.state.amount > Number(this.state.Total) && this.state.Total < 0) {
-                        this.ModalShow()
-                    } else {
-                        this.RefundTotal()
-                    }
-                } else if (this.state.Seles == "T") {
-                    if (this.state.amount > Number(this.state.Total) && this.state.Total > 0) {
-                        this.ModalShow()
-                    } else {
-                        this.Total()
+        if(this.state.ShopAmount==""){
+            return;
+        }else{
+            if (this.state.amount == "") {
+                this.LayerShow();
+            } else {
+                if (item.item.PayCode == "01") {
+                    if (this.state.Seles == "R") {
+                        if (this.state.amount > Number(this.state.Total) && this.state.Total < 0) {
+                            this.ModalShow()
+                        } else {
+                            this.RefundTotal()
+                        }
+                    } else if (this.state.Seles == "T") {
+                        if (this.state.amount > Number(this.state.Total) && this.state.Total > 0) {
+                            this.ModalShow()
+                        } else {
+                            this.Total()
+                        }
                     }
                 }
-            }
-            else if (item.item.PayCode == "00") {
-                if (this.state.Seles == "R") {
-                    var payTotal = Number(this.state.amount) + Number(this.state.payments);
-                    this.state.payments += -(Number(this.state.amount));
-                    var payamount = Number(this.state.AMount) - Number(this.state.amount);
-                    var Total = BigDecimalUtils.add(this.state.ShopAmount, this.state.payments, 2);
-                    var aptotal = BigDecimalUtils.subtract(payamount, Total, 2);
-                    if (this.state.ShopAmount < payTotal) {
-                        var Amount = {
-                            'payName': '现金',
-                            'CardFaceNo': '',
-                            'Total': payamount,
-                            'total': aptotal,
-                            'payRT': '',
-                            'PayCode': item.item.PayCode,
-                            'pid': item.item.Pid,
+                else if (item.item.PayCode == "00") {
+                    if (this.state.Seles == "R") {
+                        var payTotal = Number(this.state.amount) + Number(this.state.payments);
+                        this.state.payments += -(Number(this.state.amount));
+                        var payamount = Number(this.state.AMount) - Number(this.state.amount);
+                        var Total = BigDecimalUtils.add(this.state.ShopAmount, this.state.payments, 2);
+                        var aptotal = BigDecimalUtils.subtract(payamount, Total, 2);
+                        if (this.state.ShopAmount < payTotal) {
+                            var Amount = {
+                                'payName': '现金',
+                                'CardFaceNo': '',
+                                'Total': payamount,
+                                'total': aptotal,
+                                'payRT': '',
+                                'PayCode': item.item.PayCode,
+                                'pid': item.item.Pid,
+                            }
+                        } else {
+                            var Amount = {
+                                'payName': '现金',
+                                'CardFaceNo': '',
+                                'Total': payamount,
+                                'total': payamount,
+                                'payRT': '',
+                                'PayCode': item.item.PayCode,
+                                'pid': item.item.Pid,
+                            }
                         }
-                    } else {
-                        var Amount = {
-                            'payName': '现金',
-                            'CardFaceNo': '',
-                            'Total': payamount,
-                            'total': payamount,
-                            'payRT': '',
-                            'PayCode': item.item.PayCode,
-                            'pid': item.item.Pid,
+                        if (this.dataRows.length == 0) {
+                            this.dataRows.push(Amount);
+                            this.setState({
+                                AMount: payamount,
+                                payments: this.state.payments,
+                                payname: "现金",
+                                Total: Total,
+                                cardfaceno: "",
+                                dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
+                            })
+                        } else {
+                            for (let i = 0; i < this.dataRows.length; i++) {
+                                let RowsList = this.dataRows[i];
+                                if (RowsList.payName == "现金") {
+                                    RowsList.Total = payamount;
+                                    RowsList.total = aptotal;
+                                    this.setState({
+                                        AMount: payamount,
+                                        payments: this.state.payments,
+                                        Total: Total,
+                                        cardfaceno: "",
+                                        dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
+                                    });
+                                    break
+                                } else if (i == this.dataRows.length - 1) {
+                                    this.dataRows.push(Amount);
+                                    this.setState({
+                                        AMount: payamount,
+                                        payments: this.state.payments,
+                                        Total: Total,
+                                        cardfaceno: "",
+                                        dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
+                                    })
+                                }
+                            }
                         }
-                    }
-                    if (this.dataRows.length == 0) {
-                        this.dataRows.push(Amount);
-                        this.setState({
-                            AMount: payamount,
-                            payments: this.state.payments,
-                            payname: "现金",
-                            Total: Total,
-                            cardfaceno: "",
-                            dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
-                        })
-                    } else {
-                        for (let i = 0; i < this.dataRows.length; i++) {
-                            let RowsList = this.dataRows[i];
-                            if (RowsList.payName == "现金") {
+                        this.restorage1()
+                    } else if (this.state.Seles == "T") {
+                        var payTotal = Number(this.state.amount) + Number(this.state.payments);
+                        this.state.payments += Number(this.state.amount);
+                        var Total = (BigDecimalUtils.subtract(this.state.ShopAmount, this.state.payments, 2));
+                        var payamount = Number(this.state.AMount) + Number(this.state.amount);
+                        var aptotal = BigDecimalUtils.subtract(payamount, Total, 2);
+                        if (payTotal>=this.state.ShopAmount) {
+                            var Amount = {
+                                'payName': '现金',
+                                'CardFaceNo': '',
+                                'Total': payamount,
+                                'total': aptotal,
+                                'payRT': '',
+                                'PayCode': item.item.PayCode,
+                                'pid': item.item.Pid,
+                            }
+                        } else {
+                            var Amount = {
+                                'payName': '现金',
+                                'CardFaceNo': '',
+                                'Total': payamount,
+                                'total': payamount,
+                                'payRT': '',
+                                'PayCode': item.item.PayCode,
+                                'pid': item.item.Pid,
+                            }
+                        }
+                        if (this.dataRows.length == 0) {
+                            this.dataRows.push(Amount);
+                            this.setState({
+                                AMount: payamount,
+                                payments: this.state.payments,
+                                Total: Total,
+                                cardfaceno: "",
+                                dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
+                            })
+                        } else {
+                            for (let i = 0; i < this.dataRows.length; i++) {
+                                let RowsList = this.dataRows[i];
                                 RowsList.Total = payamount;
-                                RowsList.total = aptotal;
-                                this.setState({
-                                    AMount: payamount,
-                                    payments: this.state.payments,
-                                    Total: Total,
-                                    cardfaceno: "",
-                                    dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
-                                });
-                                break
-                            } else if (i == this.dataRows.length - 1) {
-                                this.dataRows.push(Amount);
-                                this.setState({
-                                    AMount: payamount,
-                                    payments: this.state.payments,
-                                    Total: Total,
-                                    cardfaceno: "",
-                                    dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
-                                })
+                                if (RowsList.payName == "现金") {
+                                    RowsList.total = aptotal;
+                                    this.setState({
+                                        AMount: payamount,
+                                        payments: this.state.payments,
+                                        Total: Total,
+                                        cardfaceno: "",
+                                        dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
+                                    });
+                                    break
+                                } else if (i == this.dataRows.length - 1) {
+                                    this.dataRows.push(Amount);
+                                    this.setState({
+                                        AMount: payamount,
+                                        payments: this.state.payments,
+                                        payname: "现金",
+                                        Total: Total,
+                                        cardfaceno: "",
+                                        dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
+                                    })
+                                }
                             }
                         }
+                        this.restorage();
                     }
-                    this.restorage1()
-                } else if (this.state.Seles == "T") {
-                    var payTotal = Number(this.state.amount) + Number(this.state.payments);
-                    this.state.payments += Number(this.state.amount);
-                    var Total = -(BigDecimalUtils.subtract(this.state.ShopAmount, this.state.payments, 2));
-                    var payamount = Number(this.state.AMount) + Number(this.state.amount);
-                    var aptotal = BigDecimalUtils.subtract(payamount, Total, 2);
-                    if (payTotal>=this.state.ShopAmount) {
-                        var Amount = {
-                            'payName': '现金',
-                            'CardFaceNo': '',
-                            'Total': payamount,
-                            'total': aptotal,
-                            'payRT': '',
-                            'PayCode': item.item.PayCode,
-                            'pid': item.item.Pid,
-                        }
-                    } else {
-                        var Amount = {
-                            'payName': '现金',
-                            'CardFaceNo': '',
-                            'Total': payamount,
-                            'total': payamount,
-                            'payRT': '',
-                            'PayCode': item.item.PayCode,
-                            'pid': item.item.Pid,
-                        }
-                    }
-                    if (this.dataRows.length == 0) {
-                        this.dataRows.push(Amount);
-                        this.setState({
-                            AMount: payamount,
-                            payments: this.state.payments,
-                            Total: Total,
-                            cardfaceno: "",
-                            dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
-                        })
-                    } else {
-                        for (let i = 0; i < this.dataRows.length; i++) {
-                            let RowsList = this.dataRows[i];
-                            RowsList.Total = payamount;
-                            if (RowsList.payName == "现金") {
-                                RowsList.total = aptotal;
-                                this.setState({
-                                    AMount: payamount,
-                                    payments: this.state.payments,
-                                    Total: Total,
-                                    cardfaceno: "",
-                                    dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
-                                });
-                                break
-                            } else if (i == this.dataRows.length - 1) {
-                                this.dataRows.push(Amount);
-                                this.setState({
-                                    AMount: payamount,
-                                    payments: this.state.payments,
-                                    payname: "现金",
-                                    Total: Total,
-                                    cardfaceno: "",
-                                    dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
-                                })
-                            }
-                        }
-                    }
-                    this.restorage();
                 }
-            }
-            else if(item.item.PayCode == "0Q"){
-                if (this.state.Seles == "R") {
+                else if(item.item.PayCode == "0Q"){
+                    if (this.state.Seles == "R") {
 
 
-                } else if (this.state.Seles == "T") {
-                    if (this.state.amount > Number(this.state.Total) && this.state.Total < 0) {
-                        this.ModalShow()
-                    } else {
-                        dbAdapter.selectPosOpt('MiYaMerchID').then((rows) => {
-                            for (let i = 0; i < rows.length; i++) {
-                                var row = rows.item(i);
-                                var MiYaMerchID=row.OptValue;
-                            }
-                            this.setState({
-                                MiYaMerchID:MiYaMerchID
+                    } else if (this.state.Seles == "T") {
+                        if (this.state.amount > Number(this.state.Total) && this.state.Total < 0) {
+                            this.ModalShow()
+                        } else {
+                            dbAdapter.selectPosOpt('MiYaMerchID').then((rows) => {
+                                for (let i = 0; i < rows.length; i++) {
+                                    var row = rows.item(i);
+                                    var MiYaMerchID=row.OptValue;
+                                }
+                                this.setState({
+                                    MiYaMerchID:MiYaMerchID
+                                })
                             })
-                        })
 
-                        dbAdapter.selectPosOpt('MiYaKeyCode').then((rows) => {
-                            for (let i = 0; i < rows.length; i++) {
-                                var row = rows.item(i);
-                                var MiYaKeyCode=row.OptValue;
-                            }
-                            this.setState({
-                                MiYaKeyCode:MiYaKeyCode
+                            dbAdapter.selectPosOpt('MiYaKeyCode').then((rows) => {
+                                for (let i = 0; i < rows.length; i++) {
+                                    var row = rows.item(i);
+                                    var MiYaKeyCode=row.OptValue;
+                                }
+                                this.setState({
+                                    MiYaKeyCode:MiYaKeyCode
+                                })
                             })
-                        })
 
-                        dbAdapter.selectPosOpt('MiYaIP').then((data) => {
-                            for (let i = 0; i < data.length; i++) {
-                                var datas = data.item(i);
-                                var MiYaIP=datas.OptValue;
-                            }
-                            this.setState({
-                                MiYaIP:MiYaIP
+                            dbAdapter.selectPosOpt('MiYaIP').then((data) => {
+                                for (let i = 0; i < data.length; i++) {
+                                    var datas = data.item(i);
+                                    var MiYaIP=datas.OptValue;
+                                }
+                                this.setState({
+                                    MiYaIP:MiYaIP
+                                })
                             })
-                        })
 
-                        var points=this.state.amount*100;
-                        this.setState({
-                            points:1,
-                        })
+                            var points=this.state.amount*100;
+                            this.setState({
+                                points:points,
+                            })
 
-                        this.Barcode();
+                            this.Barcode();
+                        }
                     }
+                }
+                else{
+                    alert("该支付方式还未启动，敬请期待！")
                 }
             }
         }
@@ -829,7 +833,7 @@ export default class Pay extends Component {
         if(this.state.barcode==""){
             alert("请输入付款吗")
         }else{
-            this.WaitLoading();
+            // this.WaitLoading();
             var space = "";
             var EvenNumber=this.state.evenNumber;
             var dates = new Date();
@@ -850,18 +854,93 @@ export default class Pay extends Component {
                 EvenNumber = "0"+1;
             }
             var time =years+space+months+space+days+this.state.numform+EvenNumber;
+            console.log('qqq=',this.state.MiYaMerchID,time,this.state.points+"",this.state.barcode,this.state.MiYaKeyCode,this.state.MiYaIP,"9191")
             NativeModules.AndroidMYRequest.doPay(this.state.MiYaMerchID,time,this.state.points+"",this.state.barcode,this.state.MiYaKeyCode,this.state.MiYaIP,"9191",(data)=>{
                 this.WaitLoading();
+                if(data=="1-支付成功"){
+                    this.WaitLoading();
+                    ToastAndroid.show('微信支付成功', ToastAndroid.SHORT);
+                }else if(data=="3-支付成功"){
+                    this.WaitLoading();
+                    ToastAndroid.show('支付宝支付成功', ToastAndroid.SHORT);
+                }else{
+                    alert(data)
+                }
                 var Points=this.state.points/100;
-                var points = BigDecimalUtils.add(this.state.payments, Points, 2);
-                var Total = (BigDecimalUtils.subtract(this.state.ShopAmount, points, 2));
-                this.setState({
-                    payments:points,
-                    ShopAmount:Total,
-                })
-                alert(data);
-                this.Barcode();
+                var payTotal = Number(Points) + Number(this.state.payments);
+                this.state.payments += Number(Points);
+                var Total = (BigDecimalUtils.subtract(this.state.ShopAmount, this.state.payments, 2));
+                var payamount = Number(this.state.AMount) + Number(Points);
+                // alert(payamount)
+                var aptotal = BigDecimalUtils.subtract(payamount, Total, 2);
+                if (payTotal>=this.state.ShopAmount) {
+                    var Amount = {
+                        'payName': '米雅支付',
+                        'CardFaceNo': '',
+                        'Total': Points,
+                        'total': "",
+                        'payRT': '',
+                        'PayCode': this.state.PayCode,
+                        'pid': this.state.Pid,
+                    }
+                } else {
+                    var Amount = {
+                        'payName': '米雅支付',
+                        'CardFaceNo': '',
+                        'Total': Points,
+                        'total': "",
+                        'payRT': '',
+                        'PayCode': this.state.PayCode,
+                        'pid': this.state.Pid,
+                    }
+                }
+                if (this.dataRows.length == 0) {
+                    this.dataRows.push(Amount);
+                    this.setState({
+                        AMount: payamount,
+                        payments: this.state.payments,
+                        Total: Total,
+                        cardfaceno: "",
+                        dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
+                    })
+                } else {
+                    this.dataRows.push(Amount);
+                    this.setState({
+                        // AMount: payamount,
+                        // payments: this.state.payments,
+                        // payname: "米雅支付",
+                        // Total: Total,
+                        // cardfaceno: "",
+                        dataSource: this.state.dataSource.cloneWithRows(this.dataRows)
+                    })
+                    // for (let i = 0; i < this.dataRows.length; i++) {
+                    //     let RowsList = this.dataRows[i];
+                    //     RowsList.Total = payamount;
+                    //     if (RowsList.payName == "米雅支付") {
+                    //         RowsList.total = aptotal;
+                    //         this.setState({
+                    //             AMount: payamount,//
+                    //             payments: this.state.payments,
+                    //             Total: Total,
+                    //             cardfaceno: "",
+                    //             dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
+                    //         });
+                    //         break
+                    //     } else if (i == this.dataRows.length - 1) {
+                    //         this.dataRows.push(Amount);
+                    //         this.setState({
+                    //             AMount: payamount,
+                    //             payments: this.state.payments,
+                    //             payname: "米雅支付",
+                    //             Total: Total,
+                    //             cardfaceno: "",
+                    //             dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
+                    //         })
+                    //     }
+                    // }
+                }
                 this.restorage();
+                this.Barcode();
             });
         }
     }
@@ -901,8 +980,6 @@ export default class Pay extends Component {
                         var InnerNo = NumFormatUtils.CreateInnerNo();
                         for (let i = 0; i < this.dataRows.length; i++) {
                             var dataRows = this.dataRows[i];
-                            console.log('wtf=',dataRows)
-                            console.log(dataRows.pid)
                             var ino;
                             ino = i + 1
                             var SumData = year + "-" + month + "-" + day + " " + hh + ":" + mm + ":" + ss;
@@ -940,7 +1017,6 @@ export default class Pay extends Component {
                         };
                         for (let i = 0; i < this.state.dataRows.length; i++) {
                             var DataRows = this.state.dataRows[i];
-                            console.log('WTF=',DataRows)
                             var OrderNo = 0;
                             OrderNo = i + 1;
                             var BarCode;
@@ -1018,13 +1094,13 @@ export default class Pay extends Component {
                                                         'detail': details,
                                                         'sum': sums,
                                                     });
-                                                    console.log(requestBody)
                                                     FetchUtil.post(tags, requestBody).then((success) => {
                                                         if ((success.retcode == 1)) {//表示流水上传成功 修改数据库标识
                                                             dbAdapter.upDateSum(rows.item(i).LsNo, rows.item(i).sDateTime).then((upDateSum) => {
                                                             });
                                                             dbAdapter.upDateDetail(rows.item(i).LsNo, rows.item(i).sDateTime).then((upDateDetail) => {
                                                             });
+                                                            alert("1111")
                                                         } else {
                                                             alert(JSON.stringify(success))
                                                         }
@@ -1043,8 +1119,8 @@ export default class Pay extends Component {
                             component: Index,
                         };
                         this.props.navigator.push(nextRoute);
-                        dbAdapter.deleteData("shopInfo");
-                        Storage.delete("VipPrice");
+                        // dbAdapter.deleteData("shopInfo");
+                        // Storage.delete("VipPrice");
                     }
                 })
             })
@@ -1297,8 +1373,7 @@ export default class Pay extends Component {
                                     retZjf = row.retZjf;
                                     ReferenceNo = row.ReferenceNo;
                                     retTxt = row.retTxt;
-                                }
-                                ;
+                                };
                                 //支付方式
                                 for (let i = 0; i < this.productData.length; i++) {
                                     var Pid;
@@ -1308,12 +1383,11 @@ export default class Pay extends Component {
                                         Pid = productData.Pid;
                                         PayCode = productData.PayCode;
                                     }
-                                }
-                                ;
+                                };
                                 var TblRowconcat = {
                                     'payName': '储值卡',
                                     'CardFaceNo': this.state.CardFaceNo,
-                                    'total': retcurrJF,
+                                    'Total': retcurrJF,
                                     'retZjf': retZjf,
                                     'ReferenceNo': ReferenceNo,
                                     'PayretcurrJF': PayretcurrJF,

@@ -119,11 +119,31 @@ export default class PSDan extends Component {
             }else if(this.state.CKu==''){
                 alert("仓库不能为空")
             }else{
+                var str1=this.state.YHDan;
+                var str2=this.state.JiGou;
+                var date = new Date();
+                var data=JSON.stringify(date.getTime());
                 var nextRoute={
                     name:"Index",
                     component:Index,
                 };
                 this.props.navigator.push(nextRoute);
+                Storage.delete('scode');
+                Storage.delete('StateMent');
+                Storage.delete('BQNumber');
+                Storage.delete('YuanDan');
+                Storage.delete('YdCountm');
+                Storage.delete('Modify');
+                Storage.save('Date',data);
+                Storage.save('Screen', '1');
+                Storage.save('Name','商品配送');
+                Storage.save('shildshop',str2);
+                Storage.save('OrgFormno',str1);
+                Storage.save('FormType', 'PSYW');
+                Storage.save('CKu',this.state.CKu);
+                Storage.save('valueOf','App_Client_ProPS');
+                Storage.save('history','App_Client_ProPSQ');
+                Storage.save('historyClass','App_Client_ProPSDetailQ');
             }
         }else if(this.state.Disting=="1"){
             if(this.state.JiGou==''){
@@ -131,26 +151,33 @@ export default class PSDan extends Component {
             }else if(this.state.CKu==''){
                 alert("仓库不能为空")
             }else{
+                var str1=this.state.YHDan;
+                var str2=this.state.JiGou;
+                var date = new Date();
+                var data=JSON.stringify(date.getTime());
                 var nextRoute={
                     name:"Search",
                     component:Search,
                 };
                 this.props.navigator.push(nextRoute);
+                Storage.delete('scode');
+                Storage.delete('StateMent');
+                Storage.delete('BQNumber');
+                Storage.delete('YuanDan');
+                Storage.delete('YdCountm');
+                Storage.delete('Modify');
+                Storage.save('Date',data);
+                Storage.save('Screen', '1');
+                Storage.save('Name','商品配送');
+                Storage.save('OrgFormno',str1);
+                Storage.save('shildshop',str2);
+                Storage.save('FormType', 'PSYW');
+                Storage.save('CKu',this.state.CKu);
+                Storage.save('valueOf','App_Client_ProPS');
+                Storage.save('history','App_Client_ProPSQ');
+                Storage.save('historyClass','App_Client_ProPSDetailQ');
             }
         }
-        Storage.delete('OrgFormno');
-        Storage.delete('scode');
-        Storage.delete('shildshop');
-        Storage.delete('StateMent');
-        Storage.delete('BQNumber');
-        Storage.delete('YuanDan');
-        Storage.delete('Screen');
-        Storage.delete('YdCountm');
-        Storage.delete('Modify');
-        Storage.save('Name','商品配送');
-        Storage.save('valueOf','App_Client_ProPS');
-        Storage.save('history','App_Client_ProPSQ');
-        Storage.save('historyClass','App_Client_ProPSDetailQ');
     }
 
     render() {
