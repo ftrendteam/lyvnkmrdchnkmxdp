@@ -17,7 +17,7 @@ import {
     ToastAndroid,
     ActivityIndicator,
     TouchableOpacity,
-  DeviceEventEmitter,
+    DeviceEventEmitter,
 } from 'react-native';
 import Index from "../app/Index";
 import Sell from "../Sell/Sell";
@@ -83,6 +83,7 @@ export default class Pay extends Component {
             Pid:"",
             PayCode:"",
             ShopAmount:"",
+            PriceAmount:"",
             evenNumber:1,
             VipCardNo: this.props.VipCardNo ? this.props.VipCardNo : "",
             JfBal: this.props.JfBal ? this.props.JfBal : "",
@@ -193,6 +194,7 @@ export default class Pay extends Component {
                             this.setState({
                                 ShopAmount: newAllPrice,
                                 amount:newAllPrice,
+                                PriceAmount:newAllPrice,
                             });
                             this.DisCount
                             this.DisTotil = this.state.NewPrice;
@@ -201,12 +203,13 @@ export default class Pay extends Component {
                             disCount = BigDecimalUtils.multiply(this.state.ShopAmount,BigDecimalUtils.subtract(1,BigDecimalUtils.divide(this.state.NewPrice,100)));
 
                             disNewPrice = BigDecimalUtils.subtract(this.state.ShopAmount,disCount);
-                            
+
                             disPrice = VipPrice.disCount(this.state.dataRows,this.state.ShopAmount,disNewPrice);
                             this.DisTotil = disNewPrice;
                             this.setState({
                                 ShopAmount: disCount,
                                 amount:disCount,
+                                PriceAmount:disCount,
                             });
                             this.NewPriceButton();
                         }
@@ -298,7 +301,7 @@ export default class Pay extends Component {
         }
         //单品促销
         new Promise.all(promises).then((rows)=> {
-        //    var Datafasle;
+            //    var Datafasle;
             for(let i = 0;i<rows.length; i++){
                 var row=rows[0];
                 if(row==true){
@@ -307,182 +310,184 @@ export default class Pay extends Component {
                     Datafasle=false;
                 }
             }
-        //    if(Datafasle==false){
-        //        //分组促销
-        //        new Promise.all(BGPromotion).then((rows) => {
-        //            // var BGDatafasle;
-        //            // for(let i = 0;i<rows.length; i++){
-        //            //     var row=rows[0];
-        //            //     console.log('abc=',rows)
-        //            //     if(row==true){
-        //            //         BGDatafasle=true;
-        //            //     }else if(row==false){
-        //            //         BGDatafasle=false;
-        //            //     }
-        //            // }
-        //            // console.log('BGDatafasle=', BGDatafasle);
-        //            var Fenzu = 0;
-        //            var FenzuAmount = 0;
-        //            for(let i = 0;i<this.state.dataRows.length;i++) {
-        //                var Rows = this.state.dataRows[i];
-        //                this.DisCount.push(Rows);
-        //                Fenzu = Rows.ShopAmount;
-        //                FenzuAmount += Fenzu;
-        //            }
-        //            this.setState({
-        //                ShopAmount: FenzuAmount,
-        //                amount:FenzuAmount,
-        //            })
-        //        })
-        //
-        //        //满减促销
-        //        MJPromotionManger.MJPromotion(this.state.dataRows,"*",dbAdapter).then((rows) => {
-        //            var Manjian = 0;
-        //            var ManJian = 0;
-        //            for(let i = 0;i<this.state.dataRows.length;i++) {
-        //                var Rows = this.state.dataRows[i];
-        //                this.DisCount.push(Rows);
-        //                Manjian = Rows.ShopAmount;
-        //                ManJian += Manjian;
-        //            }
-        //            this.setState({
-        //                ShopAmount: ManJian,
-        //                amount:ManJian,
-        //            })
-        //
-        //        })
-        //
-        //        //满赠促销
-        //        MZPromotionManger.mzPromotion("*",this.state.dataRows,dbAdapter).then((rows)=>{
-        //            var Manze = 0;
-        //            var ManZe = 0;
-        //            for(let i = 0;i<this.state.dataRows.length;i++) {
-        //                var Rows = this.state.dataRows[i];;
-        //                this.DisCount.push(Rows);
-        //                Manze = Rows.ShopAmount;
-        //                shopAmount += Manze;
-        //            }
-        //            this.setState({
-        //                ShopPrice:rows[0],
-        //                ManZe: ManZe,
-        //                amount:ManZe,
-        //            })
-        //
-        //            let ShopPrice=[];
-        //            if(rows.length==2){
-        //                dbAdapter.selectTdscPresent(rows[1]).then((rows) => {
-        //                    ShopPrice.push(rows.item(0))
-        //                    console.log('ShopPrice=',ShopPrice)
-        //                    this.setState({
-        //                        DataSource: this.state.DataSource.cloneWithRows(ShopPrice),
-        //                    })
-        //                    this.MZPrice();
-        //
-        //                })
-        //            }
-        //        })
-        //
-        //       // 买赠促销
-        //        new Promise.all(bpPromotons).then((rows)=> {
-        //            console.log('MZ=',rows);
-        //            var Maize = 0;
-        //            var MaiZe = 0;
-        //            for(let i = 0;i<this.state.dataRows.length;i++) {
-        //                var Rows = this.state.dataRows[i];
-        //                console.log('买赠=',Rows);
-        //                this.DisCount.push(Rows);
-        //                Maize = Rows.ShopAmount;
-        //                MaiZe += Maize;
-        //            }
-        //            this.setState({
-        //                ShopAmount: MaiZe,
-        //                amount:MaiZe,
-        //            })
-        //            console.log('length=',rows.length)
-        //            let MZShopPrice=[];
-        //            if(rows.length>=1&&rows[0]!=""){
-        //                dbAdapter.selectTdscPresent(rows[0]).then((rows) => {
-        //                    MZShopPrice.push(rows.item(0))
-        //                    console.log('买赠1=',MZShopPrice)
-        //                    this.setState({
-        //                        DataSource: this.state.DataSource.cloneWithRows(MZShopPrice),
-        //                    })
-        //                    this.MZPrice();
-        //                })
-        //            }
-        //        })
-        //
-        //        //组合促销
-        //        GSPromotionsManger.gsPromotionsManger(this.state.dataRows,"*",dbAdapter).then((rows) => {
-        //            console.log('ZH=',rows)
-        //            console.log('DataRows1111=',this.state.dataRows)
-        //            var Zuhe = 0;
-        //            var ZuHe = 0;
-        //            for(let i = 0;i<this.state.dataRows.length;i++) {
-        //                var Rows = this.state.dataRows[i];
-        //                this.DisCount.push(Rows);
-        //                console.log("组合",this.state.dataRows);
-        //                Zuhe = Rows.ShopAmount;
-        //                ZuHe += Zuhe;
-        //            }
-        //            this.setState({
-        //                ShopAmount: ZuHe,
-        //                amount:ZuHe,
-        //            })
-        //            //奇偶促销
-        //        })
-        //        //奇偶促销
-        //        EOPromotionsManger.eoPromotionsManger(this.state.dataRows,"*",dbAdapter).then((rows) => {
-        //            var Jiou = 0;
-        //            var JiOu = 0;
-        //            for(let i = 0;i<this.state.dataRows.length;i++) {
-        //                var Rows = this.state.dataRows[i];
-        //                this.DisCount.push(Rows);
-        //                console.log("奇偶",this.state.dataRows);
-        //                Jiou = Rows.ShopAmount;
-        //                JiOu += Jiou;
-        //            }
-        //            this.setState({
-        //                ShopAmount: JiOu,
-        //                amount:JiOu,
-        //            })
-        //        })
-        //
-        //    }else{
-        //        for(let i = 0;i<this.state.dataRows.length;i++) {
-        //            var Rows = this.state.dataRows[i];
-        //            console.log('DataRows=',Rows);
-        //            this.DisCount.push(Rows);
-        //            ShopPrice = Rows.ShopAmount;
-        //            shopAmount= BigDecimalUtils.add(ShopPrice,shopAmount,2);
-        //        }
-        //        alert(shopAmount);
-        //        this.setState({
-        //            ShopAmount: shopAmount,
-        //            amount:shopAmount,
-        //        })
-        //    }
-          for(let i = 0;i<this.state.dataRows.length;i++) {
-            var Rows = this.state.dataRows[i];
-            this.DisCount.push(Rows);
-            ShopPrice = Rows.ShopAmount;
-            shopAmount= BigDecimalUtils.add(ShopPrice,shopAmount,2);
-          }
-          this.setState({
-            ShopAmount: shopAmount,
-            amount:shopAmount,
-          })
+            //    if(Datafasle==false){
+            //        //分组促销
+            //        new Promise.all(BGPromotion).then((rows) => {
+            //            // var BGDatafasle;
+            //            // for(let i = 0;i<rows.length; i++){
+            //            //     var row=rows[0];
+            //            //     console.log('abc=',rows)
+            //            //     if(row==true){
+            //            //         BGDatafasle=true;
+            //            //     }else if(row==false){
+            //            //         BGDatafasle=false;
+            //            //     }
+            //            // }
+            //            // console.log('BGDatafasle=', BGDatafasle);
+            //            var Fenzu = 0;
+            //            var FenzuAmount = 0;
+            //            for(let i = 0;i<this.state.dataRows.length;i++) {
+            //                var Rows = this.state.dataRows[i];
+            //                this.DisCount.push(Rows);
+            //                Fenzu = Rows.ShopAmount;
+            //                FenzuAmount += Fenzu;
+            //            }
+            //            this.setState({
+            //                ShopAmount: FenzuAmount,
+            //                amount:FenzuAmount,
+            //                PriceAmount:FenzuAmount,
+            //            })
+            //        })
+            //
+            //        //满减促销
+            //        MJPromotionManger.MJPromotion(this.state.dataRows,"*",dbAdapter).then((rows) => {
+            //            var Manjian = 0;
+            //            var ManJian = 0;
+            //            for(let i = 0;i<this.state.dataRows.length;i++) {
+            //                var Rows = this.state.dataRows[i];
+            //                this.DisCount.push(Rows);
+            //                Manjian = Rows.ShopAmount;
+            //                ManJian += Manjian;
+            //            }
+            //            this.setState({
+            //                ShopAmount: ManJian,
+            //                amount:ManJian,
+            //            })
+            //
+            //        })
+            //
+            //        //满赠促销
+            //        MZPromotionManger.mzPromotion("*",this.state.dataRows,dbAdapter).then((rows)=>{
+            //            var Manze = 0;
+            //            var ManZe = 0;
+            //            for(let i = 0;i<this.state.dataRows.length;i++) {
+            //                var Rows = this.state.dataRows[i];;
+            //                this.DisCount.push(Rows);
+            //                Manze = Rows.ShopAmount;
+            //                shopAmount += Manze;
+            //            }
+            //            this.setState({
+            //                ShopPrice:rows[0],
+            //                ManZe: ManZe,
+            //                amount:ManZe,
+            //            })
+            //
+            //            let ShopPrice=[];
+            //            if(rows.length==2){
+            //                dbAdapter.selectTdscPresent(rows[1]).then((rows) => {
+            //                    ShopPrice.push(rows.item(0))
+            //                    console.log('ShopPrice=',ShopPrice)
+            //                    this.setState({
+            //                        DataSource: this.state.DataSource.cloneWithRows(ShopPrice),
+            //                    })
+            //                    this.MZPrice();
+            //
+            //                })
+            //            }
+            //        })
+            //
+            //       // 买赠促销
+            //        new Promise.all(bpPromotons).then((rows)=> {
+            //            console.log('MZ=',rows);
+            //            var Maize = 0;
+            //            var MaiZe = 0;
+            //            for(let i = 0;i<this.state.dataRows.length;i++) {
+            //                var Rows = this.state.dataRows[i];
+            //                console.log('买赠=',Rows);
+            //                this.DisCount.push(Rows);
+            //                Maize = Rows.ShopAmount;
+            //                MaiZe += Maize;
+            //            }
+            //            this.setState({
+            //                ShopAmount: MaiZe,
+            //                amount:MaiZe,
+            //            })
+            //            console.log('length=',rows.length)
+            //            let MZShopPrice=[];
+            //            if(rows.length>=1&&rows[0]!=""){
+            //                dbAdapter.selectTdscPresent(rows[0]).then((rows) => {
+            //                    MZShopPrice.push(rows.item(0))
+            //                    console.log('买赠1=',MZShopPrice)
+            //                    this.setState({
+            //                        DataSource: this.state.DataSource.cloneWithRows(MZShopPrice),
+            //                    })
+            //                    this.MZPrice();
+            //                })
+            //            }
+            //        })
+            //
+            //        //组合促销
+            //        GSPromotionsManger.gsPromotionsManger(this.state.dataRows,"*",dbAdapter).then((rows) => {
+            //            console.log('ZH=',rows)
+            //            console.log('DataRows1111=',this.state.dataRows)
+            //            var Zuhe = 0;
+            //            var ZuHe = 0;
+            //            for(let i = 0;i<this.state.dataRows.length;i++) {
+            //                var Rows = this.state.dataRows[i];
+            //                this.DisCount.push(Rows);
+            //                console.log("组合",this.state.dataRows);
+            //                Zuhe = Rows.ShopAmount;
+            //                ZuHe += Zuhe;
+            //            }
+            //            this.setState({
+            //                ShopAmount: ZuHe,
+            //                amount:ZuHe,
+            //            })
+            //            //奇偶促销
+            //        })
+            //        //奇偶促销
+            //        EOPromotionsManger.eoPromotionsManger(this.state.dataRows,"*",dbAdapter).then((rows) => {
+            //            var Jiou = 0;
+            //            var JiOu = 0;
+            //            for(let i = 0;i<this.state.dataRows.length;i++) {
+            //                var Rows = this.state.dataRows[i];
+            //                this.DisCount.push(Rows);
+            //                console.log("奇偶",this.state.dataRows);
+            //                Jiou = Rows.ShopAmount;
+            //                JiOu += Jiou;
+            //            }
+            //            this.setState({
+            //                ShopAmount: JiOu,
+            //                amount:JiOu,
+            //            })
+            //        })
+            //
+            //    }else{
+            //        for(let i = 0;i<this.state.dataRows.length;i++) {
+            //            var Rows = this.state.dataRows[i];
+            //            console.log('DataRows=',Rows);
+            //            this.DisCount.push(Rows);
+            //            ShopPrice = Rows.ShopAmount;
+            //            shopAmount= BigDecimalUtils.add(ShopPrice,shopAmount,2);
+            //        }
+            //        alert(shopAmount);
+            //        this.setState({
+            //            ShopAmount: shopAmount,
+            //            amount:shopAmount,
+            //        })
+            //    }
+            for(let i = 0;i<this.state.dataRows.length;i++) {
+                var Rows = this.state.dataRows[i];
+                this.DisCount.push(Rows);
+                ShopPrice = Rows.ShopAmount;
+                shopAmount= BigDecimalUtils.add(ShopPrice,shopAmount,2);
+            }
+            this.setState({
+                ShopAmount: shopAmount,
+                amount:shopAmount,
+                PriceAmount:shopAmount,
+            })
         })
-                //for(let i = 0;i<this.state.dataRows.length;i++) {
-                //    var Rows = this.state.dataRows[i];
-                //    this.DisCount.push(Rows);
-                //    ShopPrice = Rows.ShopAmount;
-                //    shopAmount= BigDecimalUtils.add(ShopPrice,shopAmount,2);
-                //}
-                //this.setState({
-                //    ShopAmount: shopAmount,
-                //    amount:shopAmount,
-                //})
+        //for(let i = 0;i<this.state.dataRows.length;i++) {
+        //    var Rows = this.state.dataRows[i];
+        //    this.DisCount.push(Rows);
+        //    ShopPrice = Rows.ShopAmount;
+        //    shopAmount= BigDecimalUtils.add(ShopPrice,shopAmount,2);
+        //}
+        //this.setState({
+        //    ShopAmount: shopAmount,
+        //    amount:shopAmount,
+        //})
         dbAdapter.selectPosOpt('CUTLEVEL').then((rows) => {
             for (let i = 0; i < rows.length; i++) {
                 var row = rows.item(i);
@@ -520,6 +525,7 @@ export default class Pay extends Component {
                             subtract: 0,
                             ShopAmount:this.state.ShopAmount,
                             amount:this.state.ShopAmount,
+                            PriceAmount:this.state.ShopAmount,
                             VipPrice:vipData,
                         })
                     }
@@ -531,10 +537,11 @@ export default class Pay extends Component {
                     subtract: 0,
                     ShopAmount:this.state.ShopAmount,
                     amount:this.state.ShopAmount,
+                    PriceAmount:this.state.ShopAmount,
                     VipPrice:vipData,
                 })
             }
-            
+
         })
         //this.setState({
         //  ShopAmount:BigDecimalUtils.multiply(this.state.ShopAmount,1,2),
@@ -601,7 +608,6 @@ export default class Pay extends Component {
             <View style={styles.ShopList1} onPress={() => this.OrderDetails(rowData)}>
                 <View style={styles.Row}><Text style={styles.Name}>{rowData.payName}</Text></View>
                 <View style={styles.Row}><Text style={styles.Name}>{rowData.CardFaceNo}</Text></View>
-
                 <View style={styles.Row}><Text style={styles.Name}>{rowData.Total}</Text></View>
                 <View style={styles.Row}><Text style={styles.Name}>{rowData.retZjf}</Text></View>
                 <View style={styles.Row}><Text style={styles.Name}>{rowData.ReferenceNo}</Text></View>
@@ -643,6 +649,7 @@ export default class Pay extends Component {
         this.setState({
             ShopAmount: AllShop,
             amount:AllShop,
+            PriceAmount:AllShop,
         })
     }
 
@@ -651,21 +658,23 @@ export default class Pay extends Component {
     }
 
     HorButton(item) {
-        if(this.state.ShopAmount==""){
+        if(this.state.amount==""){
             return;
         }else{
-            if (this.state.amount == "") {
+            if (this.state.PriceAmount == "") {
                 this.LayerShow();
             } else {
                 if (item.item.PayCode == "01") {
                     if (this.state.Seles == "R") {
-                        if (this.state.amount > Number(this.state.Total) && this.state.Total < 0) {
+                        if (this.state.amount > Number(this.state.Total)&&this.state.Total<0) {
+                            alert(this.state.amount)
                             this.ModalShow()
                         } else {
                             this.RefundTotal()
                         }
                     } else if (this.state.Seles == "T") {
-                        if (this.state.amount > Number(this.state.Total) && this.state.Total > 0) {
+                        if (this.state.amount > Number(this.state.Total)&&this.state.Total>0) {
+                            alert(this.state.amount)
                             this.ModalShow()
                         } else {
                             this.Total()
@@ -707,6 +716,8 @@ export default class Pay extends Component {
                                 payments: this.state.payments,
                                 payname: "现金",
                                 Total: Total,
+                                amount:Total,
+                                PriceAmount:Total+"",
                                 cardfaceno: "",
                                 dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
                             })
@@ -720,6 +731,8 @@ export default class Pay extends Component {
                                         AMount: payamount,
                                         payments: this.state.payments,
                                         Total: Total,
+                                        amount:Total,
+                                        PriceAmount:Total+"",
                                         cardfaceno: "",
                                         dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
                                     });
@@ -730,6 +743,8 @@ export default class Pay extends Component {
                                         AMount: payamount,
                                         payments: this.state.payments,
                                         Total: Total,
+                                        amount:Total,
+                                        PriceAmount:Total+"",
                                         cardfaceno: "",
                                         dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
                                     })
@@ -770,6 +785,8 @@ export default class Pay extends Component {
                                 AMount: payamount,
                                 payments: this.state.payments,
                                 Total: Total,
+                                amount:Total,
+                                PriceAmount:Total+"",
                                 cardfaceno: "",
                                 dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
                             })
@@ -783,6 +800,8 @@ export default class Pay extends Component {
                                         AMount: payamount,
                                         payments: this.state.payments,
                                         Total: Total,
+                                        amount:Total,
+                                        PriceAmount:Total+"",
                                         cardfaceno: "",
                                         dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
                                     });
@@ -794,6 +813,8 @@ export default class Pay extends Component {
                                         payments: this.state.payments,
                                         payname: "现金",
                                         Total: Total,
+                                        amount:Total,
+                                        PriceAmount:Total+"",
                                         cardfaceno: "",
                                         dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
                                     })
@@ -805,8 +826,46 @@ export default class Pay extends Component {
                 }
                 else if(item.item.PayCode == "0Q"){
                     if (this.state.Seles == "R") {
+                        if (this.state.amount > Number(this.state.Total) && this.state.Total < 0) {
+                            this.ModalShow()
+                        } else {
+                            dbAdapter.selectPosOpt('MiYaMerchID').then((rows) => {
+                                for (let i = 0; i < rows.length; i++) {
+                                    var row = rows.item(i);
+                                    var MiYaMerchID=row.OptValue;
+                                }
+                                this.setState({
+                                    MiYaMerchID:MiYaMerchID
+                                })
+                            })
 
+                            dbAdapter.selectPosOpt('MiYaKeyCode').then((rows) => {
+                                for (let i = 0; i < rows.length; i++) {
+                                    var row = rows.item(i);
+                                    var MiYaKeyCode=row.OptValue;
+                                }
+                                this.setState({
+                                    MiYaKeyCode:MiYaKeyCode
+                                })
+                            })
 
+                            dbAdapter.selectPosOpt('MiYaIP').then((data) => {
+                                for (let i = 0; i < data.length; i++) {
+                                    var datas = data.item(i);
+                                    var MiYaIP=datas.OptValue;
+                                }
+                                this.setState({
+                                    MiYaIP:MiYaIP
+                                })
+                            })
+
+                            var points=this.state.amount*100;
+                            this.setState({
+                                points:points,
+                            })
+
+                            this.Barcode();
+                        }
                     } else if (this.state.Seles == "T") {
                         if (this.state.amount > Number(this.state.Total) && this.state.Total < 0) {
                             this.ModalShow()
@@ -850,18 +909,72 @@ export default class Pay extends Component {
                         }
                     }
                 }
+                else if(item.item.PayCode=="11"){
+                    if (this.state.Seles == "R") {
+                        if(this.state.payments=="0"){
+                            var payments = -(Number(this.state.amount)+ Number(this.state.payments));
+                        }else{
+                            var data = -(Number(this.state.amount)-Number(this.state.payments));
+                            var payments=NumberUtils.numberFormat2(data);
+                        }
+
+                        var Total = -(Number(this.state.ShopAmount))-Number(payments);
+                        var ToTal = -(-(Number(this.state.ShopAmount))-Number(payments));//只给付款额界面显示使用
+                        var Amount = {
+                            'payName': '其他支付方式',
+                            'CardFaceNo': '',
+                            'Total': -(this.state.amount),
+                            'total': this.state.amount,
+                            'payRT': '',
+                            'PayCode': item.item.PayCode,
+                            'pid': item.item.Pid,
+                        }
+                        this.dataRows.push(Amount);
+                        this.setState({
+                            payments: payments,
+                            payname: "其他支付方式",
+                            Total: Total,
+                            amount:ToTal,
+                            PriceAmount:ToTal+"",
+                            dataSource: this.state.dataSource.cloneWithRows(this.dataRows)
+                        })
+                        this.restorage1()
+                    } else if (this.state.Seles == "T") {
+                        var payments = Number(this.state.amount)+ Number(this.state.payments);
+                        var Total = BigDecimalUtils.subtract(this.state.ShopAmount, payments, 2);
+                        var Amount = {
+                            'payName': '其他支付方式',
+                            'CardFaceNo': '',
+                            'Total': this.state.amount,
+                            'total': this.state.amount,
+                            'payRT': '',
+                            'PayCode': item.item.PayCode,
+                            'pid': item.item.Pid,
+                        }
+                        this.dataRows.push(Amount);
+                        this.setState({
+                            payments: payments,
+                            payname: "其他支付方式",
+                            Total: Total,
+                            amount:Total,
+                            PriceAmount:Total+"",
+                            dataSource: this.state.dataSource.cloneWithRows(this.dataRows)
+                        })
+                        this.restorage();
+                    }
+                }
                 else{
                     alert("该支付方式还未启动，敬请期待！")
                 }
             }
         }
     }
-  
-  /***
-   * 米雅支付接口
-   * @constructor
-   */
-  BarcodeButton(){
+
+    /***
+     * 米雅支付接口
+     * @constructor
+     */
+    BarcodeButton(){
         if(this.state.barcode==""){
             alert("请输入付款吗")
         }else{
@@ -889,7 +1002,7 @@ export default class Pay extends Component {
             //console.log('qqq=',this.state.MiYaMerchID,time,this.state.points+"",this.state.barcode,this.state.MiYaKeyCode,this.state.MiYaIP,"9191")
             this.WaitLoading();
             NativeModules.AndroidMYRequest.doPay(this.state.MiYaMerchID,time,this.state.points+"",this.state.barcode,this.state.MiYaKeyCode,this.state.MiYaIP,"9191",(data)=>{
-              this.WaitLoading();
+                this.WaitLoading();
                 if(data=="1-支付成功"){
                     //this.WaitLoading();
                     ToastAndroid.show('微信支付成功', ToastAndroid.SHORT);
@@ -902,28 +1015,29 @@ export default class Pay extends Component {
                 var Points=this.state.points/100;
                 //var payTotal = Number(Points) + Number(this.state.payments);
                 this.state.payments += Number(Points);
-                //var Total = (BigDecimalUtils.subtract(this.state.ShopAmount, this.state.payments, 2));
+                var Total = (BigDecimalUtils.subtract(this.state.ShopAmount, this.state.payments, 2));
                 //var payamount = Number(this.state.AMount) + Number(Points);
                 // alert(payamount)
-                //var aptotal = BigDecimalUtils.subtract(payamount, Total, 2);
+                // var aptotal = BigDecimalUtils.subtract(payamount, Total, 2);
+                var payments=Number(Points) + Number(this.state.payments);
                 var Amount = {
-                'payName': '米雅支付',
-                'CardFaceNo': '',
-                'Total': Points,
-                'total': "",
-                'payRT': '',
-                'PayCode': this.state.PayCode,
-                'pid': this.state.Pid,
+                    'payName': '米雅支付',
+                    'CardFaceNo': '',
+                    'Total': Points,
+                    'total': Points,
+                    'payRT': '',
+                    'PayCode': this.state.PayCode,
+                    'pid': this.state.Pid,
                 }
-              this.dataRows.push(Amount);
-              this.setState({
-                // AMount: payamount,
-                // payments: this.state.payments,
-                // payname: "米雅支付",
-                // Total: Total,
-                // cardfaceno: "",
-                dataSource: this.state.dataSource.cloneWithRows(this.dataRows)
-              })
+                this.dataRows.push(Amount);
+                this.setState({
+                    payments: payments,
+                    payname: "米雅支付",
+                    Total: Total,
+                    amount:Total,
+                    PriceAmount:Total+"",
+                    dataSource: this.state.dataSource.cloneWithRows(this.dataRows)
+                })
                 //if (payTotal>=this.state.ShopAmount) {
                 //
                 //} else {
@@ -949,7 +1063,11 @@ export default class Pay extends Component {
                 //} else {
                 //
                 //}
-                this.restorage();
+                if(this.state.Seles=="R"){
+                    this.restorage1();
+                }else if(this.state.Seles=="T"){
+                    this.restorage();
+                }
                 this.Barcode();
             });
         }
@@ -962,9 +1080,9 @@ export default class Pay extends Component {
 //保存流水表及detail表
     restorage() {
         //交易结束创建新的流水号
-          NumFormatUtils.createLsNo().then((data) => {
+        NumFormatUtils.createLsNo().then((data) => {
             Storage.save("LsNo",data);
-          });
+        });
         Storage.get('Pid').then((Pid) => {
             Storage.get('usercode').then((usercode) => {
                 Storage.get('userName').then((userName) => {
@@ -992,8 +1110,8 @@ export default class Pay extends Component {
                             ss = "0" + ss;
                         }
                         var InnerNo = NumFormatUtils.CreateInnerNo();
-                        
-                      let allDisPrice = 0;
+
+                        let allDisPrice = 0;
                         for (let i = 0; i < this.state.dataRows.length; i++) {
                             var DataRows = this.state.dataRows[i];
                             var OrderNo = 0;
@@ -1033,17 +1151,17 @@ export default class Pay extends Component {
                             detail.DepCode = DepCode;
                             detail.Price = ShopPrice;
                             detail.Amount = Count;
-                          if (i == 0) {
-                              detail.AutoDscTotal = this.state.subtract;
-                          } else {
-                              detail.AutoDscTotal = 0;
-                          }
+                            if (i == 0) {
+                                detail.AutoDscTotal = this.state.subtract;
+                            } else {
+                                detail.AutoDscTotal = 0;
+                            }
                             detail.Total = NumberUtils.numberFormat2(prototal);
                             detail.DscTotal = BigDecimalUtils.subtract(BigDecimalUtils.multiply(ShopPrice,Count,2),NumberUtils.numberFormat2(prototal),2)//this.DisTotil;
-                          detail.DscTotal= BigDecimalUtils.subtract(detail.DscTotal ,detail.AutoDscTotal,2);
-                          allDisPrice = BigDecimalUtils.add(allDisPrice,detail.DscTotal,2);
-                          detail.HandDsc = 0;
-                            
+                            detail.DscTotal= BigDecimalUtils.subtract(detail.DscTotal ,detail.AutoDscTotal,2);
+                            allDisPrice = BigDecimalUtils.add(allDisPrice,detail.DscTotal,2);
+                            detail.HandDsc = 0;
+
                             detail.AutoDscTotal = 0;
                             detail.InnerNo = InnerNo;
                             detail.OrderNo = OrderNo + "";
@@ -1051,43 +1169,43 @@ export default class Pay extends Component {
                             dbAdapter.insertDetail(detailDatas);
 
                         };
-                      for (let i = 0; i < this.dataRows.length; i++) {
-                        var dataRows = this.dataRows[i];
-                        var ino;
-                        ino = i + 1
-                        var SumData = year + "-" + month + "-" + day + " " + hh + ":" + mm + ":" + ss;
-                        //插入Sum表
-                        var sumDatas = [];
-                        var sum = {};
-                        sum.LsNo = this.state.numform;
-                        sum.sDateTime = SumData;
-                        sum.CashierId = Pid;
-                        sum.CashierCode = usercode;
-                        sum.CashierName = userName;
-                        sum.ino = ino;
-                        sum.Total = this.state.ShopAmount;
-                        sum.TotalPay = this.state.payments;
-                        sum.Change = this.state.Total;
-                        sum.TradeFlag = this.state.Seles;
-                        if (this.state.VipCardNo == "") {
-                          sum.DscTotal =allDisPrice;
-                          sum.CustType = '0';
-                          sum.CustCode = "";
-                        } else {
-                          sum.DscTotal = allDisPrice;
-                          sum.CustType = '2';
-                          sum.CustCode = this.state.VipCardNo;
-                        }
-    
-                        sum.PayId = dataRows.pid;
-                        sum.PayCode = dataRows.PayCode;
-                        sum.Amount = dataRows.total;
-                        sum.OldAmount = dataRows.total;
-                        sum.TendPayCode = this.state.VipCardNo;
-                        sum.InnerNo = InnerNo;
-                        sumDatas.push(sum);
-                        dbAdapter.insertSum(sumDatas);
-                      };
+                        for (let i = 0; i < this.dataRows.length; i++) {
+                            var dataRows = this.dataRows[i];
+                            var ino;
+                            ino = i + 1
+                            var SumData = year + "-" + month + "-" + day + " " + hh + ":" + mm + ":" + ss;
+                            //插入Sum表
+                            var sumDatas = [];
+                            var sum = {};
+                            sum.LsNo = this.state.numform;
+                            sum.sDateTime = SumData;
+                            sum.CashierId = Pid;
+                            sum.CashierCode = usercode;
+                            sum.CashierName = userName;
+                            sum.ino = ino;
+                            sum.Total = this.state.ShopAmount;
+                            sum.TotalPay = this.state.payments;
+                            sum.Change = this.state.Total;
+                            sum.TradeFlag = this.state.Seles;
+                            if (this.state.VipCardNo == "") {
+                                sum.DscTotal =allDisPrice;
+                                sum.CustType = '0';
+                                sum.CustCode = "";
+                            } else {
+                                sum.DscTotal = allDisPrice;
+                                sum.CustType = '2';
+                                sum.CustCode = this.state.VipCardNo;
+                            }
+
+                            sum.PayId = dataRows.pid;
+                            sum.PayCode = dataRows.PayCode;
+                            sum.Amount = dataRows.total;
+                            sum.OldAmount = dataRows.total;
+                            sum.TendPayCode = this.state.VipCardNo;
+                            sum.InnerNo = InnerNo;
+                            sumDatas.push(sum);
+                            dbAdapter.insertSum(sumDatas);
+                        };
                         dbAdapter.selectSum().then((rows) => {
                             let sums = [];
                             let details = [];
@@ -1138,8 +1256,8 @@ export default class Pay extends Component {
                             component: Index,
                         };
                         this.props.navigator.push(nextRoute);
-                         dbAdapter.deleteData("shopInfo");
-                         Storage.delete("VipPrice");
+                        dbAdapter.deleteData("shopInfo");
+                        Storage.delete("VipPrice");
                     }
                 })
             })
@@ -1312,8 +1430,8 @@ export default class Pay extends Component {
                             component: Index,
                         };
                         this.props.navigator.push(nextRoute);
-                        dbAdapter.deleteData("shopInfo");
-                        Storage.delete("VipPrice");
+                        // dbAdapter.deleteData("shopInfo");
+                        // Storage.delete("VipPrice");
                     };
                 });
             });
@@ -1407,6 +1525,7 @@ export default class Pay extends Component {
                                     'payName': '储值卡',
                                     'CardFaceNo': this.state.CardFaceNo,
                                     'Total': retcurrJF,
+                                    'total': retcurrJF,
                                     'retZjf': retZjf,
                                     'ReferenceNo': ReferenceNo,
                                     'PayretcurrJF': PayretcurrJF,
@@ -1420,6 +1539,8 @@ export default class Pay extends Component {
                                     payments: this.state.payments,
                                     Amount: retcurrJF,
                                     Total: Total,
+                                    amount:Total+"",
+                                    PriceAmount:Total+"",
                                     dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
                                 });
                                 this.restorage();
@@ -1542,6 +1663,7 @@ export default class Pay extends Component {
                                         retTxt: retTxt,
                                         CardFaceNo: this.state.CardFaceNo,
                                         Total: Total,
+                                        PriceAmount:Total+"",
                                         payname: "储值卡",
                                         dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
                                     });
@@ -1566,16 +1688,16 @@ export default class Pay extends Component {
     CloseRetButton() {
         this.RefundTotal();
     }
-  ScannCode(){
-    NativeModules.RNScannerAndroid.openScanner();
-    DeviceEventEmitter.addListener("code",(code)=>{
-      //alert(code)
-      this.setState({
-        myText: code
-      })
-      DeviceEventEmitter.removeAllListeners();
-    });
-  }
+    ScannCode(){
+        NativeModules.RNScannerAndroid.openScanner();
+        DeviceEventEmitter.addListener("code",(code)=>{
+            //alert(code)
+            this.setState({
+                myText: code
+            })
+            DeviceEventEmitter.removeAllListeners();
+        });
+    }
     render() {
         return (
             <View style={styles.container}>
@@ -1692,7 +1814,7 @@ export default class Pay extends Component {
                                     textalign="center"
                                     underlineColorAndroid='transparent'
                                     style={styles.paymentinput}
-                                    defaultValue ={this.state.ShopAmount}
+                                    defaultValue ={this.state.PriceAmount}
                                     onChangeText={(value) => {
                                         this.setState({
                                             amount: value
@@ -2045,10 +2167,10 @@ export default class Pay extends Component {
                             <View style={styles.Cont}>
                                 <View style={styles.miyaStyle}>
                                     <View style={{ width:30, height:30}}/>
-                                    <Text style={[styles.miyaTitlStyle, {fontSize: 18}]}>米雅支付</Text>
-                                  <TouchableOpacity onPress={this.ScannCode.bind(this)}>
-                                    <Image source={require("../images/1_05.png")} style={styles.scanImageStyle}></Image>
-                                  </TouchableOpacity>
+                                    <Text style={[styles.miyaTitlStyle, {fontSize: 18,color:"#ffffff"}]}>米雅支付</Text>
+                                    <TouchableOpacity onPress={this.ScannCode.bind(this)}>
+                                        <Image source={require("../images/1_05.png")} style={styles.scanImageStyle}></Image>
+                                    </TouchableOpacity>
                                 </View>
                                 <View style={[styles.MemberCont,{height:120,}]}>
                                     <View style={styles.MemberView}>
@@ -2105,19 +2227,19 @@ export default class Pay extends Component {
 
 const styles = StyleSheet.create({
     miyaStyle:{
-      flexDirection: 'row',
-      justifyContent:'space-between',
-      alignItems:'center',
-      backgroundColor: "#ff4e4e",
-      borderTopLeftRadius: 5,
-      borderTopRightRadius: 5,
+        flexDirection: 'row',
+        justifyContent:'space-between',
+        alignItems:'center',
+        backgroundColor: "#ff4e4e",
+        borderTopLeftRadius: 5,
+        borderTopRightRadius: 5,
     },
     miyaTitlStyle:{
-      alignItems:"center",
+        alignItems:"center",
     },
     scanImageStyle:{
-      alignItems:"right",
-      alignItems:"center",
+        alignItems:"right",
+        alignItems:"center",
     },
     ShopDataClose:{
         marginLeft:30,
@@ -2159,7 +2281,7 @@ const styles = StyleSheet.create({
         paddingBottom:15,
     },
     NewPriceleft:{
-      flex:1,
+        flex:1,
         flexDirection:"row",
     },
     NewPriceright:{
@@ -2174,8 +2296,8 @@ const styles = StyleSheet.create({
         flex:1,
     },
     PricerightText:{
-      fontSize:16,
-      color:"#333333"
+        fontSize:16,
+        color:"#333333"
     },
 
     container: {
