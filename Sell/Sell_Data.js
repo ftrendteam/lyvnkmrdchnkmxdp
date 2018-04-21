@@ -135,9 +135,7 @@ export default class SellData extends Component {
                             DownLoadBasicData.downLoadPosOpt(this.state.linkurl, this.state.ShopCode, dbAdapter, this.state.PosCode).then((response) => {
                                 if (response = true) {
                                     //创建流水号 本地保存
-                                  NumFormatUtils.createLsNo().then((data) => {
-                                    Storage.save("LsNo",data);
-                                  });
+                                 
                                     var nextRoute = {
                                         name: "Index",
                                         component: Index
@@ -149,6 +147,9 @@ export default class SellData extends Component {
                                     Storage.save('Name', '移动销售');
                                     Storage.save("Num", "1");
                                     Storage.save("inoNum", "1");
+                                      NumFormatUtils.createLsNo().then((data) => {
+                                        Storage.save("LsNo",data);
+                                      });
                                 } else {
                                     alert(JSON.stringify(response));
                                 }
