@@ -50,7 +50,7 @@ export default class ProductCG_list extends Component {
                 var row = rows.item(i);
                 this.dataRows.push(row);
             }
-
+            console.log(this.dataRows)
             this.setState({
                 dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
             })
@@ -62,41 +62,30 @@ export default class ProductCG_list extends Component {
     }
 
     Search(value){
-        //if(value>=3){
+        if(value==""){
             this.abc=[];
-            this.DataRow=[];
-            if(value==""){
-                dbAdapter.selectAllData("tsuppset").then((rows)=>{
-                    for(let i =0;i<rows.length;i++){
-                        var row = rows.item(i);
-                        this.abc.push(row);
-                    }
-                    this.setState({
-                        dataSource:this.state.dataSource.cloneWithRows(this.abc),
-                    })
+            dbAdapter.selectAllData("tsuppset").then((rows)=>{
+                for(let i =0;i<rows.length;i++){
+                    var row = rows.item(i);
+                    this.abc.push(row);
+                }
+                this.setState({
+                    dataSource:this.state.dataSource.cloneWithRows(this.abc),
                 })
-            }else if(value!==""){
-                var str;
-                dbAdapter.selectAllData("tsuppset").then((rows)=>{
-                    for (let i = 0; i < this.dataRows.length; i++) {
-                        // let temp = this.dataRows[0];
-                        let dataRow = this.dataRows[i];
-                        if (((dataRow.sCode + "").indexOf(value) >= 0)||((dataRow.sname + "").indexOf(value) >= 0)) {
-                            // this.dataRows[0] = dataRow;
-                            // this.dataRows[i] = temp;
-                            str = this.dataRows.splice(i);
-                            this.dataRows.unshift(str[0]);//将搜索到的第一条数据展示在最上面
-                            // var aaa=JSON.stringify(str)
-                            // this.DataRow.push(aaa);
-                            // break;
-                        }
-                    }
-                    this.setState({
-                        dataSource: this.state.dataSource.cloneWithRows(str),
-                    })
-                })
+            })
+        }else if(value!==""){
+            for (let i = 0; i < this.dataRows.length; i++) {
+                let dataRow = this.dataRows[i];
+                if (((dataRow.sCode + "").indexOf(value) >= 0)||((dataRow.sname + "").indexOf(value) >= 0)) {
+                    var str = this.dataRows.splice(i,1);
+                    this.dataRows.unshift(str[0]);
+                    // break;
+                }
             }
-        // }
+            this.setState({
+                dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
+            })
+        }
     }
 
     pressPop(rowData){
