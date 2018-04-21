@@ -9,6 +9,12 @@ export default class BigDecimalUtils {
    * @return {string}
    */
   static divide = (a, b, degree) => {
+    if(a==""||a==undefined||a==NaN){
+      a="0";
+    }
+    if(b==""||b==undefined||b==NaN){
+      b="0";
+    }
     //degree = BigDecimalUtils.isZero(degree);
     return  (Number(a) / Number(b)).toFixed(degree);
   }
@@ -21,6 +27,12 @@ export default class BigDecimalUtils {
    * @return {string}
    */
   static multiply = (a, b, degree) => {
+    if(a==""||a==undefined||a==NaN){
+      a="0";
+    }
+    if(b==""||b==undefined||b==NaN){
+      b="0";
+    }
     degree = BigDecimalUtils.isZero(degree);
     return  (Number(a) * Number(b)).toFixed(degree);
   }
@@ -33,6 +45,15 @@ export default class BigDecimalUtils {
    * @return {string}
    */
   static add = (a, b, degree) => {
+  
+    if(a==""||a=='undefined'||a=='NaN'){
+      a="0";
+    }
+    if(b==""||b=='undefined'||b=='NaN'){
+      b="0";
+    }
+    console.log(a)
+    console.log(b)
     degree = BigDecimalUtils.isZero(degree);
     return  (Number(a) + Number(b)).toFixed(degree);
   }
@@ -45,11 +66,18 @@ export default class BigDecimalUtils {
    * @return {string}
    */
   static subtract = (a, b, degree) => {
+    if(a==""||a=='undefined'||a=='NaN'){
+      a="0";
+    }
+    if(b==""||b=='undefined'||b=='NaN'){
+      b="0";
+    }
     degree = BigDecimalUtils.isZero(degree);
     return  (Number(a) - Number(b)).toFixed(degree);
   }
   
   static isZero = (degree) => {
+    
     if (degree == "" || degree == null || degree == 0) {
       return degree = 2;
     } else {

@@ -20,11 +20,8 @@ import {
 } from 'react-native';
 import Index from "../app/Index";
 import Pay from "../Sell/Pay";
-import DPPromotionManager from "../Sell/promotion/DPPromotionManager";
 import GoodsDetails from "../app/OrderDetails";
-import NetUtils from "../utils/NetUtils";
 import Storage from "../utils/Storage";
-import NumberUtils from "../utils/NumberUtils";
 import Swiper from 'react-native-swiper';
 import DBAdapter from "../adapter/DBAdapter";
 import DeCodePrePrint18 from "../utils/DeCodePrePrint18";
@@ -32,15 +29,14 @@ import FetchUtil from "../utils/FetchUtils";
 import VipPrice from "../utils/VipPrice";
 import NumFormatUtils from "../utils/NumFormatUtils";
 import { SwipeListView } from 'react-native-swipe-list-view';
+import DeCodePrePrint from  "../utils/DeCodePrePrint";
+import BigDecimalUtils from  "../utils/BigDecimalUtils";
 let decodepreprint = new DeCodePrePrint18();
 let dbAdapter = new DBAdapter();
-import MZPromotionManger from '../Sell/promotion/MZPromotionManger';
-import BPPromotionsManger from '../Sell/promotion/BPPromotionsManger';
-import MJPromotionManger from '../Sell/promotion/MJPromotionManger'
 var {NativeModules} = require('react-native');
 var RNScannerAndroid = NativeModules.RNScannerAndroid;
 var TblRow1;
-
+let deCode13 = new DeCodePrePrint();
 export default class Sell extends Component {
 
     constructor(props) {
@@ -86,12 +82,17 @@ export default class Sell extends Component {
         // alert(JSON.stringify(TblRow1))
         InteractionManager.runAfterInteractions(() => {
             //获取流水号
-            NumFormatUtils.createLsNo().then((data) => {
-                this.setState({
-                    numform:data
-                })
-                Storage.save("LsNo",this.state.numform);
-            });
+          Storage.get("LsNo").then((data)=>{
+            this.setState({
+              numform:data
+            })
+          });
+            //NumFormatUtils.createLsNo().then((data) => {
+            //    this.setState({
+            //        numform:data
+            //    })
+            //    Storage.save("LsNo",this.state.numform);
+            //});
             Storage.get('Name').then((tags) => {
                 this.setState({
                     name: tags
@@ -112,25 +113,20 @@ export default class Sell extends Component {
             var vipPrice = 0;
             for (let i = 0; i < rows.length; i++) {
                 var row = rows.item(i);
-                ShopPrice = (row.ShopNumber * row.ShopPrice);
-                shopAmount +=ShopPrice;
+                ShopPrice =BigDecimalUtils.multiply(row.ShopNumber ,row.ShopPrice,2);
+                shopAmount =BigDecimalUtils.add(shopAmount,ShopPrice,2);
                 Storage.save("vipPrice", JSON.stringify(shopAmount));
                 var number = row.ShopNumber;
-                shopnumber += parseInt(row.ShopNumber);
+                shopnumber =BigDecimalUtils.add(shopnumber,row.ShopNumber);//parseInt(row.ShopNumber);
                 if(this.state.VipCardNo !==""){
                     vipPrice = VipPrice.vipPrice(TblRow1[0],this.VipTblRow);
                 }
-                var VIPprice = shopAmount-vipPrice;
+                var VIPprice = BigDecimalUtils.subtract(shopAmount,vipPrice,2);
                 if (number !== 0) {
                     this.dataRow.push(row);
                     this.TblRow.push(row);
                 }
             }
-          //MZPromotionManger.mzPromotion("*",this.dataRow,dbAdapter);
-          //MJPromotionManger.MJPromotion(this.dataRow,"*",dbAdapter).then((cc)=>{
-          //      console.log("wtf===",cc)
-          //});
-          // BPPromotionsManger.bpPromotons(row,"*",dbAdapter);
             if (this.dataRow == 0) {
                 this.modal();
                 return;
@@ -173,7 +169,7 @@ export default class Sell extends Component {
                                     vipPrice = VipPrice.vipPrice(TblRow1[0],this.TblRow);
                                     // Storage.save("VipPrice", vipPrice);
                                 }
-                                var VIPprice = this.state.ShopAmount-vipPrice;
+                                var VIPprice = BigDecimalUtils.subtract(this.state.ShopAmount,vipPrice,2);
                                 var ShopPrice = row.StdPrice;
                                 var prototal=this.state.Countm*row.StdPrice;
                                 var number = row.ShopNumber;
@@ -226,7 +222,7 @@ export default class Sell extends Component {
                         if(this.state.VipCardNo !==""){
                             vipPrice = VipPrice.vipPrice(TblRow1[0],this.TblRow);
                         }
-                        var VIPprice = this.state.ShopAmount-vipPrice;
+                        var VIPprice = BigDecimalUtils.subtract(this.state.ShopAmount,vipPrice,2);
                         var ShopPrice = row.StdPrice;
                         var prototal=this.state.Countm*row.StdPrice;
                         var number = row.ShopNumber;
@@ -307,8 +303,8 @@ export default class Sell extends Component {
                         var row = rows.item(i);
                         this.VipTblRow.push(row);
                         var number = row.ShopNumber;
-                        shopAmount += parseInt(row.ShopAmount);
-                        shopnumber += parseInt(row.ShopNumber);
+                        shopAmount = BigDecimalUtils.add(row.ShopAmount,shopAmount,2);
+                        shopnumber = BigDecimalUtils.add(shopnumber,row.ShopNumber,2);
                         if(number!==0){
                             this.dataRow.push(row);
                         }
@@ -334,8 +330,13 @@ export default class Sell extends Component {
             }
         });
     }
-
-    ListButton(rowData){
+  
+  /***
+   * 商品条目点击事件
+   * @param rowData
+   * @constructor
+   */
+  ListButton(rowData){
         Storage.save("DataName", "移动销售");
         this.props.navigator.push({
             component:GoodsDetails,
@@ -363,8 +364,12 @@ export default class Sell extends Component {
     CloseButton() {
         this.Member();
     }
-
-    Button() {
+  
+  /***
+   * 查询会员信息
+   * @constructor
+   */
+  Button() {
         if(this.state.VipCardNo !==""){
             Storage.get('vipPrice').then((vipPrice) => {
                 this.setState({
@@ -394,13 +399,13 @@ export default class Sell extends Component {
                             var CardTypeCode;
                             for (let i = 0; i < TblRow.length; i++) {
                                 var row = TblRow[i];
-                                VipCardNo =  JSON.stringify(row.VipCardNo);//卡号
+                                VipCardNo =  row.CardFaceNo;//卡号
                                 BalanceTotal = JSON.stringify(row.BalanceTotal);//余额
                                 JfBal = JSON.stringify(row.JfBal);//积分
                                 CardTypeCode=JSON.stringify(row.CardTypeCode);
                             };
                             let vipPrice = VipPrice.vipPrice(TblRow[0],this.TblRow);
-                            var VIPprice = this.state.ShopAmount-vipPrice;
+                            var VIPprice = BigDecimalUtils.subtract(this.state.ShopAmount,vipPrice,2);
                             TblRow1=data.TblRow;
                             this.setState({
                                 VipCardNo: VipCardNo,
@@ -425,6 +430,7 @@ export default class Sell extends Component {
     }
 
     PayButton() {
+        
         if(this.dataRow==""){
             alert("请添加商品");
         }else{
@@ -520,6 +526,60 @@ export default class Sell extends Component {
     }
 
     inputOnBlur(){
+      let reminder=this.state.MnCode;
+      if(reminder==undefined||reminder.length==0){
+        return;
+      }
+      if((reminder.length==13&&deCode13.deCodePreFlag(reminder))){//13位条码解析
+        new Promise.all([deCode13.deCodeProdCode(reminder,dbAdapter),deCode13.deCodeTotile(reminder,dbAdapter)]).then((result)=>{
+          if(result.length==2){
+            let prodCode = result[0];
+            let price = result[1];
+            dbAdapter.selectProdCode(prodCode, 1).then((prods)=>{
+              if(prods.length==0){
+                ToastAndroid.show("商品不存在",ToastAndroid.SHORT);
+                return;
+              }
+              var row = prods.item(0);
+              let newShopNumber = BigDecimalUtils.divide(price,row.StdPrice,2);
+             
+              var DataRows = {
+                'ProdCode':row.ProdCode,
+                'ProdName':row.ProdName,
+                'ShopPrice':row.StdPrice,
+                'ShopNumber': newShopNumber,
+                'ShopAmount': price,
+                'Pid':row.Pid,
+              };
+              this.dataRow.push(DataRows);
+              this.setState({
+                //vipPrice:vipPrice,
+                MnCode:"",
+                ShopNumber:  BigDecimalUtils.add(this.state.ShopNumber,newShopNumber,2),
+                ShopAmount: BigDecimalUtils.add(this.state.ShopAmount,price,2),
+                dataSource: this.state.dataSource.cloneWithRows(this.dataRow),
+              });
+              var shopInfoData = [];
+              var shopInfo = {};
+              shopInfo.Pid = row.Pid;
+              shopInfo.ProdCode=row.ProdCode;
+              shopInfo.prodname = row.ProdName;
+              shopInfo.countm =newShopNumber;
+              shopInfo.ShopPrice = row.StdPrice;
+              shopInfo.prototal =price;
+              shopInfo.promemo = "";
+              shopInfo.DepCode = row.DepCode;
+              shopInfo.ydcountm = "";
+              shopInfo.SuppCode = row.SuppCode;
+              shopInfo.BarCode = row.BarCode;
+              shopInfoData.push(shopInfo);
+              //调用插入表方法
+              dbAdapter.insertShopInfo(shopInfoData,"1");
+              //this._dbSearch();
+            });
+          }
+        });
+      }else{
         dbAdapter.selectAidCode(this.state.MnCode,1).then((rows)=>{
             if(rows.length==0){
                 alert("助记码不存在")
@@ -528,22 +588,24 @@ export default class Sell extends Component {
                 var shopAmount = 0;
                 for (let i = 0; i < rows.length; i++) {
                     var row = rows.item(i);
+                    console.log(row)
                     var ShopPrice = row.ShopPrice;
-                    var prototal=this.state.Countm*row.ShopPrice;
+                    var prototal=BigDecimalUtils.multiply(this.state.Countm,row.ShopPrice,2);
                     var number = row.ShopNumber;
-                    shopnumber = this.state.Countm+this.state.ShopNumber;
+                    shopnumber = BigDecimalUtils.add(this.state.Countm,this.state.ShopNumber,2);
                     var DataRows = {
                         'ProdCode':row.ProdCode,
-                        'prodname':row.ProdName,
+                        'ProdName':row.ProdName,
                         'ShopPrice':row.ShopPrice,
-                        'countm': this.state.Countm,
-                        'prototal': prototal,
-                        'pid':row.Pid,
+                        'ShopNumber': this.state.Countm,
+                        'ShopAmount': prototal,
+                        'Pid':row.Pid,
                     };
                     this.dataRow.push(DataRows);
                 };
-                shopAmount =ShopPrice+this.state.ShopAmount;
+                shopAmount =BigDecimalUtils.add(ShopPrice,this.state.ShopAmount,2);
                 this.setState({
+                    MnCode:"",
                     ShopNumber: shopnumber,
                     ShopAmount: shopAmount,
                     dataSource: this.state.dataSource.cloneWithRows(this.dataRow),
@@ -565,7 +627,7 @@ export default class Sell extends Component {
                 //调用插入表方法
                 dbAdapter.insertShopInfo(shopInfoData);
             }
-        })
+        })}
     }
 
     render() {
@@ -653,6 +715,7 @@ export default class Sell extends Component {
                                     numberoflines={1}
                                     keyboardType="numeric"
                                     textalign="center"
+                                    value={this.state.MnCode}
                                     underlineColorAndroid='transparent'
                                     style={styles.TextInput}
                                     onChangeText={(value)=>{

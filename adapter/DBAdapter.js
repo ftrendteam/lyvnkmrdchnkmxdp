@@ -369,7 +369,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
     /****
      * 插入数据shopInfo表
      */
-    insertShopInfo(shopInfoData) {
+    insertShopInfo(shopInfoData,atype) {
         return new Promise((resolve, reject) => {
             let lenght = shopInfoData.length;
             if (!db) {
@@ -389,16 +389,51 @@ export default class DBAdapter extends SQLiteOpenHelper {
                     let ydcountm = shopInfo.ydcountm;
                     let suppCode = shopInfo.SuppCode;
                     let BarCode = shopInfo.BarCode;
+                  let sql="";
                     //   "prodname":"海鲜菇","countm":1.0000,"kccount":0.0,"prototal":1.0000,"unit":"kg  ","promemo":""
-                    let sql = " replace INTO shopInfo(pid,ProdCode,prodname,countm,ShopPrice,prototal,promemo,DepCode,ydcountm,SuppCode,BarCode)" +
-                        "values(?,?,?,?,?,?,?,?,?,?,?)";
-                    tx.executeSql(sql, [Pid, ProdCode, shopName, ShopNumber, ShopPrice, ShopAmount, ShopRemark, DepCode, ydcountm, suppCode, BarCode], () => {
-                            resolve(true);
-                        }, (err) => {
-                            reject(false);
-                            console.log(err);
-                        }
+                  console.log("atype=",atype)
+                  if("1"==atype){
+  
+                    sql = "update shopInfo set countm=countm+?,prototal=prototal+? where pid=?";
+                    tx.executeSql(sql, [ ShopNumber,ShopAmount, Pid], () => {
+                      resolve(true);
+                    }, (err) => {
+                      reject(false);
+                      console.log(err);
+                    });
+  
+                    sql = "update shopInfo set ShopPrice=round(prototal/ShopPrice,2) where pid=?";
+                    tx.executeSql(sql, [Pid], () => {
+                      resolve(true);
+                    }, (err) => {
+                      reject(false);
+                      console.log(err);
+                    });
+                    
+                     sql = "insert INTO shopInfo(pid,ProdCode,prodname,countm,ShopPrice,prototal,promemo,DepCode,ydcountm,SuppCode,BarCode)" +
+                      " select ?,?,?,?,?,?,?,?,?,?,? where not exists(select pid from shopInfo where pid=?)";
+                    tx.executeSql(sql, [Pid, ProdCode, shopName, ShopNumber, ShopPrice, ShopAmount, ShopRemark, DepCode, ydcountm, suppCode, BarCode,Pid], () => {
+                        resolve(true);
+                      }, (err) => {
+                        reject(false);
+                        console.log(err);
+                      }
                     );
+                  }
+                  else {
+                     sql = " replace INTO shopInfo(pid,ProdCode,prodname,countm,ShopPrice,prototal,promemo,DepCode,ydcountm,SuppCode,BarCode)" +
+                      "values(?,?,?,?,?,?,?,?,?,?,?)";
+                     console.log("c=",ShopNumber)
+                    tx.executeSql(sql, [Pid, ProdCode, shopName, ShopNumber, ShopPrice, ShopAmount, ShopRemark, DepCode, ydcountm, suppCode, BarCode], () => {
+                        resolve(true);
+                      }, (err) => {
+                        reject(false);
+                        console.log(err);
+                      }
+                    );
+                  }
+                  
+                  
                 }
             });
         });
@@ -894,7 +929,12 @@ export default class DBAdapter extends SQLiteOpenHelper {
     selectTDepSet(DepLevel) {
         return new Promise((resolve, reject) => {
             db.transaction((tx) => {
-                tx.executeSql('select a.*,ifNull(b.countm,0) as ShopNumber from tdepset a left join (select depcode,sum(countm)  as countm from shopInfo group by depcode) b on a.depcode=b.depcode where IsDel=0 and DepLevel=' + DepLevel + '', [], (tx, results) => {
+              //'select a.*,ifNull(b.countm,0) as ShopNumber from tdepset a left join (select depcode,sum(countm)  as countm from shopInfo group by depcode) b on a.depcode=b.depcode where IsDel=0 and DepLevel=' + DepLevel + ''
+              let sql = "select a.ShopNumber,b.* from (select a.depcode1 as depcode12 ,sum(ShopNumber) as ShopNumber from " +
+                "(select a.depcode1  ,ifNull(b.countm,0) as ShopNumber from tdepset a left join (select depcode,sum(countm) " +
+                " as countm from shopInfo group by depcode) b on a.depcode=b.depcode where IsDel=0 ) a join tdepset b on " +
+                "a.depcode1=b.depcode and b.isdel='0' where b.DepLevel='1' group by a.depcode1) a join tdepset b on a.depcode12=b.depcode and b.isdel='0'";
+                tx.executeSql(sql, [], (tx, results) => {
                     resolve(results.rows);
                 });
             }, (error) => {

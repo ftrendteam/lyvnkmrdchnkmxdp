@@ -6,6 +6,17 @@ let strLength;
 export default class DeCodePrePrint {
   constructor() {
   }
+  
+  deCodePreFlag = (deCode) => {
+    let flag = StringUtils.subStr(0, 2, deCode);
+    if ("27"==flag) {
+      return true;
+    } else if ("13"==flag) {
+      return true;
+    } else {
+      return false;
+    }
+  }
   /***
    * 解码 返回ProdCode
    * @return {*}

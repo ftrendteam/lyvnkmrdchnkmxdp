@@ -106,7 +106,7 @@ export default class VipPrice {
                 //  memberTotalPrice = BigDecimalUtils.multiply(productBean.getStdPrice(), productBean.getList().size());
                 //}
             }
-            if (typeof memberTotalPrice == "number" && memberTotalPrice != 0) {
+            //if (typeof memberTotalPrice == "number" && memberTotalPrice != 0) {
                 productBean.ShopAmount = memberTotalPrice;
                 // productBean.ShopPrice = memberTotalPrice;
                 let vipNum = productBean.ShopNumber;
@@ -120,7 +120,7 @@ export default class VipPrice {
                 let oldPrices = BigDecimalUtils.multiply(productBean.StdPrice, vipNum, 2);
                 let vipDis = BigDecimalUtils.subtract(oldPrices, memberTotalPrice, 2);
                 vipDisPrice = BigDecimalUtils.add(vipDisPrice, vipDis, 2);
-            }
+            //}
 
         }
         return vipDisPrice;
@@ -244,6 +244,8 @@ export default class VipPrice {
             let multiply = BigDecimalUtils.multiply(BigDecimalUtils.divide(product.ShopAmount, allPrice, 2), disPrice, 2);
             let itemTotal = product.ShopAmount;
             product.ShopAmount = BigDecimalUtils.subtract(itemTotal, multiply, 2);
+            console.log(product.ProdName)
+            console.log(product.ShopAmount)
         }
     }
 }

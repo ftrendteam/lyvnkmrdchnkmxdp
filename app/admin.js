@@ -212,35 +212,12 @@ export default class admin extends Component {
             return;
         }
         if(this.state.sCode1 == ""){
-            //ToastAndroid.show('请选择机构222信息', ToastAndroid.SHORT)
-          deCodePrePrint.deCodeProdCode("2700005001231",dbAdapter).then((code)=>{
-            });
-          deCodePrePrint.deCodeTotile("2700005001231",dbAdapter).then((pric)=>{
-              alert(pric)
-          });
-          //NativeModules.AndroidPrintInterface.print("asdfasdfasdf\n");
-          //NativeModules.AndroidPrintInterface.print("asdfasdfasdf\n");
-          //NativeModules.AndroidPrintInterface.print("asdfasdfasdf\n");
-          //NativeModules.AndroidPrintInterface.print("asdfasdfasdf\n");
-          //NativeModules.AndroidPrintInterface.startPrint();
-          //NativeModules.AndroidReadCardInterface.open();
-          //this.interval=setInterval(() => {
-          //  //  console.log('把一个定时器的引用挂在this上');
-          //  NativeModules.AndroidReadCardInterface.read("FFFFFFFFFFFF",(card)=>{
-          //      if(card!==""){
-          //        alert(card);
-          //        NativeModules.AndroidReadCardInterface.close();
-          //        this.interval && clearInterval(this.interval);
-          //      }
-          //  });
-          //}, 500);
-         
+            ToastAndroid.show('请选择机构信息', ToastAndroid.SHORT)
             return;
         }else{
             <ActivityIndicator key="1"></ActivityIndicator>
         }
         NativeModules.AndroidDeviceInfo.getIMEI((IMEI)=>{
-            console.log(IMEI)
             Storage.get('IMEI').then((tags) => {
                 if(IMEI==tags){
                     var code = ""+this.state.sCode1.replace(/(^\s+)|(\s+$)/g, "");//获取到之后前面加""+

@@ -20,6 +20,7 @@ import Sell_Data_List from "../Sell/Sell_Data_List";
 import DBAdapter from "../adapter/DBAdapter";
 import Storage from '../utils/Storage';
 import FetchUtil from "../utils/FetchUtils";
+import NumFormatUtils from "../utils/NumFormatUtils";
 import DownLoadBasicData from '../utils/DownLoadBasicData';
 let dbAdapter = new DBAdapter();
 var {NativeModules} = require('react-native');
@@ -109,7 +110,11 @@ export default class SellData extends Component {
             PosCode:PosCode,
         });
     }
-
+  
+  /***
+   * 绑定
+   * @constructor
+   */
     Button(){
         if(this.state.Disting=="0") {
             NativeModules.AndroidDeviceInfo.getIMEI((IMEI)=>{
@@ -129,6 +134,10 @@ export default class SellData extends Component {
                         if (data.retcode == 1) {
                             DownLoadBasicData.downLoadPosOpt(this.state.linkurl, this.state.ShopCode, dbAdapter, this.state.PosCode).then((response) => {
                                 if (response = true) {
+                                    //创建流水号 本地保存
+                                  NumFormatUtils.createLsNo().then((data) => {
+                                    Storage.save("LsNo",data);
+                                  });
                                     var nextRoute = {
                                         name: "Index",
                                         component: Index

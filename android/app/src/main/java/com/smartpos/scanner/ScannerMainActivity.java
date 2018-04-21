@@ -84,9 +84,12 @@ public class ScannerMainActivity extends Activity implements SurfaceHolder.Callb
                          sendBroadcast(intent);
                          finish();
                         break;
-
+                     default:
+                                    finish();
+                                break;
                 }
                 break;
+
         }
     }
 

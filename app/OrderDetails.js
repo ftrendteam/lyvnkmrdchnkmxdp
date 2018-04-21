@@ -10,6 +10,7 @@ import Search from "./Search";
 import Sell from "../Sell/Sell";
 import NumberUtils from "../utils/NumberUtils";
 import Storage from "../utils/Storage";
+import BigDecimalUtils from "../utils/BigDecimalUtils";
 import DBAdapter from "../adapter/DBAdapter";
 
 let dbAdapter = new DBAdapter();
@@ -143,7 +144,7 @@ export default class GoodsDetails extends Component {
         }else{
             var x = this.state.Number;//获取数量的数字
             var y = String(x).indexOf(".") + 1;//获取小数点的位置
-            if(y > 0) {
+            if(y > 0&&!this.state.DataName=="移动销售") {
                 alert("数量不能含有小数");
             }else if(this.state.name=="商品配送"&&this.state.ydcountm==0){
                 alert("库存为0，该商品不能进行配送")
@@ -284,10 +285,12 @@ export default class GoodsDetails extends Component {
                 BQNumber:parseInt(this.state.BQNumber)+1,
             });
         }else{
-            let numberFormat2 = NumberUtils.numberFormat2((parseInt(this.state.Number)+1)*(this.state.ShopPrice));
+         
+            //let numberFormat2 = NumberUtils.numberFormat2((parseInt(this.state.Number)+1)*(this.state.ShopPrice));
+            let numberFormat2 = BigDecimalUtils.multiply(BigDecimalUtils.add(this.state.Number,1,2),this.state.ShopPrice,2);
             this.setState({
-                Number:parseInt(this.state.Number)+1,
-                BQNumber:parseInt(this.state.BQNumber)+1,
+                Number:BigDecimalUtils.add(this.state.Number,1,2),
+                BQNumber:BigDecimalUtils.add(this.state.BQNumber,1,2),
                 numberFormat2:numberFormat2,
             });
         }
@@ -300,7 +303,8 @@ export default class GoodsDetails extends Component {
                 Number:parseInt(Number1)-1,
                 BQNumber:parseInt(BQNumber1)-1,
             });
-            let numberFormat2 = NumberUtils.numberFormat2((parseInt(Number1)-1)*(this.state.ShopPrice));
+            //let numberFormat2 = NumberUtils.numberFormat2((parseInt(Number1)-1)*(this.state.ShopPrice));
+            let numberFormat2 = BigDecimalUtils.multiply(BigDecimalUtils.subtract(Number1,1,2),this.state.ShopPrice,2);
             this.setState({
                 numberFormat2:numberFormat2,
             });
@@ -358,7 +362,7 @@ export default class GoodsDetails extends Component {
             if(this.state.OrderDetails==1){
                 var x = this.state.Number;//获取数量的数字
                 var y = String(x).indexOf(".") + 1;//获取小数点的位置
-                if(y > 0) {
+                if(y > 0&&!this.state.DataName=="移动销售") {
                     alert("数量不能含有小数");
                 } else {
                     if(this.state.name=="实时盘点"||this.state.name=="商品盘点"){
@@ -479,7 +483,7 @@ export default class GoodsDetails extends Component {
     pressPop(){
         var x = this.state.Number;//获取数量的数字
         var y = String(x).indexOf(".") + 1;//获取小数点的位置
-        if(y > 0) {
+        if(y > 0&&!this.state.DataName=="移动销售") {
             alert("数量不能含有小数");
         }else if(this.state.name=="商品配送"&&this.state.ydcountm==0){
             alert("库存为0，该商品不能进行配送")
@@ -551,6 +555,7 @@ export default class GoodsDetails extends Component {
                     shopInfo.ydcountm = this.state.ydcountm;
                     shopInfo.SuppCode = this.state.SuppCode;
                     shopInfo.BarCode = this.state.BarCode;
+                    console.log("a=",shopInfo.countm)
                     shopInfoData.push(shopInfo);
                     //调用插入表方法
                     dbAdapter.insertShopInfo(shopInfoData);
