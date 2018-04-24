@@ -161,12 +161,12 @@ export default class Index extends Component {
 
     }
 
-    //单据onclick事件
+    //单据点击事件
     _rightButtonClick() {
         this._setModalVisible();
     }
 
-    //二维码扫描
+    //手机调用二维码扫描
     Code() {
         if (this.state.head == null) {
             this._Emptydata();
@@ -182,7 +182,7 @@ export default class Index extends Component {
             decodepreprint.init(reminder, dbAdapter);
             if (title == null) {
                 this._Emptydata();
-            } else {//deCode13
+            } else {
                 if ((reminder.length == 18 && decodepreprint.deCodePreFlag())) {
                     decodepreprint.deCodeProdCode().then((datas) => {
                         dbAdapter.selectProdCode(datas, 1).then((rows) => {
@@ -495,7 +495,7 @@ export default class Index extends Component {
         })
     }
 
-    //搜索
+    //搜索框
     pressPush() {
         if (this.state.head == null) {
             this._Emptydata();
@@ -517,11 +517,10 @@ export default class Index extends Component {
         }
     }
 
-    //页面执行方法
+    //直接调用执行方法
     componentDidMount() {
         Storage.save("num", "1");
         InteractionManager.runAfterInteractions(() => {
-
             this.Storage();
             this._fetch();
             this.Device();
@@ -548,7 +547,7 @@ export default class Index extends Component {
 
         });
     }
-
+    //获取本地保存值
     Storage() {
         Storage.delete('DataName');
         Storage.get('Name').then((tags) => {
@@ -674,8 +673,7 @@ export default class Index extends Component {
         });
     }
 
-    _renderRow(rowData, sectionID, rowID) {
-        console.log(rowData.ShopNumber)
+    _renderRow(rowData, sectionID, rowID){
         return (
             <TouchableOpacity onPress={() => this._pressRow(rowData)} key={rowData.DepCode}
                               style={this.state.currentindex == rowData.DepCode ? styles.clickes : styles.click}>
@@ -693,7 +691,7 @@ export default class Index extends Component {
         );
     }
 
-    //商品品类获取品类下商品
+    //获取品类下商品
     _pressRow(rowData) {
         if (lastDepCode == "") {
             lastDepCode = rowData.DepCode;
@@ -746,7 +744,7 @@ export default class Index extends Component {
         //var endTime = (new Date()).valueOf();//获取结束时间
         //alert(endTime-startTime);
     }
-
+    //flatlist组件商品信息
     _renderItem(item, index) {
         return (
             <View style={styles.Border}>
@@ -788,7 +786,7 @@ export default class Index extends Component {
         )
     }
 
-    //修改商品数量增减查询
+    //商品数量减少查询
     Countm(item) {
         //调取数量
         // if(this.state.ShopNumber=="0"){
@@ -829,7 +827,6 @@ export default class Index extends Component {
             }
         }
         // }
-        // this._fetch();
         this._fetch1();
     }
 
