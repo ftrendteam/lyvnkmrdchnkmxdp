@@ -113,25 +113,31 @@ export default class DeCodePrePrint18 {
         } else {
           strWeightLen = "5";
         }
-        dbAdapter.selectKgOpt("ScaleWeightDegree").then((datas) => {
+        dbAdapter.selectPosOpt("WEIGHTQTY").then((datas) => {
           let length = datas.length;
           if (length != 0) {
             strWeightQTR = datas.item(0).OptValue;
             if (strWeightQTR == "") {
               strWeightQTR = "0.001";
               fixed = 3;
-            } else if ("1位小数" == strWeightQTR) {
+            } else if("0" == strWeightQTR){
+              strWeightQTR = "1";
+              fixed = 1;
+            }else if ("1" == strWeightQTR) {
               strWeightQTR = "0.1";
               fixed = 1;
-            } else if ("2位小数" == strWeightQTR) {
+            } else if ("2" == strWeightQTR) {
               strWeightQTR = "0.01";
               fixed = 2;
-            } else if ("3位小数" == strWeightQTR) {
+            } else if ("3" == strWeightQTR) {
               strWeightQTR = "0.001";
               fixed = 3;
-            } else {
+            } else if("4" == strWeightQTR){
               strWeightQTR = "0.0001";
               fixed = 4;
+            }else if("5" == strWeightQTR){
+              strWeightQTR = "0.00001";
+              fixed = 5;
             }
           } else {
             strWeightQTR = "0.01";

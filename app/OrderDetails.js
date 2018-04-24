@@ -53,7 +53,13 @@ export default class GoodsDetails extends Component {
         this.setState({
             focus:true
         })
-
+      dbAdapter.selectShopInfoData(this.state.Pid).then((data)=>{
+            if(data.length>=0){
+                this.setState({
+                    Number:data.item(0).countm
+                });
+            }
+      });
         Storage.get('Name').then((tags) => {
             this.setState({
                 name: tags

@@ -482,7 +482,17 @@ export default class DBAdapter extends SQLiteOpenHelper {
             });
         });
     }
-
+    selectShopInfoData=(pid)=>{
+      return new Promise((resolve, reject) => {
+        db.transaction((tx) => {
+          tx.executeSql("select * from shopInfo where pid='"+pid+"'", [], (tx, results) => {
+            resolve(results.rows);
+          })
+        }, (error) => {
+          this._errorCB('transaction', error);
+        });
+      });
+    }
     /***
      * 查询shopInfo表中所有商品的数量总和
      */

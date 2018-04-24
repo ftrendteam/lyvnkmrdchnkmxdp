@@ -29,7 +29,6 @@ export default class DPPromotionManager {
           let item = formTypes.item(i);
           let formNo = item.FormNo;
           DPPromotionManager.isContainCustType(cardTypeCode,dbAdapter,prodCode,formNo).then((result)=>{
-             console.log("result=",result)
             if (result) {
               dbAdapter.selectTDscProd(prodCode).then((tDscProdBeans) => {
                 if (tDscProdBeans != null) {
@@ -37,12 +36,9 @@ export default class DPPromotionManager {
                   let curr1 = tDscProdBean.Curr1;
                   let str1 = tDscProdBean.Str1;
                   dscPrice = tDscProdBean.DscPrice;
-                  //console.log("ad=", tDscProdBean)
                   if (0 == str1) {
-                    // console.log("ad=")
                     shopNewTotal = BigDecimalUtils.multiply(shopNum,
                       dscPrice, 2);
-                    // console.log("ad=", shopNewTotal)
                   } else if (1 == str1) {
                     if (shopNum <= curr1) {
                       shopNewTotal = BigDecimalUtils.multiply(shopNum,
@@ -50,15 +46,15 @@ export default class DPPromotionManager {
                     } else {
                       shopNewTotal = BigDecimalUtils.multiply(curr1,
                         dscPrice, 2);
-                      shopNewTotal += BigDecimalUtils.multiply(shopNum
-                        - curr1, productBean.StdPrice, 2);
+                      shopNewTotal = BigDecimalUtils.add(BigDecimalUtils.multiply(shopNum
+                        - curr1, productBean.StdPrice, 2),shopNewTotal,2);
                     }
                   } else if (2 == str1) {
                     if (shopNum > curr1) {
                       shopNewTotal = BigDecimalUtils.multiply(curr1,
                         productBean.StdPrice, 2);
-                      shopNewTotal += BigDecimalUtils.multiply(shopNum
-                        - curr1, dscPrice, 2);
+                      shopNewTotal = BigDecimalUtils.add(BigDecimalUtils.multiply(shopNum
+                        - curr1, dscPrice, 2),shopNewTotal,2);
                     } else if (shopNum < curr1) {
                       shopNewTotal = BigDecimalUtils.multiply(shopNum,
                         productBean.StdPrice, 2);
@@ -69,27 +65,22 @@ export default class DPPromotionManager {
                         dscPrice, 2);
                     }
                   }
-                  productBean.ShopAmount = Number(shopNewTotal);
-                  console.log("dp=",productBean.ShopAmount)
-                  //productBean.ShopPrice = dscPrice;
+                  let shopAmount = Number(shopNewTotal);
+                  if(shopAmount!=0){
+                  productBean.ShopAmount = shopAmount;
+                  }
                   dbAdapter.updateShopInfoFormType(productBean.pid)
                   resolve(productBean);
-                  // console.log('ccc=',productBean)
                 }else{
                   resolve(false);
-                  // console.log("aaaa")
                 }
               });
             }else{
-              // console.log("bbbbb")
               resolve(false);
             }
           });
         }
      });
-      // console.log('wtf=',productBean)
-      
-      
     })
     
   }

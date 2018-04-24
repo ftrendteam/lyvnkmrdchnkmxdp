@@ -10,6 +10,7 @@ export default class VipPrice {
         if (memberInfo == null || memberInfo == undefined) {
             return;
         }
+        console.log("products=",products)
         // let custTypeCode = memberInfo.CardTypeCode;
         let isDsc = memberInfo.IsDsc;
         let basePrice = memberInfo.BasePrice;
@@ -27,11 +28,8 @@ export default class VipPrice {
             let memberTotalPrice = 0;
             let productBean = products[i];
             let size = productBean.ShopNumber;
-            if ("1" == productBean.SaleType) {//获取称重商品的重量
-                //            size = DoubleUtils.string2Double(textScale2.getText()
-                //                    .toString());
-                //  size = productBean.getWeight();
-            }
+            console.log("size222=",productBean.ShopNumber)
+            console.log("size222=",size)
             if ("0" == isDsc && "1" == memberInfo.IsJf) {//积分操作
                 let gatherType = productBean.GatherType;
                 let gatherRate = productBean.GatherRate;
@@ -41,12 +39,7 @@ export default class VipPrice {
                 } else if ("1" == gatherType) {
                     //productBean.setmJF(BigDecimalUtils.multiply(gatherRate, size));
                 }
-                //if ("1" != productBean.SaleType) {
-                //  memberTotalPrice = BigDecimalUtils.multiply(size, productBean.getStdPrice());
-                //} else if ("1".equals(productBean.getSaleType())) {
-                //  memberTotalPrice = BigDecimalUtils.scaleMultiply(productBean.getWeight(),
-                //    productBean.getStdPrice());
-                //}
+                
             } else if ("1" == isDsc) {//会员价
                 if ("0" == basePrice) {//取售价
                 } else if ("1" == basePrice) {
@@ -106,7 +99,7 @@ export default class VipPrice {
                 //  memberTotalPrice = BigDecimalUtils.multiply(productBean.getStdPrice(), productBean.getList().size());
                 //}
             }
-            //if (typeof memberTotalPrice == "number" && memberTotalPrice != 0) {
+            if (memberTotalPrice != 0) {
                 productBean.ShopAmount = memberTotalPrice;
                 // productBean.ShopPrice = memberTotalPrice;
                 let vipNum = productBean.ShopNumber;
@@ -120,7 +113,7 @@ export default class VipPrice {
                 let oldPrices = BigDecimalUtils.multiply(productBean.StdPrice, vipNum, 2);
                 let vipDis = BigDecimalUtils.subtract(oldPrices, memberTotalPrice, 2);
                 vipDisPrice = BigDecimalUtils.add(vipDisPrice, vipDis, 2);
-            //}
+            }
 
         }
         return vipDisPrice;
