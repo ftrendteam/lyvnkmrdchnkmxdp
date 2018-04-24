@@ -170,9 +170,9 @@ export default class admin extends Component {
 
     //版本自动更新弹框
     Edition(){
-        let isshow = this.state.Edition;
+        let isShow = this.state.Edition;
         this.setState({
-            Edition:!isshow,
+            Edition:!isShow,
         });
     }
 

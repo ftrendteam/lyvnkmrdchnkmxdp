@@ -1135,6 +1135,7 @@ export default class Pay extends Component {
 
     //保存流水表及detail表
     restorage() {
+        Storage.delete("VipInfo");
         //交易结束创建新的流水号
         NumFormatUtils.createLsNo().then((data) => {
             Storage.save("LsNo",data);
@@ -1243,21 +1244,22 @@ export default class Pay extends Component {
                             sum.TotalPay = this.state.payments;
                             sum.Change = this.state.Total;
                             sum.TradeFlag = this.state.Seles;
-                            if (this.state.VipCardNo == "") {
+                          let cardFaceNo = dataRows.CardFaceNo;
+                            if (cardFaceNo == "") {
                                 sum.DscTotal =allDisPrice;
                                 sum.CustType = '0';
                                 sum.CustCode = "";
                             } else {
                                 sum.DscTotal = allDisPrice;
                                 sum.CustType = '2';
-                                sum.CustCode = this.state.VipCardNo;
+                                sum.CustCode = cardFaceNo;
                             }
 
                             sum.PayId = dataRows.pid;
                             sum.PayCode = dataRows.PayCode;
                             sum.Amount = dataRows.total;
                             sum.OldAmount = dataRows.total;
-                            sum.TendPayCode = this.state.VipCardNo;
+                            sum.TendPayCode = cardFaceNo;
                             sum.InnerNo = InnerNo;
                             sumDatas.push(sum);
                             dbAdapter.insertSum(sumDatas);

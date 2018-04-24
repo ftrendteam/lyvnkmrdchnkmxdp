@@ -161,12 +161,12 @@ export default class Index extends Component {
 
     }
 
-    //单据点击事件
+    //单据onclick事件
     _rightButtonClick() {
         this._setModalVisible();
     }
 
-    //手机调用二维码扫描
+    //二维码扫描
     Code() {
         if (this.state.head == null) {
             this._Emptydata();
@@ -179,113 +179,115 @@ export default class Index extends Component {
     Device() {
         DeviceEventEmitter.addListener("code", (reminder) => {
             var title = this.state.head;
+            console.log("title=",title)
             decodepreprint.init(reminder, dbAdapter);
             if (title == null) {
                 this._Emptydata();
-            } else {
+            } else {//deCode13
                 if ((reminder.length == 18 && decodepreprint.deCodePreFlag())) {
-                    decodepreprint.deCodeProdCode().then((datas) => {
-                        dbAdapter.selectProdCode(datas, 1).then((rows) => {
-                            dbAdapter.selectAidCode(reminder, 1).then((rows) => {
-                                if (rows.length == 0) {
-                                    alert("该商品不存在")
-                                } else {
-                                    if (this.state.head == "移动销售") {
-                                        var shopnumber = 0;
-                                        var shopAmount = 0;
-                                        for (let i = 0; i < rows.length; i++) {
-                                            var row = rows.item(i);
-                                            var ShopPrice = row.ShopPrice;
-                                            this.props.navigator.push({
-                                                component: OrderDetails,
-                                                params: {
-                                                    ProdName: row.ProdName,
-                                                    ShopPrice: row.StdPrice,
-                                                    Pid: row.Pid,
-                                                    countm: row.ShopNumber,
-                                                    promemo: row.ShopRemark,
-                                                    prototal: row.ShopAmount,
-                                                    ProdCode: row.ProdCode,
-                                                    DepCode: row.DepCode1,
-                                                    SuppCode: row.SuppCode,
-                                                    ydcountm: "",
-                                                    BarCode: row.BarCode,
-                                                }
-                                            })
-                                        }
-                                    } else {
-                                        Storage.get('FormType').then((tags) => {
-                                            this.setState({
-                                                FormType: tags
-                                            })
-                                        })
-
-                                        Storage.get('LinkUrl').then((tags) => {
-                                            this.setState({
-                                                LinkUrl: tags
-                                            })
-                                        })
-                                        //商品查询
-                                        Storage.get('userName').then((tags) => {
-                                            let params = {
-                                                reqCode: "App_PosReq",
-                                                reqDetailCode: "App_Client_CurrProdQry",
-                                                ClientCode: this.state.ClientCode,
-                                                sDateTime: Date.parse(new Date()),
-                                                Sign: NetUtils.MD5("App_PosReq" + "##" + "App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs") + '',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" +"PosControlCs"
-                                                username: tags,
-                                                usercode: this.state.Usercode,
-                                                SuppCode: rows.item(0).SuppCode,
-                                                ShopCode: this.state.ShopCode,
-                                                ChildShopCode: this.state.ChildShopCode,
-                                                ProdCode: datas,
-                                                OrgFormno: this.state.OrgFormno,
-                                                FormType: this.state.FormType,
-                                            };
-                                            FetchUtil.post(this.state.LinkUrl, JSON.stringify(params)).then((data) => {
-                                                var countm = JSON.stringify(data.countm);
-                                                var ShopPrice = JSON.stringify(data.ShopPrice);
-                                                if (data.retcode == 1) {
-                                                    var ShopCar = rows.item(0).ProdName;
-                                                    if (this.state.head == "商品查询") {
-                                                        this.props.navigator.push({
-                                                            component: Shopsearch,
-                                                            params: {
-                                                                ProdCode: rows.item(0).ProdCode,
-                                                                DepCode: rows.item(0).DepCode1,
-                                                            }
-                                                        })
-                                                    } else {
-                                                        this.props.navigator.push({
-                                                            component: OrderDetails,
-                                                            params: {
-                                                                ProdName: rows.item(0).ProdName,
-                                                                ShopPrice: ShopPrice,
-                                                                Pid: rows.item(0).Pid,
-                                                                countm: rows.item(0).ShopNumber,
-                                                                promemo: rows.item(0).promemo,
-                                                                prototal: rows.item(0).prototal,
-                                                                ProdCode: rows.item(0).ProdCode,
-                                                                DepCode: rows.item(0).DepCode1,
-                                                                SuppCode: rows.item(0).SuppCode,
-                                                                ydcountm: countm,
-                                                                BarCode: rows.item(0).BarCode,
-                                                            }
-                                                        })
-                                                    }
-                                                } else {
-                                                    alert(JSON.stringify(data))
-                                                }
-                                            }, (err) => {
-                                                alert("网络请求失败");
-                                            })
-                                        })
-                                    }
-                                    DeviceEventEmitter.removeAllListeners();
+                  new Promise.all([decodepreprint.deCodeProdCode(),decodepreprint.deCodeTotal(),decodepreprint.deCodeWeight()]).then((results) => {
+                    if(results.length==3){
+                      let prodCode = results[0];
+                      let total = results[1];
+                      let weight = results[2];
+                      if(this.state.head == "移动销售"){
+                        dbAdapter.selectProdCode(prodCode, 1).then((product)=>{
+                          if(product.length!=0){
+                            for (let i = 0; i < product.length; i++) {
+                              var row = product.item(i);
+                              var ShopPrice = row.ShopPrice;
+                              this.props.navigator.push({
+                                component: OrderDetails,
+                                params: {
+                                  ProdName: row.ProdName,
+                                  ShopPrice: row.StdPrice,
+                                  Pid: row.Pid,
+                                  countm: weight,
+                                  promemo: row.ShopRemark,
+                                  prototal: total,
+                                  ProdCode: row.ProdCode,
+                                  DepCode: row.DepCode1,
+                                  SuppCode: row.SuppCode,
+                                  ydcountm: "",
+                                  BarCode: row.BarCode,
                                 }
-                            })
+                              })
+                            }
+                          }else{
+                            alert("商品不存在!")
+                          }
+                        });
+                      }else{
+                        Storage.get('FormType').then((tags) => {
+                          this.setState({
+                            FormType: tags
+                          })
                         })
-                    })
+  
+                        Storage.get('LinkUrl').then((tags) => {
+                          this.setState({
+                            LinkUrl: tags
+                          })
+                        })
+                        //商品查询
+                        Storage.get('userName').then((tags) => {
+                          let params = {
+                            reqCode: "App_PosReq",
+                            reqDetailCode: "App_Client_CurrProdQry",
+                            ClientCode: this.state.ClientCode,
+                            sDateTime: Date.parse(new Date()),
+                            Sign: NetUtils.MD5("App_PosReq" + "##" + "App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs") + '',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" +"PosControlCs"
+                            username: tags,
+                            usercode: this.state.Usercode,
+                            SuppCode: row.SuppCode,
+                            ShopCode: this.state.ShopCode,
+                            ChildShopCode: this.state.ChildShopCode,
+                            ProdCode: datas,
+                            OrgFormno: this.state.OrgFormno,
+                            FormType: this.state.FormType,
+                          };
+                          FetchUtil.post(this.state.LinkUrl, JSON.stringify(params)).then((data) => {
+                            var countm = JSON.stringify(data.countm);
+                            var ShopPrice = JSON.stringify(data.ShopPrice);
+                            if (data.retcode == 1) {
+                              var ShopCar = row.ProdName;
+                              if (this.state.head == "商品查询") {
+                                this.props.navigator.push({
+                                  component: Shopsearch,
+                                  params: {
+                                    ProdCode: row.ProdCode,
+                                    DepCode: row.DepCode1,
+                                  }
+                                })
+                              } else {
+                                this.props.navigator.push({
+                                  component: OrderDetails,
+                                  params: {
+                                    ProdName: row.ProdName,
+                                    ShopPrice: ShopPrice,
+                                    Pid:row.Pid,
+                                    countm: row.ShopNumber,
+                                    promemo: row.promemo,
+                                    prototal: row.prototal,
+                                    ProdCode: row.ProdCode,
+                                    DepCode: row.DepCode1,
+                                    SuppCode: row.SuppCode,
+                                    ydcountm: countm,
+                                    BarCode: row.BarCode,
+                                  }
+                                })
+                              }
+                            } else {
+                              alert(JSON.stringify(data))
+                            }
+                          }, (err) => {
+                            alert("网络请求失败");
+                          })
+                        })
+                      }
+                      
+                    }
+                  });
                 }else if((reminder.length==13&&deCode13.deCodePreFlag(reminder))){//13位条码解析
                   new Promise.all([deCode13.deCodeProdCode(reminder,dbAdapter),deCode13.deCodeTotile(reminder,dbAdapter)]).then((result)=>{
                         if(result.length==2){
@@ -495,7 +497,7 @@ export default class Index extends Component {
         })
     }
 
-    //搜索框
+    //搜索
     pressPush() {
         if (this.state.head == null) {
             this._Emptydata();
@@ -517,10 +519,11 @@ export default class Index extends Component {
         }
     }
 
-    //直接调用执行方法
+    //页面执行方法
     componentDidMount() {
         Storage.save("num", "1");
         InteractionManager.runAfterInteractions(() => {
+
             this.Storage();
             this._fetch();
             this.Device();
@@ -547,7 +550,7 @@ export default class Index extends Component {
 
         });
     }
-    //获取本地保存值
+
     Storage() {
         Storage.delete('DataName');
         Storage.get('Name').then((tags) => {
@@ -607,7 +610,6 @@ export default class Index extends Component {
         dbAdapter.selectTDepSet('1').then((rows) => {
             for (let i = 0; i < rows.length; i++) {
                 var row = rows.item(i);
-                console.log(row);
                 this.dataRows.push(row);
                 var ShopCar = rows.item(0).DepCode;
                 ShopCar1 = BigDecimalUtils.add(row.ShopNumber , ShopCar1,2);
@@ -666,14 +668,13 @@ export default class Index extends Component {
         });
         dbAdapter.selectShopInfoAllCountm().then((rows) => {
             let ShopCar = rows.item(0).countm;
-            //console.log(rows.item(0))
             this.setState({
                 shopcar: ShopCar,
             });
         });
     }
 
-    _renderRow(rowData, sectionID, rowID){
+    _renderRow(rowData, sectionID, rowID) {
         return (
             <TouchableOpacity onPress={() => this._pressRow(rowData)} key={rowData.DepCode}
                               style={this.state.currentindex == rowData.DepCode ? styles.clickes : styles.click}>
@@ -691,7 +692,7 @@ export default class Index extends Component {
         );
     }
 
-    //获取品类下商品
+    //商品品类获取品类下商品
     _pressRow(rowData) {
         if (lastDepCode == "") {
             lastDepCode = rowData.DepCode;
@@ -744,7 +745,7 @@ export default class Index extends Component {
         //var endTime = (new Date()).valueOf();//获取结束时间
         //alert(endTime-startTime);
     }
-    //flatlist组件商品信息
+
     _renderItem(item, index) {
         return (
             <View style={styles.Border}>
@@ -786,7 +787,7 @@ export default class Index extends Component {
         )
     }
 
-    //商品数量减少查询
+    //修改商品数量增减查询
     Countm(item) {
         //调取数量
         // if(this.state.ShopNumber=="0"){
@@ -827,6 +828,7 @@ export default class Index extends Component {
             }
         }
         // }
+        // this._fetch();
         this._fetch1();
     }
 
