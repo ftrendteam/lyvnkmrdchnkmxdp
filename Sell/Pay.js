@@ -1314,8 +1314,8 @@ export default class Pay extends Component {
                             component: Index,
                         };
                         this.props.navigator.push(nextRoute);
-                        // dbAdapter.deleteData("shopInfo");
-                        // Storage.delete("VipPrice");
+                        dbAdapter.deleteData("shopInfo");
+                        Storage.delete("VipPrice");
                     }
                 })
             })
@@ -1488,8 +1488,8 @@ export default class Pay extends Component {
                             component: Index,
                         };
                         this.props.navigator.push(nextRoute);
-                        // dbAdapter.deleteData("shopInfo");
-                        // Storage.delete("VipPrice");
+                        dbAdapter.deleteData("shopInfo");
+                        Storage.delete("VipPrice");
                     };
                 });
             });
