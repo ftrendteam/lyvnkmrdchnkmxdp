@@ -18,7 +18,10 @@ public class JSPrint extends ReactContextBaseJavaModule{
     public String getName(){
         return "AndroidPrintInterface";
     }
-
+    @ReactMethod
+    public void initPrint(){
+        printModel.initPrint();
+    }
     @ReactMethod
     public void print(String strPrint){
         printModel.print(strPrint);
