@@ -1041,6 +1041,7 @@ export default class Pay extends Component {
                 this.Barcode();
             });
             if(this.state.Seles=="R"){
+                console.log(this.state.MiYaMerchID,this.state.barcode,this.state.points+"",time,this.state.MiYaKeyCode,this.state.MiYaIP,"9191")
                 NativeModules.AndroidMYRequest.doRetPay(this.state.MiYaMerchID,this.state.barcode,this.state.points+"",time,this.state.MiYaKeyCode,this.state.MiYaIP,"9191",(data)=>{
                     // this.WaitLoading();
                     console.log(data)
@@ -1135,6 +1136,7 @@ export default class Pay extends Component {
 
     //保存流水表及detail表
     restorage() {
+
         Storage.delete("VipInfo");
         //交易结束创建新的流水号
         NumFormatUtils.createLsNo().then((data) => {
