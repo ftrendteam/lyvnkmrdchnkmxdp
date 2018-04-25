@@ -14,6 +14,7 @@ public class A90Print{
      * 打印字符类型
      */
     public static void print(String strPrint){
+
         PrinterApi.PrnStr_Api(strPrint);
     }
 

@@ -28,10 +28,13 @@ public class PrintModel{
                                                 + "/" + "\0"), context);
         }
     }
-
+    public void initPrint(){
+    if("A90".equals(deviceModel)){
+                A90Print.initSet();
+            }
+    }
     public void print(String strPrint){
         if("A90".equals(deviceModel)){
-            //A90Print.initSet();
             A90Print.print(strPrint);
         }
     }
