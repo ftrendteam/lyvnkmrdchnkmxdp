@@ -219,11 +219,11 @@ export default class Pay extends Component {
             })
         }
     }
-//取消优惠弹层
+    //取消优惠弹层
     PriceClose(){
         this.NewPriceButton();
     }
-//优惠价，折扣价选择
+    //优惠价，折扣价选择
     NewPriceLeft(){
         this.setState({
             pressStatus:'pressin',
@@ -264,7 +264,6 @@ export default class Pay extends Component {
                 name: tags
             })
         })
-        // Storage.delete('EvenNumber');
         Storage.get('EvenNumber').then((evenNumber) => {
             if(evenNumber==null){
                 this.setState({
@@ -278,7 +277,7 @@ export default class Pay extends Component {
         })
         this.dbadapter();
     }
-//促销价及四舍五入
+    //促销价及四舍五入
     dbadapter() {
         var rows=this.state.dataRows;
         var shopAmount = 0;
@@ -586,11 +585,11 @@ export default class Pay extends Component {
             ToastAndroid.show('订单未完成', ToastAndroid.SHORT)
         }
     }
-//整单优惠button
+    //整单优惠button
     discount(){
         this.NewPriceButton();
     }
-//继续交易
+    //继续交易
     JiaoYi() {
         if (this.dataRows == '') {
             var nextRoute = {
@@ -667,14 +666,14 @@ export default class Pay extends Component {
                 if (item.item.PayCode == "01") {
                     if (this.state.Seles == "R") {
                         if (this.state.amount > Number(this.state.Total)&&this.state.Total<0) {
-                            alert(this.state.amount)
+                            // alert(this.state.amount)
                             this.ModalShow()
                         } else {
                             this.RefundTotal()
                         }
                     } else if (this.state.Seles == "T") {
                         if (this.state.amount > Number(this.state.Total)&&this.state.Total>0) {
-                            alert(this.state.amount)
+                            // alert(this.state.amount)
                             this.ModalShow()
                         } else {
                             this.Total()
@@ -1038,38 +1037,95 @@ export default class Pay extends Component {
                     PriceAmount:Total+"",
                     dataSource: this.state.dataSource.cloneWithRows(this.dataRows)
                 })
-                //if (payTotal>=this.state.ShopAmount) {
-                //
-                //} else {
-                //    var Amount = {
-                //        'payName': '米雅支付',
-                //        'CardFaceNo': '',
-                //        'Total': Points,
-                //        'total': "",
-                //        'payRT': '',
-                //        'PayCode': this.state.PayCode,
-                //        'pid': this.state.Pid,
-                //    }
-                //}
-                //if (this.dataRows.length == 0) {
-                //    this.dataRows.push(Amount);
-                //    this.setState({
-                //        AMount: payamount,
-                //        payments: this.state.payments,
-                //        Total: Total,
-                //        cardfaceno: "",
-                //        dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
-                //    })
-                //} else {
-                //
-                //}
-                if(this.state.Seles=="R"){
-                    this.restorage1();
-                }else if(this.state.Seles=="T"){
-                    this.restorage();
-                }
+                this.restorage();
                 this.Barcode();
             });
+            if(this.state.Seles=="R"){
+                NativeModules.AndroidMYRequest.doRetPay(this.state.MiYaMerchID,this.state.barcode,this.state.points+"",time,this.state.MiYaKeyCode,this.state.MiYaIP,"9191",(data)=>{
+                    // this.WaitLoading();
+                    console.log(data)
+                    // if(data=="1-支付成功"){
+                    //     //this.WaitLoading();
+                    //     ToastAndroid.show('微信支付成功', ToastAndroid.SHORT);
+                    // }else if(data=="3-支付成功"){
+                    //     ToastAndroid.show('支付宝支付成功', ToastAndroid.SHORT);
+                    // }else{
+                    //     alert(data)
+                    //     return;
+                    // }
+                    // var Points=this.state.points/100;
+                    // //var payTotal = Number(Points) + Number(this.state.payments);
+                    // this.state.payments += Number(Points);
+                    // var Total = (BigDecimalUtils.subtract(this.state.ShopAmount, this.state.payments, 2));
+                    // //var payamount = Number(this.state.AMount) + Number(Points);
+                    // // alert(payamount)
+                    // // var aptotal = BigDecimalUtils.subtract(payamount, Total, 2);
+                    // var payments=Number(Points) + Number(this.state.payments);
+                    // var Amount = {
+                    //     'payName': '米雅支付',
+                    //     'CardFaceNo': '',
+                    //     'Total': Points,
+                    //     'total': Points,
+                    //     'payRT': '',
+                    //     'PayCode': this.state.PayCode,
+                    //     'pid': this.state.Pid,
+                    // }0
+                    // this.dataRows.push(Amount);
+                    // this.setState({
+                    //     payments: payments,
+                    //     payname: "米雅支付",
+                    //     Total: Total,
+                    //     amount:Total,
+                    //     PriceAmount:Total+"",
+                    //     dataSource: this.state.dataSource.cloneWithRows(this.dataRows)
+                    // })
+                    // this.restorage1();
+                    this.Barcode();
+                });
+            }else if(this.state.Seles=="T"){
+                NativeModules.AndroidMYRequest.doPay(this.state.MiYaMerchID,time,this.state.points+"",this.state.barcode,this.state.MiYaKeyCode,this.state.MiYaIP,"9191",(data)=>{
+                    // this.WaitLoading();
+                    if(data=="1-支付成功"){
+                        //this.WaitLoading();
+                        ToastAndroid.show('微信支付成功', ToastAndroid.SHORT);
+                    }else if(data=="3-支付成功"){
+                        ToastAndroid.show('支付宝支付成功', ToastAndroid.SHORT);
+                    }else{
+                        alert(data)
+                        return;
+                    }
+                    var Points=this.state.points/100;
+                    //var payTotal = Number(Points) + Number(this.state.payments);
+                    this.state.payments += Number(Points);
+                    var Total = (BigDecimalUtils.subtract(this.state.ShopAmount, this.state.payments, 2));
+                    //var payamount = Number(this.state.AMount) + Number(Points);
+                    // alert(payamount)
+                    // var aptotal = BigDecimalUtils.subtract(payamount, Total, 2);
+                    var payments=Number(Points) + Number(this.state.payments);
+                    var Amount = {
+                        'payName': '米雅支付',
+                        'CardFaceNo': '',
+                        'Total': Points,
+                        'total': Points,
+                        'payRT': '',
+                        'PayCode': this.state.PayCode,
+                        'pid': this.state.Pid,
+                    }
+                    this.dataRows.push(Amount);
+                    this.setState({
+                        payments: payments,
+                        payname: "米雅支付",
+                        Total: Total,
+                        amount:Total,
+                        PriceAmount:Total+"",
+                        dataSource: this.state.dataSource.cloneWithRows(this.dataRows)
+                    })
+                    this.restorage();
+                    this.Barcode();
+                });
+                this.restorage();
+                this.Barcode();
+            }
         }
     }
 
@@ -1077,7 +1133,7 @@ export default class Pay extends Component {
         this.Barcode();
     }
 
-//保存流水表及detail表
+    //保存流水表及detail表
     restorage() {
         Storage.delete("VipInfo");
         //交易结束创建新的流水号
@@ -1432,15 +1488,15 @@ export default class Pay extends Component {
                             component: Index,
                         };
                         this.props.navigator.push(nextRoute);
-                        // dbAdapter.deleteData("shopInfo");
-                        // Storage.delete("VipPrice");
+                        dbAdapter.deleteData("shopInfo");
+                        Storage.delete("VipPrice");
                     };
                 });
             });
         });
     }
 
-//Flatlist字段
+    //Flatlist字段
     _renderItem(item, index) {
         return (
             <TouchableOpacity onPress={() => this.HorButton(item)} style={[styles.PageRowButton, {marginRight: 5}]}>
@@ -1451,12 +1507,12 @@ export default class Pay extends Component {
         )
     }
 
-//FlatList加入kay值
+    //FlatList加入kay值
     keyExtractor(item: Object, index: number) {
         return item.payName//FlatList使用json中的ProdName动态绑定key
     }
 
-//付款储值卡网络请求
+    //付款储值卡网络请求
     Button() {
         var now = new Date();
         var year = now.getFullYear();
@@ -1565,7 +1621,7 @@ export default class Pay extends Component {
         this.Total();
     }
 
-//退货储值卡
+    //退货储值卡
     RetButton() {
         var now = new Date();
         var year = now.getFullYear();
@@ -1693,7 +1749,6 @@ export default class Pay extends Component {
     ScannCode(){
         NativeModules.RNScannerAndroid.openScanner();
         DeviceEventEmitter.addListener("code",(code)=>{
-            //alert(code)
             this.setState({
                 myText: code
             })
