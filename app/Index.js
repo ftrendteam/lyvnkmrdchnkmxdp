@@ -478,7 +478,6 @@ export default class Index extends Component {
                                                         BarCode: rows.item(0).BarCode,
                                                     }
                                                 })
-                                                alert(rows.item(0).ShopPrice)
                                             }
                                             DeviceEventEmitter.removeAllListeners();
                                         } else {
