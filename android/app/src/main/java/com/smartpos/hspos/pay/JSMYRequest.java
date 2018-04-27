@@ -39,12 +39,12 @@ public class JSMYRequest extends ReactContextBaseJavaModule{
     }
 
     @ReactMethod
-    public void doPay(String SAASID,String OUT_TRADE_NO,String TOTAL_FEE,String F1,String F2,String HOST,String PORT,Callback successCallback){
-        successCallback.invoke(MYPay.doPayRequest(SAASID,OUT_TRADE_NO,TOTAL_FEE,F1,F2,HOST,PORT));
+    public void doPay(String NUMID,String USERID,String OPERATOR_ID,String SAASID,String OUT_TRADE_NO,String TOTAL_FEE,String F1,String F2,String HOST,String PORT,Callback successCallback){
+        successCallback.invoke(MYPay.doPayRequest(NUMID,USERID,OPERATOR_ID,SAASID,OUT_TRADE_NO,TOTAL_FEE,F1,F2,HOST,PORT));
     }
 
     @ReactMethod
-    public void doRetPay(String SAASID,String OUT_TRADE_NO,String TOTAL_FEE,String OUT_REQUEST_NO,String F2,String HOST,String PORT,Callback successCallback){
-        successCallback.invoke(MYPay.doPayRequest(SAASID,OUT_TRADE_NO,TOTAL_FEE,OUT_REQUEST_NO,F2,HOST,PORT));
+    public void doRetPay(String NUMID,String USERID,String OPERATOR_ID,String SAASID,String OUT_TRADE_NO,String TOTAL_FEE,String OUT_REQUEST_NO,String F2,String HOST,String PORT,Callback successCallback){
+        successCallback.invoke(MYPay.doPayRequest(NUMID,USERID,OPERATOR_ID,SAASID,OUT_TRADE_NO,TOTAL_FEE,OUT_REQUEST_NO,F2,HOST,PORT));
     }
 }

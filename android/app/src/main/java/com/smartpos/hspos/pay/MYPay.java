@@ -10,7 +10,7 @@ import java.util.Map;
  */
 
 public class MYPay {
-    public static String doPayRequest(String SAASID,String OUT_TRADE_NO,String TOTAL_FEE,String F1,String F2,String HOST,String PORT){
+    public static String doPayRequest(String NUMID,String USERID,String OPERATOR_ID,String SAASID,String OUT_TRADE_NO,String TOTAL_FEE,String F1,String F2,String HOST,String PORT){
         try {
             String path = Environment.getExternalStorageDirectory()
                     .getAbsolutePath() + "/miyajpos/";
@@ -19,9 +19,9 @@ public class MYPay {
             tlvmap.put("VERSION", "1.5");
             tlvmap.put("TRCODE", "1001");//
             tlvmap.put("SAASID", SAASID);//miya
-            tlvmap.put("NUMID", "001");//
-            tlvmap.put("USERID", "19");
-            tlvmap.put("OPERATOR_ID", "001");
+            tlvmap.put("NUMID", NUMID);//
+            tlvmap.put("USERID", USERID);
+            tlvmap.put("OPERATOR_ID", OPERATOR_ID);
             tlvmap.put("PAYMENTPLATFORM", "A");
             tlvmap.put("SERVEICETYPE", "A");//支付-A,查询-B，退货-C,退货查询-D
             tlvmap.put("OUT_TRADE_NO", OUT_TRADE_NO);//商户订单号
@@ -35,7 +35,7 @@ public class MYPay {
             other.put("PORT", PORT);
             other.put("TIMEOUT", "60");
             other.put("SUBJECT", "支付条码");
-            other.put("SAASID", "miya");
+            other.put("SAASID", SAASID);
             Map requsetMap = TcpSend.sendMiya(tlvmap, other);
             String retcode = (String) requsetMap.get("RETCODE");
             String retmsg = (String) requsetMap.get("RETMSG");
@@ -54,7 +54,7 @@ public class MYPay {
         }
     }
 
-    public static String doRetPayRequest(String SAASID,String OUT_TRADE_NO,String TOTAL_FEE,String OUT_REQUEST_NO,String F2,String HOST,String PORT){
+    public static String doRetPayRequest(String NUMID,String USERID,String OPERATOR_ID,String SAASID,String OUT_TRADE_NO,String TOTAL_FEE,String OUT_REQUEST_NO,String F2,String HOST,String PORT){
         try {
             String path = Environment.getExternalStorageDirectory()
                     .getAbsolutePath() + "/miyajpos/";
@@ -63,9 +63,9 @@ public class MYPay {
             tlvmap.put("VERSION", "1.5");
             tlvmap.put("TRCODE", "1003");//
             tlvmap.put("SAASID",SAASID);//miya
-            tlvmap.put("NUMID", "001");//
-            tlvmap.put("USERID", "19");
-            tlvmap.put("OPERATOR_ID", "001");
+            tlvmap.put("NUMID", NUMID);//
+            tlvmap.put("USERID",USERID);
+            tlvmap.put("OPERATOR_ID", OPERATOR_ID);
             tlvmap.put("PAYMENTPLATFORM", "A");
             tlvmap.put("SERVEICETYPE", "C");//支付-A,查询-B，退货-C,退货查询-D
             tlvmap.put("OUT_TRADE_NO", OUT_TRADE_NO);//商户退款单号
@@ -80,7 +80,7 @@ public class MYPay {
             other.put("PORT", PORT);
             other.put("TIMEOUT", "60");
             other.put("SUBJECT", "退款条码");
-            other.put("SAASID", "miya");
+            other.put("SAASID", SAASID);
             Map requsetMap = TcpSend.sendMiya(tlvmap, other);
             String retcode = (String) requsetMap.get("RETCODE");
             String retmsg = (String) requsetMap.get("RETMSG");

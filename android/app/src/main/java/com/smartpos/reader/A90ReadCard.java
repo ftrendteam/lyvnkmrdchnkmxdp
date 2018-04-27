@@ -10,6 +10,7 @@ import com.vanstone.trans.api.Itwell;
 import com.vanstone.trans.api.MagCardApi;
 import com.vanstone.trans.api.PiccApi;
 import com.vanstone.utils.ByteUtils;
+import com.smartpos.utils.Encrypt;
 import com.vanstone.utils.CommonConvert;
 
 /**
@@ -28,16 +29,19 @@ public class A90ReadCard {
     }
 
     public static void m1auth(String s) {//读取加认证
+        String key = Encrypt.NewStrDecrypt(s, true);
+        while (key.length() < 12) {
+            key = key + "F";
+        }
         byte[] bytes = new byte[0];
         try {
-            bytes = StringUtils.bytesFromHex(s, 6);
+            bytes = StringUtils.bytesFromHex(key, 6);
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }
         byte[] SerialNo = new byte[100];
         byte[] CardType = new byte[2];
         int m = PiccApi.PiccCheck_Api('M', CardType, SerialNo);
-        System.out.println("duka m="+m+",s="+s);
         if (m == 0) {//读卡
             int ret = 0;
             ret = PiccApi.M1Authority_Api('A', 4, bytes);//认证
