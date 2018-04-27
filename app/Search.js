@@ -614,9 +614,9 @@ export default class Search extends Component {
     }
 
     add() {
-        if(this.state.Number==""&&this.state.name!=="标签采集"){
+        if(this.state.Number1==""&&this.state.name!=="标签采集"){
             this.setState({
-                Number:1,
+                Number1:1,
                 numberFormat2:this.state.ShopPrice,
             });
         } else if(this.state.name=="标签采集"&&this.state.BQNumber==1){
@@ -820,8 +820,7 @@ export default class Search extends Component {
                     modal:"",
                 })
             }else{
-                if(this.state.Number==0&&this.state.name!=="标签采集"){
-                    alert(this.state.Number)
+                if(this.state.Number1==0&&this.state.name!=="标签采集"){
                     ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
                 } else if(this.state.BQNumber==0&&this.state.name=="标签采集"){
                     ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);

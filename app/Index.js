@@ -386,11 +386,9 @@ export default class Index extends Component {
                                 })
                               })
                             }
-                          });
+                          })
                         }
-                  });
-                
-                  
+                  })
                 } else {
                     dbAdapter.selectAidCode(reminder, 1).then((rows) => {
                         if (rows.length == 0) {
@@ -468,7 +466,7 @@ export default class Index extends Component {
                                                     component: OrderDetails,
                                                     params: {
                                                         ProdName: rows.item(0).ProdName,
-                                                        ShopPrice: rows.item(0).ShopPrice,
+                                                        ShopPrice: ShopPrice,
                                                         Pid: rows.item(0).Pid,
                                                         countm: rows.item(0).ShopNumber,
                                                         promemo: rows.item(0).promemo,

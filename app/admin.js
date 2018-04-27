@@ -212,7 +212,7 @@ export default class admin extends Component {
             return;
         }
         if(this.state.sCode1 == ""){
-            ToastAndroid.show('请选择机构信息', ToastAndroid.SHORT)
+            ToastAndroid.show('请选择机构222信息', ToastAndroid.SHORT)
             return;
         }else{
             <ActivityIndicator key="1"></ActivityIndicator>

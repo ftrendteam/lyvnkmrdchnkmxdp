@@ -117,7 +117,6 @@ export default class DownLoadBasicData {
           resolve(true);
         } else {
           reject(false);
-          alert("1111111")
         }
       });
     });

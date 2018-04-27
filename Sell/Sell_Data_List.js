@@ -125,6 +125,7 @@ export default class Sell_Data_List extends Component {
             this.props.PosCodeView(rowData.PosCode)
         }
         this.props.navigator.pop();
+        Storage.save("ShopName",rowData.ShopName);
     }
 
     _renderRow(rowData, sectionID, rowID){
