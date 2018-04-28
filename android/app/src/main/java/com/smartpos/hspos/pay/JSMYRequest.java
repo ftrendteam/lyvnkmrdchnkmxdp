@@ -14,8 +14,8 @@ public class JSMYRequest extends ReactContextBaseJavaModule{
      super(context);
         File file = new File(Environment.getExternalStorageDirectory()
                         .getAbsolutePath() + "/miyajpos/");
-                boolean exists = file.exists();
-                if (!exists) {
+
+
                     AssetsUtils.getInstance(context).copyAssetsToSD("miyajpos", "miyajpos")
                             .setFileOperateCallback(new AssetsUtils.FileOperateCallback() {
                                 @Override
@@ -30,7 +30,7 @@ public class JSMYRequest extends ReactContextBaseJavaModule{
 
                                 }
                             });
-                }
+
     }
 
     @Override
