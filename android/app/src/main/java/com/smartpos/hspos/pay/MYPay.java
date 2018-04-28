@@ -81,6 +81,9 @@ public class MYPay {
             other.put("TIMEOUT", "60");
             other.put("SUBJECT", "退款条码");
             other.put("SAASID", SAASID);
+            other.put("NUMID", NUMID);//
+            other.put("USERID",USERID);
+            other.put("OPERATOR_ID", OPERATOR_ID);
             Map requsetMap = TcpSend.sendMiya(tlvmap, other);
             String retcode = (String) requsetMap.get("RETCODE");
             String retmsg = (String) requsetMap.get("RETMSG");
