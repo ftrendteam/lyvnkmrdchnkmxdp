@@ -199,6 +199,7 @@ export default class HistoricalDocument extends Component {
             if(data.retcode == 1){
                 var DetailInfo1 = data.DetailInfo1;
                 this.dataRows = this.dataRows.concat(DetailInfo1);
+                alert(JSON.stringify(this.dataRows))
                 if(this.dataRows==0){
                     return;
                 }else{
@@ -233,6 +234,7 @@ export default class HistoricalDocument extends Component {
               Formno:rowData.Formno,
               FormDate:rowData.FormDate,
               promemo:rowData.promemo,
+              depname:rowData.depname,
           }
       })
   }
@@ -248,6 +250,10 @@ export default class HistoricalDocument extends Component {
                       <Text style={styles.List}>
                           <Text style={styles.ListLeft}>单据状态：</Text>
                           <Text style={[styles.ListRight,{color:"#ff4e4e"}]}>{rowData.checktype}</Text>
+                      </Text>
+                      <Text style={styles.List}>
+                          <Text style={styles.ListLeft}>单据品类：</Text>
+                          <Text style={styles.ListRight}>{rowData.depname}</Text>
                       </Text>
                       {
                           (this.state.name == "商品采购"||this.state.name == "商品验收"||this.state.name == "协配采购"||this.state.name == "协配收货") ?

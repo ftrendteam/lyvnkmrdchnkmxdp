@@ -10,11 +10,13 @@ import {
     View,
     Image,
     TextInput,
+    ToastAndroid,
     TouchableOpacity,
 } from 'react-native';
 import Index from "./Index";
 import Search from "./Search";
 import Distrition_list from "./Distrition_list";
+import PinLeiData from "../YHDan/PinLeiData";
 import NetUtils from "../utils/NetUtils";
 import Storage from '../utils/Storage';
 
@@ -27,16 +29,13 @@ export default class Query extends Component {
             sCode1:"",
             active:"",
             Disting:"",
+            DepName1:"",
+            DepCode1:"",
+            invoice:this.props.invoice ? this.props.invoice : "",
         };
     }
 
     componentDidMount(){
-        Storage.get('invoice').then((tags)=>{
-            this.setState({
-                invoice:tags
-            })
-        })
-
         Storage.get('Disting').then((tags)=>{
             this.setState({
                 Disting:tags
@@ -65,7 +64,8 @@ export default class Query extends Component {
             var date = new Date();
             var data=JSON.stringify(date.getTime());
             if(this.state.sCode1==""){
-                alert("请选择原始单号");
+                ToastAndroid.show("请选择原始单号",ToastAndroid.SHORT);
+                return;
             }else{
                 var nextRoute={
                     name:"主页",
@@ -81,6 +81,11 @@ export default class Query extends Component {
                 Storage.delete('YuanDan');
                 Storage.delete('YdCountm');
                 Storage.delete('Modify');
+                if(this.state.DepName1==""&&this.state.DepCode1==""){
+                    Storage.delete('DepCode');
+                }else{
+                    Storage.save('DepCode', this.state.DepCode1);
+                }
                 Storage.save('YdCountm', '3');
                 Storage.save('OrgFormno',str);
                 Storage.save('Date',data);
@@ -96,7 +101,8 @@ export default class Query extends Component {
             var date = new Date();
             var data = JSON.stringify(date.getTime());
             if (this.state.sCode1 == "") {
-                alert("请选择原始单号");
+                ToastAndroid.show("请选择原始单号",ToastAndroid.SHORT);
+                return;
             } else {
                 var nextRoute = {
                     name: "Search",
@@ -112,6 +118,11 @@ export default class Query extends Component {
                 Storage.delete('YuanDan');
                 Storage.delete('YdCountm');
                 Storage.delete('Modify');
+                if(this.state.DepName1==""&&this.state.DepCode1==""){
+                    Storage.delete('DepCode');
+                }else{
+                    Storage.save('DepCode', this.state.DepCode1);
+                }
                 Storage.save('YdCountm', '3');
                 Storage.save('OrgFormno', str);
                 Storage.save('Date', data);
@@ -135,6 +146,31 @@ export default class Query extends Component {
             }
         };
         this.props.navigator.push(nextRoute)
+    }
+
+    ShoppData() {
+        var nextRoute = {
+            name: "ProductCG_list",
+            component: PinLeiData,
+            params: {
+                DepName: (DepName) => this._DepName(DepName),
+                DepCode: (DepCode) => this._DepCode(DepCode),
+            }
+        };
+        this.props.navigator.push(nextRoute)
+    }
+
+    _DepName(DepName) {
+        DepName = String(DepName);
+        this.setState({
+            DepName1:DepName,
+        });
+    }
+    _DepCode(DepCode) {
+        DepCode = String(DepCode);
+        this.setState({
+            DepCode1:DepCode,
+        });
     }
 
     render() {
@@ -167,6 +203,27 @@ export default class Query extends Component {
                         />
                     </TouchableOpacity>
                     <TouchableOpacity onPress={this.Search.bind(this)}>
+                        <Image source={require("../images/2_03.png")}></Image>
+                    </TouchableOpacity>
+                </View>
+                <View style={styles.ContList}>
+                    <View style={styles.listleft}>
+                        <Text style={styles.listLeftText}>商品品类:</Text>
+                    </View>
+                    <TouchableOpacity style={styles.listcont} onPress={this.ShoppData.bind(this)}>
+                        <TextInput
+                            style={styles.TextInput1}
+                            autofocus={true}
+                            editable={false}
+                            defaultValue ={this.state.DepName1}
+                            numberoflines={1}
+                            placeholder="请选择商品品类"
+                            textalign="center"
+                            underlineColorAndroid='transparent'
+                            placeholderTextColor="#cccccc"
+                        />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={this.ShoppData.bind(this)}>
                         <Image source={require("../images/2_03.png")}></Image>
                     </TouchableOpacity>
                 </View>
@@ -214,7 +271,7 @@ const styles = StyleSheet.create({
         borderBottomColor:"#f2f2f2",
     },
     listleft:{
-        width:60,
+        width:80,
         marginTop:6,
     },
     listLeftText:{

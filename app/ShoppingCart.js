@@ -35,6 +35,7 @@ import ProductYS from "./ProductYS";
 import ProductXP from "./ProductXP";
 import ProductSH from "./ProductSH";
 import PSDan from "../PSDan/PSDan";//商品配送
+import PinLei from "../YHDan/PinLei";//要货单第二分页
 import DeCodePrePrint18 from "../utils/DeCodePrePrint18";
 import NetUtils from "../utils/NetUtils";
 import FetchUtils from "../utils/FetchUtils";
@@ -78,7 +79,6 @@ export default class ShoppingCart extends Component {
             OrgFormno:"",
             FormType:"",
             LinkUrl:"",
-            Document:"",
             SUbmit:"",
             BeiZhu:"",
             dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
@@ -90,12 +90,6 @@ export default class ShoppingCart extends Component {
     //自动跑接口
     componentDidMount(){
         InteractionManager.runAfterInteractions(() => {
-            Storage.get('Document').then((tags)=>{
-                this.setState({
-                    Document:tags
-                })
-
-            })
             this._dpSearch();
             this._fetch();
             this.Storage();
@@ -265,140 +259,697 @@ export default class ShoppingCart extends Component {
         RNScannerAndroid.openScanner();
     }
 
-    Device(){
+    Device() {
         DeviceEventEmitter.addListener("code", (reminder) => {
-            decodepreprint.init(reminder,dbAdapter);
-            if(reminder.length==18&&decodepreprint.deCodePreFlag()){
-                decodepreprint.deCodeProdCode().then((datas)=>{
-                    dbAdapter.selectProdCode(datas,1).then((rows)=>{
-                        Storage.get('FormType').then((tags)=>{
-                            this.setState({
-                                FormType:tags
-                            })
-                        })
-
-                        Storage.get('LinkUrl').then((tags) => {
-                            this.setState({
-                                LinkUrl:tags
-                            })
-                        })
-                        //商品查询
-                        Storage.get('userName').then((tags)=>{
-                            let params = {
-                                reqCode:"App_PosReq",
-                                reqDetailCode:"App_Client_CurrProdQry",
-                                ClientCode:this.state.ClientCode,
-                                sDateTime:Date.parse(new Date()),
-                                Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
-                                username:tags,
-                                usercode:this.state.Usercode,
-                                SuppCode:rows.item(0).SuppCode,
-                                ShopCode:this.state.ShopCode,
-                                ChildShopCode:this.state.ChildShopCode,
-                                ProdCode:datas,
-                                OrgFormno:this.state.OrgFormno,
-                                FormType:this.state.FormType,
-                            };
-                            FetchUtil.post(this.state.LinkUrl,JSON.stringify(params)).then((data)=>{
-                                var countm=JSON.stringify(data.countm);
-                                var ShopPrice=JSON.stringify(data.ShopPrice);
-                                if(data.retcode == 1){
-                                    var ShopCar = rows.item(0).ProdName;
-                                    this.props.navigator.push({
-                                        component:OrderDetails,
-                                        params:{
-                                            ProdName:rows.item(0).ProdName,
-                                            ShopPrice:ShopPrice,
-                                            Pid:rows.item(0).Pid,
-                                            countm:rows.item(0).ShopNumber,
-                                            promemo:rows.item(0).promemo,
-                                            prototal:rows.item(0).ShopAmount,
-                                            ProdCode:rows.item(0).ProdCode,
-                                            DepCode:rows.item(0).DepCode1,
-                                            SuppCode:rows.item(0).SuppCode,
-                                            ydcountm:countm,
-                                            BarCode: rows.item(0).BarCode,
-                                            ShoppData:"0",
+            decodepreprint.init(reminder, dbAdapter);
+            if (this.state.head == null) {
+                this._Emptydata();
+            } else {
+                Storage.get('DepCode').then((DepCode) => {
+                    Storage.get('FormType').then((FormType) => {
+                        Storage.get('LinkUrl').then((LinkUrl) => {
+                            Storage.get('userName').then((userName) => {
+                                if ((reminder.length == 18 && decodepreprint.deCodePreFlag())) {
+                                    new Promise.all([decodepreprint.deCodeProdCode(),decodepreprint.deCodeTotal(),decodepreprint.deCodeWeight()]).then((results) => {
+                                        if(results.length==3){
+                                            let prodCode = results[0];
+                                            let total = results[1];
+                                            let weight = results[2];
+                                            dbAdapter.selectAidCode(prodCode, 1).then((product) => {
+                                                if(product.length==0){
+                                                    ToastAndroid.show("商品不存在",ToastAndroid.SHORT);
+                                                    return;
+                                                }
+                                                for (let i = 0; i < product.length; i++) {
+                                                    var row = product.item(i);
+                                                    if(DepCode!==null) {
+                                                        if (row.DepCode1 !== DepCode) {
+                                                            ToastAndroid.show("请选择该品类下的商品",ToastAndroid.SHORT);
+                                                            return;
+                                                        } else {
+                                                            let params = {
+                                                                reqCode: "App_PosReq",
+                                                                reqDetailCode: "App_Client_CurrProdQry",
+                                                                ClientCode: this.state.ClientCode,
+                                                                sDateTime: Date.parse(new Date()),
+                                                                Sign: NetUtils.MD5("App_PosReq" + "##" + "App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs") + '',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
+                                                                username: userName,
+                                                                usercode: this.state.Usercode,
+                                                                SuppCode: row.SuppCode,
+                                                                ShopCode: this.state.ShopCode,
+                                                                ChildShopCode: this.state.ChildShopCode,
+                                                                ProdCode: row.ProdCode,
+                                                                OrgFormno: this.state.OrgFormno,
+                                                                FormType: FormType,
+                                                            };
+                                                            FetchUtils.post(LinkUrl, JSON.stringify(params)).then((data) => {
+                                                                var countm = JSON.stringify(data.countm);
+                                                                var ShopPrice = JSON.stringify(data.ShopPrice);
+                                                                if (data.retcode == 1) {
+                                                                    if (this.state.head == "商品查询") {
+                                                                        this.props.navigator.push({
+                                                                            component: Shopsearch,
+                                                                            params: {
+                                                                                ProdCode: row.ProdCode,
+                                                                                DepCode: row.DepCode1,
+                                                                            }
+                                                                        })
+                                                                        DeviceEventEmitter.removeAllListeners();
+                                                                        this.setState({
+                                                                            OrderDetails: '',
+                                                                        })
+                                                                    } else {
+                                                                        if (this.state.head == "商品采购" || this.state.head == "协配采购" || this.state.Modify == 1) {
+                                                                            if(row.ShopNumber == 0){
+                                                                                this.props.navigator.push({
+                                                                                    component: OrderDetails,
+                                                                                    params: {
+                                                                                        ProdName: row.ProdName,
+                                                                                        ShopPrice: ShopPrice,
+                                                                                        Pid: row.Pid,
+                                                                                        countm: row.ShopNumber,
+                                                                                        promemo: row.ShopRemark,
+                                                                                        prototal: row.ShopAmount,
+                                                                                        ProdCode: row.ProdCode,
+                                                                                        DepCode: row.DepCode1,
+                                                                                        SuppCode: row.SuppCode,
+                                                                                        ydcountm: countm,
+                                                                                        BarCode: row.BarCode,
+                                                                                        IsIntCount:row.IsIntCount
+                                                                                    }
+                                                                                })
+                                                                            }else{
+                                                                                this.props.navigator.push({
+                                                                                    component: OrderDetails,
+                                                                                    params: {
+                                                                                        ProdName: row.ProdName,
+                                                                                        ShopPrice: row.ShopPrice,
+                                                                                        Pid: row.Pid,
+                                                                                        countm: row.ShopNumber,
+                                                                                        promemo: row.ShopRemark,
+                                                                                        prototal: row.ShopAmount,
+                                                                                        ProdCode: row.ProdCode,
+                                                                                        DepCode: row.DepCode1,
+                                                                                        SuppCode: row.SuppCode,
+                                                                                        ydcountm: countm,
+                                                                                        BarCode: row.BarCode,
+                                                                                        IsIntCount:row.IsIntCount
+                                                                                    }
+                                                                                })
+                                                                            }
+                                                                        } else {
+                                                                            this.props.navigator.push({
+                                                                                component: OrderDetails,
+                                                                                params: {
+                                                                                    ProdName: row.ProdName,
+                                                                                    ShopPrice: ShopPrice,
+                                                                                    Pid: row.Pid,
+                                                                                    countm: row.ShopNumber,
+                                                                                    promemo: row.ShopRemark,
+                                                                                    prototal: row.ShopAmount,
+                                                                                    ProdCode: row.ProdCode,
+                                                                                    DepCode: row.DepCode1,
+                                                                                    SuppCode: row.SuppCode,
+                                                                                    ydcountm: countm,
+                                                                                    BarCode: row.BarCode,
+                                                                                    IsIntCount:row.IsIntCount
+                                                                                }
+                                                                            })
+                                                                        }
+                                                                        Storage.save("ShoppData", "清单");
+                                                                        DeviceEventEmitter.removeAllListeners();
+                                                                        this.setState({
+                                                                            OrderDetails: '',
+                                                                        })
+                                                                    }
+                                                                } else {
+                                                                    alert(JSON.stringify(data))
+                                                                }
+                                                            })
+                                                        }
+                                                    }
+                                                    else{
+                                                        let params = {
+                                                            reqCode: "App_PosReq",
+                                                            reqDetailCode: "App_Client_CurrProdQry",
+                                                            ClientCode: this.state.ClientCode,
+                                                            sDateTime: Date.parse(new Date()),
+                                                            Sign: NetUtils.MD5("App_PosReq" + "##" +
+                                                                "App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs") + '',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
+                                                            username: userName,
+                                                            usercode: this.state.Usercode,
+                                                            SuppCode: row.SuppCode,
+                                                            ShopCode: this.state.ShopCode,
+                                                            ChildShopCode: this.state.ChildShopCode,
+                                                            ProdCode: row.ProdCode,
+                                                            OrgFormno: this.state.OrgFormno,
+                                                            FormType: FormType,
+                                                        };
+                                                        FetchUtils.post(LinkUrl, JSON.stringify(params)).then((data) => {
+                                                            var countm = JSON.stringify(data.countm);
+                                                            var ShopPrice = JSON.stringify(data.ShopPrice);
+                                                            if (data.retcode == 1) {
+                                                                if (this.state.head == "商品查询") {
+                                                                    this.props.navigator.push({
+                                                                        component: Shopsearch,
+                                                                        params: {
+                                                                            ProdCode: row.ProdCode,
+                                                                            DepCode: row.DepCode1,
+                                                                        }
+                                                                    })
+                                                                    DeviceEventEmitter.removeAllListeners();
+                                                                    this.setState({
+                                                                        OrderDetails: '',
+                                                                    })
+                                                                } else {
+                                                                    if (this.state.head == "商品采购" || this.state.head == "协配采购" || this.state.Modify == 1) {
+                                                                        if(row.ShopNumber == 0){
+                                                                            this.props.navigator.push({
+                                                                                component: OrderDetails,
+                                                                                params: {
+                                                                                    ProdName: row.ProdName,
+                                                                                    ShopPrice: ShopPrice,
+                                                                                    Pid: row.Pid,
+                                                                                    countm: row.ShopNumber,
+                                                                                    promemo: row.ShopRemark,
+                                                                                    prototal: row.ShopAmount,
+                                                                                    ProdCode: row.ProdCode,
+                                                                                    DepCode: row.DepCode1,
+                                                                                    SuppCode: row.SuppCode,
+                                                                                    ydcountm: countm,
+                                                                                    BarCode: row.BarCode,
+                                                                                    IsIntCount:row.IsIntCount
+                                                                                }
+                                                                            })
+                                                                        }else{
+                                                                            this.props.navigator.push({
+                                                                                component: OrderDetails,
+                                                                                params: {
+                                                                                    ProdName: row.ProdName,
+                                                                                    ShopPrice: row.ShopPrice,
+                                                                                    Pid: row.Pid,
+                                                                                    countm: row.ShopNumber,
+                                                                                    promemo: row.ShopRemark,
+                                                                                    prototal: row.ShopAmount,
+                                                                                    ProdCode: row.ProdCode,
+                                                                                    DepCode: row.DepCode1,
+                                                                                    SuppCode: row.SuppCode,
+                                                                                    ydcountm: countm,
+                                                                                    BarCode: row.BarCode,
+                                                                                    IsIntCount:row.IsIntCount
+                                                                                }
+                                                                            })
+                                                                        }
+                                                                    } else {
+                                                                        this.props.navigator.push({
+                                                                            component: OrderDetails,
+                                                                            params: {
+                                                                                ProdName: row.ProdName,
+                                                                                ShopPrice: ShopPrice,
+                                                                                Pid: row.Pid,
+                                                                                countm: row.ShopNumber,
+                                                                                promemo: row.ShopRemark,
+                                                                                prototal: row.ShopAmount,
+                                                                                ProdCode: row.ProdCode,
+                                                                                DepCode: row.DepCode1,
+                                                                                SuppCode: row.SuppCode,
+                                                                                ydcountm: countm,
+                                                                                BarCode: row.BarCode,
+                                                                                IsIntCount:row.IsIntCount
+                                                                            }
+                                                                        })
+                                                                    }
+                                                                    Storage.save("ShoppData", "清单");
+                                                                    DeviceEventEmitter.removeAllListeners();
+                                                                    this.setState({
+                                                                        OrderDetails: '',
+                                                                    })
+                                                                }
+                                                            } else {
+                                                                alert(JSON.stringify(data))
+                                                            }
+                                                        })
+                                                    }
+                                                }
+                                            })
+                                        }
+                                    });
+                                }
+                                else if((reminder.length==13&&deCode13.deCodePreFlag(reminder))){//13位条码解析
+                                    new Promise.all([deCode13.deCodeProdCode(reminder,dbAdapter),deCode13.deCodeTotile(reminder,dbAdapter)]).then((result)=>{
+                                        if(result.length==2){
+                                            let prodCode = result[0];
+                                            let price = result[1];
+                                            dbAdapter.selectAidCode(prodCode, 1).then((rows) => {
+                                                if(rows.length==0){
+                                                    ToastAndroid.show("商品不存在",ToastAndroid.SHORT);
+                                                    return;
+                                                }
+                                                for (let i = 0; i < rows.length; i++) {
+                                                    var row = rows.item(i);
+                                                    if(DepCode!==null) {
+                                                        if (row.DepCode1 !== DepCode) {
+                                                            ToastAndroid.show("请选择该品类下的商品",ToastAndroid.SHORT);
+                                                            return;
+                                                        } else {
+                                                            let params = {
+                                                                reqCode: "App_PosReq",
+                                                                reqDetailCode: "App_Client_CurrProdQry",
+                                                                ClientCode: this.state.ClientCode,
+                                                                sDateTime: Date.parse(new Date()),
+                                                                Sign: NetUtils.MD5("App_PosReq" + "##" +
+                                                                    "App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs") + '',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
+                                                                username: userName,
+                                                                usercode: this.state.Usercode,
+                                                                SuppCode: row.SuppCode,
+                                                                ShopCode: this.state.ShopCode,
+                                                                ChildShopCode: this.state.ChildShopCode,
+                                                                ProdCode: row.ProdCode,
+                                                                OrgFormno: this.state.OrgFormno,
+                                                                FormType: FormType,
+                                                            };
+                                                            FetchUtils.post(LinkUrl, JSON.stringify(params)).then((data) => {
+                                                                var countm = JSON.stringify(data.countm);
+                                                                var ShopPrice = JSON.stringify(data.ShopPrice);
+                                                                if (data.retcode == 1) {
+                                                                    if (this.state.head == "商品查询") {
+                                                                        this.props.navigator.push({
+                                                                            component: Shopsearch,
+                                                                            params: {
+                                                                                ProdCode: row.ProdCode,
+                                                                                DepCode: row.DepCode1,
+                                                                            }
+                                                                        })
+                                                                        DeviceEventEmitter.removeAllListeners();
+                                                                        this.setState({
+                                                                            OrderDetails: '',
+                                                                        })
+                                                                    } else {
+                                                                        if (this.state.head == "商品采购" || this.state.head == "协配采购" || this.state.Modify == 1) {
+                                                                            if(row.ShopNumber == 0){
+                                                                                this.props.navigator.push({
+                                                                                    component: OrderDetails,
+                                                                                    params: {
+                                                                                        ProdName: row.ProdName,
+                                                                                        ShopPrice: ShopPrice,
+                                                                                        Pid: row.Pid,
+                                                                                        countm: row.ShopNumber,
+                                                                                        promemo: row.ShopRemark,
+                                                                                        prototal: row.ShopAmount,
+                                                                                        ProdCode: row.ProdCode,
+                                                                                        DepCode: row.DepCode1,
+                                                                                        SuppCode: row.SuppCode,
+                                                                                        ydcountm: countm,
+                                                                                        BarCode: row.BarCode,
+                                                                                        IsIntCount:row.IsIntCount
+                                                                                    }
+                                                                                })
+                                                                            }else{
+                                                                                this.props.navigator.push({
+                                                                                    component: OrderDetails,
+                                                                                    params: {
+                                                                                        ProdName: row.ProdName,
+                                                                                        ShopPrice: row.ShopPrice,
+                                                                                        Pid: row.Pid,
+                                                                                        countm: row.ShopNumber,
+                                                                                        promemo: row.ShopRemark,
+                                                                                        prototal: row.ShopAmount,
+                                                                                        ProdCode: row.ProdCode,
+                                                                                        DepCode: row.DepCode1,
+                                                                                        SuppCode: row.SuppCode,
+                                                                                        ydcountm: countm,
+                                                                                        BarCode: row.BarCode,
+                                                                                        IsIntCount:row.IsIntCount
+                                                                                    }
+                                                                                })
+                                                                            }
+                                                                        } else {
+                                                                            this.props.navigator.push({
+                                                                                component: OrderDetails,
+                                                                                params: {
+                                                                                    ProdName: row.ProdName,
+                                                                                    ShopPrice: ShopPrice,
+                                                                                    Pid: row.Pid,
+                                                                                    countm: row.ShopNumber,
+                                                                                    promemo: row.ShopRemark,
+                                                                                    prototal: row.ShopAmount,
+                                                                                    ProdCode: row.ProdCode,
+                                                                                    DepCode: row.DepCode1,
+                                                                                    SuppCode: row.SuppCode,
+                                                                                    ydcountm: countm,
+                                                                                    BarCode: row.BarCode,
+                                                                                    IsIntCount:row.IsIntCount
+                                                                                }
+                                                                            })
+                                                                        }
+                                                                        Storage.save("ShoppData", "清单");
+                                                                        DeviceEventEmitter.removeAllListeners();
+                                                                        this.setState({
+                                                                            OrderDetails: '',
+                                                                        })
+                                                                    }
+                                                                } else {
+                                                                    alert(JSON.stringify(data))
+                                                                }
+                                                            })
+                                                        }
+                                                    }
+                                                    else{
+                                                        let params = {
+                                                            reqCode: "App_PosReq",
+                                                            reqDetailCode: "App_Client_CurrProdQry",
+                                                            ClientCode: this.state.ClientCode,
+                                                            sDateTime: Date.parse(new Date()),
+                                                            Sign: NetUtils.MD5("App_PosReq" + "##" +
+                                                                "App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs") + '',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
+                                                            username: userName,
+                                                            usercode: this.state.Usercode,
+                                                            SuppCode: row.SuppCode,
+                                                            ShopCode: this.state.ShopCode,
+                                                            ChildShopCode: this.state.ChildShopCode,
+                                                            ProdCode: row.ProdCode,
+                                                            OrgFormno: this.state.OrgFormno,
+                                                            FormType: FormType,
+                                                        };
+                                                        FetchUtils.post(LinkUrl, JSON.stringify(params)).then((data) => {
+                                                            var countm = JSON.stringify(data.countm);
+                                                            var ShopPrice = JSON.stringify(data.ShopPrice);
+                                                            if (data.retcode == 1) {
+                                                                if (this.state.head == "商品查询") {
+                                                                    this.props.navigator.push({
+                                                                        component: Shopsearch,
+                                                                        params: {
+                                                                            ProdCode: row.ProdCode,
+                                                                            DepCode: row.DepCode1,
+                                                                        }
+                                                                    })
+                                                                    DeviceEventEmitter.removeAllListeners();
+                                                                    this.setState({
+                                                                        OrderDetails: '',
+                                                                    })
+                                                                } else {
+                                                                    if (this.state.head == "商品采购" || this.state.head == "协配采购" || this.state.Modify == 1) {
+                                                                        if(row.ShopNumber == 0){
+                                                                            this.props.navigator.push({
+                                                                                component: OrderDetails,
+                                                                                params: {
+                                                                                    ProdName: row.ProdName,
+                                                                                    ShopPrice: ShopPrice,
+                                                                                    Pid: row.Pid,
+                                                                                    countm: row.ShopNumber,
+                                                                                    promemo: row.ShopRemark,
+                                                                                    prototal: row.ShopAmount,
+                                                                                    ProdCode: row.ProdCode,
+                                                                                    DepCode: row.DepCode1,
+                                                                                    SuppCode: row.SuppCode,
+                                                                                    ydcountm: countm,
+                                                                                    BarCode: row.BarCode,
+                                                                                    IsIntCount:row.IsIntCount
+                                                                                }
+                                                                            })
+                                                                        }else{
+                                                                            this.props.navigator.push({
+                                                                                component: OrderDetails,
+                                                                                params: {
+                                                                                    ProdName: row.ProdName,
+                                                                                    ShopPrice: row.ShopPrice,
+                                                                                    Pid: row.Pid,
+                                                                                    countm: row.ShopNumber,
+                                                                                    promemo: row.ShopRemark,
+                                                                                    prototal: row.ShopAmount,
+                                                                                    ProdCode: row.ProdCode,
+                                                                                    DepCode: row.DepCode1,
+                                                                                    SuppCode: row.SuppCode,
+                                                                                    ydcountm: countm,
+                                                                                    BarCode: row.BarCode,
+                                                                                    IsIntCount:row.IsIntCount,
+                                                                                }
+                                                                            })
+                                                                        }
+                                                                    } else {
+                                                                        this.props.navigator.push({
+                                                                            component: OrderDetails,
+                                                                            params: {
+                                                                                ProdName: row.ProdName,
+                                                                                ShopPrice: ShopPrice,
+                                                                                Pid: row.Pid,
+                                                                                countm: row.ShopNumber,
+                                                                                promemo: row.ShopRemark,
+                                                                                prototal: row.ShopAmount,
+                                                                                ProdCode: row.ProdCode,
+                                                                                DepCode: row.DepCode1,
+                                                                                SuppCode: row.SuppCode,
+                                                                                ydcountm: countm,
+                                                                                BarCode: row.BarCode,
+                                                                                IsIntCount:row.IsIntCount,
+                                                                            }
+                                                                        })
+                                                                    }
+                                                                    Storage.save("ShoppData", "清单");
+                                                                    DeviceEventEmitter.removeAllListeners();
+                                                                    this.setState({
+                                                                        OrderDetails: '',
+                                                                    })
+                                                                }
+                                                            } else {
+                                                                alert(JSON.stringify(data))
+                                                            }
+                                                        })
+                                                    }
+                                                }
+                                            })
                                         }
                                     })
-                                }else{
-                                    alert(JSON.stringify(data))
                                 }
-                            },(err)=>{
-                                alert("网络请求失败");
+                                else {
+                                    //商品查询
+                                    dbAdapter.selectAidCode(reminder, 1).then((rows) => {
+                                        if(rows.length==0){
+                                            ToastAndroid.show("商品不存在",ToastAndroid.SHORT);
+                                            return;
+                                        }
+                                        for (let i = 0; i < rows.length; i++) {
+                                            var row = rows.item(i);
+                                            if(DepCode!==null) {
+                                                if (row.DepCode1 !== DepCode) {
+                                                    ToastAndroid.show("请选择该品类下的商品",ToastAndroid.SHORT);
+                                                    return;
+                                                } else {
+                                                    let params = {
+                                                        reqCode: "App_PosReq",
+                                                        reqDetailCode: "App_Client_CurrProdQry",
+                                                        ClientCode: this.state.ClientCode,
+                                                        sDateTime: Date.parse(new Date()),
+                                                        Sign: NetUtils.MD5("App_PosReq" + "##" +
+                                                            "App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs") + '',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
+                                                        username: userName,
+                                                        usercode: this.state.Usercode,
+                                                        SuppCode: row.SuppCode,
+                                                        ShopCode: this.state.ShopCode,
+                                                        ChildShopCode: this.state.ChildShopCode,
+                                                        ProdCode: row.ProdCode,
+                                                        OrgFormno: this.state.OrgFormno,
+                                                        FormType: FormType,
+                                                    };
+                                                    FetchUtils.post(LinkUrl, JSON.stringify(params)).then((data) => {
+                                                        var countm = JSON.stringify(data.countm);
+                                                        var ShopPrice = JSON.stringify(data.ShopPrice);
+                                                        if (data.retcode == 1) {
+                                                            if (this.state.head == "商品查询") {
+                                                                this.props.navigator.push({
+                                                                    component: Shopsearch,
+                                                                    params: {
+                                                                        ProdCode: row.ProdCode,
+                                                                        DepCode: row.DepCode1,
+                                                                    }
+                                                                })
+                                                                DeviceEventEmitter.removeAllListeners();
+                                                                this.setState({
+                                                                    OrderDetails: '',
+                                                                })
+                                                            } else {
+                                                                if (this.state.head == "商品采购" || this.state.head == "协配采购" || this.state.Modify == 1) {
+                                                                    if(row.ShopNumber == 0){
+                                                                        this.props.navigator.push({
+                                                                            component: OrderDetails,
+                                                                            params: {
+                                                                                ProdName: row.ProdName,
+                                                                                ShopPrice: ShopPrice,
+                                                                                Pid: row.Pid,
+                                                                                countm: row.ShopNumber,
+                                                                                promemo: row.ShopRemark,
+                                                                                prototal: row.ShopAmount,
+                                                                                ProdCode: row.ProdCode,
+                                                                                DepCode: row.DepCode1,
+                                                                                SuppCode: row.SuppCode,
+                                                                                ydcountm: countm,
+                                                                                BarCode: row.BarCode,
+                                                                                IsIntCount:row.IsIntCount,
+                                                                            }
+                                                                        })
+                                                                    }else{
+                                                                        this.props.navigator.push({
+                                                                            component: OrderDetails,
+                                                                            params: {
+                                                                                ProdName: row.ProdName,
+                                                                                ShopPrice: row.ShopPrice,
+                                                                                Pid: row.Pid,
+                                                                                countm: row.ShopNumber,
+                                                                                promemo: row.ShopRemark,
+                                                                                prototal: row.ShopAmount,
+                                                                                ProdCode: row.ProdCode,
+                                                                                DepCode: row.DepCode1,
+                                                                                SuppCode: row.SuppCode,
+                                                                                ydcountm: countm,
+                                                                                BarCode: row.BarCode,
+                                                                                IsIntCount:row.IsIntCount,
+                                                                            }
+                                                                        })
+                                                                    }
+                                                                } else {
+                                                                    this.props.navigator.push({
+                                                                        component: OrderDetails,
+                                                                        params: {
+                                                                            ProdName: row.ProdName,
+                                                                            ShopPrice: ShopPrice,
+                                                                            Pid: row.Pid,
+                                                                            countm: row.ShopNumber,
+                                                                            promemo: row.ShopRemark,
+                                                                            prototal: row.ShopAmount,
+                                                                            ProdCode: row.ProdCode,
+                                                                            DepCode: row.DepCode1,
+                                                                            SuppCode: row.SuppCode,
+                                                                            ydcountm: countm,
+                                                                            BarCode: row.BarCode,
+                                                                            IsIntCount:row.IsIntCount,
+                                                                        }
+                                                                    })
+                                                                }
+                                                                Storage.save("ShoppData", "清单");
+                                                                DeviceEventEmitter.removeAllListeners();
+                                                                this.setState({
+                                                                    OrderDetails: '',
+                                                                })
+                                                            }
+                                                        } else {
+                                                            alert(JSON.stringify(data))
+                                                        }
+                                                    })
+                                                }
+                                            }else{
+                                                let params = {
+                                                    reqCode: "App_PosReq",
+                                                    reqDetailCode: "App_Client_CurrProdQry",
+                                                    ClientCode: this.state.ClientCode,
+                                                    sDateTime: Date.parse(new Date()),
+                                                    Sign: NetUtils.MD5("App_PosReq" + "##" +
+                                                        "App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs") + '',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
+                                                    username: userName,
+                                                    usercode: this.state.Usercode,
+                                                    SuppCode: row.SuppCode,
+                                                    ShopCode: this.state.ShopCode,
+                                                    ChildShopCode: this.state.ChildShopCode,
+                                                    ProdCode: row.ProdCode,
+                                                    OrgFormno: this.state.OrgFormno,
+                                                    FormType: FormType,
+                                                };
+                                                FetchUtils.post(LinkUrl, JSON.stringify(params)).then((data) => {
+                                                    var countm = JSON.stringify(data.countm);
+                                                    var ShopPrice = JSON.stringify(data.ShopPrice);
+                                                    if (data.retcode == 1) {
+                                                        if (this.state.head == "商品查询") {
+                                                            this.props.navigator.push({
+                                                                component: Shopsearch,
+                                                                params: {
+                                                                    ProdCode: row.ProdCode,
+                                                                    DepCode: row.DepCode1,
+                                                                }
+                                                            })
+                                                            DeviceEventEmitter.removeAllListeners();
+                                                            this.setState({
+                                                                OrderDetails: '',
+                                                            })
+                                                        } else {
+                                                            if (this.state.head == "商品采购" || this.state.head == "协配采购" || this.state.Modify == 1) {
+                                                                if(row.ShopNumber == 0){
+                                                                    this.props.navigator.push({
+                                                                        component: OrderDetails,
+                                                                        params: {
+                                                                            ProdName: row.ProdName,
+                                                                            ShopPrice: ShopPrice,
+                                                                            Pid: row.Pid,
+                                                                            countm: row.ShopNumber,
+                                                                            promemo: row.ShopRemark,
+                                                                            prototal: row.ShopAmount,
+                                                                            ProdCode: row.ProdCode,
+                                                                            DepCode: row.DepCode1,
+                                                                            SuppCode: row.SuppCode,
+                                                                            ydcountm: countm,
+                                                                            BarCode: row.BarCode,
+                                                                            IsIntCount:row.IsIntCount,
+                                                                        }
+                                                                    })
+                                                                }else{
+                                                                    this.props.navigator.push({
+                                                                        component: OrderDetails,
+                                                                        params: {
+                                                                            ProdName: row.ProdName,
+                                                                            ShopPrice: row.ShopPrice,
+                                                                            Pid: row.Pid,
+                                                                            countm: row.ShopNumber,
+                                                                            promemo: row.ShopRemark,
+                                                                            prototal: row.ShopAmount,
+                                                                            ProdCode: row.ProdCode,
+                                                                            DepCode: row.DepCode1,
+                                                                            SuppCode: row.SuppCode,
+                                                                            ydcountm: countm,
+                                                                            BarCode: row.BarCode,
+                                                                            IsIntCount:row.IsIntCount,
+                                                                        }
+                                                                    })
+                                                                }
+                                                            } else {
+                                                                this.props.navigator.push({
+                                                                    component: OrderDetails,
+                                                                    params: {
+                                                                        ProdName: row.ProdName,
+                                                                        ShopPrice: ShopPrice,
+                                                                        Pid: row.Pid,
+                                                                        countm: row.ShopNumber,
+                                                                        promemo: row.ShopRemark,
+                                                                        prototal: row.ShopAmount,
+                                                                        ProdCode: row.ProdCode,
+                                                                        DepCode: row.DepCode1,
+                                                                        SuppCode: row.SuppCode,
+                                                                        ydcountm: countm,
+                                                                        BarCode: row.BarCode,
+                                                                        IsIntCount:row.IsIntCount,
+                                                                    }
+                                                                })
+                                                            }
+                                                            Storage.save("ShoppData", "清单");
+                                                            DeviceEventEmitter.removeAllListeners();
+                                                            this.setState({
+                                                                OrderDetails: '',
+                                                            })
+                                                        }
+                                                    } else {
+                                                        alert(JSON.stringify(data))
+                                                    }
+                                                })
+                                            }
+                                        }
+                                    })
+
+                                }
                             })
                         })
                     })
-                });
-
-            }else{
-                dbAdapter.selectAidCode(reminder,1).then((rows)=>{
-                    if(rows.length==0){
-                        alert("该商品不存在")
-                    }else{
-                        Storage.get('FormType').then((tags)=>{
-                            this.setState({
-                                FormType:tags
-                            })
-                        })
-
-                        Storage.get('LinkUrl').then((tags) => {
-                            this.setState({
-                                LinkUrl:tags
-                            })
-                        })
-                        //商品查询
-                        Storage.get('userName').then((tags)=>{
-                            let params = {
-                                reqCode:"App_PosReq",
-                                reqDetailCode:"App_Client_CurrProdQry",
-                                ClientCode:this.state.ClientCode,
-                                sDateTime:Date.parse(new Date()),
-                                Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
-                                username:tags,
-                                usercode:this.state.Usercode,
-                                SuppCode:rows.item(0).SuppCode,
-                                ShopCode:this.state.ShopCode,
-                                ChildShopCode:this.state.ChildShopCode,
-                                ProdCode:rows.item(0).ProdCode,
-                                OrgFormno:this.state.OrgFormno,
-                                FormType:this.state.FormType,
-                            };
-                            FetchUtils.post(this.state.LinkUrl,JSON.stringify(params)).then((data)=>{
-                                var countm=JSON.stringify(data.countm);
-                                var ShopPrice=JSON.stringify(data.ShopPrice);
-                                if(data.retcode == 1){
-                                    var ShopCar = rows.item(0).ProdName;
-                                    this.props.navigator.push({
-                                        component:OrderDetails,
-                                        params:{
-                                            ProdName:rows.item(0).ProdName,
-                                            ShopPrice:ShopPrice,
-                                            Pid:rows.item(0).Pid,
-                                            countm:rows.item(0).ShopNumber,
-                                            promemo:rows.item(0).ShopRemark,
-                                            prototal:rows.item(0).ShopAmount,
-                                            ProdCode:rows.item(0).ProdCode,
-                                            DepCode:rows.item(0).DepCode1,
-                                            SuppCode:rows.item(0).SuppCode,
-                                            ydcountm:countm,
-                                            BarCode: rows.item(0).BarCode,
-                                            ShoppData:"0",
-                                        }
-                                    })
-                                }else{
-                                    alert(JSON.stringify(data))
-                                }
-                            },(err)=>{
-                                alert("网络请求失败");
-                            })
-                        })
-                    }
                 })
             }
-
         })
     }
+
 
     renderRow(rowData, sectionID, rowID){
         return (
@@ -441,7 +992,7 @@ export default class ShoppingCart extends Component {
     }
 
     deteleShopInfo(rowData, sectionID, rowID){
-        dbAdapter.deteleShopInfo(rowData.ProdCode).then((rows)=>{});
+        dbAdapter.deteleShopInfo(rowData.prodcode).then((rows)=>{});
         dbAdapter.selectShopInfo().then((rows)=>{
             var shopnumber = 0;
             var shopAmount = 0;
@@ -452,9 +1003,7 @@ export default class ShoppingCart extends Component {
                 var SHopAMount=NumberUtils.numberFormat2(row.ShopAmount);
                 shopAmount += Number(SHopAMount);
                 shopnumber += Number(row.ShopNumber);
-                if(number!==0){
-                    this.ds.push(row);
-                }
+                this.ds.push(row);
             }
             this.setState({
                 number1:number,
@@ -496,10 +1045,8 @@ export default class ShoppingCart extends Component {
     pressPush(){
         this.props.navigator.push({
             component:Search,
-            params:{
-                ShoppData:"0",
-            }
-        })
+        });
+        Storage.save("ShoppData", "清单");
         DeviceEventEmitter.removeAllListeners();
     }
 
@@ -547,9 +1094,9 @@ export default class ShoppingCart extends Component {
                             ProdCode:rowData.prodcode,
                             DepCode:rowData.DepCode,
                             ydcountm:countm,
-                            ShoppData:"0",
                         }
                     })
+                    Storage.save("ShoppData", "清单");
                 }else{
                     alert(JSON.stringify(data))
                 }
@@ -621,44 +1168,78 @@ export default class ShoppingCart extends Component {
                     });
                     Storage.get('scode').then((scode)=>{
                         Storage.get('CKu').then((CKu)=> {
-                            let params = {
-                                reqCode: "App_PosReq",
-                                reqDetailCode: this.state.reqDetailCode,
-                                ClientCode: this.state.ClientCode,
-                                sDateTime: "2017-08-09 12:12:12",//获取当前时间转换成时间戳
-                                Sign: NetUtils.MD5("App_PosReq" + "##" +this.state.reqDetailCode + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',
-                                username: this.state.Username,
-                                usercode: this.state.Userpwd,
-                                DetailInfo1: {
-                                    "ShopCode": tags,
-                                    "OrgFormno": this.state.OrgFormno,
-                                    "ProMemo": this.state.Remark,
-                                    "SuppCode":scode,
-                                    "childshop":this.state.shildshop,
-                                    "pdaGuid":this.state.IMEI,
-                                    "pdgFormno":this.state.ProYH+this.state.Date,
-                                    "storecode":CKu,
-                                },
-                                DetailInfo2: this.DataShop,
-                            };
-                            console.log(JSON.stringify(params))
-                            if(this.state.Screen=="1"||this.state.Screen=="2"){
-                                var DetailInfo2=params.DetailInfo2;
-                                for(let i =0;i<DetailInfo2.length;i++){
-                                    let detail = DetailInfo2[i];
-                                    let ydcountm = detail.ydcountm;
-                                    let countm = detail.countm;
-                                    if(ydcountm!==countm){
-                                        this.screen.push(detail);
-                                    }
+                            Storage.get('DepCode').then((DepCode)=> {
+                                if(DepCode==null){
+                                    var depcode=0;
+                                }else{
+                                    var depcode=DepCode;
                                 }
-                                if(this.screen==""){
+                                let params = {
+                                    reqCode: "App_PosReq",
+                                    reqDetailCode: this.state.reqDetailCode,
+                                    ClientCode: this.state.ClientCode,
+                                    sDateTime: "2017-08-09 12:12:12",//获取当前时间转换成时间戳
+                                    Sign: NetUtils.MD5("App_PosReq" + "##" +this.state.reqDetailCode + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',
+                                    username: this.state.Username,
+                                    usercode: this.state.Userpwd,
+                                    DetailInfo1: {
+                                        "ShopCode": tags,
+                                        "OrgFormno": this.state.OrgFormno,
+                                        "ProMemo": this.state.Remark,
+                                        "SuppCode":scode,
+                                        "childshop":this.state.shildshop,
+                                        "pdaGuid":this.state.IMEI,
+                                        "pdgFormno":this.state.ProYH+this.state.Date,
+                                        "storecode":CKu,
+                                        "depcode":depcode,
+                                    },
+                                    DetailInfo2: this.DataShop,
+                                };
+                                console.log("aaaaa=",JSON.stringify(params))
+                                if(this.state.Screen=="1"||this.state.Screen=="2"){
+                                    var DetailInfo2=params.DetailInfo2;
+                                    for(let i =0;i<DetailInfo2.length;i++){
+                                        let detail = DetailInfo2[i];
+                                        let ydcountm = detail.ydcountm;
+                                        let countm = detail.countm;
+                                        if(ydcountm!==countm){
+                                            this.screen.push(detail);
+                                        }
+                                    }
+                                    if(this.screen==""){
+                                        FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
+                                            if(data.retcode == 1){
+                                                if(this.state.Screen!=="1"||this.state.Screen!=="2"||this.screen==""||scode==null){
+                                                    this.Wait();
+                                                    this.Succeed();
+                                                }
+                                            }else{
+                                                this.Wait();
+                                                alert(JSON.stringify(data))
+                                            }
+                                        },(err)=>{
+                                            alert("网络请求失败");
+                                        })
+                                    }else{
+                                        this.setState({
+                                            dataSource:this.state.dataSource.cloneWithRows(this.screen),
+                                        })
+                                        this.Wait();
+                                        this.ScreenBod();
+                                    }
+                                    this.setState({
+                                        SUbmit:'',
+                                    })
+                                }else{
                                     FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
                                         if(data.retcode == 1){
                                             if(this.state.Screen!=="1"||this.state.Screen!=="2"||this.screen==""||scode==null){
                                                 this.Wait();
                                                 this.Succeed();
                                             }
+                                            this.setState({
+                                                SUbmit:'',
+                                            })
                                         }else{
                                             this.Wait();
                                             alert(JSON.stringify(data))
@@ -666,34 +1247,8 @@ export default class ShoppingCart extends Component {
                                     },(err)=>{
                                         alert("网络请求失败");
                                     })
-                                }else{
-                                    this.setState({
-                                        dataSource:this.state.dataSource.cloneWithRows(this.screen),
-                                    })
-                                    this.Wait();
-                                    this.ScreenBod();
                                 }
-                                this.setState({
-                                    SUbmit:'',
-                                })
-                            }else{
-                                FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
-                                    if(data.retcode == 1){
-                                        if(this.state.Screen!=="1"||this.state.Screen!=="2"||this.screen==""||scode==null){
-                                            this.Wait();
-                                            this.Succeed();
-                                        }
-                                        this.setState({
-                                            SUbmit:'',
-                                        })
-                                    }else{
-                                        this.Wait();
-                                        alert(JSON.stringify(data))
-                                    }
-                                },(err)=>{
-                                    alert("网络请求失败");
-                                })
-                            }
+                            })
                         })
                     })
                 })
@@ -730,39 +1285,46 @@ export default class ShoppingCart extends Component {
                 });
                 Storage.get('scode').then((scod) => {
                     Storage.get('CKu').then((CKu)=> {
-                        let params = {
-                            reqCode: "App_PosReq",
-                            reqDetailCode: this.state.reqDetailCode,
-                            ClientCode: this.state.ClientCode,
-                            sDateTime: "2017-08-09 12:12:12",
-                            Sign: NetUtils.MD5("App_PosReq" + "##" + this.state.reqDetailCode + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs") + '',
-                            username: this.state.Username,
-                            usercode: this.state.Userpwd,
-                            DetailInfo1: {
-                                "ShopCode": tags,
-                                "OrgFormno": this.state.OrgFormno,
-                                "ProMemo": this.state.Remark,
-                                "SuppCode": scod,
-                                "childshop": this.state.shildshop,
-                                "pdaGuid": this.state.IMEI,
-                                "pdgFormno": this.state.ProYH + this.state.Date,
-                                "storecode":CKu
-                            },
-                            DetailInfo2: this.DataShop,
-                        };
-                        // console.log('qqqq=',JSON.stringify(params))
-                        FetchUtils.post(this.state.linkurl, JSON.stringify(params)).then((data) => {
-                            if (data.retcode == 1) {
-                                this.ScreenBod();
-                                this.Succeed();
-                                this.setState({
-                                    SUbmit:'',
-                                })
+                        Storage.get('DepCode').then((DepCode)=> {
+                            if (DepCode == null) {
+                                var depcode = 0;
                             } else {
-                                alert(JSON.stringify(data))
+                                var depcode = DepCode;
                             }
-                        },(err)=>{
-                            alert("网络请求失败");
+                            let params = {
+                                reqCode: "App_PosReq",
+                                reqDetailCode: this.state.reqDetailCode,
+                                ClientCode: this.state.ClientCode,
+                                sDateTime: "2017-08-09 12:12:12",
+                                Sign: NetUtils.MD5("App_PosReq" + "##" + this.state.reqDetailCode + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs") + '',
+                                username: this.state.Username,
+                                usercode: this.state.Userpwd,
+                                DetailInfo1: {
+                                    "ShopCode": tags,
+                                    "OrgFormno": this.state.OrgFormno,
+                                    "ProMemo": this.state.Remark,
+                                    "SuppCode": scod,
+                                    "childshop": this.state.shildshop,
+                                    "pdaGuid": this.state.IMEI,
+                                    "pdgFormno": this.state.ProYH + this.state.Date,
+                                    "storecode":CKu,
+                                    "depcode":depcode,
+                                },
+                                DetailInfo2: this.DataShop,
+                            };
+                            FetchUtils.post(this.state.linkurl, JSON.stringify(params)).then((data) => {
+                                if (data.retcode == 1) {
+                                    this.ScreenBod();
+                                    this.Succeed();
+                                    this.setState({
+                                        SUbmit:'',
+                                    })
+                                } else {
+                                    alert(JSON.stringify(data))
+                                }
+                            },(err)=>{
+                                alert("网络请求失败");
+                            })
                         })
                     })
                 })
@@ -837,7 +1399,10 @@ export default class ShoppingCart extends Component {
                 this.Succeed();
                 var nextRoute={
                     name:"Query",
-                    component:Query
+                    component:Query,
+                    params: {
+                        invoice:"商品盘点"
+                    }
                 };
                 this.props.navigator.push(nextRoute);
                 this.DataSource();
@@ -846,7 +1411,10 @@ export default class ShoppingCart extends Component {
                 this.Succeed();
                 var nextRoute={
                     name:"Distrition",
-                    component:Distrition
+                    component:Distrition,
+                    params: {
+                        invoice:"配送收货"
+                    }
                 };
                 this.props.navigator.push(nextRoute);
                 this.DataSource();
@@ -855,7 +1423,10 @@ export default class ShoppingCart extends Component {
                 this.Succeed();
                 var nextRoute={
                     name:"ProductCG",
-                    component:ProductCG
+                    component:ProductCG,
+                    params: {
+                        invoice:"商品采购"
+                    }
                 };
                 this.props.navigator.push(nextRoute);
                 this.DataSource();
@@ -864,7 +1435,10 @@ export default class ShoppingCart extends Component {
                 this.Succeed();
                 var nextRoute={
                     name:"ProductYS",
-                    component:ProductYS
+                    component:ProductYS,
+                    params: {
+                        invoice:"商品验收"
+                    }
                 };
                 this.props.navigator.push(nextRoute);
                 this.DataSource();
@@ -873,7 +1447,10 @@ export default class ShoppingCart extends Component {
                 this.Succeed();
                 var nextRoute={
                     name:"ProductXP",
-                    component:ProductXP
+                    component:ProductXP,
+                    params: {
+                        invoice:"协配采购"
+                    }
                 };
                 this.props.navigator.push(nextRoute);
                 this.DataSource();
@@ -882,7 +1459,10 @@ export default class ShoppingCart extends Component {
                 this.Succeed();
                 var nextRoute={
                     name:"ProductSH",
-                    component:ProductSH
+                    component:ProductSH,
+                    params: {
+                        invoice:"协配收货"
+                    }
                 };
                 this.props.navigator.push(nextRoute);
                 this.DataSource();
@@ -891,7 +1471,10 @@ export default class ShoppingCart extends Component {
                 this.Succeed();
                 var nextRoute={
                     name:"SunYi",
-                    component:SunYi
+                    component:SunYi,
+                    params: {
+                        invoice:"商品损溢"
+                    }
                 };
                 this.props.navigator.push(nextRoute);
                 this.DataSource();
@@ -900,14 +1483,49 @@ export default class ShoppingCart extends Component {
                 this.Succeed();
                 var nextRoute={
                     name:"PSDan",
-                    component:PSDan
+                    component:PSDan,
+                    params: {
+                        invoice:"商品配送"
+                    }
                 };
                 this.props.navigator.push(nextRoute);
                 this.DataSource();
             }
-            if(tags=="门店要货"||tags=="实时盘点"||tags=="标签采集"){
-                this.DataSource();
+            if(tags=="门店要货"){
                 this.Succeed();
+                var nextRoute={
+                    name:"PinLei",
+                    component:PinLei,
+                    params: {
+                        invoice:"门店要货"
+                    }
+                };
+                this.props.navigator.push(nextRoute);
+                this.DataSource();
+            }
+            if(tags=="实时盘点"){
+                this.Succeed();
+                var nextRoute={
+                    name:"PinLei",
+                    component:PinLei,
+                    params: {
+                        invoice:"实时盘点"
+                    }
+                };
+                this.props.navigator.push(nextRoute);
+                this.DataSource();
+            }
+            if(tags=="标签采集"){
+                this.Succeed();
+                var nextRoute={
+                    name:"PinLei",
+                    component:PinLei,
+                    params: {
+                        invoice:"标签采集"
+                    }
+                };
+                this.props.navigator.push(nextRoute);
+                this.DataSource();
             }
 
         })

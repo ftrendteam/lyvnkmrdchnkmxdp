@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import Index from "./Index";
 import Search from "./Search";
+import PinLei from "../YHDan/PinLei";
 import NetUtils from "../utils/NetUtils";
 import Storage from '../utils/Storage';
 
@@ -21,18 +22,12 @@ export default class SunYi extends Component {
     constructor(props){
         super(props);
         this.state = {
-            invoice:"",
+            invoice:this.props.invoice ? this.props.invoice : "",
             active:"",
         };
     }
 
     componentDidMount(){
-        Storage.get('invoice').then((tags)=>{
-            this.setState({
-                invoice:tags
-            })
-        })
-
         Storage.get('Disting').then((tags)=>{
             this.setState({
                 Disting:tags
@@ -49,129 +44,38 @@ export default class SunYi extends Component {
     }
 
     BaoSun(){
-        if(this.state.Disting=="0") {
-            var date = new Date();
-            var data=JSON.stringify(date.getTime());
-            this.setState({
-                active:data,
-            });
-            var nextRoute={
-                name:"主页",
-                component:Index
-            };
-            this.props.navigator.push(nextRoute);
-            Storage.delete('OrgFormno');
-            Storage.delete('scode');
-            Storage.delete('shildshop');
-            Storage.delete('YuanDan');
-            Storage.delete('Screen');
-            Storage.delete('StateMent');
-            Storage.delete('BQNumber');
-            Storage.delete('Modify');
-            Storage.save('Name','商品损溢');
-            Storage.save('FormType','SYYW');
-            Storage.save('ProYH','ProSY');
-            Storage.save('YdCountm','3');
-            Storage.save('OrgFormno',"1");
-            Storage.save('Date',this.state.active);
-            Storage.save('valueOf', 'App_Client_ProSY');
-            Storage.save('history', 'App_Client_ProSYQ');
-            Storage.save('historyClass', 'App_Client_ProSYDetailQ');
-        }else if(this.state.Disting=="1"){
-            var date = new Date();
-            var data=JSON.stringify(date.getTime());
-            this.setState({
-                active:data,
-            });
-            var nextRoute={
-                name:"Search",
-                component:Search
-            };
-            this.props.navigator.push(nextRoute);
-            Storage.delete('OrgFormno');
-            Storage.delete('scode');
-            Storage.delete('shildshop');
-            Storage.delete('YuanDan');
-            Storage.delete('Screen');
-            Storage.delete('StateMent');
-            Storage.delete('BQNumber');
-            Storage.delete('Modify');
-            Storage.save("invoice", "商品损溢");
-            Storage.save('Document', "商品损溢");
-            Storage.save('Name','商品损溢');
-            Storage.save('FormType','SYYW');
-            Storage.save('ProYH','ProSY');
-            Storage.save('YdCountm','3');
-            Storage.save('OrgFormno',"1");
-            Storage.save('Date',this.state.active);
-            Storage.save('valueOf', 'App_Client_ProSY');
-            Storage.save('history', 'App_Client_ProSYQ');
-            Storage.save('historyClass', 'App_Client_ProSYDetailQ');
-        }
+        var date = new Date();
+        var data=JSON.stringify(date.getTime());
+        this.setState({
+            active:data,
+        });
+        var nextRoute={
+            name:"主页",
+            component:PinLei,
+            params: {
+                OrgFormno:"报损",
+                invoice:"商品损溢"
+            }
+        };
+        this.props.navigator.push(nextRoute);
     }
 
     YiChu(){
-        if(this.state.Disting=="0") {
-            var date = new Date();
-            var data=JSON.stringify(date.getTime());
-            this.setState({
-                active:data,
-            });
-            var nextRoute={
-                name:"主页",
-                component:Index
-            };
-            this.props.navigator.push(nextRoute);
-            Storage.delete('OrgFormno');
-            Storage.delete('scode');
-            Storage.delete('shildshop');
-            Storage.delete('YuanDan');
-            Storage.delete('Screen');
-            Storage.delete('StateMent');
-            Storage.delete('BQNumber');
-            Storage.delete('YdCountm');
-            Storage.delete('Modify');
-            Storage.save("invoice", "商品损溢");
-            Storage.save('Document', "商品损溢");
-            Storage.save('Name','商品损溢');
-            Storage.save('FormType','SYYW');
-            Storage.save('ProYH','ProSY');
-            Storage.save('YdCountm','3');
-            Storage.save('OrgFormno',"0");
-            Storage.save('Date',this.state.active);
-            Storage.save('valueOf', 'App_Client_ProSY');
-            Storage.save('history', 'App_Client_ProSYQ');
-            Storage.save('historyClass', 'App_Client_ProSYDetailQ');
-        }else if(this.state.Disting=="1"){
-            var date = new Date();
-            var data=JSON.stringify(date.getTime());
-            this.setState({
-                active:data,
-            });
-            var nextRoute={
-                name:"Search",
-                component:Search
-            };
-            this.props.navigator.push(nextRoute);
-            Storage.delete('OrgFormno');
-            Storage.delete('scode');
-            Storage.delete('shildshop');
-            Storage.delete('YuanDan');
-            Storage.delete('Screen');
-            Storage.delete('StateMent');
-            Storage.delete('BQNumber');
-            Storage.delete('YdCountm');
-            Storage.delete('Modify');
-            Storage.save('Name','商品损溢');
-            Storage.save('FormType','SYYW');
-            Storage.save('ProYH','ProSY');
-            Storage.save('YdCountm','3');
-            Storage.save('OrgFormno',"0");
-            Storage.save('Date',this.state.active);
-            Storage.save('valueOf', 'App_Client_ProSY');
-            Storage.save('history', 'App_Client_ProSYQ');
-            Storage.save('historyClass', 'App_Client_ProSYDetailQ');
-        }
+        var date = new Date();
+        var data=JSON.stringify(date.getTime());
+        this.setState({
+            active:data,
+        });
+        var nextRoute={
+            name:"主页",
+            component:PinLei,
+            params: {
+                OrgFormno:"溢出",
+                invoice:"商品损溢",
+            }
+
+        };
+        this.props.navigator.push(nextRoute);
     }
 
     render() {

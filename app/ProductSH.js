@@ -9,6 +9,7 @@ import {
     Text,
     View,
     TextInput,
+    ToastAndroid,
     TouchableOpacity,
     Image
 } from 'react-native';
@@ -17,6 +18,7 @@ import Search from "./Search";
 import ProductCG_list from "./ProductCG_list";
 import ProductXP_list from "./ProductXP_list";
 import Distrition_list from "./Distrition_list";
+import PinLeiData from "../YHDan/PinLeiData";
 import NetUtils from "../utils/NetUtils";
 import Storage from '../utils/Storage';
 import ModalDropdown from 'native';
@@ -30,16 +32,13 @@ export default class ProductCG extends Component {
             shopname1:"",
             suppcode1:"",
             active:"",
+            DepName1:"",
+            DepCode1:"",
+            invoice:this.props.invoice ? this.props.invoice : "",
         };
     }
 
     componentDidMount(){
-        Storage.get('invoice').then((tags)=>{
-            this.setState({
-                invoice:tags
-            })
-        })
-
         Storage.get('Disting').then((tags)=>{
             this.setState({
                 Disting:tags
@@ -73,6 +72,20 @@ export default class ProductCG extends Component {
         });
     }
 
+    Search(){
+        Storage.save('shopPandian','App_Client_NOYSXPCGQ');
+        var nextRoute={
+            name:"Distrition_list",
+            component:Distrition_list,
+            params: {
+                SearchShopname:(Suppcode)=>this.SearchShopname(Suppcode),
+                SearchShopname1:(Suppcode1)=>this.SearchShopname1(Suppcode1),
+                // reloadShopname:(shopname)=>this._reloadShopname(shopname)
+            }
+        };
+        this.props.navigator.push(nextRoute)
+    }
+
     _reloadShopname(shopname) {
         shopname = String(shopname);
         this.setState({
@@ -93,6 +106,31 @@ export default class ProductCG extends Component {
         });
     }
 
+    ShoppData() {
+        var nextRoute = {
+            name: "ProductCG_list",
+            component: PinLeiData,
+            params: {
+                DepName: (DepName) => this._DepName(DepName),
+                DepCode: (DepCode) => this._DepCode(DepCode),
+            }
+        };
+        this.props.navigator.push(nextRoute)
+    }
+
+    _DepName(DepName) {
+        DepName = String(DepName);
+        this.setState({
+            DepName1:DepName,
+        });
+    }
+    _DepCode(DepCode) {
+        DepCode = String(DepCode);
+        this.setState({
+            DepCode1:DepCode,
+        });
+    }
+
     Button(){
         if(this.state.Disting=="0") {
             var date = new Date();
@@ -101,7 +139,8 @@ export default class ProductCG extends Component {
             var str1=this.state.shopname1;
             var str2=this.state.suppcode1;
             if(this.state.sCode1==""){
-                alert("请选择供应商")
+                ToastAndroid.show("请选择供应商",ToastAndroid.SHORT);
+                return;
             }else{
                 var nextRoute={
                     name:"Index",
@@ -110,6 +149,11 @@ export default class ProductCG extends Component {
                 this.props.navigator.push(nextRoute);
                 Storage.delete('StateMent');
                 Storage.delete('BQNumber');
+                if(this.state.DepName1==""&&this.state.DepCode1==""){
+                    Storage.delete('DepCode');
+                }else{
+                    Storage.save('DepCode', this.state.DepCode1);
+                }
                 Storage.save('YdCountm', '2');
                 Storage.save('OrgFormno',str2);
                 Storage.save('Name','协配收货');
@@ -135,7 +179,8 @@ export default class ProductCG extends Component {
             var str1=this.state.shopname1;
             var str2=this.state.suppcode1;
             if(this.state.sCode1==""){
-                alert("请选择供应商")
+                ToastAndroid.show("请选择供应商",ToastAndroid.SHORT);
+                return;
             }else {
                 var nextRoute = {
                     name: "Search",
@@ -144,6 +189,11 @@ export default class ProductCG extends Component {
                 this.props.navigator.push(nextRoute);
                 Storage.delete('StateMent');
                 Storage.delete('BQNumber');
+                if(this.state.DepName1==""&&this.state.DepCode1==""){
+                    Storage.delete('DepCode');
+                }else{
+                    Storage.save('DepCode', this.state.DepCode1);
+                }
                 Storage.save('YdCountm', '2');
                 Storage.save('OrgFormno',str2);
                 Storage.save('Name','协配收货');
@@ -164,20 +214,6 @@ export default class ProductCG extends Component {
             }
         }
 
-    }
-
-    Search(){
-        Storage.save('shopPandian','App_Client_NOYSXPCGQ');
-        var nextRoute={
-            name:"Distrition_list",
-            component:Distrition_list,
-            params: {
-                SearchShopname:(Suppcode)=>this.SearchShopname(Suppcode),
-                SearchShopname1:(Suppcode1)=>this.SearchShopname1(Suppcode1),
-                // reloadShopname:(shopname)=>this._reloadShopname(shopname)
-            }
-        };
-        this.props.navigator.push(nextRoute)
     }
 
     render() {
@@ -232,6 +268,27 @@ export default class ProductCG extends Component {
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.listimages} onPress={this.Search.bind(this)}>
                         <Image source={require("../images/2_03.png")} style={styles.Image}></Image>
+                    </TouchableOpacity>
+                </View>
+                <View style={styles.ContList}>
+                    <View style={styles.listleft}>
+                        <Text style={styles.listLeftText}>商品品类:</Text>
+                    </View>
+                    <TouchableOpacity style={styles.listcont} onPress={this.ShoppData.bind(this)}>
+                        <TextInput
+                            style={styles.TextInput1}
+                            autofocus={true}
+                            editable={false}
+                            defaultValue ={this.state.DepName1}
+                            numberoflines={1}
+                            placeholder="请选择商品品类"
+                            textalign="center"
+                            underlineColorAndroid='transparent'
+                            placeholderTextColor="#cccccc"
+                        />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={this.ShoppData.bind(this)}>
+                        <Image source={require("../images/2_03.png")}></Image>
                     </TouchableOpacity>
                 </View>
                 <TouchableOpacity style={styles.button} onPress={this.Button.bind(this)}>

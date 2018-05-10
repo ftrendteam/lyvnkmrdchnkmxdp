@@ -16,7 +16,8 @@ import {
     ToastAndroid,
     TouchableOpacity,
     DeviceEventEmitter,
-    InteractionManager
+    InteractionManager,
+    BackAndroid
 } from 'react-native';
 
 import Index from "./Index";
@@ -58,21 +59,27 @@ export default class Search extends Component {
             Remark: "",
             BarCode:"",
             modal:"",
-            BQNumber:"",
             Modify:"",
             OnPrice:"",
             Total:"",
             Price:"",
+            IsIntCount:"",
             OrderDetails:1,
             Show: false,
             emptydata:false,
             dataRows: "1",
             dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
-            ShoppData:this.props.ShoppData ? this.props.ShoppData : "",
+            ShoppData:"",
         };
         this.dataRows = [];
     }
+    componentWillMount() {
+       /* if (Platform.OS === 'android') {*/
+            BackAndroid.addEventListener('hardwareBackPress', this.onBackAndroid);
+            // this.handleBackButton = this.onBackAndroid.bind(this);
 
+        // }
+    }
     componentDidMount() {
         InteractionManager.runAfterInteractions(() => {
             this.Storage();
@@ -118,58 +125,185 @@ export default class Search extends Component {
                                 var countm = JSON.stringify(data.countm);
                                 var ShopPrice = JSON.stringify(data.ShopPrice);
                                 if (data.retcode == 1) {
-                                    var ShopCar = rows.item(0).ProdName;
-                                    if (rows.item(0).ShopNumber == 0) {
-                                        this.setState({
-                                            Number1: "",
-                                        })
-                                    } else {
-                                        this.setState({
-                                            Number1: rows.item(0).ShopNumber,
-                                        })
-                                    }
-                                    this.setState({
-                                        ProdName: rows.item(0).ProdName,
-                                        ShopPrice: rows.item(0).ShopPrice,
-                                        Pid: rows.item(0).Pid,
-                                        Remark: rows.item(0).ShopRemark,
-                                        prototal: rows.item(0).prototal,
-                                        ProdCode: rows.item(0).ProdCode,
-                                        DepCode: rows.item(0).DepCode1,
-                                        SuppCode: rows.item(0).SuppCode,
-                                        BarCode: rows.item(0).BarCode,
-                                        ydcountm: countm,
-                                        focus: true,
-                                        Search: "",
-                                        modal: 1,
-                                    })
-                                    Storage.get('YdCountm').then((ydcountm) => {
-                                        if (ydcountm == 2) {//原单数量
-                                            this.setState({
-                                                Number1: countm
-                                            })
-                                        }
-                                        this.setState({
-                                            YdCountm: ydcountm
-                                        })
-                                    });
+                                    var countm = JSON.stringify(data.countm);
+                                    var ShopPrice = JSON.stringify(data.ShopPrice);
+                                    for (let i = 0; i < rows.length; i++) {
+                                        var row = rows.item(i);
+                                        var ShopCar = rows.item(0).ProdName;
+                                        if(DepCode!==null){
+                                            if(row.DepCode1!==DepCode){
+                                                ToastAndroid.show("请选择该品类下的商品",ToastAndroid.SHORT);
+                                                return;
+                                            }else{
+                                                let numberFormat2 = NumberUtils.numberFormat2((rows.item(0).ShopNumber)*(rows.item(0).ShopPrice));
+                                                if (this.state.name == "商品采购" || this.state.name == "协配采购" || this.state.Modify == 1) {
+                                                    if(rows.item(0).ShopNumber == 0){
+                                                        this.setState({
+                                                            numberFormat2:0.00,
+                                                            Number1: '',
+                                                        })
+                                                    }else{
+                                                        this.setState({
+                                                            numberFormat2:numberFormat2,
+                                                            Number1: rows.item(0).ShopNumber,
+                                                        })
+                                                    }
+                                                    this.setState({
+                                                        ProdName: rows.item(0).ProdName,
+                                                        ShopPrice: ShopPrice,
+                                                        Pid: rows.item(0).Pid,
+                                                        Remark: rows.item(0).ShopRemark,
+                                                        prototal: rows.item(0).ShopAmount,
+                                                        ProdCode: rows.item(0).ProdCode,
+                                                        DepCode: rows.item(0).DepCode1,
+                                                        SuppCode: rows.item(0).SuppCode,
+                                                        BarCode: rows.item(0).BarCode,
+                                                        ydcountm: countm,
+                                                        focus: true,
+                                                        Search: "",
+                                                        modal: 1,
+                                                        IsIntCount:rows.item(0).IsIntCount
+                                                    })
+                                                }else {
+                                                    if(this.state.name=="标签采集"&&rows.item(0).ShopNumber == 0){
+                                                        this.setState({
+                                                            Number1: 1,
+                                                        })
+                                                    }else{
+                                                        this.setState({
+                                                            numberFormat2:numberFormat2,
+                                                            Number1: rows.item(0).ShopNumber,
+                                                        })
+                                                    }
 
-                                    Storage.get('YuanDan').then((tags) => {
-                                        if (tags == "1") {
-                                            if (this.state.Number1 == "" && !this.state.isFrist) {
+                                                    if(this.state.name!=="标签采集"&&rows.item(0).ShopNumber == 0){
+                                                        this.setState({
+                                                            numberFormat2:0.00,
+                                                            Number1: '',
+                                                        })
+                                                    }else{
+                                                        this.setState({
+                                                            numberFormat2:numberFormat2,
+                                                            Number1: rowData.ShopNumber,
+                                                        })
+                                                    }
+                                                    this.setState({
+                                                        ProdName: rows.item(0).ProdName,
+                                                        ShopPrice: rows.item(0).ShopPrice,
+                                                        Pid: rows.item(0).Pid,
+                                                        Remark: rows.item(0).ShopRemark,
+                                                        prototal: rows.item(0).ShopAmount,
+                                                        ProdCode: rows.item(0).ProdCode,
+                                                        DepCode: rows.item(0).DepCode1,
+                                                        SuppCode: rows.item(0).SuppCode,
+                                                        BarCode: rows.item(0).BarCode,
+                                                        ydcountm: countm,
+                                                        focus: true,
+                                                        Search: "",
+                                                        modal: 1,
+                                                        IsIntCount:rows.item(0).IsIntCount
+                                                    })
+                                                }
+                                            }
+                                        }else{
+                                            let numberFormat2 = NumberUtils.numberFormat2((rows.item(0).ShopNumber)*(rows.item(0).ShopPrice));
+                                            if (this.state.name == "商品采购" || this.state.name == "协配采购" || this.state.Modify == 1) {
+                                                if(rows.item(0).ShopNumber == 0){
+                                                    this.setState({
+                                                        numberFormat2:0.00,
+                                                        Number1: '',
+                                                    })
+                                                }else{
+                                                    this.setState({
+                                                        numberFormat2:numberFormat2,
+                                                        Number1: rows.item(0).ShopNumber,
+                                                    })
+                                                }
                                                 this.setState({
-                                                    Number1: this.state.ydcountm
+                                                    ProdName: rows.item(0).ProdName,
+                                                    ShopPrice: ShopPrice,
+                                                    Pid: rows.item(0).Pid,
+                                                    Remark: rows.item(0).ShopRemark,
+                                                    prototal: rows.item(0).ShopAmount,
+                                                    ProdCode: rows.item(0).ProdCode,
+                                                    DepCode: rows.item(0).DepCode1,
+                                                    SuppCode: rows.item(0).SuppCode,
+                                                    BarCode: rows.item(0).BarCode,
+                                                    ydcountm: countm,
+                                                    focus: true,
+                                                    Search: "",
+                                                    modal: 1,
+                                                    IsIntCount:rows.item(0).IsIntCount
+                                                })
+                                            }else {
+                                                if(this.state.name=="标签采集"&&rows.item(0).ShopNumber == 0){
+                                                    this.setState({
+                                                        Number1: 1,
+                                                    })
+                                                }else{
+                                                    this.setState({
+                                                        numberFormat2:numberFormat2,
+                                                        Number1: rows.item(0).ShopNumber,
+                                                    })
+                                                }
+
+                                                if(this.state.name!=="标签采集"&&rows.item(0).ShopNumber == 0){
+                                                    this.setState({
+                                                        numberFormat2:0.00,
+                                                        Number1: '',
+                                                    })
+                                                }else{
+                                                    this.setState({
+                                                        numberFormat2:numberFormat2,
+                                                        Number1: rowData.ShopNumber,
+                                                    })
+                                                }
+                                                this.setState({
+                                                    ProdName: rows.item(0).ProdName,
+                                                    ShopPrice: rows.item(0).ShopPrice,
+                                                    Pid: rows.item(0).Pid,
+                                                    Remark: rows.item(0).ShopRemark,
+                                                    prototal: rows.item(0).ShopAmount,
+                                                    ProdCode: rows.item(0).ProdCode,
+                                                    DepCode: rows.item(0).DepCode1,
+                                                    SuppCode: rows.item(0).SuppCode,
+                                                    BarCode: rows.item(0).BarCode,
+                                                    ydcountm: countm,
+                                                    focus: true,
+                                                    Search: "",
+                                                    modal: 1,
+                                                    IsIntCount:rows.item(0).IsIntCount
                                                 })
                                             }
                                         }
-                                        let numberFormat1 = NumberUtils.numberFormat2(this.state.ShopPrice);
-                                        let numberFormat2 = NumberUtils.numberFormat2((this.state.Number1) * (this.state.ShopPrice));
-                                        this.setState({
-                                            ShopPrice: numberFormat1,
-                                            numberFormat2: numberFormat2,
+                                        Storage.get('YdCountm').then((ydcountm) => {
+                                            if (ydcountm == 2) {//原单数量
+                                                this.setState({
+                                                    Number1: countm,
+                                                })
+                                            }
+                                            this.setState({
+                                                YdCountm: ydcountm
+                                            })
+                                        });
+
+                                        Storage.get('YuanDan').then((tags) => {
+                                            if (tags == "1") {
+                                                if (this.state.Number1 == "" && !this.state.isFrist) {
+                                                    this.setState({
+                                                        Number1: this.state.ydcountm
+                                                    })
+                                                }
+                                            }
+                                            let numberFormat1 = NumberUtils.numberFormat2(this.state.ShopPrice);
+                                            let numberFormat2 = NumberUtils.numberFormat2((this.state.Number1) * (this.state.ShopPrice));
+                                            this.setState({
+                                                ShopPrice: numberFormat1,
+                                                numberFormat2: numberFormat2,
+                                            })
                                         })
-                                    })
-                                } else {
+                                    }
+                                }else {
                                     alert(JSON.stringify(data))
                                 }
                             }, (err) => {
@@ -179,101 +313,186 @@ export default class Search extends Component {
                     })
                 });
             } else {
-                dbAdapter.selectAidCode(reminder, 1).then((rows) => {
-                    if (rows.length == 0) {
-                        alert("该商品不存在");
-                    } else {
-                        Storage.get('FormType').then((tags) => {
-                            this.setState({
-                                FormType: tags
-                            })
-                        })
+                Storage.get('DepCode').then((DepCode) => {
+                    Storage.get('FormType').then((FormType) => {
+                        Storage.get('LinkUrl').then((LinkUrl) => {
+                            Storage.get('scode').then((scode) => {
+                                dbAdapter.selectAidCode(reminder, 1).then((rows) => {
+                                    for (let i = 0; i < rows.length; i++) {
+                                        var row = rows.item(i);
+                                        if(this.state.name=="商品采购"||this.state.name=="商品验收"||this.state.name=="协配采购"||this.state.name=="协配收货"){
+                                            var SuppCode=scode;
+                                        }else{
+                                            var SuppCode=row.SuppCode;
+                                        }
+                                        Storage.get('userName').then((userName) => {
+                                            let params = {
+                                                reqCode: "App_PosReq",
+                                                reqDetailCode: "App_Client_CurrProdQry",
+                                                ClientCode: this.state.ClientCode,
+                                                sDateTime: Date.parse(new Date()),
+                                                Sign: NetUtils.MD5("App_PosReq" + "##" + "App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs") + '',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
+                                                username: userName,
+                                                usercode: this.state.Usercode,
+                                                SuppCode: SuppCode,
+                                                ShopCode: this.state.ShopCode,
+                                                ChildShopCode: this.state.ChildShopCode,
+                                                ProdCode: row.ProdCode,
+                                                OrgFormno: this.state.OrgFormno,
+                                                FormType: FormType,
+                                            };
+                                            FetchUtil.post(LinkUrl, JSON.stringify(params)).then((data) => {
+                                                var countm = JSON.stringify(data.countm);
+                                                var ShopPrice = JSON.stringify(data.ShopPrice);
+                                                if (data.retcode == 1) {
+                                                    if(DepCode!==null){
+                                                        if(row.DepCode1!==DepCode){
+                                                            ToastAndroid.show("请选择该品类下的商品",ToastAndroid.SHORT);
+                                                            return;
+                                                        }else{
+                                                            let numberFormat2 = NumberUtils.numberFormat2((row.ShopNumber)*(row.ShopPrice));
+                                                            if (this.state.name == "商品采购" || this.state.name == "协配采购" || this.state.Modify == 1) {
+                                                                if(row.ShopNumber == 0){
+                                                                    this.setState({
+                                                                        numberFormat2:0.00,
+                                                                        Number1: '',
+                                                                    })
+                                                                }else{
+                                                                    this.setState({
+                                                                        numberFormat2:numberFormat2,
+                                                                        Number1: row.ShopNumber,
+                                                                    })
+                                                                }
+                                                                this.setState({
+                                                                    ShopPrice: ShopPrice,
+                                                                    ProdName: row.ProdName,
+                                                                    Pid: row.Pid,
+                                                                    Remark: ro.ShopRemark,
+                                                                    prototal: row.prototal,
+                                                                    ProdCode: row.ProdCode,
+                                                                    DepCode: row.DepCode1,
+                                                                    SuppCode: row.SuppCode,
+                                                                    BarCode: row.BarCode,
+                                                                    ydcountm: countm,
+                                                                    Search:"",
+                                                                    modal:1,
+                                                                    IsIntCount:row.IsIntCount
+                                                                })
+                                                            }else {
+                                                                if(this.state.name=="标签采集"&&row.ShopNumber == 0){
+                                                                    this.setState({
+                                                                        Number1: 1,
+                                                                    })
+                                                                }else{
+                                                                    this.setState({
+                                                                        numberFormat2:numberFormat2,
+                                                                        Number1: row.ShopNumber,
+                                                                    })
+                                                                }
 
-                        Storage.get('LinkUrl').then((tags) => {
-                            this.setState({
-                                LinkUrl: tags
-                            })
-                        })
-                        //商品查询
-                        Storage.get('userName').then((tags) => {
-                            let params = {
-                                reqCode: "App_PosReq",
-                                reqDetailCode: "App_Client_CurrProdQry",
-                                ClientCode: this.state.ClientCode,
-                                sDateTime: Date.parse(new Date()),
-                                Sign: NetUtils.MD5("App_PosReq" + "##" + "App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs") + '',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
-                                username: tags,
-                                usercode: this.state.Usercode,
-                                SuppCode: rows.item(0).SuppCode,
-                                ShopCode: this.state.ShopCode,
-                                ChildShopCode: this.state.ChildShopCode,
-                                ProdCode: rows.item(0).ProdCode,
-                                OrgFormno: this.state.OrgFormno,
-                                FormType: this.state.FormType,
-                            };
-                            FetchUtil.post(this.state.LinkUrl, JSON.stringify(params)).then((data) => {
-                                var countm = JSON.stringify(data.countm);
-                                var ShopPrice = JSON.stringify(data.ShopPrice);
-                                if (data.retcode == 1) {
-                                    var ShopCar = rows.item(0).ProdName;
-                                    if (rows.item(0).ShopNumber == 0) {
-                                        this.setState({
-                                            Number1: "",
-                                        })
-                                    } else {
-                                        this.setState({
-                                            Number1: rows.item(0).ShopNumber,
+                                                                if(this.state.name!=="标签采集"&&row.ShopNumber == 0){
+                                                                    this.setState({
+                                                                        numberFormat2:0.00,
+                                                                        Number1: '',
+                                                                    })
+                                                                }else{
+                                                                    this.setState({
+                                                                        numberFormat2:numberFormat2,
+                                                                        Number1: row.ShopNumber,
+                                                                    })
+                                                                }
+                                                                this.setState({
+                                                                    ShopPrice: ShopPrice,
+                                                                    ProdName: row.ProdName,
+                                                                    Pid: row.Pid,
+                                                                    Remark: row.ShopRemark,
+                                                                    prototal: row.prototal,
+                                                                    ProdCode: row.ProdCode,
+                                                                    DepCode: row.DepCode1,
+                                                                    SuppCode: row.SuppCode,
+                                                                    BarCode: row.BarCode,
+                                                                    ydcountm: countm,
+                                                                    Search:"",
+                                                                    modal:1,
+                                                                    IsIntCount:row.IsIntCount
+                                                                })
+                                                            }
+                                                        }
+                                                    }else{
+                                                        let numberFormat2 = NumberUtils.numberFormat2((row.ShopNumber)*(ShopPrice));
+                                                        if (this.state.name == "商品采购" || this.state.name == "协配采购" || this.state.Modify == 1) {
+                                                            if(row.ShopNumber == 0){
+                                                                this.setState({
+                                                                    numberFormat2:0.00,
+                                                                    Number1: '',
+                                                                })
+                                                            }else{
+                                                                this.setState({
+                                                                    numberFormat2:numberFormat2,
+                                                                    Number1: row.ShopNumber,
+                                                                })
+                                                            }
+                                                            this.setState({
+                                                                ShopPrice: ShopPrice,
+                                                                ProdName: row.ProdName,
+                                                                Pid: row.Pid,
+                                                                Remark: row.ShopRemark,
+                                                                prototal: row.prototal,
+                                                                ProdCode: row.ProdCode,
+                                                                DepCode: row.DepCode1,
+                                                                SuppCode: row.SuppCode,
+                                                                BarCode: row.BarCode,
+                                                                ydcountm: countm,
+                                                                Search:"",
+                                                                modal:1,
+                                                                IsIntCount:row.IsIntCount
+                                                            })
+                                                        }else {
+                                                            if(this.state.name=="标签采集"&&row.ShopNumber == 0){
+                                                                this.setState({
+                                                                    Number1: 1,
+                                                                })
+                                                            }else if(this.state.name!=="标签采集"&&row.ShopNumber == 0){
+                                                                this.setState({
+                                                                    numberFormat2:0.00,
+                                                                    Number1: '',
+                                                                })
+                                                            }else{
+                                                                this.setState({
+                                                                    numberFormat2:numberFormat2,
+                                                                    Number1: row.ShopNumber,
+                                                                })
+                                                            }
+                                                            this.setState({
+                                                                ShopPrice: ShopPrice,
+                                                                ProdName: row.ProdName,
+                                                                Pid: row.Pid,
+                                                                Remark: row.ShopRemark,
+                                                                prototal: row.prototal,
+                                                                ProdCode: row.ProdCode,
+                                                                DepCode: row.DepCode1,
+                                                                SuppCode: row.SuppCode,
+                                                                BarCode: row.BarCode,
+                                                                ydcountm: countm,
+                                                                Search:"",
+                                                                modal:1,
+                                                                IsIntCount:row.IsIntCount
+                                                            })
+                                                        }
+                                                    }
+                                                    this.Modal();
+                                                } else {
+                                                    alert(JSON.stringify(data))
+                                                }
+                                            }, (err) => {
+                                                alert("网络请求失败");
+                                            })
                                         })
                                     }
-                                    this.setState({
-                                        ProdName: rows.item(0).ProdName,
-                                        ShopPrice: rows.item(0).ShopPrice,
-                                        Pid: rows.item(0).Pid,
-                                        Remark: rows.item(0).ShopRemark,
-                                        prototal: rows.item(0).ShopAmount,
-                                        ProdCode: rows.item(0).ProdCode,
-                                        DepCode: rows.item(0).DepCode1,
-                                        SuppCode: rows.item(0).SuppCode,
-                                        BarCode: rows.item(0).BarCode,
-                                        ydcountm: countm,
-                                        focus: true,
-                                        Search: "",
-                                        modal: 1,
-                                    })
-                                    Storage.get('YdCountm').then((ydcountm) => {
-                                        if (ydcountm == 2) {//原单数量
-                                            this.setState({
-                                                Number1: countm,
-                                            })
-                                        }
-                                        this.setState({
-                                            YdCountm: ydcountm
-                                        })
-                                    });
-
-                                    Storage.get('YuanDan').then((tags) => {
-                                        if (tags == "1") {
-                                            if (this.state.Number1 == "" && !this.state.isFrist) {
-                                                this.setState({
-                                                    Number1: this.state.ydcountm
-                                                })
-                                            }
-                                        }
-                                        let numberFormat1 = NumberUtils.numberFormat2(this.state.ShopPrice);
-                                        let numberFormat2 = NumberUtils.numberFormat2((this.state.Number1) * (this.state.ShopPrice));
-                                        this.setState({
-                                            ShopPrice: numberFormat1,
-                                            numberFormat2: numberFormat2,
-                                        })
-                                    })
-                                } else {
-                                    alert(JSON.stringify(data))
-                                }
-                            }, (err) => {
-                                alert("网络请求失败");
+                                })
                             })
                         })
-                    }
+                    })
                 })
             }
         })
@@ -335,11 +554,17 @@ export default class Search extends Component {
             })
         })
 
+        Storage.get('ShoppData').then((tags) => {
+            this.setState({
+                ShoppData: tags
+            })
+        })
+
     }
 
     Close() {
         DeviceEventEmitter.removeAllListeners();
-        if(this.state.ShoppData=="0"){
+        if(this.state.ShoppData=="清单"){
             var nextRoute = {
                 name: "清单",
                 component: ShoppingCart,
@@ -359,10 +584,8 @@ export default class Search extends Component {
         this.Modal();
         dbAdapter.selectAidCode(value, 1).then((rows) => {
             this.dataRows = [];
-            console.log("row==",rows.length)
             for (let i = 0; i < rows.length; i++) {
                 var row = rows.item(i);
-                console.log("rilegoule=",row.ShopNumber)
                 this.dataRows.push(row);
             }
             this.setState({
@@ -379,115 +602,188 @@ export default class Search extends Component {
             </TouchableOpacity>
         );
     }
-
+    /**
+     * 商品查询
+     */
     OrderDetails(rowData) {
-        Storage.get('FormType').then((tags) => {
-            this.setState({
-                FormType: tags
-            })
-        })
-
-        Storage.get('LinkUrl').then((tags) => {
-            this.setState({
-                LinkUrl: tags
-            })
-        })
-        //商品查询
-        dbAdapter.selectAidCode(rowData.ProdCode, 1).then((rows) => {
-            Storage.get('userName').then((tags) => {
-                let params = {
-                    reqCode: "App_PosReq",
-                    reqDetailCode: "App_Client_CurrProdQry",
-                    ClientCode: this.state.ClientCode,
-                    sDateTime: Date.parse(new Date()),
-                    Sign: NetUtils.MD5("App_PosReq" + "##" + "App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs") + '',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
-                    username: tags,
-                    usercode: this.state.Usercode,
-                    SuppCode: rowData.SuppCode,
-                    ShopCode: this.state.ShopCode,
-                    ChildShopCode: this.state.ChildShopCode,
-                    ProdCode: rowData.ProdCode,
-                    OrgFormno: this.state.OrgFormno,
-                    FormType: this.state.FormType,
-                };
-                FetchUtil.post(this.state.LinkUrl, JSON.stringify(params)).then((data) => {
-                    var countm = JSON.stringify(data.countm);
-                    var ShopPrice = JSON.stringify(data.ShopPrice);
-                    if (data.retcode == 1) {
-                        for (let i = 0; i < rows.length; i++) {
-                            var row = rows.item(i);
-                            if (this.state.name == "商品采购" || this.state.name == "协配采购" || this.state.Modify == 1) {
-                                if (rowData.ShopNumber == 0) {
-                                    this.setState({
-                                        ShopPrice: ShopPrice,
-                                        ProdName: rowData.ProdName,
-                                        Pid: rowData.Pid,
-                                        Number1: '',
-                                        Remark: rowData.ShopRemark,
-                                        prototal: rowData.prototal,
-                                        ProdCode: rowData.ProdCode,
-                                        DepCode: rowData.DepCode1,
-                                        SuppCode: rowData.SuppCode,
-                                        BarCode: rowData.BarCode,
-                                        ydcountm: countm,
-                                        Search:"",
-                                        modal:1,
-                                        numberFormat2:0.00,
-                                    })
-                                }else{
-                                    let numberFormat2 = NumberUtils.numberFormat2((rowData.ShopNumber)*(row.ShopPrice));
-                                    this.setState({
-                                        ShopPrice: row.ShopPrice,
-                                        ProdName: rowData.ProdName,
-                                        Pid: rowData.Pid,
-                                        Number1: rowData.ShopNumber,
-                                        Remark: rowData.ShopRemark,
-                                        prototal: rowData.prototal,
-                                        ProdCode: rowData.ProdCode,
-                                        DepCode: rowData.DepCode1,
-                                        SuppCode: rowData.SuppCode,
-                                        BarCode: rowData.BarCode,
-                                        ydcountm: countm,
-                                        Search:"",
-                                        modal:1,
-                                        numberFormat2:numberFormat2,
-                                    })
-                                }
+        Storage.get('DepCode').then((DepCode) => {
+            Storage.get('FormType').then((FormType) => {
+                Storage.get('LinkUrl').then((LinkUrl) => {
+                    Storage.get('scode').then((scode) => {
+                        dbAdapter.selectAidCode(rowData.ProdCode, 1).then((rows) => {
+                            if(this.state.name=="商品采购"||this.state.name=="商品验收"||this.state.name=="协配采购"||this.state.name=="协配收货"){
+                                var SuppCode=scode
                             }else{
-                                let numberFormat2 = NumberUtils.numberFormat2((rowData.ShopNumber)*(ShopPrice));
-                                if(rowData.ShopNumber == 0){
-                                    this.setState({
-                                        numberFormat2:0.00,
-                                        Number1: '',
-                                    })
-                                }else{
-                                    this.setState({
-                                        numberFormat2:numberFormat2,
-                                        Number1: rowData.ShopNumber,
-                                    })
-                                }
-                                this.setState({
-                                    ShopPrice: ShopPrice,
-                                    ProdName: rowData.ProdName,
-                                    Pid: rowData.Pid,
-                                    Remark: rowData.ShopRemark,
-                                    prototal: rowData.prototal,
-                                    ProdCode: rowData.ProdCode,
-                                    DepCode: rowData.DepCode1,
-                                    SuppCode: rowData.SuppCode,
-                                    BarCode: rowData.BarCode,
-                                    ydcountm: countm,
-                                    Search:"",
-                                    modal:1,
-                                })
+                                var SuppCode=rowData.SuppCode
                             }
-                        }
-                        this.Modal();
-                    } else {
-                        alert(JSON.stringify(data))
-                    }
-                }, (err) => {
-                    alert("网络请求失败");
+                            Storage.get('userName').then((userName) => {
+                                let params = {
+                                    reqCode: "App_PosReq",
+                                    reqDetailCode: "App_Client_CurrProdQry",
+                                    ClientCode: this.state.ClientCode,
+                                    sDateTime: Date.parse(new Date()),
+                                    Sign: NetUtils.MD5("App_PosReq" + "##" + "App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs") + '',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
+                                    username: userName,
+                                    usercode: this.state.Usercode,
+                                    SuppCode: SuppCode,
+                                    ShopCode: this.state.ShopCode,
+                                    ChildShopCode: this.state.ChildShopCode,
+                                    ProdCode: rowData.ProdCode,
+                                    OrgFormno: this.state.OrgFormno,
+                                    FormType: FormType,
+                                };
+                                FetchUtil.post(LinkUrl, JSON.stringify(params)).then((data) => {
+                                    var countm = JSON.stringify(data.countm);
+                                    var ShopPrice = JSON.stringify(data.ShopPrice);
+                                    if (data.retcode == 1) {
+                                        for (let i = 0; i < rows.length; i++) {
+                                            var row = rows.item(i);
+                                            if(DepCode!==null){
+                                                if(row.DepCode1!==DepCode){
+                                                    ToastAndroid.show("请选择该品类下的商品",ToastAndroid.SHORT);
+                                                    return;
+                                                }else{
+                                                    let numberFormat2 = NumberUtils.numberFormat2((rowData.ShopNumber)*(row.ShopPrice));
+                                                    if (this.state.name == "商品采购" || this.state.name == "协配采购" || this.state.Modify == 1) {
+                                                        if(rowData.ShopNumber == 0){
+                                                            this.setState({
+                                                                numberFormat2:0.00,
+                                                                Number1: '',
+                                                            })
+                                                        }else{
+                                                            this.setState({
+                                                                numberFormat2:numberFormat2,
+                                                                Number1: rowData.ShopNumber,
+                                                            })
+                                                        }
+                                                        this.setState({
+                                                            ShopPrice: ShopPrice,
+                                                            ProdName: rowData.ProdName,
+                                                            Pid: rowData.Pid,
+                                                            Remark: rowData.ShopRemark,
+                                                            prototal: rowData.prototal,
+                                                            ProdCode: rowData.ProdCode,
+                                                            DepCode: rowData.DepCode1,
+                                                            SuppCode: rowData.SuppCode,
+                                                            BarCode: rowData.BarCode,
+                                                            ydcountm: countm,
+                                                            Search:"",
+                                                            modal:1,
+                                                            IsIntCount:row.IsIntCount
+                                                        })
+                                                    }else {
+                                                        if(this.state.name=="标签采集"&&rowData.ShopNumber == 0){
+                                                            this.setState({
+                                                                Number1: 1,
+                                                            })
+                                                        }else{
+                                                            this.setState({
+                                                                numberFormat2:numberFormat2,
+                                                                Number1: rowData.ShopNumber,
+                                                            })
+                                                        }
+
+                                                        if(this.state.name!=="标签采集"&&rowData.ShopNumber == 0){
+                                                            this.setState({
+                                                                numberFormat2:0.00,
+                                                                Number1: '',
+                                                            })
+                                                        }else{
+                                                            this.setState({
+                                                                numberFormat2:numberFormat2,
+                                                                Number1: rowData.ShopNumber,
+                                                            })
+                                                        }
+                                                        this.setState({
+                                                            ShopPrice: ShopPrice,
+                                                            ProdName: rowData.ProdName,
+                                                            Pid: rowData.Pid,
+                                                            Remark: rowData.ShopRemark,
+                                                            prototal: rowData.prototal,
+                                                            ProdCode: rowData.ProdCode,
+                                                            DepCode: rowData.DepCode1,
+                                                            SuppCode: rowData.SuppCode,
+                                                            BarCode: rowData.BarCode,
+                                                            ydcountm: countm,
+                                                            Search:"",
+                                                            modal:1,
+                                                            IsIntCount:row.IsIntCount
+                                                        })
+                                                    }
+                                                }
+                                            }else{
+                                                let numberFormat2 = NumberUtils.numberFormat2((rowData.ShopNumber)*(ShopPrice));
+                                                if (this.state.name == "商品采购" || this.state.name == "协配采购" || this.state.Modify == 1) {
+                                                    if(rowData.ShopNumber == 0){
+                                                        this.setState({
+                                                            numberFormat2:0.00,
+                                                            Number1: '',
+                                                        })
+                                                    }else{
+                                                        this.setState({
+                                                            numberFormat2:numberFormat2,
+                                                            Number1: rowData.ShopNumber,
+                                                        })
+                                                    }
+                                                    this.setState({
+                                                        ShopPrice: ShopPrice,
+                                                        ProdName: rowData.ProdName,
+                                                        Pid: rowData.Pid,
+                                                        Remark: rowData.ShopRemark,
+                                                        prototal: rowData.prototal,
+                                                        ProdCode: rowData.ProdCode,
+                                                        DepCode: rowData.DepCode1,
+                                                        SuppCode: rowData.SuppCode,
+                                                        BarCode: rowData.BarCode,
+                                                        ydcountm: countm,
+                                                        Search:"",
+                                                        modal:1,
+                                                        IsIntCount:row.IsIntCount
+                                                    })
+                                                }else {
+                                                    if(this.state.name=="标签采集"&&rowData.ShopNumber == 0){
+                                                        this.setState({
+                                                            Number1: 1,
+                                                        })
+                                                    }else if(this.state.name!=="标签采集"&&rowData.ShopNumber == 0){
+                                                        this.setState({
+                                                            numberFormat2:0.00,
+                                                            Number1: '',
+                                                        })
+                                                    }else{
+                                                        this.setState({
+                                                            numberFormat2:numberFormat2,
+                                                            Number1: rowData.ShopNumber,
+                                                        })
+                                                    }
+                                                    this.setState({
+                                                        ShopPrice: ShopPrice,
+                                                        ProdName: rowData.ProdName,
+                                                        Pid: rowData.Pid,
+                                                        Remark: rowData.ShopRemark,
+                                                        prototal: rowData.prototal,
+                                                        ProdCode: rowData.ProdCode,
+                                                        DepCode: rowData.DepCode1,
+                                                        SuppCode: rowData.SuppCode,
+                                                        BarCode: rowData.BarCode,
+                                                        ydcountm: countm,
+                                                        Search:"",
+                                                        modal:1,
+                                                        IsIntCount:row.IsIntCount
+                                                    })
+                                                }
+                                            }
+                                        }
+                                        this.Modal();
+                                    } else {
+                                        alert(JSON.stringify(data))
+                                    }
+                                }, (err) => {
+                                    alert("网络请求失败");
+                                })
+                            })
+                        })
+                    })
                 })
             })
         })
@@ -501,27 +797,99 @@ export default class Search extends Component {
     }
 
     onSubmitEditing(){
-        var ShopPrice = this.state.Number1 * this.state.ShopPrice
+        var numberFormat2 = this.state.Number1 * this.state.ShopPrice;
+        let shopprice=Math.round(numberFormat2 * 100) / 100;
         this.setState({
-            numberFormat2:ShopPrice
+            numberFormat2:shopprice
         })
     }
 
     onNumber(){
-        var ShopPrice = (this.state.Number1 * this.state.ShopPrice);
+        var numberFormat2 = this.state.Number1 * this.state.ShopPrice;
+        let shopprice=Math.round(numberFormat2 * 100) / 100;
         this.setState({
-            numberFormat2:NumberUtils.numberFormat2(ShopPrice),
-        });
+            numberFormat2:shopprice
+        })
         if(this.state.name=="商品采购"||this.state.name=="协配采购"||this.state.Modify==1){
             this.setState({
                 OnPrice:1,
                 PriceText:1
             });
         }else{
-            var x = this.state.Number1;//获取数量的数字
-            var y = String(x).indexOf(".") + 1;//获取小数点的位置
-            if(y > 0) {
-                alert("数量不能含有小数");
+            if(this.state.IsIntCount==0){
+                var number = this.state.Number1;//获取数量的数字
+                if(parseInt(number)==number) {
+                    if(this.state.name=="实时盘点"||this.state.name=="商品盘点"){
+                        var shopInfoData = [];
+                        var shopInfo = {};
+                        shopInfo.Pid = this.state.Pid;
+                        shopInfo.ProdCode = this.state.ProdCode;
+                        shopInfo.prodname = this.state.ProdName;
+                        shopInfo.countm = this.state.Number1;
+                        shopInfo.ShopPrice = this.state.ShopPrice;
+                        if(this.state.name=="标签采集"){
+                            shopInfo.prototal = "0";
+                        }else{
+                            shopInfo.prototal = NumberUtils.numberFormat2(ShopPrice);
+                        }
+                        shopInfo.promemo = this.state.Remark;
+                        shopInfo.DepCode = this.state.DepCode;
+                        shopInfo.ydcountm = this.state.ydcountm;
+                        shopInfo.SuppCode = this.state.SuppCode;
+                        shopInfo.BarCode = this.state.BarCode;
+                        shopInfoData.push(shopInfo);
+                        //调用插入表方法
+                        dbAdapter.insertShopInfo(shopInfoData);
+                        this.setState({
+                            Number1: "",
+                            ydcountm: "",
+                            ShopPrice: "",
+                            numberFormat2: "",
+                            Remark: "",
+                            ProdName: "",
+                            modal:"",
+                        })
+                    }else{
+                        if(this.state.Number1==0){
+                            ToastAndroid.show('商品数量不能为空', ToastAndroid.SHORT);
+                        }else{
+                            var shopInfoData = [];
+                            var shopInfo = {};
+                            shopInfo.Pid = this.state.Pid;
+                            shopInfo.ProdCode = this.state.ProdCode;
+                            shopInfo.prodname = this.state.ProdName;
+                            shopInfo.countm = this.state.Number1;
+                            shopInfo.ShopPrice = this.state.ShopPrice;
+                            if(this.state.name=="标签采集"){
+                                shopInfo.prototal = "0";
+                            }else{
+                                shopInfo.prototal = NumberUtils.numberFormat2(ShopPrice);
+                            }
+                            shopInfo.promemo = this.state.Remark;
+                            shopInfo.DepCode = this.state.DepCode;
+                            shopInfo.ydcountm = this.state.ydcountm;
+                            shopInfo.SuppCode = this.state.SuppCode;
+                            shopInfo.BarCode = this.state.BarCode;
+                            shopInfoData.push(shopInfo);
+                            //调用插入表方法
+                            dbAdapter.insertShopInfo(shopInfoData);
+                            this.setState({
+                                Number1: "",
+                                ydcountm: "",
+                                ShopPrice: "",
+                                numberFormat2: "",
+                                Remark: "",
+                                ProdName: "",
+                                modal:"",
+                            })
+                        }
+                    }
+                }else{
+                    alert("数量不能含有小数");
+                    this.setState({
+                        Total:"",
+                    });
+                }
             } else {
                 if(this.state.name=="实时盘点"||this.state.name=="商品盘点"){
                     var shopInfoData = [];
@@ -531,10 +899,10 @@ export default class Search extends Component {
                     shopInfo.prodname = this.state.ProdName;
                     shopInfo.countm = this.state.Number1;
                     shopInfo.ShopPrice = this.state.ShopPrice;
-                    if(this.state.BQNumber==3){
+                    if(this.state.name=="标签采集"){
                         shopInfo.prototal = "0";
                     }else{
-                        shopInfo.prototal = NumberUtils.numberFormat2(ShopPrice);
+                        shopInfo.prototal = shopprice;
                     }
                     shopInfo.promemo = this.state.Remark;
                     shopInfo.DepCode = this.state.DepCode;
@@ -564,10 +932,10 @@ export default class Search extends Component {
                         shopInfo.prodname = this.state.ProdName;
                         shopInfo.countm = this.state.Number1;
                         shopInfo.ShopPrice = this.state.ShopPrice;
-                        if(this.state.BQNumber==3){
+                        if(this.state.name=="标签采集"){
                             shopInfo.prototal = "0";
                         }else{
-                            shopInfo.prototal = NumberUtils.numberFormat2(ShopPrice);
+                            shopInfo.prototal = shopprice;
                         }
                         shopInfo.promemo = this.state.Remark;
                         shopInfo.DepCode = this.state.DepCode;
@@ -619,37 +987,54 @@ export default class Search extends Component {
                 Number1:1,
                 numberFormat2:this.state.ShopPrice,
             });
-        } else if(this.state.name=="标签采集"&&this.state.BQNumber==1){
+        } else if(this.state.name=="标签采集"&&this.state.Number1==1){
             this.setState({
-                BQNumber:2,
+                Number1:2,
             });
         }else{
-            let numberFormat2 = NumberUtils.numberFormat2((parseInt(this.state.Number1)+1)*(this.state.ShopPrice));
+            let numberFormat1 =Number(this.state.Number1)+1;
+            let numberFormat2 = (numberFormat1 * this.state.ShopPrice);
+            let shopprice=Math.round(numberFormat2 * 100) / 100;
             this.setState({
-                Number1:parseInt(this.state.Number1)+1,
-                BQNumber:parseInt(this.state.BQNumber)+1,
-                numberFormat2:numberFormat2,
+                Number1:Number(this.state.Number1)+1,
+                numberFormat2:shopprice,
             });
         }
     }
 
     subtraction() {
-        if (this.state.Number1 > 0||this.state.BQNumber >1) {
+        if (this.state.Number1 > 0) {
             var Number1 = this.state.Number1;
-            var BQNumber1=this.state.BQNumber;
             this.setState({
-                Number1: parseInt(Number1) - 1,
-                BQNumber:parseInt(BQNumber1)-1,
+                Number1: Number(this.state.Number1)-1,
             });
-            let numberFormat2 = NumberUtils.numberFormat2((parseInt(Number1) - 1) * (this.state.ShopPrice));
+            let numberFormat1 =Number(this.state.Number1)-1;
+            let numberFormat2 = (numberFormat1 * this.state.ShopPrice);
+            let shopprice=Math.round(numberFormat2 * 100) / 100;
             this.setState({
-                numberFormat2: numberFormat2,
+                numberFormat2: shopprice,
+            });
+        }
+
+        if(this.state.Number1 ==0&&this.state.name!=="标签采集"){
+            ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
+            this.setState({
+                Number1:this.state.Number1,
+                numberFormat2:0,
+            });
+        }else if(this.state.Number1 <1&&this.state.name!=="标签采集"){
+            ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
+            let numberFormat2 = (this.state.Number1 * this.state.ShopPrice);
+            let shopprice=Math.round(numberFormat2 * 100) / 100;
+            this.setState({
+                Number1:this.state.Number1,
+                numberFormat2:shopprice,
             });
         }
         if (this.state.Number1 == 0||this.state.Number1 == "") {
             ToastAndroid.show('商品数量不能为空', ToastAndroid.SHORT);
             this.setState({
-                Number1: ""
+                Number1: 0
             });
         }
     }
@@ -658,7 +1043,6 @@ export default class Search extends Component {
         let numberFormat2 = NumberUtils.numberFormat2((0) * (this.state.ShopPrice));
         this.setState({
             Number1: 0,
-            BQNumber:1,
             numberFormat2: numberFormat2,
         })
     }
@@ -669,9 +1053,10 @@ export default class Search extends Component {
                 numberFormat2:"0.00",
             });
         }else{
-            let numberFormat2 = NumberUtils.numberFormat2((parseInt(this.state.Number1))*(this.state.ShopPrice));
+            let numberFormat2 = (this.state.Number1 * this.state.ShopPrice);
+            let shopprice=Math.round(numberFormat2 * 100) / 100;
             this.setState({
-                numberFormat2:numberFormat2,
+                numberFormat2:shopprice,
                 Total:1,
                 OnPrice:""
             });
@@ -686,19 +1071,92 @@ export default class Search extends Component {
             })
         }else{
             var Modify=NumberUtils.numberFormat2(this.state.numberFormat2/this.state.Number1);
-            this.setState({
-                ShopPrice:Modify,
-                modal:'',
-                OnPrice:'',
-                Total:'',
-                PriceText:''
-            })
             if(this.state.OrderDetails==1){
-                var x = this.state.Number1;//获取数量的数字
-                var y = String(x).indexOf(".") + 1;//获取小数点的位置
-                if(y > 0) {
-                    alert("数量不能含有小数");
+                if(this.state.IsIntCount==0){
+                    var number = this.state.Number1;//获取数量的数字
+                    if(parseInt(number)==number) {
+                        this.setState({
+                            ShopPrice:Modify,
+                            modal:'',
+                            OnPrice:'',
+                            Total:'',
+                            PriceText:''
+                        })
+                        if(this.state.name=="实时盘点"||this.state.name=="商品盘点"){
+                            var shopInfoData = [];
+                            var shopInfo = {};
+                            shopInfo.Pid = this.state.Pid;
+                            shopInfo.ProdCode = this.state.ProdCode;
+                            shopInfo.prodname = this.state.ProdName;
+                            shopInfo.countm = this.state.Number1;
+                            shopInfo.ShopPrice = Modify;
+                            shopInfo.prototal = this.state.numberFormat2;
+                            shopInfo.promemo = this.state.Remark;
+                            shopInfo.DepCode = this.state.DepCode;
+                            shopInfo.ydcountm = this.state.ydcountm;
+                            shopInfo.SuppCode = this.state.SuppCode;
+                            shopInfo.BarCode = this.state.BarCode;
+                            shopInfoData.push(shopInfo);
+                            //调用插入表方法
+                            dbAdapter.insertShopInfo(shopInfoData);
+                            this.setState({
+                                Number1: "",
+                                ydcountm: "",
+                                ShopPrice: "",
+                                numberFormat2: "",
+                                Remark: "",
+                                ProdName: "",
+                                modal:"",
+                            })
+                        }else{
+                            if(this.state.Number1==0){
+                                ToastAndroid.show('商品数量不能为空', ToastAndroid.SHORT);
+                            }else{
+                                var shopInfoData = [];
+                                var shopInfo = {};
+                                shopInfo.Pid = this.state.Pid;
+                                shopInfo.ProdCode = this.state.ProdCode;
+                                shopInfo.prodname = this.state.ProdName;
+                                shopInfo.countm = this.state.Number1;
+                                shopInfo.ShopPrice = Modify;
+                                if(this.state.name=="标签采集"){
+                                    shopInfo.prototal = "0";
+                                }else{
+                                    shopInfo.prototal = this.state.numberFormat2;
+                                }
+                                shopInfo.promemo = this.state.Remark;
+                                shopInfo.DepCode = this.state.DepCode;
+                                shopInfo.ydcountm = this.state.ydcountm;
+                                shopInfo.SuppCode = this.state.SuppCode;
+                                shopInfo.BarCode = this.state.BarCode;
+                                shopInfoData.push(shopInfo);
+                                //调用插入表方法
+                                dbAdapter.insertShopInfo(shopInfoData);
+                                this.setState({
+                                    Number1: "",
+                                    ydcountm: "",
+                                    ShopPrice: "",
+                                    numberFormat2: "",
+                                    Remark: "",
+                                    ProdName: "",
+                                    modal:"",
+                                })
+                            }
+                        }
+                    }else{
+                        alert("数量不能含有小数");
+                        this.setState({
+                            Total:"",
+                        });
+                    }
                 } else {
+                    this.setState({
+                        ShopPrice:Modify,
+                        modal:'',
+                        OnPrice:'',
+                        Total:'',
+                        PriceText:''
+                    })
                     if(this.state.name=="实时盘点"||this.state.name=="商品盘点"){
                         var shopInfoData = [];
                         var shopInfo = {};
@@ -707,11 +1165,7 @@ export default class Search extends Component {
                         shopInfo.prodname = this.state.ProdName;
                         shopInfo.countm = this.state.Number1;
                         shopInfo.ShopPrice = Modify;
-                        if(this.state.BQNumber==3){
-                            shopInfo.prototal = "0";
-                        }else{
-                            shopInfo.prototal = this.state.numberFormat2;
-                        }
+                        shopInfo.prototal = this.state.numberFormat2;
                         shopInfo.promemo = this.state.Remark;
                         shopInfo.DepCode = this.state.DepCode;
                         shopInfo.ydcountm = this.state.ydcountm;
@@ -740,11 +1194,7 @@ export default class Search extends Component {
                             shopInfo.prodname = this.state.ProdName;
                             shopInfo.countm = this.state.Number1;
                             shopInfo.ShopPrice = Modify;
-                            if(this.state.BQNumber==3){
-                                shopInfo.prototal = "0";
-                            }else{
-                                shopInfo.prototal = this.state.numberFormat2;
-                            }
+                            shopInfo.prototal = this.state.numberFormat2;
                             shopInfo.promemo = this.state.Remark;
                             shopInfo.DepCode = this.state.DepCode;
                             shopInfo.ydcountm = this.state.ydcountm;
@@ -784,10 +1234,78 @@ export default class Search extends Component {
     }
 
     pressPop() {
-        var x = this.state.Number1;//获取数量的数字
-        var y = String(x).indexOf(".") + 1;//获取小数点的位置
-        if(y > 0) {
-            alert("数量不能含有小数");
+        if(this.state.IsIntCount==0){
+            var number = this.state.Number1;//获取数量的数字
+            if(parseInt(number)==number) {
+                if(this.state.name=="实时盘点"||this.state.name=="商品盘点"){
+                    var shopInfoData = [];
+                    var shopInfo = {};
+                    shopInfo.Pid = this.state.Pid;
+                    shopInfo.ProdCode = this.state.ProdCode;
+                    shopInfo.prodname = this.state.ProdName;
+                    shopInfo.countm = this.state.Number1;
+                    shopInfo.ShopPrice = this.state.ShopPrice;
+                    shopInfo.prototal = this.state.numberFormat2;
+                    shopInfo.promemo = this.state.Remark;
+                    shopInfo.DepCode = this.state.DepCode;
+                    shopInfo.ydcountm = this.state.ydcountm;
+                    shopInfo.SuppCode = this.state.SuppCode;
+                    shopInfo.BarCode = this.state.BarCode;
+                    shopInfoData.push(shopInfo);
+                    //调用插入表方法
+                    dbAdapter.insertShopInfo(shopInfoData);
+                    this.setState({
+                        Number1: "",
+                        ydcountm: "",
+                        ShopPrice: "",
+                        numberFormat2: "",
+                        Remark: "",
+                        ProdName: "",
+                        modal:"",
+                    })
+                }else{
+                    if(this.state.Number1==0&&this.state.name!=="标签采集"){
+                        ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
+                    } else if(this.state.Number1==0&&this.state.name=="标签采集"){
+                        ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
+                    }else{
+                        var shopInfoData = [];
+                        var shopInfo = {};
+                        shopInfo.Pid = this.state.Pid;
+                        shopInfo.ProdCode = this.state.ProdCode;
+                        shopInfo.prodname = this.state.ProdName;
+                        shopInfo.countm = this.state.Number1;
+                        shopInfo.ShopPrice = this.state.ShopPrice;
+                        if(this.state.name=="标签采集"){
+                            shopInfo.prototal = "0";
+                        }else{
+                            shopInfo.prototal = this.state.numberFormat2;
+                        }
+                        shopInfo.promemo = this.state.Remark;
+                        shopInfo.DepCode = this.state.DepCode;
+                        shopInfo.ydcountm = this.state.ydcountm;
+                        shopInfo.SuppCode = this.state.SuppCode;
+                        shopInfo.BarCode = this.state.BarCode;
+                        shopInfoData.push(shopInfo);
+                        //调用插入表方法
+                        dbAdapter.insertShopInfo(shopInfoData);
+                        this.setState({
+                            Number1: "",
+                            ydcountm: "",
+                            ShopPrice: "",
+                            numberFormat2: "",
+                            Remark: "",
+                            ProdName: "",
+                            modal:"",
+                        })
+                    }
+                }
+            }else{
+                alert("数量不能含有小数");
+                this.setState({
+                    Total:"",
+                });
+            }
         } else {
             if(this.state.name=="实时盘点"||this.state.name=="商品盘点"){
                 var shopInfoData = [];
@@ -797,7 +1315,7 @@ export default class Search extends Component {
                 shopInfo.prodname = this.state.ProdName;
                 shopInfo.countm = this.state.Number1;
                 shopInfo.ShopPrice = this.state.ShopPrice;
-                if(this.state.BQNumber==3){
+                if(this.state.name=="标签采集"){
                     shopInfo.prototal = "0";
                 }else{
                     shopInfo.prototal = this.state.numberFormat2;
@@ -822,7 +1340,7 @@ export default class Search extends Component {
             }else{
                 if(this.state.Number1==0&&this.state.name!=="标签采集"){
                     ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
-                } else if(this.state.BQNumber==0&&this.state.name=="标签采集"){
+                } else if(this.state.Number1==0&&this.state.name=="标签采集"){
                     ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
                 }else{
                     var shopInfoData = [];
@@ -832,7 +1350,7 @@ export default class Search extends Component {
                     shopInfo.prodname = this.state.ProdName;
                     shopInfo.countm = this.state.Number1;
                     shopInfo.ShopPrice = this.state.ShopPrice;
-                    if(this.state.BQNumber==3){
+                    if(this.state.name=="标签采集"){
                         shopInfo.prototal = "0";
                     }else{
                         shopInfo.prototal = this.state.numberFormat2;
@@ -869,6 +1387,15 @@ export default class Search extends Component {
     Emptydata(){
         this._Emptydata();
     }
+
+    /**
+     *
+     * 物理键返回按钮
+     */
+    onBackAndroid = () => {
+        ToastAndroid.show('再按一次退出应用');
+        return false;
+    };
 
     render() {
         return (

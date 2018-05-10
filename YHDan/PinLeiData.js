@@ -1,7 +1,5 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
+ * 要货单商品品类
  */
 
 import React, { Component } from 'react';
@@ -23,13 +21,13 @@ import Storage from '../utils/Storage';
 let dbAdapter = new DBAdapter();
 let db;
 
-export default class JiGou extends Component {
+export default class PinLeiData extends Component {
     constructor(props){
         super(props);
         this.state = {
             search:"",
             show:false,
-            dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => true}),
+            dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => true,}),
         };
         this.dataRows = [];
     }
@@ -45,16 +43,13 @@ export default class JiGou extends Component {
     }
 
     fetch(){
-        Storage.get('code').then((tags)=>{
-            dbAdapter.selectXPShopCode(tags).then((rows)=>{
-                for(let i =0;i<rows.length;i++){
-                    var row = rows.item(i);
-                    this.dataRows.push(row);
-                }
-                this.setState({
-                    dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
-                    dataRows: this.dataRows,
-                })
+        dbAdapter.selectTDepSet('1').then((rows) => {
+            for(let i =0;i<rows.length;i++){
+                var row = rows.item(i);
+                this.dataRows.push(row);
+            }
+            this.setState({
+                dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
             })
         })
     }
@@ -64,25 +59,48 @@ export default class JiGou extends Component {
     }
 
     Search(value){
-        for (let i = 0; i < this.dataRows.length; i++) {
-            let temp = this.dataRows[0];
-            let dataRow = this.dataRows[i];
-            if (((dataRow.shopcode + "").indexOf(value) >= 0)) {
-                this.dataRows[0] = dataRow;
-                this.dataRows[i] = temp;
-                break;
+        if(value==""){
+            this.abc=[];
+            dbAdapter.selectAllData("tsuppset").then((rows)=>{
+                for(let i =0;i<rows.length;i++){
+                    var row = rows.item(i);
+                    this.abc.push(row);
+                }
+                this.setState({
+                    dataSource:this.state.dataSource.cloneWithRows(this.abc),
+                })
+            })
+        }else if(value!==""){
+            for (let i = 0; i < this.dataRows.length; i++) {
+                let dataRow = this.dataRows[i];
+                if (((dataRow.DepName + "").indexOf(value) >= 0)) {
+                    var str = this.dataRows.splice(i,1);
+                    this.dataRows.unshift(str[0]);
+                    // break;
+                }
             }
+            this.setState({
+                dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
+            })
         }
-        this.setState({
-            dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
-        })
-
     }
 
     pressPop(rowData){
-        var Data=rowData.shopcode;
-        if(this.props.reloadShopname){
-            this.props.reloadShopname(Data)
+        if(this.props.DepName||this.props.DepCode){
+            this.props.DepName(rowData.DepName);
+            this.props.DepCode(rowData.DepCode);
+        }
+        this.props.navigator.pop();
+    }
+
+    /**
+     *
+     * 清空数据
+     */
+    DeleteData(){
+        if(this.props.DepName||this.props.DepCode){
+            this.props.DepName("");
+            this.props.DepCode("");
         }
         this.props.navigator.pop();
     }
@@ -91,10 +109,10 @@ export default class JiGou extends Component {
         return(
             <TouchableOpacity style={styles.header} onPress={()=>this.pressPop(rowData)}>
                 <View style={styles.coding}>
-                    <Text style={styles.codingText}>{rowData.shopcode}</Text>
+                    <Text style={styles.codingText}>{rowData.DepName}</Text>
                 </View>
                 <View style={styles.name}>
-                    <Text style={styles.codingText}>{rowData.shopname}</Text>
+                    <Text style={styles.codingText}>{rowData.DepCode}</Text>
                 </View>
             </TouchableOpacity>
         )
@@ -107,7 +125,7 @@ export default class JiGou extends Component {
                     <TextInput
                         autofocus="{true}"
                         returnKeyType="search"
-                        placeholder="搜索相关单号"
+                        placeholder="搜索相关名称"
                         placeholderColor="#323232"
                         underlineColorAndroid='transparent'
                         style={styles.Search}
@@ -126,27 +144,27 @@ export default class JiGou extends Component {
                 <View>
                     <View style={styles.head}>
                         <View style={styles.coding}>
-                            <Text style={styles.codingText}>机构号</Text>
+                            <Text style={styles.codingText}>品类名称</Text>
                         </View>
                         <View style={styles.name}>
-                            <Text style={styles.codingText}>名称</Text>
+                            <Text style={styles.codingText}>编码</Text>
                         </View>
-
                     </View>
-                    {
-                        (this.state.dataRows == "") ?
-                            <View style={styles.Null}>
-                                <Text style={styles.NullText}>
-                                    没有搜索到相关商品~~~
-                                </Text>
-                            </View> :
-                            <ListView
-                                style={styles.scrollview}
-                                dataSource={this.state.dataSource}
-                                showsVerticalScrollIndicator={true}
-                                renderRow={this._renderRow.bind(this)}
-                            />
-                    }
+                    <TouchableOpacity onPress={this.DeleteData.bind(this)} style={styles.header}>
+                        <View style={styles.coding}>
+                            <Text style={[styles.codingText,{color:"#ff4e4e"}]}>清空</Text>
+                        </View>
+                        <View style={styles.name}>
+                            <Text style={styles.codingText}></Text>
+                        </View>
+                    </TouchableOpacity>
+                    <ListView
+                        style={styles.scrollview}
+                        enableEmptySections = {true}
+                        dataSource={this.state.dataSource}
+                        showsVerticalScrollIndicator={true}
+                        renderRow={this._renderRow.bind(this)}
+                    />
                 </View>
             </View>
         );
@@ -228,20 +246,18 @@ const styles = StyleSheet.create({
         flex:1,
         paddingLeft:12
     },
+    codingText1:{
+        color:"#333333",
+        fontSize:16,
+    },
     name:{
         flex:1,
     },
+    nameText1:{
+        color:"#333333",
+        fontSize:16,
+    },
     scrollview:{
         marginBottom:120,
-    },
-    Null: {
-        marginLeft: 25,
-        marginRight: 25,
-        marginTop: 120,
-    },
-    NullText: {
-        color: "#cccccc",
-        fontSize: 20,
-        textAlign: "center"
-    },
+    }
 });

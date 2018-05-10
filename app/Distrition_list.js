@@ -86,17 +86,15 @@ export default class Distrition_list extends Component {
                 reqCode:"App_PosReq",
                 reqDetailCode:this.state.shopPandian,
                 ClientCode:tags,
-                sDateTime:Date.parse(new Date()),//获取当前时间转换成时间戳
-                Sign:NetUtils.MD5("App_PosReq" + "##" +this.state.shopPandian + "##" + Date.parse(new Date()) + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
+                sDateTime:"2017-08-09 12:12:12",//获取当前时间转换成时间戳
+                Sign:NetUtils.MD5("App_PosReq" + "##" +this.state.shopPandian + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
                 username:this.state.userName,
                 usercode:this.state.Usercode,
                 shopcode:this.state.str2,
             };
-
             FetchUtil.post(this.state.LinkUrl,JSON.stringify(params)).then((data)=>{
                 if(data.retcode == 1){
                     var DetailInfo = data.DetailInfo;
-                    console.log(DetailInfo);
                     this.dataRows = this.dataRows.concat(DetailInfo);
                     this.setState({
                         DetailInfo:DetailInfo
@@ -108,7 +106,9 @@ export default class Distrition_list extends Component {
                             dataSource:this.state.dataSource.cloneWithRows(this.dataRows)
                         })
                     }
-                }else{}
+                }else{
+                    alert(JSON.stringify(data))
+                }
             },(err)=>{
                 alert("网络请求失败");
             })

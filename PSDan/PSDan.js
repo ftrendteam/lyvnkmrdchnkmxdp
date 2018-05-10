@@ -10,6 +10,7 @@ import {
     View,
     Image,
     TextInput,
+    ToastAndroid,
     TouchableOpacity,
 } from 'react-native';
 import Index from "../app/Index";
@@ -17,6 +18,7 @@ import Search from "../app/Search";
 import JiGou from "./JiGou";
 import YHDan from "./YHDan";
 import CKu from "./CKu";
+import PinLeiData from "../YHDan/PinLeiData";
 import Storage from '../utils/Storage';
 import ModalDropdown from 'native';
 
@@ -28,7 +30,9 @@ export default class PSDan extends Component {
             JiGou:'',
             YHDan:'',
             Disting:'',
-            CKu:"001"
+            DepName1:"",
+            DepCode1:"",
+            CKu:"001",
         }
     }
 
@@ -91,7 +95,8 @@ export default class PSDan extends Component {
 //仓库
     CKOclick(){
         if(this.state.JiGou==''){
-            alert("请先选择机构号")
+            ToastAndroid.show('请先选择机构号', ToastAndroid.SHORT);
+            // alert("请先选择机构号")
         }else{
             var nextRoute={
                 name:"CKu",
@@ -112,12 +117,39 @@ export default class PSDan extends Component {
         });
     }
 
+    ShoppData() {
+        var nextRoute = {
+            name: "ProductCG_list",
+            component: PinLeiData,
+            params: {
+                DepName: (DepName) => this._DepName(DepName),
+                DepCode: (DepCode) => this._DepCode(DepCode),
+            }
+        };
+        this.props.navigator.push(nextRoute)
+    }
+
+    _DepName(DepName) {
+        DepName = String(DepName);
+        this.setState({
+            DepName1:DepName,
+        });
+    }
+    _DepCode(DepCode) {
+        DepCode = String(DepCode);
+        this.setState({
+            DepCode1:DepCode,
+        });
+    }
+
     Button(){
         if(this.state.Disting=="0"){
             if(this.state.JiGou==''){
-                alert("机构号不能为空")
+                ToastAndroid.show("机构号不能为空",ToastAndroid.SHORT);
+                return;
             }else if(this.state.CKu==''){
-                alert("仓库不能为空")
+                ToastAndroid.show("仓库不能为空",ToastAndroid.SHORT);
+                return;
             }else{
                 var str1=this.state.YHDan;
                 var str2=this.state.JiGou;
@@ -134,6 +166,16 @@ export default class PSDan extends Component {
                 Storage.delete('YuanDan');
                 Storage.delete('YdCountm');
                 Storage.delete('Modify');
+                if(this.state.DepName1==""&&this.state.DepCode1==""){
+                    Storage.delete('DepCode');
+                }else{
+                    Storage.save('DepCode', this.state.DepCode1);
+                }
+                if(this.state.YHDan==""){
+                    Storage.save('YdCountm',"1");
+                }else{
+                    Storage.save('YdCountm',"2");
+                }
                 Storage.save('Date',data);
                 Storage.save('Screen', '1');
                 Storage.save('Name','商品配送');
@@ -147,9 +189,11 @@ export default class PSDan extends Component {
             }
         }else if(this.state.Disting=="1"){
             if(this.state.JiGou==''){
-                alert("机构号不能为空")
+                ToastAndroid.show("机构号不能为空",ToastAndroid.SHORT);
+                return;
             }else if(this.state.CKu==''){
-                alert("仓库不能为空")
+                ToastAndroid.show("仓库不能为空",ToastAndroid.SHORT);
+                return;
             }else{
                 var str1=this.state.YHDan;
                 var str2=this.state.JiGou;
@@ -166,6 +210,16 @@ export default class PSDan extends Component {
                 Storage.delete('YuanDan');
                 Storage.delete('YdCountm');
                 Storage.delete('Modify');
+                if(this.state.DepName1==""&&this.state.DepCode1==""){
+                    Storage.delete('DepCode');
+                }else{
+                    Storage.save('DepCode', this.state.DepCode1);
+                }
+                if(this.state.YHDan==""){
+                    Storage.save('YdCountm',"1");
+                }else{
+                    Storage.save('YdCountm',"2");
+                }
                 Storage.save('Date',data);
                 Storage.save('Screen', '1');
                 Storage.save('Name','商品配送');
@@ -252,6 +306,27 @@ export default class PSDan extends Component {
                         />
                     </TouchableOpacity>
                     <TouchableOpacity onPress={this.CKOclick.bind(this)}>
+                        <Image source={require("../images/2_03.png")}></Image>
+                    </TouchableOpacity>
+                </View>
+                <View style={styles.ContList}>
+                    <View style={styles.listleft}>
+                        <Text style={styles.listLeftText}>商品品类:</Text>
+                    </View>
+                    <TouchableOpacity style={styles.listcont} onPress={this.ShoppData.bind(this)}>
+                        <TextInput
+                            style={styles.TextInput1}
+                            autofocus={true}
+                            editable={false}
+                            defaultValue ={this.state.DepName1}
+                            numberoflines={1}
+                            placeholder="请选择商品品类"
+                            textalign="center"
+                            underlineColorAndroid='transparent'
+                            placeholderTextColor="#cccccc"
+                        />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={this.ShoppData.bind(this)}>
                         <Image source={require("../images/2_03.png")}></Image>
                     </TouchableOpacity>
                 </View>

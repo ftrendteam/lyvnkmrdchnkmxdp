@@ -86,7 +86,6 @@ export default class admin extends Component {
                 linkurl:tags
             })
         })
-      NativeModules.AndroidMYRequest.doPay("","","","","","","",()=>{});
         Storage.get('Url').then((tags) => {
             //apk版本自动更新
             FetchUtil.post(tags+"/Default2.aspx?jsonStr={'TblName':'AndroidYWVersion'}").then((data) => {//获取最新apk版本号
@@ -96,6 +95,7 @@ export default class admin extends Component {
                     }
                 });
             },(err)=>{
+                console.log("王二傻子是个傻子")
                 alert("网络请求失败");
             })
         })
@@ -108,7 +108,6 @@ export default class admin extends Component {
                  'sDateTime':Date.parse(new Date()),//获取当前时间转换成时间戳
                  'Sign':NetUtils.MD5("App_PosReq" + "##" +"App_Client_UseQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
             };
-            console.log("a=",params)
             FetchUtil.post(this.state.linkurl.trim(),JSON.stringify(params)).then((data)=>{
               if(data.retcode == 1){
                 //用户信息
@@ -131,6 +130,7 @@ export default class admin extends Component {
                 alert(JSON.stringify(data))
               }
             },(err)=>{
+                console.log("王二傻子是个傻子+11111")
                 alert("网络请求失败");
             })
         });

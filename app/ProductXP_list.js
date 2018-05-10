@@ -55,6 +55,7 @@ export default class ProductXP_list extends Component {
                 }
                 this.setState({
                     dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
+                    dataRows: this.dataRows,
                 })
             })
         })
@@ -134,13 +135,21 @@ export default class ProductXP_list extends Component {
                         </View>
 
                     </View>
-                    <ListView
-                        style={styles.scrollview}
-                        enableEmptySections = {true}
-                        dataSource={this.state.dataSource}
-                        showsVerticalScrollIndicator={true}
-                        renderRow={this._renderRow.bind(this)}
-                    />
+                    {
+                        (this.state.dataRows == "") ?
+                            <View style={styles.Null}>
+                                <Text style={styles.NullText}>
+                                    没有搜索到相关商品~~~
+                                </Text>
+                            </View> :
+                            <ListView
+                                style={styles.scrollview}
+                                enableEmptySections = {true}
+                                dataSource={this.state.dataSource}
+                                showsVerticalScrollIndicator={true}
+                                renderRow={this._renderRow.bind(this)}
+                            />
+                    }
                 </View>
             </View>
         );
@@ -227,5 +236,15 @@ const styles = StyleSheet.create({
     },
     scrollview:{
         marginBottom:120,
-    }
+    },
+    Null: {
+        marginLeft: 25,
+        marginRight: 25,
+        marginTop: 120,
+    },
+    NullText: {
+        color: "#cccccc",
+        fontSize: 20,
+        textAlign: "center"
+    },
 });

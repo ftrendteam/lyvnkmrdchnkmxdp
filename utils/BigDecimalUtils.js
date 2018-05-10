@@ -52,8 +52,6 @@ export default class BigDecimalUtils {
     if(b==""||b=='undefined'||b=='NaN'){
       b="0";
     }
-    console.log(a)
-    console.log(b)
     degree = BigDecimalUtils.isZero(degree);
     return  (Number(a) + Number(b)).toFixed(degree);
   }

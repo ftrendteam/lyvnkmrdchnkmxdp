@@ -159,7 +159,7 @@ export default class Shopsearch extends Component {
                                 FUseSalePrice =  row.FUseSalePrice;
                                 PriceFlag =  row.PriceFlag;
                             };
-                            if(FNoCG==1||FNoSale==1||FNoYH==1||FNoPromotion==1||FNoTH==1||FNoCD==1){
+                            if(FNoCG==1||FNoSale==1||FNoYH==1||FNoPromotion==1||FNoTH==1||FNoCD==1||FUseSalePrice==1||PriceFlag==1){
                                 this.setState({
                                     FNoCG:"是",
                                     FNoSale:"是",
@@ -167,6 +167,8 @@ export default class Shopsearch extends Component {
                                     FNoPromotion:"是",
                                     FNoTH:"是",
                                     FNoCD:"是",
+                                    FUseSalePrice:"是",
+                                    PriceFlag:"是",
                                 })
                             }else{
                                 this.setState({
@@ -176,6 +178,8 @@ export default class Shopsearch extends Component {
                                     FNoPromotion:"否",
                                     FNoTH:"否",
                                     FNoCD:"否",
+                                    FUseSalePrice:"否",
+                                    PriceFlag:"否",
                                 })
                             }
                             this.setState({
@@ -209,8 +213,6 @@ export default class Shopsearch extends Component {
                                 VipPrice3:VipPrice3,
                                 PsPrice:PsPrice,
                                 WPrice:WPrice,
-                                FUseSalePrice:FUseSalePrice,
-                                PriceFlag:PriceFlag,
                             })
 
                         }else{}

@@ -28,9 +28,10 @@ import DeCodePrePrint18 from "../utils/DeCodePrePrint18";
 import FetchUtil from "../utils/FetchUtils";
 import VipPrice from "../utils/VipPrice";
 import NumFormatUtils from "../utils/NumFormatUtils";
-import { SwipeListView } from 'react-native-swipe-list-view';
-import DeCodePrePrint from  "../utils/DeCodePrePrint";
-import BigDecimalUtils from  "../utils/BigDecimalUtils";
+import {SwipeListView} from 'react-native-swipe-list-view';
+import DeCodePrePrint from "../utils/DeCodePrePrint";
+import BigDecimalUtils from "../utils/BigDecimalUtils";
+
 let decodepreprint = new DeCodePrePrint18();
 let dbAdapter = new DBAdapter();
 var {NativeModules} = require('react-native');
@@ -44,16 +45,16 @@ export default class Sell extends Component {
         this.state = {
             name: "",
             VipCardNo: "",
-            vipPrice:"",
-            ShopAmount:"",
+            vipPrice: "",
+            ShopAmount: "",
             ShopNumber: "",
             BalanceTotal: "",
             JfBal: "",
-            CardTypeCode:"",
-            numform:"",
+            CardTypeCode: "",
+            numform: "",
             MemberTextInput: "",
-            promemo:"",
-            Countm:1,
+            promemo: "",
+            Countm: 1,
             Show: false,
             Member: false,
             // dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
@@ -79,14 +80,13 @@ export default class Sell extends Component {
     }
 
     componentDidMount() {
-        // alert(JSON.stringify(TblRow1))
         InteractionManager.runAfterInteractions(() => {
             //获取流水号
-          Storage.get("LsNo").then((data)=>{
-            this.setState({
-              numform:data
-            })
-          });
+            Storage.get("LsNo").then((data) => {
+                this.setState({
+                    numform: data
+                })
+            });
             Storage.get('Name').then((tags) => {
                 this.setState({
                     name: tags
@@ -103,83 +103,56 @@ export default class Sell extends Component {
         dbAdapter.selectShopInfo().then((rows) => {
             var shopnumber = 0;
             var shopAmount = 0;
-            var ShopPrice=0;
+            var ShopPrice = 0;
             var vipPrice = 0;
             for (let i = 0; i < rows.length; i++) {
                 var row = rows.item(i);
-                ShopPrice =BigDecimalUtils.multiply(row.ShopNumber ,row.ShopPrice,2);
-                shopAmount =BigDecimalUtils.add(shopAmount,ShopPrice,2);
+                ShopPrice = BigDecimalUtils.multiply(row.ShopNumber, row.ShopPrice, 2);
+                shopAmount = BigDecimalUtils.add(shopAmount, ShopPrice, 2);
                 //Storage.save("vipPrice", JSON.stringify(shopAmount));
                 var number = row.ShopNumber;
-                shopnumber =BigDecimalUtils.add(shopnumber,row.ShopNumber);//parseInt(row.ShopNumber);
+                shopnumber = BigDecimalUtils.add(shopnumber, row.ShopNumber);//parseInt(row.ShopNumber);
                 //if(this.state.VipCardNo !==""){
                 //    vipPrice = VipPrice.vipPrice(TblRow1[0],this.VipTblRow);
                 //}
                 //var VIPprice = BigDecimalUtils.subtract(shopAmount,vipPrice,2);
-                if (number !== 0) {
-                    this.dataRow.push(row);
-                    this.TblRow.push(row);
-                }
+                this.dataRow.push(row);
+                this.TblRow.push(row);
             }
             if (this.dataRow == 0) {
                 this.modal();
                 return;
             } else {
-              
-              Storage.get("VipInfo").then((data)=>{
-                var VIPprice = shopAmount;
-                if(data!=null&&data!="undefined"){
-                  var row =JSON.parse(data);
-                  TblRow1 = row;
-                  VipCardNo =  row.CardFaceNo;//卡号
-                  BalanceTotal = row.BalanceTotal;//余额
-                  JfBal = row.JfBal;//积分
-                  CardTypeCode=row.CardTypeCode;
-  
-                  let vipPrice = VipPrice.vipPrice(row,this.TblRow);
-                    VIPprice = BigDecimalUtils.subtract(shopAmount,vipPrice,2);
-                  this.setState({
-                    VipCardNo: VipCardNo,
-                    BalanceTotal: BalanceTotal,
-                    JfBal: JfBal,
-                    ShopAmount: VIPprice,
-                    vipPrice:vipPrice,
-                    CardTypeCode:CardTypeCode
-                  });
-                }
-                //var row =JSON.parse(data);
-                //VipCardNo =  row.CardFaceNo;//卡号
-                //BalanceTotal = row.BalanceTotal;//余额
-                //JfBal = row.JfBal;//积分
-                //CardTypeCode=row.CardTypeCode;
-                //
-                //let vipPrice = VipPrice.vipPrice(row,this.TblRow);
-                //var VIPprice = BigDecimalUtils.subtract(shopAmount,vipPrice,2);
-                //this.setState({
-                //  VipCardNo: VipCardNo,
-                //  BalanceTotal: BalanceTotal,
-                //  JfBal: JfBal,
-                //  ShopAmount: VIPprice,
-                //  vipPrice:vipPrice,
-                //  CardTypeCode:CardTypeCode
-                //});
-                
-                this.setState({
-                  ShopNumber: shopnumber,//数量
-                  ShopAmount: VIPprice,//总金额this.dataRow
-                  dataSource: this.state.dataSource.cloneWithRows(this.dataRow),
-                })
-              });
-                //Storage.get('VipPrice').then((vipPrice) => {
-                //    this.setState({
-                //        ShopNumber: shopnumber,//数量
-                //        ShopAmount: VIPprice,//总金额this.dataRow
-                //        dataSource: this.state.dataSource.cloneWithRows(this.dataRow),
-                //    })
-                //})
+                Storage.get("VipInfo").then((data) => {
+                    var VIPprice = shopAmount;
+                    if (data != null && data != "undefined") {
+                        var row = JSON.parse(data);
+                        TblRow1 = row;
+                        VipCardNo = row.CardFaceNo;//卡号
+                        BalanceTotal = row.BalanceTotal;//余额
+                        JfBal = row.JfBal;//积分
+                        CardTypeCode = row.CardTypeCode;
+
+                        let vipPrice = VipPrice.vipPrice(row, this.TblRow);
+                        VIPprice = BigDecimalUtils.subtract(shopAmount, vipPrice, 2);
+                        this.setState({
+                            VipCardNo: VipCardNo,
+                            BalanceTotal: BalanceTotal,
+                            JfBal: JfBal,
+                            ShopAmount: VIPprice,
+                            vipPrice: vipPrice,
+                            CardTypeCode: CardTypeCode
+                        });
+                    }
+                    this.setState({
+                        ShopNumber: shopnumber,//数量
+                        ShopAmount: VIPprice,//总金额this.dataRow
+                        dataSource: this.state.dataSource.cloneWithRows(this.dataRow),
+                    })
+                });
                 this.modal();
             }
-        });
+        })
     }
 
     Return() {
@@ -190,172 +163,181 @@ export default class Sell extends Component {
         this.props.navigator.push(nextRoute);
     }
 
-    Device(){
+    Device() {
         DeviceEventEmitter.addListener("code", (reminder) => {
-            decodepreprint.init(reminder,dbAdapter);
-            if(reminder.length==18&&decodepreprint.deCodePreFlag()){
-                //decodepreprint.deCodeProdCode().then((datas)=>{
-                //    dbAdapter.selectProdCode(datas,1).then((rows)=>{
-                //        dbAdapter.selectAidCode(reminder,1).then((rows)=>{
-                //            var shopnumber = 0;
-                //            var shopAmount = 0;
-                //            var vipPrice = 0;
-                //            for (let i = 0; i < rows.length; i++) {
-                //                var row = rows.item(i);
-                //                this.TblRow.push(row);
-                //                if(this.state.VipCardNo !==""){
-                //                    vipPrice = VipPrice.vipPrice(TblRow1[0],this.TblRow);
-                //                    // Storage.save("VipPrice", vipPrice);
-                //                }
-                //                var VIPprice = BigDecimalUtils.subtract(this.state.ShopAmount,vipPrice,2);
-                //                var ShopPrice = row.StdPrice;
-                //                var prototal=this.state.Countm*row.StdPrice;
-                //                var number = row.ShopNumber;
-                //                shopnumber = this.state.Countm+this.state.ShopNumber;
-                //                var DataRows = {
-                //                    'ProdCode':row.ProdCode,
-                //                    'ProdName':row.ProdName,
-                //                    'ShopPrice':row.StdPrice,
-                //                    'ShopNumber': this.state.Countm,
-                //                    'ShopAmount': prototal,
-                //                    'pid':row.Pid,
-                //                };
-                //                this.dataRow.push(DataRows);
-                //            };
-                //            shopAmount =ShopPrice+VIPprice;
-                //            this.setState({
-                //                vipPrice:vipPrice,
-                //                ShopNumber: shopnumber,
-                //                ShopAmount: shopAmount,
-                //                dataSource: this.state.dataSource.cloneWithRows(this.dataRow),
-                //            });
-                //            //存表
-                //            var shopInfoData = [];
-                //            var shopInfo = {};
-                //            shopInfo.Pid = row.Pid;
-                //            shopInfo.ProdCode=row.ProdCode;
-                //            shopInfo.prodname = row.ProdName;
-                //            shopInfo.countm = this.state.Countm;
-                //            shopInfo.ShopPrice = row.StdPrice;
-                //            shopInfo.prototal =(this.state.Countm)*(row.StdPrice);
-                //            shopInfo.promemo = this.state.promemo;
-                //            shopInfo.DepCode = row.DepCode;
-                //            shopInfo.ydcountm = "";
-                //            shopInfo.SuppCode = row.SuppCode;
-                //            shopInfo.BarCode = row.BarCode;
-                //            shopInfoData.push(shopInfo);
-                //            //调用插入表方法
-                //            dbAdapter.insertShopInfo(shopInfoData);
-                //        })
-                //    })
-                //});
-              new Promise.all([decodepreprint.deCodeProdCode(),decodepreprint.deCodeTotal(),decodepreprint.deCodeWeight()]).then((results) => {
-                if(results.length==3){
-                  let prodCode = results[0];
-                  let total = results[1];
-                  let weight = results[2];
-                  dbAdapter.selectProdCode(prodCode, 1).then((product)=>{
-                    if(product.length!=0){
-                      var row = product.item(0);
-          
-                      var DataRows = {
-                        'ProdCode':row.ProdCode,
-                        'ProdName':row.ProdName,
-                        'ShopPrice':row.StdPrice,
-                        'ShopNumber': weight,
-                        'ShopAmount': total,
-                        'Pid':row.Pid,
-                      };
-                      this.dataRow.push(DataRows);
-                      this.setState({
-                        //vipPrice:vipPrice,
-                        MnCode:"",
-                        ShopNumber:  BigDecimalUtils.add(this.state.ShopNumber,weight,2),
-                        ShopAmount: BigDecimalUtils.add(this.state.ShopAmount,total,2),
-                        dataSource: this.state.dataSource.cloneWithRows(this.dataRow),
-                      });
-                      var shopInfoData = [];
-                      var shopInfo = {};
-                      shopInfo.Pid = row.Pid;
-                      shopInfo.ProdCode=row.ProdCode;
-                      shopInfo.prodname = row.ProdName;
-                      shopInfo.countm =weight;
-                      shopInfo.ShopPrice = row.StdPrice;
-                      shopInfo.prototal =total;
-                      shopInfo.promemo = "";
-                      shopInfo.DepCode = row.DepCode;
-                      shopInfo.ydcountm = "";
-                      shopInfo.SuppCode = row.SuppCode;
-                      shopInfo.BarCode = row.BarCode;
-                      shopInfoData.push(shopInfo);
-                      //调用插入表方法
-                      dbAdapter.insertShopInfo(shopInfoData,"1");
+            decodepreprint.init(reminder, dbAdapter);
+            if ((reminder.length == 13 && deCode13.deCodePreFlag(reminder))) {//13位条码解析
+                new Promise.all([deCode13.deCodeProdCode(reminder, dbAdapter), deCode13.deCodeTotile(reminder, dbAdapter)]).then((result) => {
+                    if (result.length == 2) {
+                        let prodCode = result[0];
+                        let price = result[1];
+                        dbAdapter.selectProdCode(prodCode, 1).then((prods) => {
+                            if (prods.length == 0) {
+                                ToastAndroid.show("商品不存在", ToastAndroid.SHORT);
+                                return;
+                            }
+                            var row = prods.item(0);
+                            let newShopNumber = BigDecimalUtils.divide(price, row.StdPrice, 2);
+
+                            var DataRows = {
+                                'ProdCode': row.ProdCode,
+                                'ProdName': row.ProdName,
+                                'ShopPrice': row.StdPrice,
+                                'ShopNumber': newShopNumber,
+                                'ShopAmount': price,
+                                'Pid': row.Pid,
+                            };
+                            this.dataRow.push(DataRows);
+
+                            var SHopAMount = NumberUtils.numberFormat2(row.ShopAmount);
+                            shopAmount += Number(SHopAMount);
+                            this.setState({
+                                //vipPrice:vipPrice,
+                                MnCode: "",
+                                ShopNumber: BigDecimalUtils.add(this.state.ShopNumber, newShopNumber, 2),
+                                ShopAmount: BigDecimalUtils.add(this.state.ShopAmount, price, 2),
+                                dataSource: this.state.dataSource.cloneWithRows(this.dataRow),
+                            });
+                            var shopInfoData = [];
+                            var shopInfo = {};
+                            shopInfo.Pid = row.Pid;
+                            shopInfo.ProdCode = row.ProdCode;
+                            shopInfo.prodname = row.ProdName;
+                            shopInfo.countm = newShopNumber;
+                            shopInfo.ShopPrice = row.StdPrice;
+                            shopInfo.prototal = price;
+                            shopInfo.promemo = "";
+                            shopInfo.DepCode = row.DepCode;
+                            shopInfo.ydcountm = "";
+                            shopInfo.SuppCode = row.SuppCode;
+                            shopInfo.BarCode = row.BarCode;
+                            shopInfoData.push(shopInfo);
+                            //let vipPrice = VipPrice.vipPrice(row,shopInfoData);
+                            //let VIPprice = BigDecimalUtils.subtract(shopAmount,vipPrice,2);
+                            //this.setState({
+                            //  ShopNumber: shopnumber,//数量
+                            //  ShopAmount: VIPprice,//总金额this.dataRow
+                            //  dataSource: this.state.dataSource.cloneWithRows(this.dataRow),
+                            //})
+                            //调用插入表方法
+                            dbAdapter.insertShopInfo(shopInfoData, "1");
+                            //this._dbSearch();
+                            //_dbSearch()
+                        });
                     }
-                  });
-                }
-              });
-            }else{
-                dbAdapter.selectAidCode(reminder,1).then((rows)=>{
-                    var shopnumber = 0;
-                    var shopAmount = 0;
-                    var vipPrice = 0;
-                    for (let i = 0; i < rows.length; i++) {
-                        var row = rows.item(i);
-                        this.TblRow.push(row);
-                        if(this.state.VipCardNo !==""){
-                            vipPrice = VipPrice.vipPrice(TblRow1[0],this.TblRow);
-                        }
-                        var VIPprice = BigDecimalUtils.subtract(this.state.ShopAmount,vipPrice,2);
-                        var ShopPrice = row.StdPrice;
-                        var prototal=this.state.Countm*row.StdPrice;
-                        var number = row.ShopNumber;
-                        shopnumber = this.state.Countm+this.state.ShopNumber;
-                        var DataRows = {
-                            'ProdCode':row.ProdCode,
-                            'ProdName':row.ProdName,
-                            'ShopPrice':row.StdPrice,
-                            'ShopNumber': this.state.Countm,
-                            'ShopAmount': prototal,
-                            'pid':row.Pid,
+                });
+            } else if (reminder.length == 18 && decodepreprint.deCodePreFlag()) {
+                new Promise.all([decodepreprint.deCodeProdCode(), decodepreprint.deCodeTotal(), decodepreprint.deCodeWeight()]).then((results) => {
+                    if (results.length == 3) {
+                        let prodCode = results[0];
+                        let total = results[1];
+                        let weight = results[2];
+                        dbAdapter.selectProdCode(prodCode, 1).then((product) => {
+                            let length = rows.length;
+                            if (product.length != 0) {
+                                var row = product.item(0);
+                                var DataRows = {
+                                    'ProdCode': row.ProdCode,
+                                    'ProdName': row.ProdName,
+                                    'ShopPrice': row.StdPrice,
+                                    'ShopNumber': weight,
+                                    'ShopAmount': total,
+                                    'Pid': row.Pid,
+                                };
+                                this.dataRow.push(DataRows);
+                                this.setState({
+                                    //vipPrice:vipPrice,
+                                    MnCode: "",
+                                    ShopNumber: BigDecimalUtils.add(this.state.ShopNumber, weight, 2),
+                                    ShopAmount: BigDecimalUtils.add(this.state.ShopAmount, total, 2),
+                                    dataSource: this.state.dataSource.cloneWithRows(this.dataRow),
+                                });
+
+                                var shopInfoData = [];
+                                var shopInfo = {};
+                                shopInfo.Pid = row.Pid;
+                                shopInfo.ProdCode = row.ProdCode;
+                                shopInfo.prodname = row.ProdName;
+                                shopInfo.countm = weight;
+                                shopInfo.ShopPrice = row.StdPrice;
+                                shopInfo.prototal = total;
+                                shopInfo.promemo = "";
+                                shopInfo.DepCode = row.DepCode;
+                                shopInfo.ydcountm = "";
+                                shopInfo.SuppCode = row.SuppCode;
+                                shopInfo.BarCode = row.BarCode;
+                                shopInfoData.push(shopInfo);
+                                //调用插入表方法
+                                dbAdapter.insertShopInfo(shopInfoData, "1");
+                            }
+                        })
+                    }
+                })
+            } else {
+                dbAdapter.selectAidCode(reminder, 1).then((rows) => {
+                    let length = rows.length;
+                    if (length == 0) {
+                        alert("助记码不存在")
+                    } else {
+                        var shopnumber = 0;
+                        var shopAmount = 0;
+                        for (let i = 0; i < length; i++) {
+                            var row = rows.item(i);
+                            var ShopPrice = row.ShopPrice;
+                            var prototal = BigDecimalUtils.multiply(this.state.Countm, row.ShopPrice, 2);
+                            var number = row.ShopNumber;
+                            shopnumber = BigDecimalUtils.add(this.state.Countm, this.state.ShopNumber, 2);
+                            row.ShopNumber = this.state.Countm;
+                            row.ShopAmount = prototal;
+
+                            this.dataRow.push(row);//展示商品数组
                         };
-                        this.dataRow.push(DataRows);
-                    };
-                    shopAmount =ShopPrice+VIPprice;
-                    this.setState({
-                        vipPrice:vipPrice,
-                        ShopNumber: shopnumber,
-                        ShopAmount: shopAmount,
-                        dataSource: this.state.dataSource.cloneWithRows(this.dataRow),
-                    });
-                    //存表
-                    var shopInfoData = [];
-                    var shopInfo = {};
-                    shopInfo.Pid = row.Pid;
-                    shopInfo.ProdCode=row.ProdCode;
-                    shopInfo.prodname = row.ProdName;
-                    shopInfo.countm = this.state.Countm;
-                    shopInfo.ShopPrice = row.StdPrice;
-                    shopInfo.prototal =(this.state.Countm)*(row.StdPrice);
-                    shopInfo.promemo = this.state.promemo;
-                    shopInfo.DepCode = row.DepCode;
-                    shopInfo.ydcountm = "";
-                    shopInfo.SuppCode = row.SuppCode;
-                    shopInfo.BarCode = row.BarCode;
-                    shopInfoData.push(shopInfo);
-                    //调用插入表方法
-                    dbAdapter.insertShopInfo(shopInfoData);
+                        shopAmount = BigDecimalUtils.add(ShopPrice, this.state.ShopAmount, 2);
+                        this.setState({
+                            MnCode: "",
+                            ShopNumber: shopnumber,
+                            ShopAmount: shopAmount,
+                            dataSource: this.state.dataSource.cloneWithRows(this.dataRow),
+                        });
+                        var shopInfoData = [];
+                        var shopInfo = {};
+                        shopInfo.Pid = row.Pid;
+                        shopInfo.ProdCode = row.ProdCode;
+                        shopInfo.prodname = row.ProdName;
+                        shopInfo.countm = this.state.Countm;
+                        shopInfo.ShopPrice = row.ShopPrice;
+                        shopInfo.prototal = (this.state.Countm) * (row.ShopPrice);
+                        shopInfo.promemo = this.state.promemo;
+                        shopInfo.DepCode = row.DepCode;
+                        shopInfo.ydcountm = "";
+                        shopInfo.SuppCode = row.SuppCode;
+                        shopInfo.BarCode = row.BarCode;
+                        shopInfoData.push(shopInfo);
+                        //调用插入表方法
+                        dbAdapter.insertShopInfo(shopInfoData, "1");
+                        //this._dbSearch();
+                        let vipPrice = VipPrice.vipPrice(TblRow1[0], this.TblRow);
+                        let newPrice = BigDecimalUtils.subtract(shopAmount, vipPrice, 2);
+                        let allPrice = 0;
+                        for (let i = 0; i < this.dataRow.length; i++) {
+                            allPrice = BigDecimalUtils.add(allPrice, this.dataRow[i].ShopAmount, 2);
+                        }
+                        this.setState({
+                            ShopAmount: allPrice,
+                        });
+                    }
                 })
             }
         })
     }
 
-    Code(){
+    Code() {
         RNScannerAndroid.openScanner();
     }
 
     _renderRow(rowData, sectionID, rowID) {
         return (
-            <TouchableOpacity  onPress={()=>this.ListButton(rowData)} style={styles.ShopList1}>
+            <TouchableOpacity onPress={() => this.ListButton(rowData)} style={styles.ShopList1}>
                 <Text style={styles.Name}>{rowData.ProdCode}</Text>
                 <Text style={styles.Name}>{rowData.ProdName}</Text>
                 <Text style={styles.Number}>{rowData.ShopPrice}</Text>
@@ -365,98 +347,122 @@ export default class Sell extends Component {
         );
     }
 
-    renderHiddenRow(rowData, sectionID, rowID){
+    renderHiddenRow(rowData, sectionID, rowID) {
         return (
-            <TouchableOpacity onPress={()=>this.deteleShopInfo(rowData)} style={styles.rowBack}>
+            <TouchableOpacity onPress={() => this.deteleShopInfo(rowData)} style={styles.rowBack}>
                 <Text style={styles.rowBackText}>删除</Text>
             </TouchableOpacity>
         );
     }
 
-    deteleShopInfo(rowData, sectionID, rowID){
-        dbAdapter.deteleShopInfo(rowData.ProdCode).then((rows)=>{
-            if(rows==true){
-                dbAdapter.selectShopInfo().then((rows)=>{
+    deteleShopInfo(rowData, sectionID, rowID) {
+        dbAdapter.deteleShopInfo(rowData.ProdCode).then((rows) => {
+            if (rows == true) {
+                dbAdapter.selectShopInfo().then((rows) => {
                     var shopnumber = 0;
                     var shopAmount = 0;
                     var vipPrice = 0;
-                    this.dataRow=[];
-                    this.VipTblRow=[];
-                    for(let i =0;i<rows.length;i++){
+                    this.dataRow = [];
+                    this.VipTblRow = [];
+                    for (let i = 0; i < rows.length; i++) {
                         var row = rows.item(i);
                         this.VipTblRow.push(row);
                         var number = row.ShopNumber;
-                        shopAmount = BigDecimalUtils.add(row.ShopAmount,shopAmount,2);
-                        shopnumber = BigDecimalUtils.add(shopnumber,row.ShopNumber,2);
-                        if(number!==0){
+                        shopAmount = BigDecimalUtils.add(row.ShopAmount, shopAmount, 2);
+                        shopnumber = BigDecimalUtils.add(shopnumber, row.ShopNumber, 2);
+                        if (number !== 0) {
                             this.dataRow.push(row);
                         }
                     }
-                    if(this.state.VipCardNo !==""){
-                        vipPrice = VipPrice.vipPrice(TblRow1[0],this.VipTblRow);
+                    if (this.state.VipCardNo !== "") {
+                        vipPrice = VipPrice.vipPrice(TblRow1[0], this.VipTblRow);
                     }
-                    var VIPprice = shopAmount-vipPrice;
+                    var VIPprice = shopAmount - vipPrice;
                     this.setState({
-                        vipPrice:vipPrice,
-                        number1:number,
-                        ShopNumber:shopnumber,//数量
-                        ShopAmount:VIPprice,//总金额
-                        dataSource:this.state.dataSource.cloneWithRows(this.dataRow),
+                        vipPrice: vipPrice,
+                        number1: number,
+                        ShopNumber: shopnumber,//数量
+                        ShopAmount: VIPprice,//总金额
+                        dataSource: this.state.dataSource.cloneWithRows(this.dataRow),
                     })
                 });
-                dbAdapter.selectShopInfoAllCountm().then((rows)=>{
+                dbAdapter.selectShopInfoAllCountm().then((rows) => {
                     var ShopCar = rows.item(0).countm;
                     this.setState({
-                        shopcar:ShopCar
+                        shopcar: ShopCar
                     });
                 });
             }
         });
     }
-  
-  /***
-   * 商品条目点击事件
-   * @param rowData
-   * @constructor
-   */
-  ListButton(rowData){
+
+    /***
+     * 商品条目点击事件
+     * @param rowData
+     * @constructor
+     */
+    ListButton(rowData) {
         Storage.save("DataName", "移动销售");
         this.props.navigator.push({
-            component:GoodsDetails,
-            params:{
-                ProdCode:rowData.ProdCode,
-                ProdName:rowData.ProdName,
-                Pid:rowData.Pid,
-                ShopPrice:rowData.ShopPrice,
-                Remark:this.state.promemo,
-                prototal:(this.state.Countm)*(rowData.ShopPrice),
-                countm:rowData.ShopNumber,
-                DepCode:rowData.DepCode,
-                ydcountm:"",
-                promemo:"",
-                SuppCode:rowData.SuppCode,
-                BarCode:rowData.BarCode,
+            component: GoodsDetails,
+            params: {
+                ProdCode: rowData.ProdCode,
+                ProdName: rowData.ProdName,
+                Pid: rowData.Pid,
+                ShopPrice: rowData.ShopPrice,
+                Remark: this.state.promemo,
+                prototal: (this.state.Countm) * (rowData.ShopPrice),
+                countm: rowData.ShopNumber,
+                DepCode: rowData.DepCode,
+                ydcountm: "",
+                promemo: "",
+                SuppCode: rowData.SuppCode,
+                BarCode: rowData.BarCode,
+                IsIntCount:rowData.IsIntCount
             }
         })
     }
 
     MemberButton() {
         this.Member();
+        dbAdapter.selectKgOpt('VipICRWPwd').then((data) => {
+            for (let i = 0; i < data.length; i++) {
+                var datas = data.item(i);
+                var OptValue = datas.OptValue;
+                NativeModules.AndroidReadCardInterface.open();
+                this._timer = setInterval(() => {
+                    NativeModules.AndroidReadCardInterface.read(OptValue, (successCallback) => {
+                        if (successCallback != "") {
+                            this.setState({
+                                CardNumber: successCallback
+                            })
+                            NativeModules.AndroidReadCardInterface.close();
+                            clearInterval(this._timer);
+                        }
+                    })
+                }, 1000);
+
+            }
+        })
+
     }
 
     CloseButton() {
         this.Member();
+        this.setState({
+            CardNumber: ""
+        })
     }
-  
-  /***
-   * 查询会员信息
-   * @constructor
-   */
-  Button() {
-        if(this.state.VipCardNo !==""){
+
+    /***
+     * 查询会员信息
+     * @constructor
+     */
+    Button() {
+        if (this.state.VipCardNo !== "") {
             Storage.get('vipPrice').then((vipPrice) => {
                 this.setState({
-                    ShopAmount:vipPrice
+                    ShopAmount: vipPrice
                 })
             })
         }
@@ -472,7 +478,7 @@ export default class Sell extends Component {
                     IsChuZhi: "",
                 };
                 Storage.get('LinkUrl').then((tags) => {
-                    FetchUtil.post(tags,JSON.stringify(params)).then((data) => {
+                    FetchUtil.post(tags, JSON.stringify(params)).then((data) => {
                         if (data.retcode == 1) {
                             var TblRow = data.TblRow;
                             var VipCardNo;
@@ -482,22 +488,23 @@ export default class Sell extends Component {
                             var CardTypeCode;
                             for (let i = 0; i < TblRow.length; i++) {
                                 var row = TblRow[i];
-                                Storage.save("VipInfo",JSON.stringify(row));
-                                VipCardNo =  row.CardFaceNo;//卡号
+                                Storage.save("VipInfo", JSON.stringify(row));
+                                VipCardNo = row.CardFaceNo;//卡号
                                 BalanceTotal = JSON.stringify(row.BalanceTotal);//余额
                                 JfBal = JSON.stringify(row.JfBal);//积分
-                                CardTypeCode=JSON.stringify(row.CardTypeCode);
-                            };
-                            let vipPrice = VipPrice.vipPrice(TblRow[0],this.TblRow);
-                            var VIPprice = BigDecimalUtils.subtract(this.state.ShopAmount,vipPrice,2);
-                            TblRow1=data.TblRow;
+                                CardTypeCode = JSON.stringify(row.CardTypeCode);
+                            }
+                            ;
+                            let vipPrice = VipPrice.vipPrice(TblRow[0], this.TblRow);
+                            var VIPprice = BigDecimalUtils.subtract(this.state.ShopAmount, vipPrice, 2);
+                            TblRow1 = data.TblRow;
                             this.setState({
                                 VipCardNo: VipCardNo,
                                 BalanceTotal: BalanceTotal,
                                 JfBal: JfBal,
                                 ShopAmount: VIPprice,
-                                vipPrice:vipPrice,
-                                CardTypeCode:CardTypeCode
+                                vipPrice: vipPrice,
+                                CardTypeCode: CardTypeCode
                             });
                             this.modal();
                             this.Member();
@@ -505,7 +512,7 @@ export default class Sell extends Component {
                             this.modal();
                             alert(JSON.stringify(data));
                         }
-                    },(err)=>{
+                    }, (err) => {
                         alert("网络请求失败");
                     })
                 })
@@ -514,47 +521,47 @@ export default class Sell extends Component {
     }
 
     PayButton() {
-        
-        if(this.dataRow==""){
+        if (this.dataRow == "") {
             alert("请添加商品");
-        }else{
-            if(this.state.name=="退货"){
-                var dataRows=this.dataRow;
+        } else {
+            if (this.state.name == "退货") {
+                var dataRows = this.dataRow;
                 var nextRoute = {
                     name: "Pay",
                     component: Pay,
                     params: {
-                        VipCardNo:this.state.VipCardNo,
+                        VipCardNo: this.state.VipCardNo,
                         JfBal: this.state.JfBal,
                         BalanceTotal: this.state.BalanceTotal,
-                        CardTypeCode:this.state.CardTypeCode,
+                        CardTypeCode: this.state.CardTypeCode,
                         shopamount: this.state.ShopAmount,
-                        numform:this.state.numform,
-                        vipData:JSON.stringify(this.state.vipPrice),
-                        Seles:"R",
-                        dataRows:dataRows,
+                        numform: this.state.numform,
+                        vipData: JSON.stringify(this.state.vipPrice),
+                        Seles: "R",
+                        dataRows: dataRows,
                     }
                 };
                 this.props.navigator.push(nextRoute);
-            }else if(this.state.name=="移动销售"){
-                var dataRows=this.dataRow;
+            } else if (this.state.name == "移动销售") {
+                var dataRows = this.dataRow;
                 var nextRoute = {
                     name: "Pay",
                     component: Pay,
                     params: {
-                        VipCardNo:this.state.VipCardNo,
+                        VipCardNo: this.state.VipCardNo,
                         JfBal: this.state.JfBal,
                         BalanceTotal: this.state.BalanceTotal,
-                        CardTypeCode:this.state.CardTypeCode,
+                        CardTypeCode: this.state.CardTypeCode,
                         shopamount: this.state.ShopAmount,
-                        numform:this.state.numform,
-                        vipData:JSON.stringify(this.state.vipPrice),
-                        Seles:"T",
-                        dataRows:dataRows,
+                        numform: this.state.numform,
+                        vipData: JSON.stringify(this.state.vipPrice),
+                        Seles: "T",
+                        dataRows: dataRows,
                     }
                 };
                 this.props.navigator.push(nextRoute);
-            };
+            }
+            ;
 
         }
         //界面跳转
@@ -572,7 +579,7 @@ export default class Sell extends Component {
         // }
     }
 
-    ReturnGoods(){
+    ReturnGoods() {
         // Storage.get('ShopCode').then((ShopCode) => {
         //     Storage.get('PosCode').then((PosCode) => {
         //         let params = {
@@ -590,213 +597,209 @@ export default class Sell extends Component {
         //     })
         // })
         this.setState({
-            name:"退货"
+            name: "退货"
         });
 
     }
 
-    DeleteShop(){
-        if(this.dataRow==""){
+    DeleteShop() {
+        if (this.dataRow == "") {
             alert("请添加商品");
-        }else {
+        } else {
             dbAdapter.deleteData("shopInfo");
             this.dataRow = [];
             this.setState({
                 dataSource: this.state.dataSource.cloneWithRows(this.dataRow),
-                ShopNumber:"",
-                ShopAmount:"",
+                ShopNumber: "",
+                ShopAmount: "",
             })
         }
     }
 
-    inputOnBlur(){
-      let reminder=this.state.MnCode;
-      if(reminder==undefined||reminder.length==0){
-        return;
-      }
-      decodepreprint.init(reminder,dbAdapter);
-      if((reminder.length==13&&deCode13.deCodePreFlag(reminder))){//13位条码解析
-        new Promise.all([deCode13.deCodeProdCode(reminder,dbAdapter),deCode13.deCodeTotile(reminder,dbAdapter)]).then((result)=>{
-          if(result.length==2){
-            let prodCode = result[0];
-            let price = result[1];
-            dbAdapter.selectProdCode(prodCode, 1).then((prods)=>{
-              if(prods.length==0){
-                ToastAndroid.show("商品不存在",ToastAndroid.SHORT);
-                return;
-              }
-              var row = prods.item(0);
-              let newShopNumber = BigDecimalUtils.divide(price,row.StdPrice,2);
-             
-              var DataRows = {
-                'ProdCode':row.ProdCode,
-                'ProdName':row.ProdName,
-                'ShopPrice':row.StdPrice,
-                'ShopNumber': newShopNumber,
-                'ShopAmount': price,
-                'Pid':row.Pid,
-              };
-              this.dataRow.push(DataRows);
-              this.setState({
-                //vipPrice:vipPrice,
-                MnCode:"",
-                ShopNumber:  BigDecimalUtils.add(this.state.ShopNumber,newShopNumber,2),
-                ShopAmount: BigDecimalUtils.add(this.state.ShopAmount,price,2),
-                dataSource: this.state.dataSource.cloneWithRows(this.dataRow),
-              });
-              var shopInfoData = [];
-              var shopInfo = {};
-              shopInfo.Pid = row.Pid;
-              shopInfo.ProdCode=row.ProdCode;
-              shopInfo.prodname = row.ProdName;
-              shopInfo.countm =newShopNumber;
-              shopInfo.ShopPrice = row.StdPrice;
-              shopInfo.prototal =price;
-              shopInfo.promemo = "";
-              shopInfo.DepCode = row.DepCode;
-              shopInfo.ydcountm = "";
-              shopInfo.SuppCode = row.SuppCode;
-              shopInfo.BarCode = row.BarCode;
-              shopInfoData.push(shopInfo);
-              //let vipPrice = VipPrice.vipPrice(row,shopInfoData);
-              //let VIPprice = BigDecimalUtils.subtract(shopAmount,vipPrice,2);
-              //this.setState({
-              //  ShopNumber: shopnumber,//数量
-              //  ShopAmount: VIPprice,//总金额this.dataRow
-              //  dataSource: this.state.dataSource.cloneWithRows(this.dataRow),
-              //})
-              //调用插入表方法
-              dbAdapter.insertShopInfo(shopInfoData,"1");
-              //this._dbSearch();
-              //_dbSearch()
+    inputOnBlur() {
+        let reminder = this.state.MnCode;
+        if (reminder == undefined || reminder.length == 0) {
+            return;
+        }
+        decodepreprint.init(reminder, dbAdapter);
+        if ((reminder.length == 13 && deCode13.deCodePreFlag(reminder))) {//13位条码解析
+            new Promise.all([deCode13.deCodeProdCode(reminder, dbAdapter), deCode13.deCodeTotile(reminder, dbAdapter)]).then((result) => {
+                if (result.length == 2) {
+                    let prodCode = result[0];
+                    let price = result[1];
+                    dbAdapter.selectProdCode(prodCode, 1).then((prods) => {
+                        if (prods.length == 0) {
+                            ToastAndroid.show("商品不存在", ToastAndroid.SHORT);
+                            return;
+                        }
+                        var row = prods.item(0);
+                        let newShopNumber = BigDecimalUtils.divide(price, row.StdPrice, 2);
+
+                        var DataRows = {
+                            'ProdCode': row.ProdCode,
+                            'ProdName': row.ProdName,
+                            'ShopPrice': row.StdPrice,
+                            'ShopNumber': newShopNumber,
+                            'ShopAmount': price,
+                            'Pid': row.Pid,
+                        };
+                        this.dataRow.push(DataRows);
+
+                        var SHopAMount = NumberUtils.numberFormat2(row.ShopAmount);
+                        shopAmount += Number(SHopAMount);
+                        this.setState({
+                            //vipPrice:vipPrice,
+                            MnCode: "",
+                            ShopNumber: BigDecimalUtils.add(this.state.ShopNumber, newShopNumber, 2),
+                            ShopAmount: BigDecimalUtils.add(this.state.ShopAmount, price, 2),
+                            dataSource: this.state.dataSource.cloneWithRows(this.dataRow),
+                        });
+                        var shopInfoData = [];
+                        var shopInfo = {};
+                        shopInfo.Pid = row.Pid;
+                        shopInfo.ProdCode = row.ProdCode;
+                        shopInfo.prodname = row.ProdName;
+                        shopInfo.countm = newShopNumber;
+                        shopInfo.ShopPrice = row.StdPrice;
+                        shopInfo.prototal = price;
+                        shopInfo.promemo = "";
+                        shopInfo.DepCode = row.DepCode;
+                        shopInfo.ydcountm = "";
+                        shopInfo.SuppCode = row.SuppCode;
+                        shopInfo.BarCode = row.BarCode;
+                        shopInfoData.push(shopInfo);
+                        //let vipPrice = VipPrice.vipPrice(row,shopInfoData);
+                        //let VIPprice = BigDecimalUtils.subtract(shopAmount,vipPrice,2);
+                        //this.setState({
+                        //  ShopNumber: shopnumber,//数量
+                        //  ShopAmount: VIPprice,//总金额this.dataRow
+                        //  dataSource: this.state.dataSource.cloneWithRows(this.dataRow),
+                        //})
+                        //调用插入表方法
+                        dbAdapter.insertShopInfo(shopInfoData, "1");
+                        //this._dbSearch();
+                        //_dbSearch()
+                    });
+                }
             });
-          }
-        });
-      }else if(reminder.length==18&&decodepreprint.deCodePreFlag()) {
-        new Promise.all([decodepreprint.deCodeProdCode(),decodepreprint.deCodeTotal(),decodepreprint.deCodeWeight()]).then((results) => {
-          if(results.length==3){
-            let prodCode = results[0];
-            let total = results[1];
-            let weight = results[2];
-            dbAdapter.selectProdCode(prodCode, 1).then((product)=>{
-              if(product.length!=0){
-                var row = product.item(0);
-          
-                var DataRows = {
-                  'ProdCode':row.ProdCode,
-                  'ProdName':row.ProdName,
-                  'ShopPrice':row.StdPrice,
-                  'ShopNumber': weight,
-                  'ShopAmount': total,
-                  'Pid':row.Pid,
-                };
-                this.dataRow.push(DataRows);
-                this.setState({
-                  //vipPrice:vipPrice,
-                  MnCode:"",
-                  ShopNumber:  BigDecimalUtils.add(this.state.ShopNumber,weight,2),
-                  ShopAmount: BigDecimalUtils.add(this.state.ShopAmount,total,2),
-                  dataSource: this.state.dataSource.cloneWithRows(this.dataRow),
-                });
-                
-                var shopInfoData = [];
-                var shopInfo = {};
-                shopInfo.Pid = row.Pid;
-                shopInfo.ProdCode=row.ProdCode;
-                shopInfo.prodname = row.ProdName;
-                shopInfo.countm =weight;
-                shopInfo.ShopPrice = row.StdPrice;
-                shopInfo.prototal =total;
-                shopInfo.promemo = "";
-                shopInfo.DepCode = row.DepCode;
-                shopInfo.ydcountm = "";
-                shopInfo.SuppCode = row.SuppCode;
-                shopInfo.BarCode = row.BarCode;
-                shopInfoData.push(shopInfo);
-                //调用插入表方法
-                dbAdapter.insertShopInfo(shopInfoData,"1");
-              }
+        } else if (reminder.length == 18 && decodepreprint.deCodePreFlag()) {
+            new Promise.all([decodepreprint.deCodeProdCode(), decodepreprint.deCodeTotal(), decodepreprint.deCodeWeight()]).then((results) => {
+                if (results.length == 3) {
+                    let prodCode = results[0];
+                    let total = results[1];
+                    let weight = results[2];
+                    dbAdapter.selectProdCode(prodCode, 1).then((product) => {
+                        let length = rows.length;
+                        if (product.length != 0) {
+                            var row = product.item(0);
+                            var DataRows = {
+                                'ProdCode': row.ProdCode,
+                                'ProdName': row.ProdName,
+                                'ShopPrice': row.StdPrice,
+                                'ShopNumber': weight,
+                                'ShopAmount': total,
+                                'Pid': row.Pid,
+                            };
+                            this.dataRow.push(DataRows);
+                            this.setState({
+                                //vipPrice:vipPrice,
+                                MnCode: "",
+                                ShopNumber: BigDecimalUtils.add(this.state.ShopNumber, weight, 2),
+                                ShopAmount: BigDecimalUtils.add(this.state.ShopAmount, total, 2),
+                                dataSource: this.state.dataSource.cloneWithRows(this.dataRow),
+                            });
+
+                            var shopInfoData = [];
+                            var shopInfo = {};
+                            shopInfo.Pid = row.Pid;
+                            shopInfo.ProdCode = row.ProdCode;
+                            shopInfo.prodname = row.ProdName;
+                            shopInfo.countm = weight;
+                            shopInfo.ShopPrice = row.StdPrice;
+                            shopInfo.prototal = total;
+                            shopInfo.promemo = "";
+                            shopInfo.DepCode = row.DepCode;
+                            shopInfo.ydcountm = "";
+                            shopInfo.SuppCode = row.SuppCode;
+                            shopInfo.BarCode = row.BarCode;
+                            shopInfoData.push(shopInfo);
+                            //调用插入表方法
+                            dbAdapter.insertShopInfo(shopInfoData, "1");
+                        }
+                    });
+                }
             });
-          }
-        });
-       
-      }else{
-        dbAdapter.selectAidCode(this.state.MnCode,1).then((rows)=>{
-          let length = rows.length;
-          if(length==0){
-                alert("助记码不存在")
-            }else{
-                var shopnumber = 0;
-                var shopAmount = 0;
-                for (let i = 0; i < length; i++) {
-                    var row = rows.item(i);
-                    var ShopPrice = row.ShopPrice;
-                    var prototal=BigDecimalUtils.multiply(this.state.Countm,row.ShopPrice,2);
-                    var number = row.ShopNumber;
-                    shopnumber = BigDecimalUtils.add(this.state.Countm,this.state.ShopNumber,2);
-                    this.TblRow.push(row);
-                    //var DataRows = {
-                    //    'ProdCode':row.ProdCode,
-                    //    'ProdName':row.ProdName,
-                    //    'ShopPrice':row.ShopPrice,
-                    //    'ShopNumber': this.state.Countm,
-                    //    'ShopAmount': prototal,
-                    //    'Pid':row.Pid,
-                    //};
-                  row.ShopNumber=this.state.Countm;
-                  row.ShopAmount=prototal;
-                    
-                    this.dataRow.push(row);//展示商品数组
-                };
-                shopAmount =BigDecimalUtils.add(ShopPrice,this.state.ShopAmount,2);
-                
-                this.setState({
-                    MnCode:"",
-                    ShopNumber: shopnumber,
-                    ShopAmount: shopAmount,
-                    dataSource: this.state.dataSource.cloneWithRows(this.dataRow),
-                });
-                if(length==1){
-                var shopInfoData = [];
-                var shopInfo = {};
-                shopInfo.Pid = row.Pid;
-                shopInfo.ProdCode=row.ProdCode;
-                shopInfo.prodname = row.ProdName;
-                shopInfo.countm = this.state.Countm;
-                shopInfo.ShopPrice = row.ShopPrice;
-                shopInfo.prototal =(this.state.Countm)*(row.ShopPrice);
-                shopInfo.promemo = this.state.promemo;
-                shopInfo.DepCode = row.DepCode;
-                shopInfo.ydcountm = "";
-                shopInfo.SuppCode = row.SuppCode;
-                shopInfo.BarCode = row.BarCode;
-                shopInfoData.push(shopInfo);
-                //调用插入表方法
-                dbAdapter.insertShopInfo(shopInfoData,"1");
-                //this._dbSearch();
-                  let vipPrice = VipPrice.vipPrice(TblRow1[0],this.TblRow);
-                  console.log("huiyuan==",TblRow1[0])
-                  console.log("vipPrice==",vipPrice)
-                  console.log("vipPrice2==",shopAmount,vipPrice)
-                  let newPrice = BigDecimalUtils.subtract(shopAmount,vipPrice,2);
-                  let allPrice = 0;
-                  //if(this.dataRow.length==1){
-                  //  allPrice= newPrice;
-                  //}else{
-                  //  allPrice= BigDecimalUtils.add(newPrice,this.state.ShopAmount,2);
-                  //}
-                  for(let i=0;i<this.dataRow.length;i++){
-                    allPrice = BigDecimalUtils.add(allPrice,this.dataRow[i].ShopAmount,2);
-                  }
-                  //BigDecimalUtils.add(newPrice,this.state.ShopAmount,2)
-                  this.setState({
-                    ShopAmount: allPrice,
-                  });
-                  }
-            }
-        })}
+
+        } else {
+            dbAdapter.selectAidCode(this.state.MnCode, 1).then((rows) => {
+                let length = rows.length;
+                if (length == 0) {
+                    alert("助记码不存在")
+                } else {
+                    var shopnumber = 0;
+                    var shopAmount = 0;
+                    for (let i = 0; i < length; i++) {
+                        var row = rows.item(i);
+                        var ShopPrice = row.ShopPrice;
+                        var prototal = BigDecimalUtils.multiply(this.state.Countm, row.ShopPrice, 2);
+                        var number = row.ShopNumber;
+                        shopnumber = BigDecimalUtils.add(this.state.Countm, this.state.ShopNumber, 2);
+                        this.TblRow.push(row);
+                        //var DataRows = {
+                        //    'ProdCode':row.ProdCode,
+                        //    'ProdName':row.ProdName,
+                        //    'ShopPrice':row.ShopPrice,
+                        //    'ShopNumber': this.state.Countm,
+                        //    'ShopAmount': prototal,
+                        //    'Pid':row.Pid,
+                        //};
+                        row.ShopNumber = this.state.Countm;
+                        row.ShopAmount = prototal;
+
+                        this.dataRow.push(row);//展示商品数组
+                    }
+                    ;
+                    shopAmount = BigDecimalUtils.add(ShopPrice, this.state.ShopAmount, 2);
+
+                    this.setState({
+                        MnCode: "",
+                        ShopNumber: shopnumber,
+                        ShopAmount: shopAmount,
+                        dataSource: this.state.dataSource.cloneWithRows(this.dataRow),
+                    });
+                    if (length == 1) {
+                        var shopInfoData = [];
+                        var shopInfo = {};
+                        shopInfo.Pid = row.Pid;
+                        shopInfo.ProdCode = row.ProdCode;
+                        shopInfo.prodname = row.ProdName;
+                        shopInfo.countm = this.state.Countm;
+                        shopInfo.ShopPrice = row.ShopPrice;
+                        shopInfo.prototal = (this.state.Countm) * (row.ShopPrice);
+                        shopInfo.promemo = this.state.promemo;
+                        shopInfo.DepCode = row.DepCode;
+                        shopInfo.ydcountm = "";
+                        shopInfo.SuppCode = row.SuppCode;
+                        shopInfo.BarCode = row.BarCode;
+                        shopInfoData.push(shopInfo);
+                        //调用插入表方法
+                        dbAdapter.insertShopInfo(shopInfoData, "1");
+                        //this._dbSearch();
+                        let vipPrice = VipPrice.vipPrice(TblRow1[0], this.TblRow);
+                        let newPrice = BigDecimalUtils.subtract(shopAmount, vipPrice, 2);
+                        let allPrice = 0;
+                        for (let i = 0; i < this.dataRow.length; i++) {
+                            allPrice = BigDecimalUtils.add(allPrice, this.dataRow[i].ShopAmount, 2);
+                        }
+                        this.setState({
+                            ShopAmount: allPrice,
+                        });
+                    }
+                }
+            })
+        }
     }
-    
+
     render() {
         return (
             <View style={styles.container}>
@@ -885,9 +888,9 @@ export default class Sell extends Component {
                                     value={this.state.MnCode}
                                     underlineColorAndroid='transparent'
                                     style={styles.TextInput}
-                                    onChangeText={(value)=>{
+                                    onChangeText={(value) => {
                                         this.setState({
-                                            MnCode:value
+                                            MnCode: value
                                         })
                                     }}
                                     onSubmitEditing={this.inputOnBlur.bind(this)}
@@ -900,7 +903,11 @@ export default class Sell extends Component {
                                     <Text style={[styles.InputingText, {fontWeight: "bold"}]}>金额:</Text>
                                 </View>
                                 <View style={styles.Inputingright}>
-                                    <Text style={[styles.InputingText, {fontWeight: "bold", fontSize: 20, color: "red"}]}>{this.state.ShopAmount}</Text>
+                                    <Text style={[styles.InputingText, {
+                                        fontWeight: "bold",
+                                        fontSize: 20,
+                                        color: "red"
+                                    }]}>{this.state.ShopAmount}</Text>
                                 </View>
                             </View>
                             <View style={styles.Inputing1}>
@@ -918,7 +925,11 @@ export default class Sell extends Component {
                                     <Text style={[styles.InputingText, {fontWeight: "bold"}]}>数量:</Text>
                                 </View>
                                 <View style={styles.Inputingright}>
-                                    <Text style={[styles.InputingText, {fontWeight: "bold", fontSize: 20, color: "red"}]}>{this.state.ShopNumber}</Text>
+                                    <Text style={[styles.InputingText, {
+                                        fontWeight: "bold",
+                                        fontSize: 20,
+                                        color: "red"
+                                    }]}>{this.state.ShopNumber}</Text>
                                 </View>
                             </View>
                             <View style={styles.Inputing1}>
@@ -1043,6 +1054,7 @@ export default class Sell extends Component {
                                             underlineColorAndroid='transparent'
                                             placeholderTextColor="#bcbdc1"
                                             style={styles.CardTextInput}
+                                            defaultValue={this.state.CardNumber}
                                             onChangeText={(value) => {
                                                 this.setState({
                                                     CardNumber: value
@@ -1070,15 +1082,15 @@ export default class Sell extends Component {
 }
 
 const styles = StyleSheet.create({
-    Top:{
-        height:100,
-        backgroundColor:"#ccc"
+    Top: {
+        height: 100,
+        backgroundColor: "#ccc"
     },
-    Center:{
-      flex:1,
+    Center: {
+        flex: 1,
     },
-    Bottom:{
-        height:220,
+    Bottom: {
+        height: 220,
     },
     container: {
         flex: 1,
@@ -1092,22 +1104,22 @@ const styles = StyleSheet.create({
         paddingRight: 16,
         flexDirection: "row",
     },
-    return:{
-        width:60,
+    return: {
+        width: 60,
     },
     HeaderList: {
         flex: 1,
         paddingRight: 56,
         marginTop: 3,
     },
-    HeaderText:{
+    HeaderText: {
         textAlign: "center",
         color: "#ffffff",
         fontSize: 22,
     },
-    SearchImage:{
-        width:60,
-        paddingLeft:20
+    SearchImage: {
+        width: 60,
+        paddingLeft: 20
     },
     TitleCont: {
         height: 40,
@@ -1128,20 +1140,20 @@ const styles = StyleSheet.create({
     List: {
         flex: 1,
         flexDirection: "row",
-        marginTop:5,
+        marginTop: 5,
     },
-    refund:{
-        paddingTop:5,
-        paddingBottom:5,
-        paddingLeft:15,
-        paddingRight:15,
-        backgroundColor:"#ffba00",
-        borderRadius:5,
+    refund: {
+        paddingTop: 5,
+        paddingBottom: 5,
+        paddingLeft: 15,
+        paddingRight: 15,
+        backgroundColor: "#ffba00",
+        borderRadius: 5,
     },
-    Goods:{
-        fontSize:16,
-        color:"#ffffff",
-        textAlign:"center"
+    Goods: {
+        fontSize: 16,
+        color: "#ffffff",
+        textAlign: "center"
     },
     ListView1: {
         width: 70,
@@ -1157,7 +1169,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
     ShopCont: {
-        backgroundColor:"#f2f2f2",
+        backgroundColor: "#f2f2f2",
         paddingLeft: 10,
         paddingRight: 10,
     },
@@ -1359,15 +1371,15 @@ const styles = StyleSheet.create({
         paddingBottom: 6,
         borderRadius: 5,
     },
-    rowBack:{
-        backgroundColor:"#ff4e4e",
-        paddingTop:10,
-        paddingBottom:10,
-        paddingRight:35
+    rowBack: {
+        backgroundColor: "#ff4e4e",
+        paddingTop: 10,
+        paddingBottom: 10,
+        paddingRight: 35
     },
-    rowBackText:{
-        color:"#ffffff",
-        fontSize:16,
-        textAlign:"right"
+    rowBackText: {
+        color: "#ffffff",
+        fontSize: 16,
+        textAlign: "right"
     }
 });

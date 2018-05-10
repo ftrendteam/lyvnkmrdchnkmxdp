@@ -32,8 +32,8 @@ export default class GoodsDetails extends Component {
             ydcountm:this.props.ydcountm ? this.props.ydcountm : "",
             SuppCode:this.props.SuppCode ? this.props.SuppCode : "",
             BarCode:this.props.BarCode ? this.props.BarCode : "",
-            ShoppData:this.props.ShoppData ? this.props.ShoppData : "",
-            Price:"",
+            IsIntCount:this.props.IsIntCount ? this.props.IsIntCount : "",
+            ShoppData:"",
             totalPrice:"",
             name:"",
             YdCountm:"",
@@ -83,6 +83,11 @@ export default class GoodsDetails extends Component {
                 Modify: tags
             })
         })
+        Storage.get('ShoppData').then((tags) => {
+            this.setState({
+                ShoppData: tags
+            })
+        })
 
         Storage.get('YuanDan').then((tags)=>{
             if(tags==1){
@@ -103,13 +108,13 @@ export default class GoodsDetails extends Component {
     }
 
     GoodsDetails(){
-        if(this.state.name=="移动销售"){
+        if(this.state.DataName=="移动销售"){
             var nextRoute={
                 name:"移动销售",
                 component:Sell,
             };
             this.props.navigator.push(nextRoute);
-        }else if(this.state.ShoppData=="0"){
+        }else if(this.state.ShoppData=="清单"){
             var nextRoute={
                 name:"清单",
                 component:ShoppingCart,
@@ -148,63 +153,114 @@ export default class GoodsDetails extends Component {
                 PriceText:1
             });
         }else{
-            var x = this.state.Number;//获取数量的数字
-            var y = String(x).indexOf(".") + 1;//获取小数点的位置
-            if(y > 0&&!this.state.DataName=="移动销售") {
-                alert("数量不能含有小数");
-            }else if(this.state.name=="商品配送"&&this.state.ydcountm==0){
+            if(this.state.name=="商品配送"&&this.state.ydcountm==0){
                 alert("库存为0，该商品不能进行配送")
             } else {
-                if(this.state.name=="实时盘点"||this.state.name=="商品盘点"){
-                    var shopInfoData = [];
-                    var shopInfo = {};
-                    shopInfo.Pid = this.state.Pid;
-                    shopInfo.ProdCode=this.state.ProdCode;
-                    shopInfo.prodname = this.state.ProdName;
-                    shopInfo.countm = this.state.Number;
-                    shopInfo.ShopPrice = this.state.ShopPrice;
-                    if(this.state.YdCountm == 5){
-                        shopInfo.prototal = "0";
-                    }else{
-                        shopInfo.prototal = NumberUtils.numberFormat2(ShopPrice);
-                    }
-                    shopInfo.promemo = this.state.Remark;
-                    shopInfo.DepCode = this.state.DepCode;
-                    shopInfo.ydcountm = this.state.ydcountm;
-                    shopInfo.SuppCode = this.state.SuppCode;
-                    shopInfo.BarCode = this.state.BarCode;
-                    shopInfoData.push(shopInfo);
-                    //调用插入表方法
-                    dbAdapter.insertShopInfo(shopInfoData);
-                    if(this.state.name=="移动销售"){
-                        var nextRoute={
-                            name:"移动销售",
-                            component:Sell,
-                        };
-                        this.props.navigator.push(nextRoute);
-                    }else if(this.state.ShoppData=="0"){
-                        var nextRoute={
-                            name:"清单",
-                            component:ShoppingCart,
-                            params:{
-                                DepCode:this.state.DepCode,
+                if(this.state.IsIntCount==0){
+                    var number = this.state.Number;//获取数量的数字
+                    if(parseInt(number)==number){
+                        if(this.state.name=="实时盘点"||this.state.name=="商品盘点"){
+                            var shopInfoData = [];
+                            var shopInfo = {};
+                            shopInfo.Pid = this.state.Pid;
+                            shopInfo.ProdCode=this.state.ProdCode;
+                            shopInfo.prodname = this.state.ProdName;
+                            shopInfo.countm = this.state.Number;
+                            shopInfo.ShopPrice = this.state.ShopPrice;
+                            if(this.state.YdCountm == 5){
+                                shopInfo.prototal = "0";
+                            }else{
+                                shopInfo.prototal = NumberUtils.numberFormat2(ShopPrice);
                             }
-                        };
-                        this.props.navigator.push(nextRoute);
-                    }else{
-                        var nextRoute={
-                            name:"主页",
-                            component:Index,
-                            params:{
-                                DepCode:this.state.DepCode,
+                            shopInfo.promemo = this.state.Remark;
+                            shopInfo.DepCode = this.state.DepCode;
+                            shopInfo.ydcountm = this.state.ydcountm;
+                            shopInfo.SuppCode = this.state.SuppCode;
+                            shopInfo.BarCode = this.state.BarCode;
+                            shopInfoData.push(shopInfo);
+                            //调用插入表方法
+                            dbAdapter.insertShopInfo(shopInfoData);
+                            if(this.state.name=="移动销售"){
+                                var nextRoute={
+                                    name:"移动销售",
+                                    component:Sell,
+                                };
+                                this.props.navigator.push(nextRoute);
+                            }else if(this.state.ShoppData=="清单"){
+                                var nextRoute={
+                                    name:"清单",
+                                    component:ShoppingCart,
+                                    params:{
+                                        DepCode:this.state.DepCode,
+                                    }
+                                };
+                                this.props.navigator.push(nextRoute);
+                            }else{
+                                var nextRoute={
+                                    name:"主页",
+                                    component:Index,
+                                    params:{
+                                        DepCode:this.state.DepCode,
+                                    }
+                                };
+                                this.props.navigator.push(nextRoute);
                             }
-                        };
-                        this.props.navigator.push(nextRoute);
-                    }
-                }else{
-                    if(this.state.Number==0){
-                        ToastAndroid.show('商品数量不能为空', ToastAndroid.SHORT);
+                        }else{
+                            if(this.state.Number==0){
+                                ToastAndroid.show('商品数量不能为空', ToastAndroid.SHORT);
+                            }else{
+                                var shopInfoData = [];
+                                var shopInfo = {};
+                                shopInfo.Pid = this.state.Pid;
+                                shopInfo.ProdCode=this.state.ProdCode;
+                                shopInfo.prodname = this.state.ProdName;
+                                shopInfo.countm = this.state.Number;
+                                shopInfo.ShopPrice = this.state.ShopPrice;
+                                if(this.state.YdCountm == 5){
+                                    shopInfo.prototal = "0";
+                                }else{
+                                    shopInfo.prototal = NumberUtils.numberFormat2(ShopPrice);
+                                }
+                                shopInfo.promemo = this.state.Remark;
+                                shopInfo.DepCode = this.state.DepCode;
+                                shopInfo.ydcountm = this.state.ydcountm;
+                                shopInfo.SuppCode = this.state.SuppCode;
+                                shopInfo.BarCode = this.state.BarCode;
+                                shopInfoData.push(shopInfo);
+                                //调用插入表方法
+                                dbAdapter.insertShopInfo(shopInfoData);
+                                if(this.state.name=="移动销售"){
+                                    var nextRoute={
+                                        name:"移动销售",
+                                        component:Sell,
+                                    };
+                                    this.props.navigator.push(nextRoute);
+                                }else if(this.state.ShoppData=="清单"){
+                                    var nextRoute={
+                                        name:"清单",
+                                        component:ShoppingCart,
+                                        params:{
+                                            DepCode:this.state.DepCode,
+                                        }
+                                    };
+                                    this.props.navigator.push(nextRoute);
+                                }else{
+                                    var nextRoute={
+                                        name:"主页",
+                                        component:Index,
+                                        params:{
+                                            DepCode:this.state.DepCode,
+                                        }
+                                    };
+                                    this.props.navigator.push(nextRoute);
+                                }
+                            }
+                        }
                     }else{
+                        alert("数量不能含有小数");
+                    }
+                }else {
+                    if(this.state.name=="实时盘点"||this.state.name=="商品盘点"){
                         var shopInfoData = [];
                         var shopInfo = {};
                         shopInfo.Pid = this.state.Pid;
@@ -231,7 +287,7 @@ export default class GoodsDetails extends Component {
                                 component:Sell,
                             };
                             this.props.navigator.push(nextRoute);
-                        }else if(this.state.ShoppData=="0"){
+                        }else if(this.state.ShoppData=="清单"){
                             var nextRoute={
                                 name:"清单",
                                 component:ShoppingCart,
@@ -249,6 +305,56 @@ export default class GoodsDetails extends Component {
                                 }
                             };
                             this.props.navigator.push(nextRoute);
+                        }
+                    }else{
+                        if(this.state.Number==0){
+                            ToastAndroid.show('商品数量不能为空', ToastAndroid.SHORT);
+                        }else{
+                            var shopInfoData = [];
+                            var shopInfo = {};
+                            shopInfo.Pid = this.state.Pid;
+                            shopInfo.ProdCode=this.state.ProdCode;
+                            shopInfo.prodname = this.state.ProdName;
+                            shopInfo.countm = this.state.Number;
+                            shopInfo.ShopPrice = this.state.ShopPrice;
+                            if(this.state.YdCountm == 5){
+                                shopInfo.prototal = "0";
+                            }else{
+                                shopInfo.prototal = NumberUtils.numberFormat2(ShopPrice);
+                            }
+                            shopInfo.promemo = this.state.Remark;
+                            shopInfo.DepCode = this.state.DepCode;
+                            shopInfo.ydcountm = this.state.ydcountm;
+                            shopInfo.SuppCode = this.state.SuppCode;
+                            shopInfo.BarCode = this.state.BarCode;
+                            shopInfoData.push(shopInfo);
+                            //调用插入表方法
+                            dbAdapter.insertShopInfo(shopInfoData);
+                            if(this.state.name=="移动销售"){
+                                var nextRoute={
+                                    name:"移动销售",
+                                    component:Sell,
+                                };
+                                this.props.navigator.push(nextRoute);
+                            }else if(this.state.ShoppData=="清单"){
+                                var nextRoute={
+                                    name:"清单",
+                                    component:ShoppingCart,
+                                    params:{
+                                        DepCode:this.state.DepCode,
+                                    }
+                                };
+                                this.props.navigator.push(nextRoute);
+                            }else{
+                                var nextRoute={
+                                    name:"主页",
+                                    component:Index,
+                                    params:{
+                                        DepCode:this.state.DepCode,
+                                    }
+                                };
+                                this.props.navigator.push(nextRoute);
+                            }
                         }
                     }
                 }
@@ -288,43 +394,51 @@ export default class GoodsDetails extends Component {
         }
         else if(this.state.name=="标签采集"&&this.state.BQNumber==1){
             this.setState({
-                BQNumber:parseInt(this.state.BQNumber)+1,
+                BQNumber:Number(this.state.BQNumber)+1,
             });
         }else{
-         
-            //let numberFormat2 = NumberUtils.numberFormat2((parseInt(this.state.Number)+1)*(this.state.ShopPrice));
-            let numberFormat2 = BigDecimalUtils.multiply(BigDecimalUtils.add(this.state.Number,1,2),this.state.ShopPrice,2);
+            let numberFormat1 = BigDecimalUtils.add(this.state.Number,1,2);
+            let numberFormat2 = (numberFormat1 * this.state.ShopPrice);
+            let shopprice=Math.round(numberFormat2 * 100) / 100;
             this.setState({
                 Number:BigDecimalUtils.add(this.state.Number,1,2),
                 BQNumber:BigDecimalUtils.add(this.state.BQNumber,1,2),
-                numberFormat2:numberFormat2,
+                numberFormat2:shopprice,
             });
         }
     }
 
     subtraction(){
-            var Number1=this.state.Number;
-            var BQNumber1=this.state.BQNumber;
-            this.setState({
-                Number:parseInt(Number1)-1,
-                BQNumber:parseInt(BQNumber1)-1,
-            });
-            //let numberFormat2 = NumberUtils.numberFormat2((parseInt(Number1)-1)*(this.state.ShopPrice));
-            let numberFormat2 = BigDecimalUtils.multiply(BigDecimalUtils.subtract(Number1,1,2),this.state.ShopPrice,2);
-            this.setState({
-                numberFormat2:numberFormat2,
-            });
-        if(this.state.Number == 1&&this.state.name!=="标签采集"){
+        var Number1=this.state.Number;
+        var BQNumber1=this.state.BQNumber;
+        this.setState({
+            Number:Number(this.state.Number)-1,
+            BQNumber:Number(BQNumber1)-1,
+        });
+        let numberFormat1 =Number(this.state.Number)-1;
+        let numberFormat2 = (numberFormat1 * this.state.ShopPrice);
+        let shopprice=Math.round(numberFormat2 * 100) / 100;
+        this.setState({
+            numberFormat2:shopprice,
+        });
+        if(this.state.Number ==0&&this.state.name!=="标签采集"){
             ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
             this.setState({
-               Number:1,
-               numberFormat2:this.state.ShopPrice,
+               Number:this.state.Number,
+               numberFormat2:0,
             });
-            return;
-        }else if(this.state.BQNumber == 1&&this.state.name=="标签采集"){
+        }else if(this.state.Number <1&&this.state.name!=="标签采集"){
+            ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
+            let numberFormat2 = (this.state.Number * this.state.ShopPrice);
+            let shopprice=Math.round(numberFormat2 * 100) / 100;
+            this.setState({
+                Number:this.state.Number,
+                numberFormat2:shopprice,
+            });
+        }else if(this.state.BQNumber<1&&this.state.name=="标签采集"){
             ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
             this.setState({
-                BQNumber:1,
+                BQNumber:this.state.BQNumber,
                 numberFormat2:this.state.ShopPrice,
             });
         }
@@ -334,7 +448,7 @@ export default class GoodsDetails extends Component {
         let numberFormat2 = NumberUtils.numberFormat2((0)*(this.state.ShopPrice));
         this.setState({
             Number:0,
-            BQNumber:1,
+            BQNumber:0,
             numberFormat2:numberFormat2,
         })
     }
@@ -345,9 +459,10 @@ export default class GoodsDetails extends Component {
                 numberFormat2:"0.00",
             });
         }else{
-            let numberFormat2 = NumberUtils.numberFormat2((parseInt(this.state.Number))*(this.state.ShopPrice));
+            let numberFormat2 = (this.state.Number * this.state.ShopPrice);
+            let shopprice=Math.round(numberFormat2 * 100) / 100;
             this.setState({
-                numberFormat2:numberFormat2,
+                numberFormat2:shopprice,
                 Total:1,
                 OnPrice:""
             });
@@ -366,70 +481,123 @@ export default class GoodsDetails extends Component {
                 ShopPrice:Modify,
             })
             if(this.state.OrderDetails==1){
-                var x = this.state.Number;//获取数量的数字
-                var y = String(x).indexOf(".") + 1;//获取小数点的位置
-                if(y > 0&&!this.state.DataName=="移动销售") {
-                    alert("数量不能含有小数");
-                } else {
-                    if(this.state.name=="实时盘点"||this.state.name=="商品盘点"){
-                        var shopInfoData = [];
-                        var shopInfo = {};
-                        shopInfo.Pid = this.state.Pid;
-                        shopInfo.ProdCode=this.state.ProdCode;
-                        shopInfo.prodname = this.state.ProdName;
-                        shopInfo.countm = this.state.Number;
-                        shopInfo.ShopPrice = Modify;
-                        if(this.state.YdCountm == 5){
-                            shopInfo.prototal = "0";
-                        }else{
-                            shopInfo.prototal = this.state.numberFormat2;
-                        }
-                        shopInfo.promemo = this.state.Remark;
-                        shopInfo.DepCode = this.state.DepCode;
-                        shopInfo.ydcountm = this.state.ydcountm;
-                        shopInfo.SuppCode = this.state.SuppCode;
-                        shopInfo.BarCode = this.state.BarCode;
-                        shopInfoData.push(shopInfo);
-                        //调用插入表方法
-                        dbAdapter.insertShopInfo(shopInfoData);
-                        if(this.state.ShoppData=="0"){
-                            var nextRoute={
-                                name:"清单",
-                                component:ShoppingCart,
-                                params:{
-                                    DepCode:this.state.DepCode,
+                if(this.state.name=="商品配送"&&this.state.ydcountm==0){
+                    alert("库存为0，该商品不能进行配送")
+                }else {
+                    if(this.state.IsIntCount==0){
+                        var number = this.state.Number;//获取数量的数字
+                        if(parseInt(number)==number){
+                            if (this.state.name == "实时盘点" || this.state.name == "商品盘点") {
+                                var shopInfoData = [];
+                                var shopInfo = {};
+                                shopInfo.Pid = this.state.Pid;
+                                shopInfo.ProdCode = this.state.ProdCode;
+                                shopInfo.prodname = this.state.ProdName;
+                                shopInfo.countm = this.state.Number;
+                                shopInfo.ShopPrice = Modify;
+                                if (this.state.YdCountm == 5) {
+                                    shopInfo.prototal = "0";
+                                } else {
+                                    shopInfo.prototal = this.state.numberFormat2;
                                 }
-                            };
-                            this.props.navigator.push(nextRoute);
-                        }else{
+                                shopInfo.promemo = this.state.Remark;
+                                shopInfo.DepCode = this.state.DepCode;
+                                shopInfo.ydcountm = this.state.ydcountm;
+                                shopInfo.SuppCode = this.state.SuppCode;
+                                shopInfo.BarCode = this.state.BarCode;
+                                shopInfoData.push(shopInfo);
+                                //调用插入表方法
+                                dbAdapter.insertShopInfo(shopInfoData);
+                                if (this.state.ShoppData == "清单") {
+                                    var nextRoute = {
+                                        name: "清单",
+                                        component: ShoppingCart,
+                                        params: {
+                                            DepCode: this.state.DepCode,
+                                        }
+                                    };
+                                    this.props.navigator.push(nextRoute);
+                                } else {
 
-                            var nextRoute={
-                                name:"主页",
-                                component:Index,
-                                params:{
-                                    DepCode:this.state.DepCode,
+                                    var nextRoute = {
+                                        name: "主页",
+                                        component: Index,
+                                        params: {
+                                            DepCode: this.state.DepCode,
+                                        }
+                                    };
+                                    this.props.navigator.push(nextRoute);
                                 }
-                            };
-                            this.props.navigator.push(nextRoute);
-                        }
-                    }else{
-                        if(this.state.Number==0){
-                            ToastAndroid.show('商品数量不能为空', ToastAndroid.SHORT);
+                            } else {
+                                if (this.state.Number == 0) {
+                                    ToastAndroid.show('商品数量不能为空', ToastAndroid.SHORT);
+                                } else {
+                                    var shopInfoData = [];
+                                    var shopInfo = {};
+                                    shopInfo.Pid = this.state.Pid;
+                                    shopInfo.ProdCode = this.state.ProdCode;
+                                    shopInfo.prodname = this.state.ProdName;
+                                    if (this.state.name == "标签采集") {
+                                        shopInfo.countm = this.state.BQNumber;
+                                    } else {
+                                        shopInfo.countm = this.state.Number;
+                                    }
+                                    shopInfo.ShopPrice = Modify;
+                                    if (this.state.YdCountm == 5) {
+                                        shopInfo.prototal = "0";
+                                    } else {
+                                        shopInfo.prototal = this.state.numberFormat2;
+                                    }
+                                    shopInfo.promemo = this.state.Remark;
+                                    shopInfo.DepCode = this.state.DepCode;
+                                    shopInfo.ydcountm = this.state.ydcountm;
+                                    shopInfo.SuppCode = this.state.SuppCode;
+                                    shopInfo.BarCode = this.state.BarCode;
+                                    shopInfoData.push(shopInfo);
+                                    //调用插入表方法
+                                    dbAdapter.insertShopInfo(shopInfoData);
+                                    if (this.state.DataName == "移动销售") {
+                                        var nextRoute = {
+                                            name: "移动销售",
+                                            component: Sell,
+                                        };
+                                        this.props.navigator.push(nextRoute);
+                                    } else if (this.state.ShoppData == "清单") {
+                                        var nextRoute = {
+                                            name: "清单",
+                                            component: ShoppingCart,
+                                            params: {
+                                                DepCode: this.state.DepCode,
+                                            }
+                                        };
+                                        this.props.navigator.push(nextRoute);
+                                    } else {
+                                        var nextRoute = {
+                                            name: "主页",
+                                            component: Index,
+                                            params: {
+                                                DepCode: this.state.DepCode,
+                                            }
+                                        };
+                                        this.props.navigator.push(nextRoute);
+                                    }
+                                }
+                            }
                         }else{
+                            alert("数量不能含有小数");
+                        }
+                    }else {
+                        if (this.state.name == "实时盘点" || this.state.name == "商品盘点") {
                             var shopInfoData = [];
                             var shopInfo = {};
                             shopInfo.Pid = this.state.Pid;
-                            shopInfo.ProdCode=this.state.ProdCode;
+                            shopInfo.ProdCode = this.state.ProdCode;
                             shopInfo.prodname = this.state.ProdName;
-                            if(this.state.name=="标签采集"){
-                                shopInfo.countm = this.state.BQNumber;
-                            }else{
-                                shopInfo.countm = this.state.Number;
-                            }
+                            shopInfo.countm = this.state.Number;
                             shopInfo.ShopPrice = Modify;
-                            if(this.state.YdCountm == 5){
+                            if (this.state.YdCountm == 5) {
                                 shopInfo.prototal = "0";
-                            }else{
+                            } else {
                                 shopInfo.prototal = this.state.numberFormat2;
                             }
                             shopInfo.promemo = this.state.Remark;
@@ -440,30 +608,79 @@ export default class GoodsDetails extends Component {
                             shopInfoData.push(shopInfo);
                             //调用插入表方法
                             dbAdapter.insertShopInfo(shopInfoData);
-                            if(this.state.DataName=="移动销售"){
-                                var nextRoute={
-                                    name:"移动销售",
-                                    component:Sell,
-                                };
-                                this.props.navigator.push(nextRoute);
-                            }else if(this.state.ShoppData=="0"){
-                                var nextRoute={
-                                    name:"清单",
-                                    component:ShoppingCart,
-                                    params:{
-                                        DepCode:this.state.DepCode,
+                            if (this.state.ShoppData == "清单") {
+                                var nextRoute = {
+                                    name: "清单",
+                                    component: ShoppingCart,
+                                    params: {
+                                        DepCode: this.state.DepCode,
                                     }
                                 };
                                 this.props.navigator.push(nextRoute);
-                            }else{
-                                var nextRoute={
-                                    name:"主页",
-                                    component:Index,
-                                    params:{
-                                        DepCode:this.state.DepCode,
+                            } else {
+
+                                var nextRoute = {
+                                    name: "主页",
+                                    component: Index,
+                                    params: {
+                                        DepCode: this.state.DepCode,
                                     }
                                 };
                                 this.props.navigator.push(nextRoute);
+                            }
+                        } else {
+                            if (this.state.Number == 0) {
+                                ToastAndroid.show('商品数量不能为空', ToastAndroid.SHORT);
+                            } else {
+                                var shopInfoData = [];
+                                var shopInfo = {};
+                                shopInfo.Pid = this.state.Pid;
+                                shopInfo.ProdCode = this.state.ProdCode;
+                                shopInfo.prodname = this.state.ProdName;
+                                if (this.state.name == "标签采集") {
+                                    shopInfo.countm = this.state.BQNumber;
+                                } else {
+                                    shopInfo.countm = this.state.Number;
+                                }
+                                shopInfo.ShopPrice = Modify;
+                                if (this.state.YdCountm == 5) {
+                                    shopInfo.prototal = "0";
+                                } else {
+                                    shopInfo.prototal = this.state.numberFormat2;
+                                }
+                                shopInfo.promemo = this.state.Remark;
+                                shopInfo.DepCode = this.state.DepCode;
+                                shopInfo.ydcountm = this.state.ydcountm;
+                                shopInfo.SuppCode = this.state.SuppCode;
+                                shopInfo.BarCode = this.state.BarCode;
+                                shopInfoData.push(shopInfo);
+                                //调用插入表方法
+                                dbAdapter.insertShopInfo(shopInfoData);
+                                if (this.state.DataName == "移动销售") {
+                                    var nextRoute = {
+                                        name: "移动销售",
+                                        component: Sell,
+                                    };
+                                    this.props.navigator.push(nextRoute);
+                                } else if (this.state.ShoppData == "清单") {
+                                    var nextRoute = {
+                                        name: "清单",
+                                        component: ShoppingCart,
+                                        params: {
+                                            DepCode: this.state.DepCode,
+                                        }
+                                    };
+                                    this.props.navigator.push(nextRoute);
+                                } else {
+                                    var nextRoute = {
+                                        name: "主页",
+                                        component: Index,
+                                        params: {
+                                            DepCode: this.state.DepCode,
+                                        }
+                                    };
+                                    this.props.navigator.push(nextRoute);
+                                }
                             }
                         }
                     }
@@ -487,69 +704,156 @@ export default class GoodsDetails extends Component {
     }
 
     pressPop(){
-        var x = this.state.Number;//获取数量的数字
-        var y = String(x).indexOf(".") + 1;//获取小数点的位置
-        if(y > 0&&!this.state.DataName=="移动销售") {
-            alert("数量不能含有小数");
-        }else if(this.state.name=="商品配送"&&this.state.ydcountm==0){
+        if(this.state.name=="商品配送"&&this.state.ydcountm==0){
             alert("库存为0，该商品不能进行配送")
         }else {
-            if(this.state.name=="实时盘点"||this.state.name=="商品盘点"){
-                var shopInfoData = [];
-                var shopInfo = {};
-                shopInfo.Pid = this.state.Pid;
-                shopInfo.ProdCode=this.state.ProdCode;
-                shopInfo.prodname = this.state.ProdName;
-                shopInfo.countm = this.state.Number;
-                shopInfo.ShopPrice = this.state.ShopPrice;
-                if(this.state.YdCountm == 5){
-                    shopInfo.prototal = "0";
-                }else{
-                    shopInfo.prototal = this.state.numberFormat2;
-                }
-                shopInfo.promemo = this.state.Remark;
-                shopInfo.DepCode = this.state.DepCode;
-                shopInfo.ydcountm = this.state.ydcountm;
-                shopInfo.SuppCode = this.state.SuppCode;
-                shopInfo.BarCode = this.state.BarCode;
-                shopInfoData.push(shopInfo);
-                //调用插入表方法
-                dbAdapter.insertShopInfo(shopInfoData);
-                if(this.state.ShoppData=="0"){
-                    var nextRoute={
-                        name:"清单",
-                        component:ShoppingCart,
-                        params:{
-                            DepCode:this.state.DepCode,
+            if(this.state.IsIntCount==0){
+                var number = this.state.Number;//获取数量的数字
+                var BQNumber = this.state.BQNumber;//获取数量的数字
+                if(this.state.name=="标签采集"){
+                    if(parseInt(BQNumber)==BQNumber){
+                        if(this.state.BQNumber==0){
+                            ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
+                        }else{
+                            var shopInfoData = [];
+                            var shopInfo = {};
+                            shopInfo.Pid = this.state.Pid;
+                            shopInfo.ProdCode=this.state.ProdCode;
+                            shopInfo.prodname = this.state.ProdName;
+                            shopInfo.countm = this.state.BQNumber;
+                            shopInfo.ShopPrice = this.state.ShopPrice;
+                            shopInfo.prototal = "0";
+                            shopInfo.promemo = this.state.Remark;
+                            shopInfo.DepCode = this.state.DepCode;
+                            shopInfo.ydcountm = this.state.ydcountm;
+                            shopInfo.SuppCode = this.state.SuppCode;
+                            shopInfo.BarCode = this.state.BarCode;
+                            shopInfoData.push(shopInfo);
+                            //调用插入表方法
+                            dbAdapter.insertShopInfo(shopInfoData);
+                            if(this.state.DataName=="移动销售"){
+                                var nextRoute={
+                                    name:"移动销售",
+                                    component:Sell,
+                                };
+                                this.props.navigator.push(nextRoute);
+                            }else if(this.state.ShoppData=="清单"){
+                                var nextRoute={
+                                    name:"清单",
+                                    component:ShoppingCart,
+                                };
+                                this.props.navigator.push(nextRoute);
+                            }else{
+                                var nextRoute={
+                                    name:"主页",
+                                    component:Index,
+                                    params:{
+                                        DepCode:this.state.DepCode,
+                                    }
+                                };
+                                this.props.navigator.push(nextRoute);
+                            }
                         }
-                    };
-                    this.props.navigator.push(nextRoute);
+                    } else{
+                        alert("数量不能含有小数");
+                    }
                 }else{
-                    var nextRoute={
-                        name:"主页",
-                        component:Index,
-                        params:{
-                            DepCode:this.state.DepCode,
+                    if(parseInt(number)==number){
+                        if(this.state.name=="实时盘点"||this.state.name=="商品盘点"){
+                            var shopInfoData = [];
+                            var shopInfo = {};
+                            shopInfo.Pid = this.state.Pid;
+                            shopInfo.ProdCode=this.state.ProdCode;
+                            shopInfo.prodname = this.state.ProdName;
+                            shopInfo.countm = this.state.Number;
+                            shopInfo.ShopPrice = this.state.ShopPrice;
+                            shopInfo.prototal = this.state.numberFormat2;
+                            shopInfo.promemo = this.state.Remark;
+                            shopInfo.DepCode = this.state.DepCode;
+                            shopInfo.ydcountm = this.state.ydcountm;
+                            shopInfo.SuppCode = this.state.SuppCode;
+                            shopInfo.BarCode = this.state.BarCode;
+                            shopInfoData.push(shopInfo);
+                            //调用插入表方法
+                            dbAdapter.insertShopInfo(shopInfoData);
+                            if(this.state.ShoppData=="清单"){
+                                var nextRoute={
+                                    name:"清单",
+                                    component:ShoppingCart,
+                                    params:{
+                                        DepCode:this.state.DepCode,
+                                    }
+                                };
+                                this.props.navigator.push(nextRoute);
+                            }else{
+                                var nextRoute={
+                                    name:"主页",
+                                    component:Index,
+                                    params:{
+                                        DepCode:this.state.DepCode,
+                                    }
+                                };
+                                this.props.navigator.push(nextRoute);
+                            }
+                        }else{
+                            if(this.state.Number==0){
+                                ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
+                            }else{
+                                var shopInfoData = [];
+                                var shopInfo = {};
+                                shopInfo.Pid = this.state.Pid;
+                                shopInfo.ProdCode=this.state.ProdCode;
+                                shopInfo.prodname = this.state.ProdName;
+                                shopInfo.countm = this.state.Number;
+                                shopInfo.ShopPrice = this.state.ShopPrice;
+                                shopInfo.prototal = this.state.numberFormat2;
+                                shopInfo.promemo = this.state.Remark;
+                                shopInfo.DepCode = this.state.DepCode;
+                                shopInfo.ydcountm = this.state.ydcountm;
+                                shopInfo.SuppCode = this.state.SuppCode;
+                                shopInfo.BarCode = this.state.BarCode;
+                                shopInfoData.push(shopInfo);
+                                //调用插入表方法
+                                dbAdapter.insertShopInfo(shopInfoData);
+                                if(this.state.DataName=="移动销售"){
+                                    var nextRoute={
+                                        name:"移动销售",
+                                        component:Sell,
+                                    };
+                                    this.props.navigator.push(nextRoute);
+                                }else if(this.state.ShoppData=="清单"){
+                                    var nextRoute={
+                                        name:"清单",
+                                        component:ShoppingCart,
+                                        params:{
+                                            DepCode:this.state.DepCode,
+                                        }
+                                    };
+                                    this.props.navigator.push(nextRoute);
+                                }else{
+                                    var nextRoute={
+                                        name:"主页",
+                                        component:Index,
+                                        params:{
+                                            DepCode:this.state.DepCode,
+                                        }
+                                    };
+                                    this.props.navigator.push(nextRoute);
+                                }
+                            }
                         }
-                    };
-                    this.props.navigator.push(nextRoute);
+                    } else{
+                        alert("数量不能含有小数");
+                    }
                 }
             }else{
-                if(this.state.Number==0&&this.state.name!=="标签采集"){
-                    ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
-                } else if(this.state.BQNumber==0&&this.state.name=="标签采集"){
-                    ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
-                }else{
+                if(this.state.name=="实时盘点"||this.state.name=="商品盘点"){
                     var shopInfoData = [];
                     var shopInfo = {};
                     shopInfo.Pid = this.state.Pid;
                     shopInfo.ProdCode=this.state.ProdCode;
                     shopInfo.prodname = this.state.ProdName;
-                    if(this.state.name=="标签采集"){
-                        shopInfo.countm = this.state.BQNumber;
-                    }else{
-                        shopInfo.countm = this.state.Number;
-                    }
+                    shopInfo.countm = this.state.Number;
                     shopInfo.ShopPrice = this.state.ShopPrice;
                     if(this.state.YdCountm == 5){
                         shopInfo.prototal = "0";
@@ -561,17 +865,10 @@ export default class GoodsDetails extends Component {
                     shopInfo.ydcountm = this.state.ydcountm;
                     shopInfo.SuppCode = this.state.SuppCode;
                     shopInfo.BarCode = this.state.BarCode;
-                    console.log("a=",shopInfo.countm)
                     shopInfoData.push(shopInfo);
                     //调用插入表方法
                     dbAdapter.insertShopInfo(shopInfoData);
-                    if(this.state.DataName=="移动销售"){
-                        var nextRoute={
-                            name:"移动销售",
-                            component:Sell,
-                        };
-                        this.props.navigator.push(nextRoute);
-                    }else if(this.state.ShoppData=="0"){
+                    if(this.state.ShoppData=="清单"){
                         var nextRoute={
                             name:"清单",
                             component:ShoppingCart,
@@ -589,6 +886,63 @@ export default class GoodsDetails extends Component {
                             }
                         };
                         this.props.navigator.push(nextRoute);
+                    }
+                }else{
+                    if(this.state.Number==0&&this.state.name!=="标签采集"){
+                        ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
+                    } else if(this.state.BQNumber==0&&this.state.name=="标签采集"){
+                        ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
+                    }else{
+                        var shopInfoData = [];
+                        var shopInfo = {};
+                        shopInfo.Pid = this.state.Pid;
+                        shopInfo.ProdCode=this.state.ProdCode;
+                        shopInfo.prodname = this.state.ProdName;
+                        if(this.state.name=="标签采集"){
+                            shopInfo.countm = this.state.BQNumber;
+                        }else{
+                            shopInfo.countm = this.state.Number;
+                        }
+                        shopInfo.ShopPrice = this.state.ShopPrice;
+                        if(this.state.YdCountm == 5){
+                            shopInfo.prototal = "0";
+                        }else{
+                            shopInfo.prototal = this.state.numberFormat2;
+                        }
+                        shopInfo.promemo = this.state.Remark;
+                        shopInfo.DepCode = this.state.DepCode;
+                        shopInfo.ydcountm = this.state.ydcountm;
+                        shopInfo.SuppCode = this.state.SuppCode;
+                        shopInfo.BarCode = this.state.BarCode;
+                        console.log("a=",shopInfo.countm)
+                        shopInfoData.push(shopInfo);
+                        //调用插入表方法
+                        dbAdapter.insertShopInfo(shopInfoData);
+                        if(this.state.DataName=="移动销售"){
+                            var nextRoute={
+                                name:"移动销售",
+                                component:Sell,
+                            };
+                            this.props.navigator.push(nextRoute);
+                        }else if(this.state.ShoppData=="清单"){
+                            var nextRoute={
+                                name:"清单",
+                                component:ShoppingCart,
+                                params:{
+                                    DepCode:this.state.DepCode,
+                                }
+                            };
+                            this.props.navigator.push(nextRoute);
+                        }else{
+                            var nextRoute={
+                                name:"主页",
+                                component:Index,
+                                params:{
+                                    DepCode:this.state.DepCode,
+                                }
+                            };
+                            this.props.navigator.push(nextRoute);
+                        }
                     }
                 }
             }
@@ -670,7 +1024,7 @@ export default class GoodsDetails extends Component {
                     </View>:null
                 }
                 {
-                    (this.state.YdCountm==2||this.state.name=="商品配送")?
+                    (this.state.YdCountm==2)?
                         <View style={styles.List}>
                             <View style={styles.left2}>
                                 <Text style={styles.left}>原单数量</Text>
@@ -738,7 +1092,7 @@ export default class GoodsDetails extends Component {
                                 }
 
                                 {
-                                    (this.state.name=="商品采购"||this.state.name=="商品验收"||this.state.name=="移动销售"||this.state.name=="协配采购")?
+                                    (this.state.name=="商品采购"||this.state.Modify==1||this.state.name=="移动销售"||this.state.name=="协配采购")?
                                         <View style={styles.onPrice}>
                                             {
                                                 (this.state.Total == 1) ?

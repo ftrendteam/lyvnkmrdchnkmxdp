@@ -58,6 +58,28 @@ export default class StockEnquiries extends Component {
             this.setState({
                 search:reminder
             })
+            this.ModalShow();
+            this.dataRows=[];
+            Storage.get('str2').then((tags) => {
+                let params = {
+                    TblName:"android_ProdQryCurrKC",
+                    shopcode:tags,
+                    NeedPage:"0",
+                    PageSize:"20",
+                    CurrPage:"1",
+                    context:this.state.search,
+                }
+                FetchUtil.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
+                    var TblRow = data.TblRow;
+                    this.dataRows = this.dataRows.concat(TblRow);
+                    this.setState({
+                        dataSource:this.state.dataSource.cloneWithRows(this.dataRows)
+                    })
+                    this.ModalShow();
+                },(err)=>{
+                    alert("网络请求失败");
+                })
+            })
         })
     }
 
@@ -80,6 +102,7 @@ export default class StockEnquiries extends Component {
                 PageSize:"20",
                 CurrPage:"1",
                 context:this.state.search,
+                // usercode:usercode,
             }
             FetchUtil.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
                 var TblRow = data.TblRow;
@@ -141,14 +164,17 @@ export default class StockEnquiries extends Component {
                     <View style={styles.Title}>
                         <TextInput
                             ref={component => this._textInput = component}
-                            onEndEditing={()=>{this._onEndEditing()}}
-                            autofocus="{true}"
+                            autoFocus={true}
                             returnKeyType="search"
+                            numberoflines={1}
+                            keyboardType="numeric"
+                            textalign="center"
+                            underlineColorAndroid='transparent'
                             placeholder="搜索相关产品名称"
                             placeholderColor="#323232"
-                            underlineColorAndroid='transparent'
                             style={styles.Search}
                             value={this.state.search}
+                            onEndEditing={()=>{this._onEndEditing()}}
                             onChangeText={(value)=>{
                                 this.setState({
                                     search:value

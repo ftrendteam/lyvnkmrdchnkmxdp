@@ -10,12 +10,14 @@ import {
     View,
     Image,
     TextInput,
+    ToastAndroid,
     TouchableOpacity,
 } from 'react-native';
 
 import Index from "./Index";
 import Search from "./Search";
 import ProductCG_list from "./ProductCG_list";
+import PinLeiData from "../YHDan/PinLeiData";
 import NetUtils from "../utils/NetUtils";
 import Storage from '../utils/Storage';
 import ModalDropdown from 'native';
@@ -27,18 +29,14 @@ export default class ProductCG extends Component {
             show:false,
             Number:"",
             sCode1:"",
-            invoice:"",
             active:"",
+            DepName1:"",
+            DepCode1:"",
+            invoice:this.props.invoice ? this.props.invoice : "",
         };
     }
 
     componentDidMount(){
-        Storage.get('invoice').then((tags)=>{
-            this.setState({
-                invoice:tags
-            })
-        })
-
         Storage.get('Disting').then((tags)=>{
             this.setState({
                 Disting:tags
@@ -72,11 +70,37 @@ export default class ProductCG extends Component {
         });
     }
 
+    ShoppData() {
+        var nextRoute = {
+            name: "ProductCG_list",
+            component: PinLeiData,
+            params: {
+                DepName: (DepName) => this._DepName(DepName),
+                DepCode: (DepCode) => this._DepCode(DepCode),
+            }
+        };
+        this.props.navigator.push(nextRoute)
+    }
+
+    _DepName(DepName) {
+        DepName = String(DepName);
+        this.setState({
+            DepName1:DepName,
+        });
+    }
+    _DepCode(DepCode) {
+        DepCode = String(DepCode);
+        this.setState({
+            DepCode1:DepCode,
+        });
+    }
+
     Button(){
         if(this.state.Disting=="0") {
             var str=this.state.sCode1;
             if(this.state.sCode1==""){
-                alert("请选择供应商")
+                ToastAndroid.show("请选择供应商",ToastAndroid.SHORT);
+                return;
             }else{
                 var date = new Date();
                 var data=JSON.stringify(date.getTime());
@@ -92,6 +116,11 @@ export default class ProductCG extends Component {
                 Storage.delete('YuanDan');
                 Storage.delete('Screen');
                 Storage.delete('Modify');
+                if(this.state.DepName1==""&&this.state.DepCode1==""){
+                    Storage.delete('DepCode');
+                }else{
+                    Storage.save('DepCode', this.state.DepCode1);
+                }
                 Storage.save('Name','商品采购');
                 Storage.save('FormType','CGYW');
                 Storage.save('valueOf','App_Client_ProCG');
@@ -105,7 +134,8 @@ export default class ProductCG extends Component {
         }else if(this.state.Disting=="1"){
             var str=this.state.sCode1;
             if(this.state.sCode1==""){
-                alert("请选择供应商")
+                ToastAndroid.show("请选择供应商",ToastAndroid.SHORT);
+                return;
             }else{
                 var date = new Date();
                 var data=JSON.stringify(date.getTime());
@@ -121,6 +151,11 @@ export default class ProductCG extends Component {
                 Storage.delete('YuanDan');
                 Storage.delete('Screen');
                 Storage.delete('Modify');
+                if(this.state.DepName1==""&&this.state.DepCode1==""){
+                    Storage.delete('DepCode');
+                }else{
+                    Storage.save('DepCode', this.state.DepCode1);
+                }
                 Storage.save('Name','商品采购');
                 Storage.save('FormType','CGYW');
                 Storage.save('valueOf','App_Client_ProCG');
@@ -165,6 +200,27 @@ export default class ProductCG extends Component {
                         />
                     </TouchableOpacity>
                     <TouchableOpacity onPress={this.onclick.bind(this)}>
+                        <Image source={require("../images/2_03.png")}></Image>
+                    </TouchableOpacity>
+                </View>
+                <View style={styles.ContList}>
+                    <View style={styles.listleft}>
+                        <Text style={styles.listLeftText}>商品品类:</Text>
+                    </View>
+                    <TouchableOpacity style={styles.listcont} onPress={this.ShoppData.bind(this)}>
+                        <TextInput
+                            style={styles.TextInput1}
+                            autofocus={true}
+                            editable={false}
+                            defaultValue ={this.state.DepName1}
+                            numberoflines={1}
+                            placeholder="请选择商品品类"
+                            textalign="center"
+                            underlineColorAndroid='transparent'
+                            placeholderTextColor="#cccccc"
+                        />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={this.ShoppData.bind(this)}>
                         <Image source={require("../images/2_03.png")}></Image>
                     </TouchableOpacity>
                 </View>

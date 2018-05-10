@@ -33,6 +33,7 @@ public class A90ReadCard {
         while (key.length() < 12) {
             key = key + "F";
         }
+        System.out.println("key="+key);
         byte[] bytes = new byte[0];
         try {
             bytes = StringUtils.bytesFromHex(key, 6);
@@ -42,6 +43,7 @@ public class A90ReadCard {
         byte[] SerialNo = new byte[100];
         byte[] CardType = new byte[2];
         int m = PiccApi.PiccCheck_Api('M', CardType, SerialNo);
+        System.out.println();
         if (m == 0) {//读卡
             int ret = 0;
             ret = PiccApi.M1Authority_Api('A', 4, bytes);//认证

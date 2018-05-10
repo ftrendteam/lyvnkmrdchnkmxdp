@@ -35,12 +35,12 @@ export default class GoodsDetails extends Component {
              Formno:this.props.Formno ? this.props.Formno : "",
              FormDate:this.props.FormDate ? this.props.FormDate : "",
              promemo:this.props.promemo ? this.props.promemo : "无",
+             depname:this.props.depname ? this.props.depname : "",
           };
           this.dataRows = [];
     }
 
     componentDidMount(){
-
          //获取本地数据库url
          Storage.get('LinkUrl').then((tags) => {
             this.setState({
@@ -180,7 +180,9 @@ export default class GoodsDetails extends Component {
                     <Text style={styles.ListText}>单据备注：</Text>
                     <Text style={styles.ListText}>{this.state.promemo}</Text>
                 </View>
-                <View style={styles.Listright}>
+            </View>
+            <View style={styles.List}>
+                <View style={[styles.ListLeft,{flex:1}]}>
                     <Text style={styles.ListText}>单据状态：</Text>
                     <Text style={[styles.ListText,{color:"#ff4e4e"}]}>{this.state.checktype}</Text>
                 </View>
@@ -189,6 +191,12 @@ export default class GoodsDetails extends Component {
                 <View style={styles.ListLeft}>
                     <Text style={styles.ListText}>制单日期：</Text>
                     <Text style={styles.ListText}>{this.state.FormDate}</Text>
+                </View>
+            </View>
+            <View style={styles.List}>
+                <View style={styles.ListLeft}>
+                    <Text style={styles.ListText}>商品品类：</Text>
+                    <Text style={styles.ListText}>{this.state.depname}</Text>
                 </View>
             </View>
             {
@@ -283,6 +291,9 @@ const styles = StyleSheet.create({
         paddingBottom:20,
         alignItems:"center",
         flexDirection:"row",
+   },
+   ShopCont:{
+        marginBottom:30,
    },
    Name:{
        flex:1,

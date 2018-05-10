@@ -72,6 +72,7 @@ export default class YHDan extends Component {
                                     console.log('aaaa',this.dataRows)
                                     this.setState({
                                         dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
+                                        DetailInfo:DetailInfo,
                                     })
                                 }else{
                                     alert(JSON.stringify(data))
@@ -154,12 +155,20 @@ export default class YHDan extends Component {
                             <Text style={styles.codingText}>要货单号</Text>
                         </View>
                     </View>
-                    <ListView
-                        style={styles.scrollview}
-                        dataSource={this.state.dataSource}
-                        showsVerticalScrollIndicator={true}
-                        renderRow={this._renderRow.bind(this)}
-                    />
+                    {
+                        (this.state.DetailInfo== null) ?
+                            <View style={styles.Null}>
+                                <Text style={styles.NullText}>
+                                    没有搜索到相关商品~~~
+                                </Text>
+                            </View> :
+                            <ListView
+                                style={styles.scrollview}
+                                dataSource={this.state.dataSource}
+                                showsVerticalScrollIndicator={true}
+                                renderRow={this._renderRow.bind(this)}
+                            />
+                    }
                 </View>
             </View>
         );
@@ -246,5 +255,15 @@ const styles = StyleSheet.create({
     },
     scrollview:{
         marginBottom:120,
-    }
+    },
+    Null: {
+        marginLeft: 25,
+        marginRight: 25,
+        marginTop: 120,
+    },
+    NullText: {
+        color: "#cccccc",
+        fontSize: 20,
+        textAlign: "center"
+    },
 });

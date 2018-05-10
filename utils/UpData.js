@@ -37,7 +37,6 @@ export default class UpData {
               dbAdapter.insertTUserRrightData(detailInfo3);
               //用户管理机构表
               var detailInfo4 = data.DetailInfo4;
-              console.log(detailInfo4);
               dbAdapter.insertTUsershopData(detailInfo4);
               let categoryBody = RequestBodyUtils.createCategory(currShopCode);
               dbAdapter.downProductAndCategory(categoryBody, currShopCode).then((result) => {

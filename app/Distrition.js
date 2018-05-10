@@ -15,6 +15,7 @@ import {
 import Index from "./Index";
 import Search from "./Search";
 import Distrition_list from "./Distrition_list";
+import PinLeiData from "../YHDan/PinLeiData";
 import NetUtils from "../utils/NetUtils";
 import Storage from '../utils/Storage';
 
@@ -24,19 +25,15 @@ export default class Distrition extends Component {
         this.state = {
             show:false,
             Number:"",
-            invoice:"",
             sCode1:"",
             active:"",
+            DepCode1:"",
+            DepCode1:"",
+            invoice:this.props.invoice ? this.props.invoice : "",
         };
     }
 
     componentDidMount(){
-        Storage.get('invoice').then((tags)=>{
-            this.setState({
-                invoice:tags
-            })
-        })
-
         Storage.get('Disting').then((tags)=>{
             this.setState({
                 Disting:tags
@@ -59,28 +56,10 @@ export default class Distrition extends Component {
             sCode1:sCode,
         });
     }
-
-    //判断当前输入是否为正确的单号 并保存
-    // pressPush(){
-    //     var date = new Date();
-    //     var data=JSON.stringify(date.getTime());
-    //     var str=this.state.sCode1;
-    //     var nextRoute={
-    //         name:"主页",
-    //         component:Search
-    //     };
-    //     this.props.navigator.push(nextRoute);
-    //     Storage.delete('YuanDan');
-    //     Storage.save('OrgFormno',str);
-    //     Storage.save('Date',data);
-    //     Storage.save('Name','配送收货单');
-    //     Storage.save('FormType','PSSHYW');
-    //     Storage.save('valueOf','App_Client_ProPSSH');
-    //     Storage.save('history','App_Client_ProPSSHQ');
-    //     Storage.save('historyClass','App_Client_ProPSSHDetailQ');
-    //     Storage.save('ProYH','ProPSSH');
-    // }
-
+    /**
+     *
+     * 确定按钮点击跳转至商品列表
+     */
     Home(){
         if(this.state.Disting=="0") {
             var date = new Date();
@@ -98,6 +77,11 @@ export default class Distrition extends Component {
             Storage.delete('StateMent');
             Storage.delete('BQNumber');
             Storage.delete('Modify');
+            if(this.state.DepName1==""&&this.state.DepCode1==""){
+                Storage.delete('DepCode');
+            }else{
+                Storage.save('DepCode', this.state.DepCode1);
+            }
             Storage.save('YdCountm', '2');
             Storage.save('YuanDan','1');
             Storage.save('OrgFormno',str);
@@ -126,6 +110,11 @@ export default class Distrition extends Component {
             Storage.delete('StateMent');
             Storage.delete('BQNumber');
             Storage.delete('Modify');
+            if(this.state.DepName1==""&&this.state.DepCode1==""){
+                Storage.delete('DepCode');
+            }else{
+                Storage.save('DepCode', this.state.DepCode1);
+            }
             Storage.save('YdCountm', '2');
             Storage.save('YuanDan','1');
             Storage.save('OrgFormno',str);
@@ -142,7 +131,10 @@ export default class Distrition extends Component {
     }
 
 
-
+    /**
+     *
+     * 单号点击查询
+     */
     Search(){
         Storage.save('shopPandian','App_Client_NOYSPSQ');
         var nextRoute={
@@ -153,6 +145,33 @@ export default class Distrition extends Component {
             }
         };
         this.props.navigator.push(nextRoute)
+    }
+
+    /**
+     * 商品品类点击查询
+     */
+    onclick(){
+        var nextRoute={
+            name:"ProductCG_list",
+            component:PinLeiData,
+            params: {
+                DepName:(DepName)=>this._DepName(DepName),
+                DepCode:(DepCode)=>this._DepCode(DepCode),
+            }
+        };
+        this.props.navigator.push(nextRoute)
+    }
+    _DepName(DepName) {
+        DepName = String(DepName);
+        this.setState({
+            DepName1:DepName,
+        });
+    }
+    _DepCode(DepCode) {
+        DepCode = String(DepCode);
+        this.setState({
+            DepCode1:DepCode,
+        });
     }
 
     render() {
@@ -186,6 +205,27 @@ export default class Distrition extends Component {
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.listimages} onPress={this.Search.bind(this)}>
                         <Image source={require("../images/2_03.png")} style={styles.Image}></Image>
+                    </TouchableOpacity>
+                </View>
+                <View style={styles.ContList}>
+                    <View style={styles.listleft}>
+                        <Text style={styles.listLeftText}>商品品类:</Text>
+                    </View>
+                    <TouchableOpacity style={styles.listcont} onPress={this.onclick.bind(this)}>
+                        <TextInput
+                            style={styles.TextInput1}
+                            autofocus={true}
+                            editable={false}
+                            defaultValue ={this.state.DepName1}
+                            numberoflines={1}
+                            placeholder="请选择商品品类"
+                            textalign="center"
+                            underlineColorAndroid='transparent'
+                            placeholderTextColor="#cccccc"
+                        />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={this.onclick.bind(this)}>
+                        <Image source={require("../images/2_03.png")}></Image>
                     </TouchableOpacity>
                 </View>
                 <View style={styles.search}>
@@ -232,7 +272,7 @@ const styles = StyleSheet.create({
         borderBottomColor:"#f2f2f2",
     },
     listleft:{
-        width:60,
+        width:80,
         marginTop:6,
     },
     listLeftText:{
