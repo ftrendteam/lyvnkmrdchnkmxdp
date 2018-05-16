@@ -81,7 +81,6 @@ export default class admin extends Component {
         })
         //获取数据库url地址
         Storage.get('LinkUrl').then((tags) => {
-          console.log('sadf=',tags,'=b');
             this.setState({
                 linkurl:tags
             })
@@ -95,7 +94,6 @@ export default class admin extends Component {
                     }
                 });
             },(err)=>{
-                console.log("王二傻子是个傻子")
                 alert("网络请求失败");
             })
         })
@@ -123,14 +121,12 @@ export default class admin extends Component {
                 dbAdapter.insertTUserRrightData(detailInfo3);
                 //用户管理机构表
                 var detailInfo4 = data.DetailInfo4;
-                console.log(detailInfo4)
                 dbAdapter.insertTUsershopData(detailInfo4);
                 //var acquiring = DataUtils.get("LinkUrl",LinkUrl);
               }else{
                 alert(JSON.stringify(data))
               }
             },(err)=>{
-                console.log("王二傻子是个傻子+11111")
                 alert("网络请求失败");
             })
         });

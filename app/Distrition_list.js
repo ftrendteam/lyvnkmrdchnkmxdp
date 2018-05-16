@@ -137,23 +137,25 @@ export default class Distrition_list extends Component {
     }
 
     pressPop(rowData){
-        if(this.props.reloadView){
-            if(this.state.shopPandian=='App_Client_NoEndPCQ'||this.state.shopPandian=='App_Client_NOYSPSQ'){
-                this.props.reloadView(rowData.Formno)
+        if(this.props.reloadView||this.props.DepName||this.props.DepCode){
+            if(this.state.shopPandian=='App_Client_NOYSPSQ'){
+                this.props.reloadView(rowData.Formno);
+                this.props.DepName(rowData.depname);
+                this.props.DepCode(rowData.depcode);
+            }else if(this.state.shopPandian=='App_Client_NoEndPCQ'){
+                this.props.reloadView(rowData.Formno);
             }
         }
         this.props.navigator.pop();
     }
 
     pressPop1(rowData){
-        if(this.props.SearchShopname){
+        if(this.props.SearchShopname||this.props.SearchShopname1||this.props.DepName||this.props.DepCode){
             if(this.state.shopPandian=='App_Client_NOYSCGQ'||this.state.shopPandian=='App_Client_NOYSXPCGQ'){
-                this.props.SearchShopname(rowData.Formno)
-            }
-        }
-        if(this.props.SearchShopname1){
-            if(this.state.shopPandian=='App_Client_NOYSCGQ'||this.state.shopPandian=='App_Client_NOYSXPCGQ'){
-                this.props.SearchShopname1(rowData.suppcode)
+                this.props.SearchShopname(rowData.Formno);
+                this.props.SearchShopname1(rowData.suppcode);
+                this.props.DepName(rowData.depname);
+                this.props.DepCode(rowData.depcode);
             }
         }
         this.props.navigator.pop();
@@ -161,29 +163,33 @@ export default class Distrition_list extends Component {
 
     _renderRow(rowData, sectionID, rowID){
         return(
-            <TouchableOpacity style={styles.header}>
+            <View style={styles.header}>
                 {
                     (this.state.shopPandian=='App_Client_NoEndPCQ'||this.state.shopPandian=='App_Client_NOYSPSQ')?
-                        <TouchableOpacity onPress={()=>this.pressPop(rowData)} style={styles.coding}>
-                            <View >
+                        <TouchableOpacity onPress={()=>this.pressPop(rowData)} style={styles.Coding}>
+                            <View style={[styles.coding,{flex:3}]}>
                                 <Text style={styles.codingText}>{rowData.Formno}</Text>
+                            </View>
+                            <View style={[styles.coding,{flex:2}]}>
+                                <Text style={styles.codingText}>{rowData.depname}</Text>
                             </View>
                         </TouchableOpacity>:null
                 }
                 {
                     (this.state.shopPandian=='App_Client_NOYSCGQ'||this.state.shopPandian=='App_Client_NOYSXPCGQ')?
-                        <TouchableOpacity onPress={()=>this.pressPop1(rowData)} style={styles.coding}>
-                            <Text style={styles.codingText}>{rowData.Formno}</Text>
+                        <TouchableOpacity onPress={()=>this.pressPop1(rowData)} style={styles.Coding}>
+                            <View style={[styles.coding,{flex:3}]}>
+                                <Text style={styles.codingText}>{rowData.Formno}</Text>
+                            </View>
+                            <View style={[styles.coding,{flex:1}]}>
+                                <Text style={styles.codingText}>{rowData.suppcode}</Text>
+                            </View>
+                            <View style={[styles.coding,{flex:1}]}>
+                                <Text style={styles.codingText}>{rowData.depname}</Text>
+                            </View>
                         </TouchableOpacity>:null
                 }
-                {
-                    (this.state.shopPandian=='App_Client_NOYSCGQ'||this.state.shopPandian=='App_Client_NOYSXPCGQ')?
-                        <TouchableOpacity onPress={()=>this.pressPop1(rowData)}style={styles.name}>
-                            <Text style={styles.codingText}>{rowData.suppcode}</Text>
-                        </TouchableOpacity>:null
-                }
-
-            </TouchableOpacity>
+            </View>
         )
 
     }
@@ -212,13 +218,25 @@ export default class Distrition_list extends Component {
                 </View>
                 <View>
                     <View style={styles.head}>
-                        <View style={styles.coding}>
+                        <View style={[styles.coding,{flex:3}]}>
                             <Text style={styles.codingText}>单据号</Text>
                         </View>
                         {
+                            (this.state.invoice=="配送收货")?
+                                <View style={[styles.coding,{flex:2}]}>
+                                    <Text style={styles.codingText}>品类</Text>
+                                </View>:null
+                        }
+                        {
                             (this.state.invoice=="商品验收"||this.state.invoice=="协配收货")?
-                                <View style={styles.name}>
+                                <View style={[styles.coding,{flex:1}]}>
                                     <Text style={styles.codingText}>供应商</Text>
+                                </View>:null
+                        }
+                        {
+                            (this.state.invoice=="商品验收"||this.state.invoice=="协配收货")?
+                                <View style={[styles.coding,{flex:1}]}>
+                                    <Text style={styles.codingText}>品类</Text>
                                 </View>:null
                         }
                     </View>
@@ -292,6 +310,9 @@ const styles = StyleSheet.create({
         paddingLeft:25,
         paddingRight:25,
     },
+    Coding:{
+        flexDirection:"row",
+    },
     coding:{
         flex:2,
         paddingLeft:5
@@ -306,9 +327,8 @@ const styles = StyleSheet.create({
         flex:1,
     },
     header:{
-        flexDirection:"row",
-        paddingLeft:25,
-        paddingRight:25,
+        paddingLeft:15,
+        paddingRight:15,
         paddingTop:13,
         paddingBottom:13,
         backgroundColor:"#ffffff",

@@ -41,12 +41,11 @@ export default class  login extends Component{
             show:false,
             ErrorShow:false
         };
+        console.log("constructor")
     }
 
     componentDidMount() {
-        this.setState({
-            focus: true
-        })
+        console.log("componentDidMount")
     }
 
     pressPush(){

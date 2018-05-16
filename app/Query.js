@@ -81,6 +81,7 @@ export default class Query extends Component {
                 Storage.delete('YuanDan');
                 Storage.delete('YdCountm');
                 Storage.delete('Modify');
+                Storage.delete("PeiSong");
                 if(this.state.DepName1==""&&this.state.DepCode1==""){
                     Storage.delete('DepCode');
                 }else{
@@ -118,6 +119,7 @@ export default class Query extends Component {
                 Storage.delete('YuanDan');
                 Storage.delete('YdCountm');
                 Storage.delete('Modify');
+                Storage.delete("PeiSong");
                 if(this.state.DepName1==""&&this.state.DepCode1==""){
                     Storage.delete('DepCode');
                 }else{
@@ -142,7 +144,7 @@ export default class Query extends Component {
             name:"Distrition_list",
             component:Distrition_list,
             params: {
-                reloadView:(sCode)=>this._reloadView(sCode)
+                reloadView:(sCode)=>this._reloadView(sCode),
             }
         };
         this.props.navigator.push(nextRoute)

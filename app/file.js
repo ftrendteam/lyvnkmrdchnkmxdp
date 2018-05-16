@@ -26,15 +26,18 @@ export default class file extends Component {
           first:"",
           show:false
       };
+      console.log("file-constructor")
   }
   _setModalVisible() {
     let isShow = this.state.show;
     this.setState({
         show:!isShow,
     });
+
   }
 
   componentWillMount(){
+      console.log("file-_setModalVisible")
        Storage.get('FirstTime').then((tags) => {
            Storage.get('FirstTime1').then((FirstTime1) => {
                 if(tags == 1&&FirstTime1==2){

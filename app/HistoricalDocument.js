@@ -199,7 +199,6 @@ export default class HistoricalDocument extends Component {
             if(data.retcode == 1){
                 var DetailInfo1 = data.DetailInfo1;
                 this.dataRows = this.dataRows.concat(DetailInfo1);
-                alert(JSON.stringify(this.dataRows))
                 if(this.dataRows==0){
                     return;
                 }else{

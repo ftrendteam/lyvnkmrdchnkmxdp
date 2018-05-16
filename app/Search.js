@@ -63,6 +63,7 @@ export default class Search extends Component {
             OnPrice:"",
             Total:"",
             Price:"",
+            OptValue:"",
             IsIntCount:"",
             OrderDetails:1,
             Show: false,
@@ -82,6 +83,15 @@ export default class Search extends Component {
     }
     componentDidMount() {
         InteractionManager.runAfterInteractions(() => {
+            dbAdapter.selectKgOpt('YDPosCanChangePrice').then((data) => {
+                for (let i = 0; i < data.length; i++) {
+                    var datas = data.item(i);
+                    var OptValue=datas.OptValue;
+                    this.setState({
+                        OptValue:OptValue,
+                    });
+                }
+            })
             this.Storage();
             this.Device();
         });
@@ -805,54 +815,267 @@ export default class Search extends Component {
     }
 
     onNumber(){
-        var numberFormat2 = this.state.Number1 * this.state.ShopPrice;
-        let shopprice=Math.round(numberFormat2 * 100) / 100;
-        this.setState({
-            numberFormat2:shopprice
-        })
-        if(this.state.name=="商品采购"||this.state.name=="协配采购"||this.state.Modify==1){
-            this.setState({
-                OnPrice:1,
-                PriceText:1
-            });
-        }else{
-            if(this.state.IsIntCount==0){
-                var number = this.state.Number1;//获取数量的数字
-                if(parseInt(number)==number) {
-                    if(this.state.name=="实时盘点"||this.state.name=="商品盘点"){
-                        var shopInfoData = [];
-                        var shopInfo = {};
-                        shopInfo.Pid = this.state.Pid;
-                        shopInfo.ProdCode = this.state.ProdCode;
-                        shopInfo.prodname = this.state.ProdName;
-                        shopInfo.countm = this.state.Number1;
-                        shopInfo.ShopPrice = this.state.ShopPrice;
-                        if(this.state.name=="标签采集"){
-                            shopInfo.prototal = "0";
-                        }else{
-                            shopInfo.prototal = NumberUtils.numberFormat2(ShopPrice);
-                        }
-                        shopInfo.promemo = this.state.Remark;
-                        shopInfo.DepCode = this.state.DepCode;
-                        shopInfo.ydcountm = this.state.ydcountm;
-                        shopInfo.SuppCode = this.state.SuppCode;
-                        shopInfo.BarCode = this.state.BarCode;
-                        shopInfoData.push(shopInfo);
-                        //调用插入表方法
-                        dbAdapter.insertShopInfo(shopInfoData);
-                        this.setState({
-                            Number1: "",
-                            ydcountm: "",
-                            ShopPrice: "",
-                            numberFormat2: "",
-                            Remark: "",
-                            ProdName: "",
-                            modal:"",
+        if(this.state.YdCountm == 6&&this.state.ydcountm==0){
+            alert("库存为0，该商品不能进行配送")
+        }else {
+            if(this.state.Number1<0){
+                if(this.state.name=="商品损溢"||this.state.name=="商品盘点"||this.state.name=="移动销售"){
+                    var numberFormat2 = this.state.Number1 * this.state.ShopPrice;
+                    let shopprice=Math.round(numberFormat2 * 100) / 100;
+                    this.setState({
+                        numberFormat2:shopprice
+                    })
+                    if(this.state.name=="商品采购"||this.state.name=="协配采购"||this.state.Modify==1){
+                        dbAdapter.selectKgOpt('YDPosCanChangePrice').then((data) => {
+                            for (let i = 0; i < data.length; i++) {
+                                var datas = data.item(i);
+                                if(datas.OptValue==1){
+                                    this.setState({
+                                        OnPrice:1,
+                                        PriceText:1
+                                    });
+                                }
+                            }
                         })
+                    }else if(this.state.name=="移动销售"){
+                        this.setState({
+                            OnPrice:1,
+                            PriceText:1
+                        });
                     }else{
-                        if(this.state.Number1==0){
-                            ToastAndroid.show('商品数量不能为空', ToastAndroid.SHORT);
+                        if(this.state.IsIntCount==0){
+                            var number = this.state.Number1;//获取数量的数字
+                            if(parseInt(number)==number) {
+                                if(this.state.name=="实时盘点"||this.state.name=="商品盘点"){
+                                    var shopInfoData = [];
+                                    var shopInfo = {};
+                                    shopInfo.Pid = this.state.Pid;
+                                    shopInfo.ProdCode = this.state.ProdCode;
+                                    shopInfo.prodname = this.state.ProdName;
+                                    shopInfo.countm = this.state.Number1;
+                                    shopInfo.ShopPrice = this.state.ShopPrice;
+                                    if(this.state.name=="标签采集"){
+                                        shopInfo.prototal = "0";
+                                    }else{
+                                        shopInfo.prototal = NumberUtils.numberFormat2(ShopPrice);
+                                    }
+                                    shopInfo.promemo = this.state.Remark;
+                                    shopInfo.DepCode = this.state.DepCode;
+                                    shopInfo.ydcountm = this.state.ydcountm;
+                                    shopInfo.SuppCode = this.state.SuppCode;
+                                    shopInfo.BarCode = this.state.BarCode;
+                                    shopInfoData.push(shopInfo);
+                                    //调用插入表方法
+                                    dbAdapter.insertShopInfo(shopInfoData);
+                                    this.setState({
+                                        Number1: "",
+                                        ydcountm: "",
+                                        ShopPrice: "",
+                                        numberFormat2: "",
+                                        Remark: "",
+                                        ProdName: "",
+                                        modal:"",
+                                    })
+                                }else{
+                                    if(this.state.Number1==0){
+                                        ToastAndroid.show('商品数量不能为空', ToastAndroid.SHORT);
+                                    }else{
+                                        var shopInfoData = [];
+                                        var shopInfo = {};
+                                        shopInfo.Pid = this.state.Pid;
+                                        shopInfo.ProdCode = this.state.ProdCode;
+                                        shopInfo.prodname = this.state.ProdName;
+                                        shopInfo.countm = this.state.Number1;
+                                        shopInfo.ShopPrice = this.state.ShopPrice;
+                                        if(this.state.name=="标签采集"){
+                                            shopInfo.prototal = "0";
+                                        }else{
+                                            shopInfo.prototal = NumberUtils.numberFormat2(ShopPrice);
+                                        }
+                                        shopInfo.promemo = this.state.Remark;
+                                        shopInfo.DepCode = this.state.DepCode;
+                                        shopInfo.ydcountm = this.state.ydcountm;
+                                        shopInfo.SuppCode = this.state.SuppCode;
+                                        shopInfo.BarCode = this.state.BarCode;
+                                        shopInfoData.push(shopInfo);
+                                        //调用插入表方法
+                                        dbAdapter.insertShopInfo(shopInfoData);
+                                        this.setState({
+                                            Number1: "",
+                                            ydcountm: "",
+                                            ShopPrice: "",
+                                            numberFormat2: "",
+                                            Remark: "",
+                                            ProdName: "",
+                                            modal:"",
+                                        })
+                                    }
+                                }
+                            }else{
+                                alert("数量不能含有小数");
+                                this.setState({
+                                    Total:"",
+                                });
+                            }
+                        } else {
+                            if(this.state.name=="实时盘点"||this.state.name=="商品盘点"){
+                                var shopInfoData = [];
+                                var shopInfo = {};
+                                shopInfo.Pid = this.state.Pid;
+                                shopInfo.ProdCode = this.state.ProdCode;
+                                shopInfo.prodname = this.state.ProdName;
+                                shopInfo.countm = this.state.Number1;
+                                shopInfo.ShopPrice = this.state.ShopPrice;
+                                if(this.state.name=="标签采集"){
+                                    shopInfo.prototal = "0";
+                                }else{
+                                    shopInfo.prototal = shopprice;
+                                }
+                                shopInfo.promemo = this.state.Remark;
+                                shopInfo.DepCode = this.state.DepCode;
+                                shopInfo.ydcountm = this.state.ydcountm;
+                                shopInfo.SuppCode = this.state.SuppCode;
+                                shopInfo.BarCode = this.state.BarCode;
+                                shopInfoData.push(shopInfo);
+                                //调用插入表方法
+                                dbAdapter.insertShopInfo(shopInfoData);
+                                this.setState({
+                                    Number1: "",
+                                    ydcountm: "",
+                                    ShopPrice: "",
+                                    numberFormat2: "",
+                                    Remark: "",
+                                    ProdName: "",
+                                    modal:"",
+                                })
+                            }else{
+                                if(this.state.Number1==0){
+                                    ToastAndroid.show('商品数量不能为空', ToastAndroid.SHORT);
+                                }else{
+                                    var shopInfoData = [];
+                                    var shopInfo = {};
+                                    shopInfo.Pid = this.state.Pid;
+                                    shopInfo.ProdCode = this.state.ProdCode;
+                                    shopInfo.prodname = this.state.ProdName;
+                                    shopInfo.countm = this.state.Number1;
+                                    shopInfo.ShopPrice = this.state.ShopPrice;
+                                    if(this.state.name=="标签采集"){
+                                        shopInfo.prototal = "0";
+                                    }else{
+                                        shopInfo.prototal = shopprice;
+                                    }
+                                    shopInfo.promemo = this.state.Remark;
+                                    shopInfo.DepCode = this.state.DepCode;
+                                    shopInfo.ydcountm = this.state.ydcountm;
+                                    shopInfo.SuppCode = this.state.SuppCode;
+                                    shopInfo.BarCode = this.state.BarCode;
+                                    shopInfoData.push(shopInfo);
+                                    //调用插入表方法
+                                    dbAdapter.insertShopInfo(shopInfoData);
+                                    this.setState({
+                                        Number1: "",
+                                        ydcountm: "",
+                                        ShopPrice: "",
+                                        numberFormat2: "",
+                                        Remark: "",
+                                        ProdName: "",
+                                        modal:"",
+                                    })
+                                }
+                            }
+                        }
+                    }
+                }else{
+                    ToastAndroid.show('商品数量不能为负数', ToastAndroid.SHORT);
+                }
+            }else{
+                var numberFormat2 = this.state.Number1 * this.state.ShopPrice;
+                let shopprice=Math.round(numberFormat2 * 100) / 100;
+                this.setState({
+                    numberFormat2:shopprice
+                })
+                if(this.state.name=="商品采购"||this.state.name=="协配采购"||this.state.Modify==1){
+                    this.setState({
+                        OnPrice:1,
+                        PriceText:1
+                    });
+                }else{
+                    if(this.state.IsIntCount==0){
+                        var number = this.state.Number1;//获取数量的数字
+                        if(parseInt(number)==number) {
+                            if(this.state.name=="实时盘点"||this.state.name=="商品盘点"){
+                                var shopInfoData = [];
+                                var shopInfo = {};
+                                shopInfo.Pid = this.state.Pid;
+                                shopInfo.ProdCode = this.state.ProdCode;
+                                shopInfo.prodname = this.state.ProdName;
+                                shopInfo.countm = this.state.Number1;
+                                shopInfo.ShopPrice = this.state.ShopPrice;
+                                if(this.state.name=="标签采集"){
+                                    shopInfo.prototal = "0";
+                                }else{
+                                    shopInfo.prototal = NumberUtils.numberFormat2(ShopPrice);
+                                }
+                                shopInfo.promemo = this.state.Remark;
+                                shopInfo.DepCode = this.state.DepCode;
+                                shopInfo.ydcountm = this.state.ydcountm;
+                                shopInfo.SuppCode = this.state.SuppCode;
+                                shopInfo.BarCode = this.state.BarCode;
+                                shopInfoData.push(shopInfo);
+                                //调用插入表方法
+                                dbAdapter.insertShopInfo(shopInfoData);
+                                this.setState({
+                                    Number1: "",
+                                    ydcountm: "",
+                                    ShopPrice: "",
+                                    numberFormat2: "",
+                                    Remark: "",
+                                    ProdName: "",
+                                    modal:"",
+                                })
+                            }else{
+                                if(this.state.Number1==0){
+                                    ToastAndroid.show('商品数量不能为空', ToastAndroid.SHORT);
+                                }else{
+                                    var shopInfoData = [];
+                                    var shopInfo = {};
+                                    shopInfo.Pid = this.state.Pid;
+                                    shopInfo.ProdCode = this.state.ProdCode;
+                                    shopInfo.prodname = this.state.ProdName;
+                                    shopInfo.countm = this.state.Number1;
+                                    shopInfo.ShopPrice = this.state.ShopPrice;
+                                    if(this.state.name=="标签采集"){
+                                        shopInfo.prototal = "0";
+                                    }else{
+                                        shopInfo.prototal = NumberUtils.numberFormat2(ShopPrice);
+                                    }
+                                    shopInfo.promemo = this.state.Remark;
+                                    shopInfo.DepCode = this.state.DepCode;
+                                    shopInfo.ydcountm = this.state.ydcountm;
+                                    shopInfo.SuppCode = this.state.SuppCode;
+                                    shopInfo.BarCode = this.state.BarCode;
+                                    shopInfoData.push(shopInfo);
+                                    //调用插入表方法
+                                    dbAdapter.insertShopInfo(shopInfoData);
+                                    this.setState({
+                                        Number1: "",
+                                        ydcountm: "",
+                                        ShopPrice: "",
+                                        numberFormat2: "",
+                                        Remark: "",
+                                        ProdName: "",
+                                        modal:"",
+                                    })
+                                }
+                            }
                         }else{
+                            alert("数量不能含有小数");
+                            this.setState({
+                                Total:"",
+                            });
+                        }
+                    } else {
+                        if(this.state.name=="实时盘点"||this.state.name=="商品盘点"){
                             var shopInfoData = [];
                             var shopInfo = {};
                             shopInfo.Pid = this.state.Pid;
@@ -863,7 +1086,7 @@ export default class Search extends Component {
                             if(this.state.name=="标签采集"){
                                 shopInfo.prototal = "0";
                             }else{
-                                shopInfo.prototal = NumberUtils.numberFormat2(ShopPrice);
+                                shopInfo.prototal = shopprice;
                             }
                             shopInfo.promemo = this.state.Remark;
                             shopInfo.DepCode = this.state.DepCode;
@@ -882,78 +1105,41 @@ export default class Search extends Component {
                                 ProdName: "",
                                 modal:"",
                             })
-                        }
-                    }
-                }else{
-                    alert("数量不能含有小数");
-                    this.setState({
-                        Total:"",
-                    });
-                }
-            } else {
-                if(this.state.name=="实时盘点"||this.state.name=="商品盘点"){
-                    var shopInfoData = [];
-                    var shopInfo = {};
-                    shopInfo.Pid = this.state.Pid;
-                    shopInfo.ProdCode = this.state.ProdCode;
-                    shopInfo.prodname = this.state.ProdName;
-                    shopInfo.countm = this.state.Number1;
-                    shopInfo.ShopPrice = this.state.ShopPrice;
-                    if(this.state.name=="标签采集"){
-                        shopInfo.prototal = "0";
-                    }else{
-                        shopInfo.prototal = shopprice;
-                    }
-                    shopInfo.promemo = this.state.Remark;
-                    shopInfo.DepCode = this.state.DepCode;
-                    shopInfo.ydcountm = this.state.ydcountm;
-                    shopInfo.SuppCode = this.state.SuppCode;
-                    shopInfo.BarCode = this.state.BarCode;
-                    shopInfoData.push(shopInfo);
-                    //调用插入表方法
-                    dbAdapter.insertShopInfo(shopInfoData);
-                    this.setState({
-                        Number1: "",
-                        ydcountm: "",
-                        ShopPrice: "",
-                        numberFormat2: "",
-                        Remark: "",
-                        ProdName: "",
-                        modal:"",
-                    })
-                }else{
-                    if(this.state.Number1==0){
-                        ToastAndroid.show('商品数量不能为空', ToastAndroid.SHORT);
-                    }else{
-                        var shopInfoData = [];
-                        var shopInfo = {};
-                        shopInfo.Pid = this.state.Pid;
-                        shopInfo.ProdCode = this.state.ProdCode;
-                        shopInfo.prodname = this.state.ProdName;
-                        shopInfo.countm = this.state.Number1;
-                        shopInfo.ShopPrice = this.state.ShopPrice;
-                        if(this.state.name=="标签采集"){
-                            shopInfo.prototal = "0";
                         }else{
-                            shopInfo.prototal = shopprice;
+                            if(this.state.Number1==0){
+                                ToastAndroid.show('商品数量不能为空', ToastAndroid.SHORT);
+                            }else{
+                                var shopInfoData = [];
+                                var shopInfo = {};
+                                shopInfo.Pid = this.state.Pid;
+                                shopInfo.ProdCode = this.state.ProdCode;
+                                shopInfo.prodname = this.state.ProdName;
+                                shopInfo.countm = this.state.Number1;
+                                shopInfo.ShopPrice = this.state.ShopPrice;
+                                if(this.state.name=="标签采集"){
+                                    shopInfo.prototal = "0";
+                                }else{
+                                    shopInfo.prototal = shopprice;
+                                }
+                                shopInfo.promemo = this.state.Remark;
+                                shopInfo.DepCode = this.state.DepCode;
+                                shopInfo.ydcountm = this.state.ydcountm;
+                                shopInfo.SuppCode = this.state.SuppCode;
+                                shopInfo.BarCode = this.state.BarCode;
+                                shopInfoData.push(shopInfo);
+                                //调用插入表方法
+                                dbAdapter.insertShopInfo(shopInfoData);
+                                this.setState({
+                                    Number1: "",
+                                    ydcountm: "",
+                                    ShopPrice: "",
+                                    numberFormat2: "",
+                                    Remark: "",
+                                    ProdName: "",
+                                    modal:"",
+                                })
+                            }
                         }
-                        shopInfo.promemo = this.state.Remark;
-                        shopInfo.DepCode = this.state.DepCode;
-                        shopInfo.ydcountm = this.state.ydcountm;
-                        shopInfo.SuppCode = this.state.SuppCode;
-                        shopInfo.BarCode = this.state.BarCode;
-                        shopInfoData.push(shopInfo);
-                        //调用插入表方法
-                        dbAdapter.insertShopInfo(shopInfoData);
-                        this.setState({
-                            Number1: "",
-                            ydcountm: "",
-                            ShopPrice: "",
-                            numberFormat2: "",
-                            Remark: "",
-                            ProdName: "",
-                            modal:"",
-                        })
                     }
                 }
             }
@@ -1070,18 +1256,405 @@ export default class Search extends Component {
                 numberFormat2:"0.00"
             })
         }else{
+            if(this.state.YdCountm == 6&&this.state.ydcountm==0){
+                alert("库存为0，该商品不能进行配送")
+            }else {
+                if(this.state.Number1<0){
+                    if(this.state.name=="商品损溢"||this.state.name=="商品盘点"||this.state.name=="移动销售"){
+                        var Modify=NumberUtils.numberFormat2(this.state.numberFormat2/this.state.Number1);
+                        if(this.state.OrderDetails==1){
+                            if(this.state.IsIntCount==0){
+                                var number = this.state.Number1;//获取数量的数字
+                                if(parseInt(number)==number) {
+                                    this.setState({
+                                        ShopPrice:Modify,
+                                        modal:'',
+                                        OnPrice:'',
+                                        Total:'',
+                                        PriceText:''
+                                    })
+                                    if(this.state.name=="实时盘点"||this.state.name=="商品盘点"){
+                                        var shopInfoData = [];
+                                        var shopInfo = {};
+                                        shopInfo.Pid = this.state.Pid;
+                                        shopInfo.ProdCode = this.state.ProdCode;
+                                        shopInfo.prodname = this.state.ProdName;
+                                        shopInfo.countm = this.state.Number1;
+                                        shopInfo.ShopPrice = Modify;
+                                        shopInfo.prototal = this.state.numberFormat2;
+                                        shopInfo.promemo = this.state.Remark;
+                                        shopInfo.DepCode = this.state.DepCode;
+                                        shopInfo.ydcountm = this.state.ydcountm;
+                                        shopInfo.SuppCode = this.state.SuppCode;
+                                        shopInfo.BarCode = this.state.BarCode;
+                                        shopInfoData.push(shopInfo);
+                                        //调用插入表方法
+                                        dbAdapter.insertShopInfo(shopInfoData);
+                                        this.setState({
+                                            Number1: "",
+                                            ydcountm: "",
+                                            ShopPrice: "",
+                                            numberFormat2: "",
+                                            Remark: "",
+                                            ProdName: "",
+                                            modal:"",
+                                        })
+                                    }else{
+                                        if(this.state.Number1==0){
+                                            ToastAndroid.show('商品数量不能为空', ToastAndroid.SHORT);
+                                        }else{
+                                            var shopInfoData = [];
+                                            var shopInfo = {};
+                                            shopInfo.Pid = this.state.Pid;
+                                            shopInfo.ProdCode = this.state.ProdCode;
+                                            shopInfo.prodname = this.state.ProdName;
+                                            shopInfo.countm = this.state.Number1;
+                                            shopInfo.ShopPrice = Modify;
+                                            if(this.state.name=="标签采集"){
+                                                shopInfo.prototal = "0";
+                                            }else{
+                                                shopInfo.prototal = this.state.numberFormat2;
+                                            }
+                                            shopInfo.promemo = this.state.Remark;
+                                            shopInfo.DepCode = this.state.DepCode;
+                                            shopInfo.ydcountm = this.state.ydcountm;
+                                            shopInfo.SuppCode = this.state.SuppCode;
+                                            shopInfo.BarCode = this.state.BarCode;
+                                            shopInfoData.push(shopInfo);
+                                            //调用插入表方法
+                                            dbAdapter.insertShopInfo(shopInfoData);
+                                            this.setState({
+                                                Number1: "",
+                                                ydcountm: "",
+                                                ShopPrice: "",
+                                                numberFormat2: "",
+                                                Remark: "",
+                                                ProdName: "",
+                                                modal:"",
+                                            })
+                                        }
+                                    }
+                                }else{
+                                    alert("数量不能含有小数");
+                                    this.setState({
+                                        Total:"",
+                                    });
+                                }
+                            } else {
+                                this.setState({
+                                    ShopPrice:Modify,
+                                    modal:'',
+                                    OnPrice:'',
+                                    Total:'',
+                                    PriceText:''
+                                })
+                                if(this.state.name=="实时盘点"||this.state.name=="商品盘点"){
+                                    var shopInfoData = [];
+                                    var shopInfo = {};
+                                    shopInfo.Pid = this.state.Pid;
+                                    shopInfo.ProdCode = this.state.ProdCode;
+                                    shopInfo.prodname = this.state.ProdName;
+                                    shopInfo.countm = this.state.Number1;
+                                    shopInfo.ShopPrice = Modify;
+                                    shopInfo.prototal = this.state.numberFormat2;
+                                    shopInfo.promemo = this.state.Remark;
+                                    shopInfo.DepCode = this.state.DepCode;
+                                    shopInfo.ydcountm = this.state.ydcountm;
+                                    shopInfo.SuppCode = this.state.SuppCode;
+                                    shopInfo.BarCode = this.state.BarCode;
+                                    shopInfoData.push(shopInfo);
+                                    //调用插入表方法
+                                    dbAdapter.insertShopInfo(shopInfoData);
+                                    this.setState({
+                                        Number1: "",
+                                        ydcountm: "",
+                                        ShopPrice: "",
+                                        numberFormat2: "",
+                                        Remark: "",
+                                        ProdName: "",
+                                        modal:"",
+                                    })
+                                }else{
+                                    if(this.state.Number1==0){
+                                        ToastAndroid.show('商品数量不能为空', ToastAndroid.SHORT);
+                                    }else{
+                                        var shopInfoData = [];
+                                        var shopInfo = {};
+                                        shopInfo.Pid = this.state.Pid;
+                                        shopInfo.ProdCode = this.state.ProdCode;
+                                        shopInfo.prodname = this.state.ProdName;
+                                        shopInfo.countm = this.state.Number1;
+                                        shopInfo.ShopPrice = Modify;
+                                        shopInfo.prototal = this.state.numberFormat2;
+                                        shopInfo.promemo = this.state.Remark;
+                                        shopInfo.DepCode = this.state.DepCode;
+                                        shopInfo.ydcountm = this.state.ydcountm;
+                                        shopInfo.SuppCode = this.state.SuppCode;
+                                        shopInfo.BarCode = this.state.BarCode;
+                                        shopInfoData.push(shopInfo);
+                                        //调用插入表方法
+                                        dbAdapter.insertShopInfo(shopInfoData);
+                                        this.setState({
+                                            Number1: "",
+                                            ydcountm: "",
+                                            ShopPrice: "",
+                                            numberFormat2: "",
+                                            Remark: "",
+                                            ProdName: "",
+                                            modal:"",
+                                        })
+                                    }
+                                }
+                            }
+                        }
+                    }else{
+                        ToastAndroid.show('商品数量不能为负数', ToastAndroid.SHORT);
+                    }
+                }else{
+                    var Modify=NumberUtils.numberFormat2(this.state.numberFormat2/this.state.Number1);
+                    if(this.state.OrderDetails==1){
+                        if(this.state.IsIntCount==0){
+                            var number = this.state.Number1;//获取数量的数字
+                            if(parseInt(number)==number) {
+                                this.setState({
+                                    ShopPrice:Modify,
+                                    modal:'',
+                                    OnPrice:'',
+                                    Total:'',
+                                    PriceText:''
+                                })
+                                if(this.state.name=="实时盘点"||this.state.name=="商品盘点"){
+                                    var shopInfoData = [];
+                                    var shopInfo = {};
+                                    shopInfo.Pid = this.state.Pid;
+                                    shopInfo.ProdCode = this.state.ProdCode;
+                                    shopInfo.prodname = this.state.ProdName;
+                                    shopInfo.countm = this.state.Number1;
+                                    shopInfo.ShopPrice = Modify;
+                                    shopInfo.prototal = this.state.numberFormat2;
+                                    shopInfo.promemo = this.state.Remark;
+                                    shopInfo.DepCode = this.state.DepCode;
+                                    shopInfo.ydcountm = this.state.ydcountm;
+                                    shopInfo.SuppCode = this.state.SuppCode;
+                                    shopInfo.BarCode = this.state.BarCode;
+                                    shopInfoData.push(shopInfo);
+                                    //调用插入表方法
+                                    dbAdapter.insertShopInfo(shopInfoData);
+                                    this.setState({
+                                        Number1: "",
+                                        ydcountm: "",
+                                        ShopPrice: "",
+                                        numberFormat2: "",
+                                        Remark: "",
+                                        ProdName: "",
+                                        modal:"",
+                                    })
+                                }else{
+                                    if(this.state.Number1==0){
+                                        ToastAndroid.show('商品数量不能为空', ToastAndroid.SHORT);
+                                    }else{
+                                        var shopInfoData = [];
+                                        var shopInfo = {};
+                                        shopInfo.Pid = this.state.Pid;
+                                        shopInfo.ProdCode = this.state.ProdCode;
+                                        shopInfo.prodname = this.state.ProdName;
+                                        shopInfo.countm = this.state.Number1;
+                                        shopInfo.ShopPrice = Modify;
+                                        if(this.state.name=="标签采集"){
+                                            shopInfo.prototal = "0";
+                                        }else{
+                                            shopInfo.prototal = this.state.numberFormat2;
+                                        }
+                                        shopInfo.promemo = this.state.Remark;
+                                        shopInfo.DepCode = this.state.DepCode;
+                                        shopInfo.ydcountm = this.state.ydcountm;
+                                        shopInfo.SuppCode = this.state.SuppCode;
+                                        shopInfo.BarCode = this.state.BarCode;
+                                        shopInfoData.push(shopInfo);
+                                        //调用插入表方法
+                                        dbAdapter.insertShopInfo(shopInfoData);
+                                        this.setState({
+                                            Number1: "",
+                                            ydcountm: "",
+                                            ShopPrice: "",
+                                            numberFormat2: "",
+                                            Remark: "",
+                                            ProdName: "",
+                                            modal:"",
+                                        })
+                                    }
+                                }
+                            }else{
+                                alert("数量不能含有小数");
+                                this.setState({
+                                    Total:"",
+                                });
+                            }
+                        } else {
+                            this.setState({
+                                ShopPrice:Modify,
+                                modal:'',
+                                OnPrice:'',
+                                Total:'',
+                                PriceText:''
+                            })
+                            if(this.state.name=="实时盘点"||this.state.name=="商品盘点"){
+                                var shopInfoData = [];
+                                var shopInfo = {};
+                                shopInfo.Pid = this.state.Pid;
+                                shopInfo.ProdCode = this.state.ProdCode;
+                                shopInfo.prodname = this.state.ProdName;
+                                shopInfo.countm = this.state.Number1;
+                                shopInfo.ShopPrice = Modify;
+                                shopInfo.prototal = this.state.numberFormat2;
+                                shopInfo.promemo = this.state.Remark;
+                                shopInfo.DepCode = this.state.DepCode;
+                                shopInfo.ydcountm = this.state.ydcountm;
+                                shopInfo.SuppCode = this.state.SuppCode;
+                                shopInfo.BarCode = this.state.BarCode;
+                                shopInfoData.push(shopInfo);
+                                //调用插入表方法
+                                dbAdapter.insertShopInfo(shopInfoData);
+                                this.setState({
+                                    Number1: "",
+                                    ydcountm: "",
+                                    ShopPrice: "",
+                                    numberFormat2: "",
+                                    Remark: "",
+                                    ProdName: "",
+                                    modal:"",
+                                })
+                            }else{
+                                if(this.state.Number1==0){
+                                    ToastAndroid.show('商品数量不能为空', ToastAndroid.SHORT);
+                                }else{
+                                    var shopInfoData = [];
+                                    var shopInfo = {};
+                                    shopInfo.Pid = this.state.Pid;
+                                    shopInfo.ProdCode = this.state.ProdCode;
+                                    shopInfo.prodname = this.state.ProdName;
+                                    shopInfo.countm = this.state.Number1;
+                                    shopInfo.ShopPrice = Modify;
+                                    shopInfo.prototal = this.state.numberFormat2;
+                                    shopInfo.promemo = this.state.Remark;
+                                    shopInfo.DepCode = this.state.DepCode;
+                                    shopInfo.ydcountm = this.state.ydcountm;
+                                    shopInfo.SuppCode = this.state.SuppCode;
+                                    shopInfo.BarCode = this.state.BarCode;
+                                    shopInfoData.push(shopInfo);
+                                    //调用插入表方法
+                                    dbAdapter.insertShopInfo(shopInfoData);
+                                    this.setState({
+                                        Number1: "",
+                                        ydcountm: "",
+                                        ShopPrice: "",
+                                        numberFormat2: "",
+                                        Remark: "",
+                                        ProdName: "",
+                                        modal:"",
+                                    })
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    numberFormat2(){
+        if(this.state.Number1==""){
+            alert("请先添加商品数量");
+            this.setState({
+                numberFormat2:"0.00"
+            })
+        }else{
             var Modify=NumberUtils.numberFormat2(this.state.numberFormat2/this.state.Number1);
-            if(this.state.OrderDetails==1){
-                if(this.state.IsIntCount==0){
-                    var number = this.state.Number1;//获取数量的数字
-                    if(parseInt(number)==number) {
-                        this.setState({
-                            ShopPrice:Modify,
-                            modal:'',
-                            OnPrice:'',
-                            Total:'',
-                            PriceText:''
-                        })
+            this.setState({
+                ShopPrice:Modify
+            })
+        }
+    }
+
+    pressPop() {
+        if(this.state.YdCountm == 6&&this.state.ydcountm==0){
+            alert("库存为0，该商品不能进行配送")
+        }else {
+            if(this.state.Number1<0){
+                if(this.state.name=="商品损溢"||this.state.name=="商品盘点"||this.state.name=="移动销售"){
+                    if(this.state.IsIntCount==0){
+                        var number = this.state.Number1;//获取数量的数字
+                        if(parseInt(number)==number) {
+                            if(this.state.name=="实时盘点"||this.state.name=="商品盘点"){
+                                var shopInfoData = [];
+                                var shopInfo = {};
+                                shopInfo.Pid = this.state.Pid;
+                                shopInfo.ProdCode = this.state.ProdCode;
+                                shopInfo.prodname = this.state.ProdName;
+                                shopInfo.countm = this.state.Number1;
+                                shopInfo.ShopPrice = this.state.ShopPrice;
+                                shopInfo.prototal = this.state.numberFormat2;
+                                shopInfo.promemo = this.state.Remark;
+                                shopInfo.DepCode = this.state.DepCode;
+                                shopInfo.ydcountm = this.state.ydcountm;
+                                shopInfo.SuppCode = this.state.SuppCode;
+                                shopInfo.BarCode = this.state.BarCode;
+                                shopInfoData.push(shopInfo);
+                                //调用插入表方法
+                                dbAdapter.insertShopInfo(shopInfoData);
+                                this.setState({
+                                    Number1: "",
+                                    ydcountm: "",
+                                    ShopPrice: "",
+                                    numberFormat2: "",
+                                    Remark: "",
+                                    ProdName: "",
+                                    modal:"",
+                                })
+                            }else{
+                                if(this.state.Number1==0&&this.state.name!=="标签采集"){
+                                    ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
+                                } else if(this.state.Number1==0&&this.state.name=="标签采集"){
+                                    ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
+                                }else{
+                                    var shopInfoData = [];
+                                    var shopInfo = {};
+                                    shopInfo.Pid = this.state.Pid;
+                                    shopInfo.ProdCode = this.state.ProdCode;
+                                    shopInfo.prodname = this.state.ProdName;
+                                    shopInfo.countm = this.state.Number1;
+                                    shopInfo.ShopPrice = this.state.ShopPrice;
+                                    if(this.state.name=="标签采集"){
+                                        shopInfo.prototal = "0";
+                                    }else{
+                                        shopInfo.prototal = this.state.numberFormat2;
+                                    }
+                                    shopInfo.promemo = this.state.Remark;
+                                    shopInfo.DepCode = this.state.DepCode;
+                                    shopInfo.ydcountm = this.state.ydcountm;
+                                    shopInfo.SuppCode = this.state.SuppCode;
+                                    shopInfo.BarCode = this.state.BarCode;
+                                    shopInfoData.push(shopInfo);
+                                    //调用插入表方法
+                                    dbAdapter.insertShopInfo(shopInfoData);
+                                    this.setState({
+                                        Number1: "",
+                                        ydcountm: "",
+                                        ShopPrice: "",
+                                        numberFormat2: "",
+                                        Remark: "",
+                                        ProdName: "",
+                                        modal:"",
+                                    })
+                                }
+                            }
+                        }else{
+                            alert("数量不能含有小数");
+                            this.setState({
+                                Total:"",
+                            });
+                        }
+                    } else {
                         if(this.state.name=="实时盘点"||this.state.name=="商品盘点"){
                             var shopInfoData = [];
                             var shopInfo = {};
@@ -1089,7 +1662,82 @@ export default class Search extends Component {
                             shopInfo.ProdCode = this.state.ProdCode;
                             shopInfo.prodname = this.state.ProdName;
                             shopInfo.countm = this.state.Number1;
-                            shopInfo.ShopPrice = Modify;
+                            shopInfo.ShopPrice = this.state.ShopPrice;
+                            if(this.state.name=="标签采集"){
+                                shopInfo.prototal = "0";
+                            }else{
+                                shopInfo.prototal = this.state.numberFormat2;
+                            }
+                            shopInfo.promemo = this.state.Remark;
+                            shopInfo.DepCode = this.state.DepCode;
+                            shopInfo.ydcountm = this.state.ydcountm;
+                            shopInfo.SuppCode = this.state.SuppCode;
+                            shopInfo.BarCode = this.state.BarCode;
+                            shopInfoData.push(shopInfo);
+                            //调用插入表方法
+                            dbAdapter.insertShopInfo(shopInfoData);
+                            this.setState({
+                                Number1: "",
+                                ydcountm: "",
+                                ShopPrice: "",
+                                numberFormat2: "",
+                                Remark: "",
+                                ProdName: "",
+                                modal:"",
+                            })
+                        }else{
+                            if(this.state.Number1==0&&this.state.name!=="标签采集"){
+                                ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
+                            } else if(this.state.Number1==0&&this.state.name=="标签采集"){
+                                ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
+                            }else{
+                                var shopInfoData = [];
+                                var shopInfo = {};
+                                shopInfo.Pid = this.state.Pid;
+                                shopInfo.ProdCode = this.state.ProdCode;
+                                shopInfo.prodname = this.state.ProdName;
+                                shopInfo.countm = this.state.Number1;
+                                shopInfo.ShopPrice = this.state.ShopPrice;
+                                if(this.state.name=="标签采集"){
+                                    shopInfo.prototal = "0";
+                                }else{
+                                    shopInfo.prototal = this.state.numberFormat2;
+                                }
+                                shopInfo.promemo = this.state.Remark;
+                                shopInfo.DepCode = this.state.DepCode;
+                                shopInfo.ydcountm = this.state.ydcountm;
+                                shopInfo.SuppCode = this.state.SuppCode;
+                                shopInfo.BarCode = this.state.BarCode;
+                                shopInfoData.push(shopInfo);
+                                //调用插入表方法
+                                dbAdapter.insertShopInfo(shopInfoData);
+                                this.setState({
+                                    Number1: "",
+                                    ydcountm: "",
+                                    ShopPrice: "",
+                                    numberFormat2: "",
+                                    Remark: "",
+                                    ProdName: "",
+                                    modal:"",
+                                })
+                            }
+                        }
+                    }
+                }else{
+                    ToastAndroid.show('商品数量不能为负数', ToastAndroid.SHORT);
+                }
+            }else{
+                if(this.state.IsIntCount==0){
+                    var number = this.state.Number1;//获取数量的数字
+                    if(parseInt(number)==number) {
+                        if(this.state.name=="实时盘点"||this.state.name=="商品盘点"){
+                            var shopInfoData = [];
+                            var shopInfo = {};
+                            shopInfo.Pid = this.state.Pid;
+                            shopInfo.ProdCode = this.state.ProdCode;
+                            shopInfo.prodname = this.state.ProdName;
+                            shopInfo.countm = this.state.Number1;
+                            shopInfo.ShopPrice = this.state.ShopPrice;
                             shopInfo.prototal = this.state.numberFormat2;
                             shopInfo.promemo = this.state.Remark;
                             shopInfo.DepCode = this.state.DepCode;
@@ -1109,8 +1757,10 @@ export default class Search extends Component {
                                 modal:"",
                             })
                         }else{
-                            if(this.state.Number1==0){
-                                ToastAndroid.show('商品数量不能为空', ToastAndroid.SHORT);
+                            if(this.state.Number1==0&&this.state.name!=="标签采集"){
+                                ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
+                            } else if(this.state.Number1==0&&this.state.name=="标签采集"){
+                                ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
                             }else{
                                 var shopInfoData = [];
                                 var shopInfo = {};
@@ -1118,7 +1768,7 @@ export default class Search extends Component {
                                 shopInfo.ProdCode = this.state.ProdCode;
                                 shopInfo.prodname = this.state.ProdName;
                                 shopInfo.countm = this.state.Number1;
-                                shopInfo.ShopPrice = Modify;
+                                shopInfo.ShopPrice = this.state.ShopPrice;
                                 if(this.state.name=="标签采集"){
                                     shopInfo.prototal = "0";
                                 }else{
@@ -1150,125 +1800,7 @@ export default class Search extends Component {
                         });
                     }
                 } else {
-                    this.setState({
-                        ShopPrice:Modify,
-                        modal:'',
-                        OnPrice:'',
-                        Total:'',
-                        PriceText:''
-                    })
                     if(this.state.name=="实时盘点"||this.state.name=="商品盘点"){
-                        var shopInfoData = [];
-                        var shopInfo = {};
-                        shopInfo.Pid = this.state.Pid;
-                        shopInfo.ProdCode = this.state.ProdCode;
-                        shopInfo.prodname = this.state.ProdName;
-                        shopInfo.countm = this.state.Number1;
-                        shopInfo.ShopPrice = Modify;
-                        shopInfo.prototal = this.state.numberFormat2;
-                        shopInfo.promemo = this.state.Remark;
-                        shopInfo.DepCode = this.state.DepCode;
-                        shopInfo.ydcountm = this.state.ydcountm;
-                        shopInfo.SuppCode = this.state.SuppCode;
-                        shopInfo.BarCode = this.state.BarCode;
-                        shopInfoData.push(shopInfo);
-                        //调用插入表方法
-                        dbAdapter.insertShopInfo(shopInfoData);
-                        this.setState({
-                            Number1: "",
-                            ydcountm: "",
-                            ShopPrice: "",
-                            numberFormat2: "",
-                            Remark: "",
-                            ProdName: "",
-                            modal:"",
-                        })
-                    }else{
-                        if(this.state.Number1==0){
-                            ToastAndroid.show('商品数量不能为空', ToastAndroid.SHORT);
-                        }else{
-                            var shopInfoData = [];
-                            var shopInfo = {};
-                            shopInfo.Pid = this.state.Pid;
-                            shopInfo.ProdCode = this.state.ProdCode;
-                            shopInfo.prodname = this.state.ProdName;
-                            shopInfo.countm = this.state.Number1;
-                            shopInfo.ShopPrice = Modify;
-                            shopInfo.prototal = this.state.numberFormat2;
-                            shopInfo.promemo = this.state.Remark;
-                            shopInfo.DepCode = this.state.DepCode;
-                            shopInfo.ydcountm = this.state.ydcountm;
-                            shopInfo.SuppCode = this.state.SuppCode;
-                            shopInfo.BarCode = this.state.BarCode;
-                            shopInfoData.push(shopInfo);
-                            //调用插入表方法
-                            dbAdapter.insertShopInfo(shopInfoData);
-                            this.setState({
-                                Number1: "",
-                                ydcountm: "",
-                                ShopPrice: "",
-                                numberFormat2: "",
-                                Remark: "",
-                                ProdName: "",
-                                modal:"",
-                            })
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    numberFormat2(){
-        if(this.state.Number1==""){
-            alert("请先添加商品数量");
-            this.setState({
-                numberFormat2:"0.00"
-            })
-        }else{
-            var Modify=NumberUtils.numberFormat2(this.state.numberFormat2/this.state.Number1);
-            this.setState({
-                ShopPrice:Modify
-            })
-        }
-    }
-
-    pressPop() {
-        if(this.state.IsIntCount==0){
-            var number = this.state.Number1;//获取数量的数字
-            if(parseInt(number)==number) {
-                if(this.state.name=="实时盘点"||this.state.name=="商品盘点"){
-                    var shopInfoData = [];
-                    var shopInfo = {};
-                    shopInfo.Pid = this.state.Pid;
-                    shopInfo.ProdCode = this.state.ProdCode;
-                    shopInfo.prodname = this.state.ProdName;
-                    shopInfo.countm = this.state.Number1;
-                    shopInfo.ShopPrice = this.state.ShopPrice;
-                    shopInfo.prototal = this.state.numberFormat2;
-                    shopInfo.promemo = this.state.Remark;
-                    shopInfo.DepCode = this.state.DepCode;
-                    shopInfo.ydcountm = this.state.ydcountm;
-                    shopInfo.SuppCode = this.state.SuppCode;
-                    shopInfo.BarCode = this.state.BarCode;
-                    shopInfoData.push(shopInfo);
-                    //调用插入表方法
-                    dbAdapter.insertShopInfo(shopInfoData);
-                    this.setState({
-                        Number1: "",
-                        ydcountm: "",
-                        ShopPrice: "",
-                        numberFormat2: "",
-                        Remark: "",
-                        ProdName: "",
-                        modal:"",
-                    })
-                }else{
-                    if(this.state.Number1==0&&this.state.name!=="标签采集"){
-                        ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
-                    } else if(this.state.Number1==0&&this.state.name=="标签采集"){
-                        ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
-                    }else{
                         var shopInfoData = [];
                         var shopInfo = {};
                         shopInfo.Pid = this.state.Pid;
@@ -1298,80 +1830,43 @@ export default class Search extends Component {
                             ProdName: "",
                             modal:"",
                         })
-                    }
-                }
-            }else{
-                alert("数量不能含有小数");
-                this.setState({
-                    Total:"",
-                });
-            }
-        } else {
-            if(this.state.name=="实时盘点"||this.state.name=="商品盘点"){
-                var shopInfoData = [];
-                var shopInfo = {};
-                shopInfo.Pid = this.state.Pid;
-                shopInfo.ProdCode = this.state.ProdCode;
-                shopInfo.prodname = this.state.ProdName;
-                shopInfo.countm = this.state.Number1;
-                shopInfo.ShopPrice = this.state.ShopPrice;
-                if(this.state.name=="标签采集"){
-                    shopInfo.prototal = "0";
-                }else{
-                    shopInfo.prototal = this.state.numberFormat2;
-                }
-                shopInfo.promemo = this.state.Remark;
-                shopInfo.DepCode = this.state.DepCode;
-                shopInfo.ydcountm = this.state.ydcountm;
-                shopInfo.SuppCode = this.state.SuppCode;
-                shopInfo.BarCode = this.state.BarCode;
-                shopInfoData.push(shopInfo);
-                //调用插入表方法
-                dbAdapter.insertShopInfo(shopInfoData);
-                this.setState({
-                    Number1: "",
-                    ydcountm: "",
-                    ShopPrice: "",
-                    numberFormat2: "",
-                    Remark: "",
-                    ProdName: "",
-                    modal:"",
-                })
-            }else{
-                if(this.state.Number1==0&&this.state.name!=="标签采集"){
-                    ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
-                } else if(this.state.Number1==0&&this.state.name=="标签采集"){
-                    ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
-                }else{
-                    var shopInfoData = [];
-                    var shopInfo = {};
-                    shopInfo.Pid = this.state.Pid;
-                    shopInfo.ProdCode = this.state.ProdCode;
-                    shopInfo.prodname = this.state.ProdName;
-                    shopInfo.countm = this.state.Number1;
-                    shopInfo.ShopPrice = this.state.ShopPrice;
-                    if(this.state.name=="标签采集"){
-                        shopInfo.prototal = "0";
                     }else{
-                        shopInfo.prototal = this.state.numberFormat2;
+                        if(this.state.Number1==0&&this.state.name!=="标签采集"){
+                            ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
+                        } else if(this.state.Number1==0&&this.state.name=="标签采集"){
+                            ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
+                        }else{
+                            var shopInfoData = [];
+                            var shopInfo = {};
+                            shopInfo.Pid = this.state.Pid;
+                            shopInfo.ProdCode = this.state.ProdCode;
+                            shopInfo.prodname = this.state.ProdName;
+                            shopInfo.countm = this.state.Number1;
+                            shopInfo.ShopPrice = this.state.ShopPrice;
+                            if(this.state.name=="标签采集"){
+                                shopInfo.prototal = "0";
+                            }else{
+                                shopInfo.prototal = this.state.numberFormat2;
+                            }
+                            shopInfo.promemo = this.state.Remark;
+                            shopInfo.DepCode = this.state.DepCode;
+                            shopInfo.ydcountm = this.state.ydcountm;
+                            shopInfo.SuppCode = this.state.SuppCode;
+                            shopInfo.BarCode = this.state.BarCode;
+                            shopInfoData.push(shopInfo);
+                            //调用插入表方法
+                            dbAdapter.insertShopInfo(shopInfoData);
+                            this.setState({
+                                Number1: "",
+                                ydcountm: "",
+                                ShopPrice: "",
+                                numberFormat2: "",
+                                Remark: "",
+                                ProdName: "",
+                                modal:"",
+                            })
+                        }
                     }
-                    shopInfo.promemo = this.state.Remark;
-                    shopInfo.DepCode = this.state.DepCode;
-                    shopInfo.ydcountm = this.state.ydcountm;
-                    shopInfo.SuppCode = this.state.SuppCode;
-                    shopInfo.BarCode = this.state.BarCode;
-                    shopInfoData.push(shopInfo);
-                    //调用插入表方法
-                    dbAdapter.insertShopInfo(shopInfoData);
-                    this.setState({
-                        Number1: "",
-                        ydcountm: "",
-                        ShopPrice: "",
-                        numberFormat2: "",
-                        Remark: "",
-                        ProdName: "",
-                        modal:"",
-                    })
                 }
             }
         }
@@ -1487,7 +1982,7 @@ export default class Search extends Component {
                                     </View>
                                 </View>
                                 {
-                                    (this.state.YdCountm == 1||this.state.YdCountm == 5) ?
+                                    (this.state.YdCountm == 1||this.state.YdCountm == 6||this.state.YdCountm == 5) ?
                                         <View style={styles.List}>
                                             <View style={styles.left2}>
                                                 <Text style={styles.left}>现在库存</Text>
@@ -1513,7 +2008,7 @@ export default class Search extends Component {
                                                 <Text style={styles.left}>单价</Text>
                                         }
                                         {
-                                            (this.state.name=="商品采购"||this.state.name=="协配采购"||this.state.Modify=="1")?
+                                            (this.state.name=="商品采购"&&this.state.OptValue==1||this.state.name=="协配采购"&&this.state.OptValue==1||this.state.name=="移动销售"||this.state.Modify==1&&this.state.OptValue==1)?
                                                 <View style={styles.onPrice}>
                                                     {
                                                         (this.state.OnPrice==1)?
@@ -1560,7 +2055,7 @@ export default class Search extends Component {
                                                         <Text style={styles.left}>金额</Text>
                                                 }
                                                 {
-                                                    (this.state.name=="商品采购"||this.state.name=="商品验收"||this.state.name=="协配采购")?
+                                                    (this.state.name=="商品采购"&&this.state.OptValue==1||this.state.name=="协配采购"&&this.state.OptValue==1||this.state.name=="移动销售"||this.state.Modify==1&&this.state.OptValue==1)?
                                                         <View style={styles.onPrice}>
                                                             {
                                                                 (this.state.Total == 1) ?

@@ -42,6 +42,7 @@ import FetchUtils from "../utils/FetchUtils";
 import DBAdapter from "../adapter/DBAdapter";
 import Storage from "../utils/Storage";
 import NumberUtils from "../utils/NumberUtils";
+import BigDecimalUtils from "../utils/BigDecimalUtils";
 import SideMenu from 'react-native-side-menu';
 import { SwipeListView } from 'react-native-swipe-list-view';
 
@@ -85,6 +86,8 @@ export default class ShoppingCart extends Component {
             ds:new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
         };
         this.ds = [];
+        this.rows=[];
+        this.DataShop=[];
     }
 
     //自动跑接口
@@ -106,6 +109,7 @@ export default class ShoppingCart extends Component {
     _dpSearch(){
         //取出保存本地的数据  'valueOf'是保存的时候自己定义的参数   tags就是保存的那个值
         //在一进来页面就取出来，就不会出现第一次点击为 空值
+        Storage.delete("ShoppData");
         Storage.get('valueOf').then((tags) => {
             this.setState({
                 reqDetailCode: tags
@@ -146,12 +150,108 @@ export default class ShoppingCart extends Component {
 
         this.modal();
         //查询shopInfo表中某品类的数量
+        Storage.get('PeiSong').then((PeiSong) => {
+            if(PeiSong=="商品配送"){
+                dbAdapter.selectShopInfo().then((rows)=> {
+                    if (rows.length == 0) {
+                        Storage.get('LinkUrl').then((LinkUrl) => {
+                            Storage.get('ClientCode').then((ClientCode)=>{
+                                Storage.get('shildshop').then((ChildShopCode)=>{
+                                    Storage.get('code').then((ShopCode)=>{
+                                        Storage.get('OrgFormno').then((OrgFormno)=>{
+                                            let params = {
+                                                reqCode: "App_PosReq",
+                                                reqDetailCode: "App_Client_ProPSYHDetailQ",
+                                                ClientCode: ClientCode,
+                                                sDateTime: Date.parse(new Date()),
+                                                Sign: NetUtils.MD5("App_PosReq" + "##" + "App_Client_ProPSYHDetailQ" + "##" + Date.parse(new Date()) + "##" + "PosControlCs") + '',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
+                                                ShopCode: ShopCode,
+                                                ChildShopCode: ChildShopCode,
+                                                OrgFormno: OrgFormno,
+                                            };
+                                            FetchUtils.post(LinkUrl, JSON.stringify(params)).then((data) => {
+                                                var DetailInfos =data.DetailInfo;
+                                                if(data.retcode == 1){
+                                                    var ShopNumber = 0;
+                                                    var shopAmount = 0;
+                                                    for(let i =0;i<DetailInfos.length;i++) {
+                                                        let detailInfo = DetailInfos[i];
+                                                        var shopInfoData = [];
+                                                        var shopInfo = {};
+                                                        var serial=i+1;
+                                                        var prodcode=detailInfo.prodcode;
+                                                        var countm=detailInfo.countm;
+                                                        var pid=detailInfo.pid;
+                                                        var promemo = "";
+                                                        var ydcountm = detailInfo.countm;
+                                                        var prodname=detailInfo.prodname;
+                                                        var shopnumber=detailInfo.countm;
+                                                        var ProPrice=detailInfo.ShopPrice;
+                                                        var ShopAmount=detailInfo.prototal;
+                                                        shopAmount += Number(ShopAmount);
+                                                        ShopNumber += Number(shopnumber);
+                                                        this.ds.push(detailInfo);
+                                                        var DataShop = {
+                                                            'serial':serial,
+                                                            'prodname':prodname,
+                                                            'barCode':"",
+                                                            'prodcode': prodcode,
+                                                            'shopnumber':shopnumber,
+                                                            'countm': countm,
+                                                            'ProPrice': ProPrice,
+                                                            'promemo': "",
+                                                            'ydcountm': ydcountm,
+                                                            'ShopAmount':ShopAmount,
+                                                            'SuppCode':"",
+                                                            'Pid':pid,
+                                                            'DepCode':"",
+                                                        }
+                                                        this.DataShop.push(DataShop);
+                                                        shopInfo.Pid = pid;
+                                                        shopInfo.ProdCode=prodcode;
+                                                        shopInfo.prodname = prodname;
+                                                        shopInfo.countm = countm;
+                                                        shopInfo.ShopPrice = ProPrice;
+                                                        shopInfo.prototal = ShopAmount;
+                                                        shopInfo.promemo = promemo;
+                                                        shopInfo.DepCode = "";
+                                                        shopInfo.ydcountm = ydcountm;
+                                                        shopInfo.SuppCode = "";
+                                                        shopInfo.BarCode = "";
+                                                        shopInfoData.push(shopInfo);
+                                                        //调用插入表方法
+                                                        dbAdapter.insertShopInfo(shopInfoData);
+                                                    }
+                                                    this.modal();
+                                                    this.setState({
+                                                        ShopNumber:ShopNumber,//数量
+                                                        ShopAmount:NumberUtils.numberFormat2(shopAmount),//总金额
+                                                        ds:this.state.ds.cloneWithRows(this.DataShop)
+                                                    })
+                                                }
+                                            })
+                                        })
+                                    })
+                                })
+                            })
+                        })
+                    }else{
+                        this.shopinfo();
+                    }
+                })
+            } else{
+                this.shopinfo();
+            }
+        })
+    }
+
+    /**
+     * 查询shopinfo表数据
+     */
+    shopinfo(){
         dbAdapter.selectShopInfo().then((rows)=>{
-            //this._ModalVisible();
             var shopnumber = 0;
             var shopAmount = 0;
-            this.ds=[];
-            this.DataShop=[];
             for(let i =0;i<rows.length;i++){
                 var serial=i+1;
                 var row = rows.item(i);
@@ -173,7 +273,7 @@ export default class ShoppingCart extends Component {
                     'barCode':barCode,
                     'prodcode': prodcode,
                     'shopnumber':number,
-                    'countm': countm,
+                    'countm': number,
                     'ProPrice': ProPrice,
                     'promemo': promemo,
                     'ydcountm': ydcountm,
@@ -184,19 +284,14 @@ export default class ShoppingCart extends Component {
                 }
                 this.DataShop.push(DataShop);
             }
-            if(this.ds==0){
-                this.modal();
-                return;
-            }else{
-                this.setState({
-                    number1:number,
-                    ShopNumber:shopnumber,//数量
-                    ShopAmount:NumberUtils.numberFormat2(shopAmount),//总金额
-                    ds:this.state.ds.cloneWithRows(this.DataShop)
-                })
-                this.modal();
-            }
-        });
+            this.setState({
+                number1:number,
+                ShopNumber:shopnumber,//数量
+                ShopAmount:NumberUtils.numberFormat2(shopAmount),//总金额
+                ds:this.state.ds.cloneWithRows(this.DataShop)
+            })
+            this.modal();
+        })
     }
 
     Storage(){
@@ -358,6 +453,7 @@ export default class ShoppingCart extends Component {
                                                                                 })
                                                                             }
                                                                         } else {
+                                                                            Storage.save("ShoppData", "清单");
                                                                             this.props.navigator.push({
                                                                                 component: OrderDetails,
                                                                                 params: {
@@ -376,7 +472,6 @@ export default class ShoppingCart extends Component {
                                                                                 }
                                                                             })
                                                                         }
-                                                                        Storage.save("ShoppData", "清单");
                                                                         DeviceEventEmitter.removeAllListeners();
                                                                         this.setState({
                                                                             OrderDetails: '',
@@ -461,6 +556,7 @@ export default class ShoppingCart extends Component {
                                                                             })
                                                                         }
                                                                     } else {
+                                                                        Storage.save("ShoppData", "清单");
                                                                         this.props.navigator.push({
                                                                             component: OrderDetails,
                                                                             params: {
@@ -479,7 +575,6 @@ export default class ShoppingCart extends Component {
                                                                             }
                                                                         })
                                                                     }
-                                                                    Storage.save("ShoppData", "清单");
                                                                     DeviceEventEmitter.removeAllListeners();
                                                                     this.setState({
                                                                         OrderDetails: '',
@@ -584,6 +679,7 @@ export default class ShoppingCart extends Component {
                                                                                 })
                                                                             }
                                                                         } else {
+                                                                            Storage.save("ShoppData", "清单");
                                                                             this.props.navigator.push({
                                                                                 component: OrderDetails,
                                                                                 params: {
@@ -602,7 +698,6 @@ export default class ShoppingCart extends Component {
                                                                                 }
                                                                             })
                                                                         }
-                                                                        Storage.save("ShoppData", "清单");
                                                                         DeviceEventEmitter.removeAllListeners();
                                                                         this.setState({
                                                                             OrderDetails: '',
@@ -687,6 +782,7 @@ export default class ShoppingCart extends Component {
                                                                             })
                                                                         }
                                                                     } else {
+                                                                        Storage.save("ShoppData", "清单");
                                                                         this.props.navigator.push({
                                                                             component: OrderDetails,
                                                                             params: {
@@ -705,7 +801,6 @@ export default class ShoppingCart extends Component {
                                                                             }
                                                                         })
                                                                     }
-                                                                    Storage.save("ShoppData", "清单");
                                                                     DeviceEventEmitter.removeAllListeners();
                                                                     this.setState({
                                                                         OrderDetails: '',
@@ -807,6 +902,7 @@ export default class ShoppingCart extends Component {
                                                                         })
                                                                     }
                                                                 } else {
+                                                                    Storage.save("ShoppData", "清单");
                                                                     this.props.navigator.push({
                                                                         component: OrderDetails,
                                                                         params: {
@@ -825,7 +921,6 @@ export default class ShoppingCart extends Component {
                                                                         }
                                                                     })
                                                                 }
-                                                                Storage.save("ShoppData", "清单");
                                                                 DeviceEventEmitter.removeAllListeners();
                                                                 this.setState({
                                                                     OrderDetails: '',
@@ -909,6 +1004,7 @@ export default class ShoppingCart extends Component {
                                                                     })
                                                                 }
                                                             } else {
+                                                                Storage.save("ShoppData", "清单");
                                                                 this.props.navigator.push({
                                                                     component: OrderDetails,
                                                                     params: {
@@ -927,7 +1023,6 @@ export default class ShoppingCart extends Component {
                                                                     }
                                                                 })
                                                             }
-                                                            Storage.save("ShoppData", "清单");
                                                             DeviceEventEmitter.removeAllListeners();
                                                             this.setState({
                                                                 OrderDetails: '',
@@ -950,7 +1045,6 @@ export default class ShoppingCart extends Component {
         })
     }
 
-
     renderRow(rowData, sectionID, rowID){
         return (
             <TouchableOpacity style={styles.ShopList} onPress={()=>this.OrderDetails(rowData)}>
@@ -958,12 +1052,7 @@ export default class ShoppingCart extends Component {
                     <View style={styles.serial}>
                         <Text style={styles.SerialText}>{rowData.serial}.</Text>
                     </View>
-                    {
-                        (rowData.prodcode=="")?
-                            <Text style={[styles.Name,styles.Name1]}>{rowData.prodcode}</Text>
-                            :
-                            <Text style={[styles.Name,styles.Name1]}>{rowData.barCode}</Text>
-                    }
+                    <Text style={[styles.Name,styles.Name1]}>{rowData.prodcode}</Text>
                     <Text style={[styles.Name,styles.Name1]}>{rowData.prodname}</Text>
                 </View>
                 <View style={styles.RowList1}>
@@ -991,27 +1080,56 @@ export default class ShoppingCart extends Component {
         );
     }
 
+    /**
+     *
+     * 删除每一列数据
+     */
     deteleShopInfo(rowData, sectionID, rowID){
         dbAdapter.deteleShopInfo(rowData.prodcode).then((rows)=>{});
         dbAdapter.selectShopInfo().then((rows)=>{
+            this.DataShop=[];
+            this.ds=[];
             var shopnumber = 0;
             var shopAmount = 0;
-            this.ds=[];
             for(let i =0;i<rows.length;i++){
+                var serial=i+1;
                 var row = rows.item(i);
+                var prodname = row.prodname;
                 var number = row.ShopNumber;
+                var prodcode = row.ProdCode;
+                var countm = row.countm;
+                var ProPrice = row.ShopPrice;
+                var promemo = row.promemo;
+                var ydcountm = row.ydcountm;
+                var barCode = row.BarCode;
                 var SHopAMount=NumberUtils.numberFormat2(row.ShopAmount);
                 shopAmount += Number(SHopAMount);
                 shopnumber += Number(row.ShopNumber);
                 this.ds.push(row);
+                var DataShop = {
+                    'serial':serial,
+                    'prodname':prodname,
+                    'barCode':barCode,
+                    'prodcode': prodcode,
+                    'shopnumber':number,
+                    'countm': number,
+                    'ProPrice': ProPrice,
+                    'promemo': promemo,
+                    'ydcountm': ydcountm,
+                    'ShopAmount':row.ShopAmount,
+                    'SuppCode':row.SuppCode,
+                    'Pid':row.pid,
+                    'DepCode':row.DepCode,
+                }
+                this.DataShop.push(DataShop);
             }
             this.setState({
                 number1:number,
                 ShopNumber:shopnumber,//数量
                 ShopAmount:NumberUtils.numberFormat2(shopAmount),//总金额
-                ds:this.state.ds.cloneWithRows(this.ds)
+                ds:this.state.ds.cloneWithRows(this.DataShop)
             })
-        });
+        })
         dbAdapter.selectShopInfoAllCountm().then((rows)=>{
             var ShopCar = rows.item(0).countm;
             this.setState({
@@ -1043,67 +1161,75 @@ export default class ShoppingCart extends Component {
     }
 
     pressPush(){
+        Storage.save("ShoppData", "清单");
         this.props.navigator.push({
             component:Search,
         });
-        Storage.save("ShoppData", "清单");
         DeviceEventEmitter.removeAllListeners();
     }
 
     //点击商品列表跳转到修改商品数量页面
     OrderDetails(rowData, sectionID, rowID){
-        Storage.get('FormType').then((tags)=>{
-            this.setState({
-                FormType:tags
-            })
-        })
-
-        Storage.get('LinkUrl').then((tags) => {
-            this.setState({
-                LinkUrl:tags
-            })
-        })
-        Storage.get('userName').then((tags)=>{
-            let params = {
-                reqCode:"App_PosReq",
-                reqDetailCode:"App_Client_CurrProdQry",
-                ClientCode:this.state.ClientCode,
-                sDateTime:Date.parse(new Date()),
-                Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
-                username:tags,
-                usercode:this.state.Usercode,
-                SuppCode:rowData.SuppCode,
-                ShopCode:this.state.ShopCode,
-                ChildShopCode:this.state.ChildShopCode,
-                ProdCode:rowData.prodcode,
-                OrgFormno:this.state.OrgFormno,
-                FormType:this.state.FormType,
-            };
-
-            FetchUtils.post(this.state.LinkUrl,JSON.stringify(params)).then((data)=>{
-                var countm=JSON.stringify(data.countm);
-                var ShopPrice=JSON.stringify(data.ShopPrice);
-                if(data.retcode == 1){
-                    this.props.navigator.push({
-                        component:OrderDetails,
-                        params:{
-                            ProdName:rowData.prodname,
-                            ShopPrice:rowData.ProPrice,
-                            countm:rowData.shopnumber,
-                            Pid:rowData.pid,
-                            ProdCode:rowData.prodcode,
-                            DepCode:rowData.DepCode,
-                            ydcountm:countm,
-                        }
+        Storage.get('FormType').then((FormType)=>{
+            Storage.get('LinkUrl').then((LinkUrl) => {
+                Storage.get('userName').then((userName)=>{
+                    Storage.get('PeiSong').then((PeiSong) => {
+                        dbAdapter.selectAidCode(rowData.prodcode, 1).then((rows) => {
+                            for (let i = 0; i < rows.length; i++) {
+                                var row = rows.item(i);
+                                if(PeiSong=="商品配送"){
+                                    var SuppCode="";
+                                }else{
+                                    var SuppCode=rowData.SuppCode;
+                                }
+                                let params = {
+                                    reqCode:"App_PosReq",
+                                    reqDetailCode:"App_Client_CurrProdQry",
+                                    ClientCode:this.state.ClientCode,
+                                    sDateTime:"2017-08-09 12:12:12",
+                                    Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_CurrProdQry" + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
+                                    username:userName,
+                                    usercode:this.state.Usercode,
+                                    SuppCode:SuppCode,
+                                    ShopCode:this.state.ShopCode,
+                                    ChildShopCode:this.state.ChildShopCode,
+                                    ProdCode:rowData.prodcode,
+                                    OrgFormno:this.state.OrgFormno,
+                                    FormType:FormType,
+                                };
+                                FetchUtils.post(LinkUrl,JSON.stringify(params)).then((data)=>{
+                                    var ydcountm=JSON.stringify(data.countm);
+                                    var ShopPrice=JSON.stringify(data.ShopPrice);
+                                    if(data.retcode == 1){
+                                        Storage.save("ShoppData", "清单");
+                                        this.props.navigator.push({
+                                            component:OrderDetails,
+                                            params:{
+                                                ProdName:rowData.prodname,
+                                                ShopPrice:rowData.ProPrice,
+                                                countm:rowData.countm,
+                                                Pid:row.Pid,
+                                                ProdCode:rowData.prodcode,
+                                                DepCode:rowData.DepCode,
+                                                ydcountm:ydcountm,
+                                                SuppCode: row.SuppCode,
+                                                BarCode: row.BarCode,
+                                                IsIntCount:row.IsIntCount
+                                            }
+                                        })
+                                    }else{
+                                        alert(JSON.stringify(data))
+                                    }
+                                },(err)=>{
+                                    alert("网络请求失败");
+                                })
+                            }
+                        })
                     })
-                    Storage.save("ShoppData", "清单");
-                }else{
-                    alert(JSON.stringify(data))
-                }
-            },(err)=>{
-                alert("网络请求失败");
+                })
             })
         })
+
     }
 
     pressPop(){
@@ -1195,7 +1321,6 @@ export default class ShoppingCart extends Component {
                                     },
                                     DetailInfo2: this.DataShop,
                                 };
-                                console.log("aaaaa=",JSON.stringify(params))
                                 if(this.state.Screen=="1"||this.state.Screen=="2"){
                                     var DetailInfo2=params.DetailInfo2;
                                     for(let i =0;i<DetailInfo2.length;i++){
@@ -1605,7 +1730,7 @@ export default class ShoppingCart extends Component {
                         <Text style={styles.Number}>数量</Text>
                         <Text style={styles.Price}>单价</Text>
                         {
-                            (this.state.Name=="标签采集")?
+                            (this.state.Name=="标签采集"||this.state.Name=="售价调整")?
                                 null
                                 :
                                 <Text style={styles.SmallScale}>小计</Text>
@@ -1635,7 +1760,7 @@ export default class ShoppingCart extends Component {
                             <Text style={styles.ClientType}>{this.state.ShopNumber}</Text>
                         </Text>
                         {
-                            (this.state.Name=="标签采集")?
+                            (this.state.Name=="标签采集"||this.state.Name=="售价调整")?
                                 null
                                 :
                                 <Text style={styles.ClientText}>
@@ -1993,7 +2118,7 @@ const styles = StyleSheet.create({
         color:"#333333",
     },
     ShopList:{
-        paddingRight:10,
+        paddingRight:20,
         paddingTop:18,
         paddingBottom:18,
         backgroundColor:"#ffffff",

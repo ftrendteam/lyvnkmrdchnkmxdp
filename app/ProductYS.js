@@ -103,7 +103,8 @@ export default class ProductCG extends Component {
                 Storage.delete('shildshop');
                 Storage.delete('StateMent');
                 Storage.delete('BQNumber');
-                if(this.state.DepName1==""&&this.state.DepCode1==""){
+                Storage.delete("PeiSong");
+                if(this.state.DepCode1==""||this.state.DepCode1==0){
                     Storage.delete('DepCode');
                 }else{
                     Storage.save('DepCode', this.state.DepCode1);
@@ -122,6 +123,8 @@ export default class ProductCG extends Component {
                 Storage.save("scode",str);
                 if(this.state.suppcode1==""){
                     Storage.save('Modify', '1');
+                }else{
+                    Storage.delete('Modify');
                 }
             }
         }else if(this.state.Disting=="1"){
@@ -143,7 +146,8 @@ export default class ProductCG extends Component {
                 Storage.delete('shildshop');
                 Storage.delete('StateMent');
                 Storage.delete('BQNumber');
-                if(this.state.DepName1==""&&this.state.DepCode1==""){
+                Storage.delete("PeiSong");
+                if(this.state.DepCode1==""||this.state.DepCode1==0){
                     Storage.delete('DepCode');
                 }else{
                     Storage.save('DepCode', this.state.DepCode1);
@@ -162,6 +166,8 @@ export default class ProductCG extends Component {
                 Storage.save("scode",str);
                 if(this.state.suppcode1==""){
                     Storage.save('Modify', '1');
+                }else{
+                    Storage.delete('Modify');
                 }
             }
         }
@@ -174,7 +180,9 @@ export default class ProductCG extends Component {
             component:Distrition_list,
             params: {
                 SearchShopname:(Suppcode)=>this.SearchShopname(Suppcode),
-                SearchShopname1:(Suppcode1)=>this.SearchShopname1(Suppcode1)
+                SearchShopname1:(Suppcode1)=>this.SearchShopname1(Suppcode1),
+                DepName: (DepName) => this._DepName(DepName),
+                DepCode: (DepCode) => this._DepCode(DepCode),
             }
         };
         this.props.navigator.push(nextRoute)

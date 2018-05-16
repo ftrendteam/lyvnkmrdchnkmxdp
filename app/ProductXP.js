@@ -137,6 +137,7 @@ export default class ProductCG extends Component {
                 Storage.delete('StateMent');
                 Storage.delete('BQNumber');
                 Storage.delete('Modify');
+                Storage.delete("PeiSong");
                 if(this.state.DepName1==""&&this.state.DepCode1==""){
                     Storage.delete('DepCode');
                 }else{
@@ -176,6 +177,7 @@ export default class ProductCG extends Component {
                 Storage.delete('StateMent');
                 Storage.delete('BQNumber');
                 Storage.delete('Modify');
+                Storage.delete("PeiSong");
                 if(this.state.DepName1==""&&this.state.DepCode1==""){
                     Storage.delete('DepCode');
                 }else{

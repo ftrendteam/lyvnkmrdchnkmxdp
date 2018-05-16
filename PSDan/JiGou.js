@@ -87,6 +87,13 @@ export default class JiGou extends Component {
         this.props.navigator.pop();
     }
 
+    DeleteData(){
+        if(this.props.reloadShopname){
+            this.props.reloadShopname("");
+        }
+        this.props.navigator.pop();
+    }
+
     _renderRow(rowData, sectionID, rowID){
         return(
             <TouchableOpacity style={styles.header} onPress={()=>this.pressPop(rowData)}>
@@ -133,6 +140,14 @@ export default class JiGou extends Component {
                         </View>
 
                     </View>
+                    <TouchableOpacity onPress={this.DeleteData.bind(this)} style={styles.header}>
+                        <View style={styles.coding}>
+                            <Text style={[styles.codingText,{color:"#ff4e4e"}]}>清空</Text>
+                        </View>
+                        <View style={styles.name}>
+                            <Text style={styles.codingText}></Text>
+                        </View>
+                    </TouchableOpacity>
                     {
                         (this.state.dataRows == "") ?
                             <View style={styles.Null}>

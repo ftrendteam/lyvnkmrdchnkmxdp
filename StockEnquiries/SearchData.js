@@ -485,7 +485,17 @@ export default class SearchData extends Component {
     }
 
     onSubmitEditing(){
-        this.inputOnBlur();
+        dbAdapter.selectAidCode(this.state.Search, 1).then((rows) => {
+            this.dataRows = [];
+            for (let i = 0; i < rows.length; i++) {
+                var row = rows.item(i);
+                this.dataRows.push(row);
+            }
+            this.setState({
+                dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
+                dataRows: this.dataRows
+            })
+        });
 
     }
 

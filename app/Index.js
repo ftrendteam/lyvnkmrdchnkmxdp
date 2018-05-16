@@ -46,6 +46,7 @@ import StockEnquiries from "../StockEnquiries/StockEnquiries";//库存查询
 import Shopsearch from "../StockEnquiries/Shopsearch";//点击商品 商品查询
 import SearchData from "../StockEnquiries/SearchData";//搜索页面 商品查询
 import PSDan from "../PSDan/PSDan";//商品配送
+import YHSearch from "../YHSearch/YHSearch";//要货查询
 import NetUtils from "../utils/NetUtils";
 import FetchUtil from "../utils/FetchUtils";//网络请求封装
 import UpData from "../utils/UpData";//数据更新
@@ -1509,13 +1510,56 @@ export default class Index extends Component {
                                                                                 ProdCode: item.item.ProdCode,
                                                                                 DepCode: item.item.DepCode1,
                                                                                 SuppCode: item.item.SuppCode,
-                                                                                ydcountm: countm,
+                                                                                ydcountm: row.ydcountm,
                                                                                 BarCode: item.item.BarCode,
                                                                                 IsIntCount:row.IsIntCount
                                                                             }
                                                                         })
                                                                     }
 
+                                                                }else if(this.state.head=="售价调整"){
+                                                                    dbAdapter.selectShopInfoData(item.item.Pid).then((datas)=> {
+                                                                        if(datas.length==0){
+                                                                            this.props.navigator.push({
+                                                                                component: OrderDetails,
+                                                                                params: {
+                                                                                    ProdName: item.item.ProdName,
+                                                                                    ShopPrice: ShopPrice,
+                                                                                    Pid: item.item.Pid,
+                                                                                    countm: item.item.ShopNumber,
+                                                                                    promemo: item.item.promemo,
+                                                                                    prototal: item.item.prototal,
+                                                                                    ProdCode: item.item.ProdCode,
+                                                                                    DepCode: item.item.DepCode1,
+                                                                                    SuppCode: item.item.SuppCode,
+                                                                                    ydcountm: "",
+                                                                                    BarCode: item.item.BarCode,
+                                                                                    IsIntCount:row.IsIntCount
+                                                                                }
+                                                                            })
+                                                                        }else{
+                                                                            for (let i = 0; i < datas.length; i++) {
+                                                                                var data = datas.item(i);
+                                                                                this.props.navigator.push({
+                                                                                    component: OrderDetails,
+                                                                                    params: {
+                                                                                        ProdName: item.item.ProdName,
+                                                                                        ShopPrice: ShopPrice,
+                                                                                        Pid: item.item.Pid,
+                                                                                        countm: item.item.ShopNumber,
+                                                                                        promemo: item.item.promemo,
+                                                                                        prototal: item.item.prototal,
+                                                                                        ProdCode: item.item.ProdCode,
+                                                                                        DepCode: item.item.DepCode1,
+                                                                                        SuppCode: item.item.SuppCode,
+                                                                                        ydcountm: data.ydcountm,
+                                                                                        BarCode: item.item.BarCode,
+                                                                                        IsIntCount:row.IsIntCount
+                                                                                    }
+                                                                                })
+                                                                            }
+                                                                        }
+                                                                    })
                                                                 } else {
                                                                     if(this.state.head=="标签采集"&&row.ShopNumber == 0){
                                                                         this.setState({
@@ -1667,6 +1711,49 @@ export default class Index extends Component {
                                                                         }
                                                                     })
                                                                 }
+                                                            }else if(this.state.head=="售价调整"){
+                                                                dbAdapter.selectShopInfoData(item.item.Pid).then((datas)=> {
+                                                                    if(datas.length==0){
+                                                                        this.props.navigator.push({
+                                                                            component: OrderDetails,
+                                                                            params: {
+                                                                                ProdName: item.item.ProdName,
+                                                                                ShopPrice: ShopPrice,
+                                                                                Pid: item.item.Pid,
+                                                                                countm: item.item.ShopNumber,
+                                                                                promemo: item.item.promemo,
+                                                                                prototal: item.item.prototal,
+                                                                                ProdCode: item.item.ProdCode,
+                                                                                DepCode: item.item.DepCode1,
+                                                                                SuppCode: item.item.SuppCode,
+                                                                                ydcountm: "",
+                                                                                BarCode: item.item.BarCode,
+                                                                                IsIntCount:row.IsIntCount
+                                                                            }
+                                                                        })
+                                                                    }else{
+                                                                        for (let i = 0; i < datas.length; i++) {
+                                                                            var data = datas.item(i);
+                                                                            this.props.navigator.push({
+                                                                                component: OrderDetails,
+                                                                                params: {
+                                                                                    ProdName: item.item.ProdName,
+                                                                                    ShopPrice: ShopPrice,
+                                                                                    Pid: item.item.Pid,
+                                                                                    countm: item.item.ShopNumber,
+                                                                                    promemo: item.item.promemo,
+                                                                                    prototal: item.item.prototal,
+                                                                                    ProdCode: item.item.ProdCode,
+                                                                                    DepCode: item.item.DepCode1,
+                                                                                    SuppCode: item.item.SuppCode,
+                                                                                    ydcountm: data.ydcountm,
+                                                                                    BarCode: item.item.BarCode,
+                                                                                    IsIntCount:row.IsIntCount
+                                                                                }
+                                                                            })
+                                                                        }
+                                                                    }
+                                                                })
                                                             } else {
                                                                 if(this.state.head=="标签采集"&&rows.item(0).ShopNumber == 0){
                                                                     this.setState({
@@ -1674,7 +1761,7 @@ export default class Index extends Component {
                                                                     })
                                                                 }else{
                                                                     this.setState({
-                                                                        Number1: rows.item(0).ShopNumber,
+                                                                        Number1: row.ShopNumber,
                                                                     })
                                                                 }
 
@@ -1684,7 +1771,7 @@ export default class Index extends Component {
                                                                     })
                                                                 }else{
                                                                     this.setState({
-                                                                        Number1: rowData.ShopNumber,
+                                                                        Number1: row.ShopNumber,
                                                                     })
                                                                 }
                                                                 this.props.navigator.push({
@@ -1751,7 +1838,9 @@ export default class Index extends Component {
             pressStatus: 0
         });
     }
-
+    /**
+     * 门店要货
+     */
     YaoHuo() {
         if (this.state.ShopCar1 > 0) {
             this._setModalVisible();
@@ -1780,6 +1869,9 @@ export default class Index extends Component {
                                 }else {
                                     this.Promp();
                                 }
+                            }else {
+                                ToastAndroid.show("没有权限",ToastAndroid.SHORT);
+                                return;
                             }
                         })
                     } else {
@@ -1789,7 +1881,9 @@ export default class Index extends Component {
             });
         }
     }
-
+    /**
+     * 商品损溢
+     */
     SunYi() {
         if (this.state.ShopCar1 > 0) {
             this._setModalVisible();
@@ -1823,7 +1917,9 @@ export default class Index extends Component {
             })
         }
     }
-
+    /**
+     * 实时盘点
+     */
     SSPanDian() {
         if (this.state.ShopCar1 > 0) {
             this._setModalVisible();
@@ -1856,7 +1952,9 @@ export default class Index extends Component {
             })
         }
     }
-
+    /**
+     * 商品盘点
+     */
     SPPanDian() {
         if (this.state.ShopCar1 > 0) {
             this._setModalVisible();
@@ -1890,7 +1988,9 @@ export default class Index extends Component {
         }
 
     }
-
+    /**
+     * 配送收货
+     */
     PSShouHuo() {
         if (this.state.ShopCar1 > 0) {
             this._setModalVisible();
@@ -1919,6 +2019,9 @@ export default class Index extends Component {
                                 } else {
                                     this.Promp();
                                 }
+                            }else{
+                                ToastAndroid.show("没有权限",ToastAndroid.SHORT);
+                                return;
                             }
                         })
                     } else {
@@ -1929,7 +2032,9 @@ export default class Index extends Component {
         }
 
     }
-
+    /**
+     * 商品采购
+     */
     SPCaiGou() {
         if (this.state.ShopCar1 > 0) {
             this._setModalVisible();
@@ -1970,7 +2075,9 @@ export default class Index extends Component {
             });
         }
     }
-
+    /**
+     * 商品验收
+     */
     SPYanShou() {
         if (this.state.ShopCar1 > 0) {
             this._setModalVisible();
@@ -2011,7 +2118,9 @@ export default class Index extends Component {
             });
         }
     }
-
+    /**
+     * 协配采购
+     */
     XPCaiGou() {
         if (this.state.ShopCar1 > 0) {
             this._setModalVisible();
@@ -2042,6 +2151,9 @@ export default class Index extends Component {
                                 } else {
                                     this.Promp();
                                 }
+                            }else{
+                                ToastAndroid.show("没有权限",ToastAndroid.SHORT);
+                                return;
                             }
                         })
                     } else {
@@ -2051,7 +2163,9 @@ export default class Index extends Component {
             });
         }
     }
-
+    /**
+     * 协配收货
+     */
     XPShouHuo() {
         if (this.state.ShopCar1 > 0) {
             this._setModalVisible();
@@ -2095,7 +2209,9 @@ export default class Index extends Component {
 
         }
     }
-
+    /**
+     * 商品配送
+     */
     PSDan(){
         if (this.state.ShopCar1 > 0) {
             this._setModalVisible();
@@ -2110,7 +2226,10 @@ export default class Index extends Component {
                         Storage.save("invoice", "商品配送");
                         var nextRoute = {
                             name: "商品配送",
-                            component: PSDan
+                            component: PSDan,
+                            params: {
+                                invoice:"商品配送"
+                            }
                         };
                         this.props.navigator.push(nextRoute);
                         this._setModalVisible();
@@ -2121,7 +2240,8 @@ export default class Index extends Component {
                         this.Promp();
                     }
                 }else {
-                    this.Permissions1()
+                    ToastAndroid.show("没有权限",ToastAndroid.SHORT);
+                    return;
                 }
             })
         }
@@ -2129,7 +2249,6 @@ export default class Index extends Component {
 
     /**
      * 移动销售 进行绑定功能
-     * @constructor
      */
     Sell() {
         if (this.state.ShopCar1 > 0) {
@@ -2254,7 +2373,9 @@ export default class Index extends Component {
             }
         }
     }
-
+    /**
+     * 标签采集
+     */
     BQbutton() {
 
         if (this.state.ShopCar1 > 0) {
@@ -2288,7 +2409,9 @@ export default class Index extends Component {
             })
         }
     }
-
+    /**
+     * 库存查询
+     */
     StockEnquiries() {
         if (this.state.ShopCar1 > 0) {
             this._setModalVisible();
@@ -2305,7 +2428,9 @@ export default class Index extends Component {
             this._setModalVisible();
         }
     }
-
+    /**
+     * 商品查询
+     */
     ShopSearch() {
         if (this.state.ShopCar1 > 0) {
             this._setModalVisible();
@@ -2331,6 +2456,72 @@ export default class Index extends Component {
             this._setModalVisible();
             Storage.save('Name', '商品查询');
 
+        }
+    }
+    /**
+     * 要货查询
+     */
+    YHSearch(){
+        if (this.state.ShopCar1 > 0) {
+            this._setModalVisible();
+            ToastAndroid.show("商品未提交",ToastAndroid.SHORT);
+            return;
+        } else if (this.state.username == null) {
+            this._setModalVisible();
+        } else {
+            dbAdapter.selectUserRight(this.state.usercode, "K0706").then((rows) => {
+                if (rows == true) {
+                    if (this.state.Disting == "0" || this.state.Disting == "1") {
+                        var nextRoute = {
+                            name: "要货查询",
+                            component: YHSearch,
+                        };
+                        this.props.navigator.push(nextRoute);
+                        this._setModalVisible();
+                    } else {
+                        this.Promp();
+                    }
+                }else {
+                    ToastAndroid.show("没有权限",ToastAndroid.SHORT);
+                    return;
+                }
+            })
+        }
+    }
+    /**
+     * 售价调整
+     */
+
+    PriceTZ(){
+        if (this.state.ShopCar1 > 0) {
+            this._setModalVisible();
+            ToastAndroid.show("商品未提交",ToastAndroid.SHORT);
+            return;
+        } else if (this.state.username == null) {
+            this._setModalVisible();
+        } else {
+            dbAdapter.selectUserRight(this.state.usercode, "K0601").then((rows) => {
+                if (rows == true) {
+                    if (this.state.Disting == "0" || this.state.Disting == "1") {
+                        Storage.save("invoice", "售价调整");
+                        var nextRoute = {
+                            name: "售价调整",
+                            component: PinLei,
+                            params: {
+                                invoice:"售价调整"
+                            }
+                        };
+                        this.props.navigator.push(nextRoute);
+                        this._setModalVisible();
+                        DeviceEventEmitter.removeAllListeners();
+                    }else {
+                        this.Promp();
+                    }
+                }else {
+                    ToastAndroid.show("没有权限",ToastAndroid.SHORT);
+                    return;
+                }
+            })
         }
     }
 
@@ -2636,6 +2827,7 @@ export default class Index extends Component {
             })
         })
     }
+
     PSDan1(){
         this._StateMent();
         var nextRoute = {
@@ -2648,12 +2840,18 @@ export default class Index extends Component {
         Storage.save('history','App_Client_ProPSQ');
         Storage.save('historyClass','App_Client_ProPSDetailQ');
     }
-    Sell1() {
 
+    PriceTZ1(){
+        var nextRoute = {
+            name: "HistoricalDocument",
+            component: HistoricalDocument
+        };
+        this.props.navigator.push(nextRoute);
+        Storage.delete('Name');
+        Storage.save('name', '售价调整');
+        Storage.save('history', 'App_Client_ProTJQ');//门店要货查询
+        Storage.save('historyClass', 'App_Client_ProTJDetailQ');//门店要货明细查询
     }
-
-    //单据功能分类结束
-
     //FlatList加入kay值
     keyExtractor(item: Object, index: number) {
         return item.ProdName//FlatList使用json中的ProdName动态绑定key
@@ -3073,6 +3271,29 @@ export default class Index extends Component {
                                         商品配送
                                     </Text>
                                 </TouchableOpacity>
+                                <TouchableOpacity style={[styles.ModalHeadImage, {borderRightWidth: 1, borderRightColor: "#f2f2f2"}]} onPress={this.YHSearch.bind(this)}>
+                                    <Text style={styles.ModalHeadImage1}>
+                                        <Image source={require("../images/1_61.png")}/>
+                                    </Text>
+                                    <Text style={styles.ModalHeadText}>
+                                        要货查询
+                                    </Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={styles.ModalHeadImage}
+                                    onPress={this.BQbutton.bind(this)}>
+                                    <Text style={styles.ModalHeadImage1}>
+                                        <Image source={require("../images/1_60.png")}/>
+                                    </Text>
+                                    <Text style={styles.ModalHeadText}>
+                                        标签采集
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={styles.ModalLine}>
+                                <Image source={require("../images/1_48.png")} style={styles.ModalImageLine}/>
+                            </View>
+                            <View style={[styles.ModalHead, {marginBottom: 10}]}>
                                 <TouchableOpacity
                                     style={[styles.ModalHeadImage, {borderRightWidth: 1, borderRightColor: "#f2f2f2"}]}
                                     onPress={this.Sell.bind(this)}>
@@ -3081,6 +3302,14 @@ export default class Index extends Component {
                                     </Text>
                                     <Text style={styles.ModalHeadText}>
                                         移动销售
+                                    </Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={[styles.ModalHeadImage, {borderRightWidth: 1, borderRightColor: "#f2f2f2"}]} onPress={this.ShopSearch.bind(this)}>
+                                    <Text style={styles.ModalHeadImage1}>
+                                        <Image source={require("../images/1_61.png")}/>
+                                    </Text>
+                                    <Text style={styles.ModalHeadText}>
+                                        商品查询
                                     </Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity
@@ -3098,26 +3327,8 @@ export default class Index extends Component {
                                 <Image source={require("../images/1_48.png")} style={styles.ModalImageLine}/>
                             </View>
                             <View style={[styles.ModalHead, {marginBottom: 10}]}>
-                                <TouchableOpacity style={[styles.ModalHeadImage, {borderRightWidth: 1, borderRightColor: "#f2f2f2"}]} onPress={this.ShopSearch.bind(this)}>
-                                    <Text style={styles.ModalHeadImage1}>
-                                        <Image source={require("../images/1_58.png")}/>
-                                    </Text>
-                                    <Text style={styles.ModalHeadText}>
-                                        商品查询
-                                    </Text>
-                                </TouchableOpacity>
                                 <TouchableOpacity
                                     style={[styles.ModalHeadImage, {borderRightWidth: 1, borderRightColor: "#f2f2f2"}]}
-                                    onPress={this.BQbutton.bind(this)}>
-                                    <Text style={styles.ModalHeadImage1}>
-                                        <Image source={require("../images/1_60.png")}/>
-                                    </Text>
-                                    <Text style={styles.ModalHeadText}>
-                                        标签采集
-                                    </Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity
-                                    style={styles.ModalHeadImage}
                                     onPress={this.StateMent.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1-60.png")}/>
@@ -3126,11 +3337,6 @@ export default class Index extends Component {
                                         单据报表
                                     </Text>
                                 </TouchableOpacity>
-                            </View>
-                            <View style={styles.ModalLine}>
-                                <Image source={require("../images/1_48.png")} style={styles.ModalImageLine}/>
-                            </View>
-                            <View style={[styles.ModalHead, {marginBottom: 10}]}>
                                 <TouchableOpacity
                                     style={[styles.ModalHeadImage, {borderRightWidth: 1, borderRightColor: "#f2f2f2"}]}
                                     onPress={this.pullOut.bind(this)}>
@@ -3151,8 +3357,8 @@ export default class Index extends Component {
                                         数据更新
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.ModalHeadImage}></TouchableOpacity>
                             </View>
+
                         </View>
                     </ScrollView>
                 </Modal>
@@ -3317,8 +3523,18 @@ export default class Index extends Component {
                                         商品配送
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={[styles.ModalHeadImage,
-                                    {borderRightWidth: 1, borderRightColor: "#f2f2f2"}]}
+                                <TouchableOpacity
+                                    style={[styles.ModalHeadImage, {borderRightWidth: 1, borderRightColor: "#f2f2f2"}]}
+                                    onPress={this.PriceTZ1.bind(this)}>
+                                    <Text style={styles.ModalHeadImage1}>
+                                        <Image source={require("../images/1_58.png")}/>
+                                    </Text>
+                                    <Text style={styles.ModalHeadText}>
+                                        售价调整
+                                    </Text>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity style={styles.ModalHeadImage}
                                                   onPress={this.pullOut1.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_56.png")}/>
@@ -3327,7 +3543,6 @@ export default class Index extends Component {
                                         退出账号
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.ModalHeadImage}></TouchableOpacity>
                             </View>
                         </View>
                     </ScrollView>

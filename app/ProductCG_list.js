@@ -50,7 +50,6 @@ export default class ProductCG_list extends Component {
                 var row = rows.item(i);
                 this.dataRows.push(row);
             }
-            console.log(this.dataRows)
             this.setState({
                 dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
             })

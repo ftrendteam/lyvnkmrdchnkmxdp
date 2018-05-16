@@ -64,12 +64,10 @@ export default class YHDan extends Component {
                                 detailshopcode:this.state.JiGou,
                                 Sign:NetUtils.MD5("App_PosReq" + "##" +'App_Client_NOYHQ' + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',
                             };
-                            console.log(JSON.stringify(params))
                             FetchUtils.post(LinkUrl,JSON.stringify(params)).then((data)=>{
                                 if(data.retcode == 1){
                                     var DetailInfo = data.DetailInfo;
                                     this.dataRows = this.dataRows.concat(DetailInfo);
-                                    console.log('aaaa',this.dataRows)
                                     this.setState({
                                         dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
                                         DetailInfo:DetailInfo,
@@ -109,9 +107,13 @@ export default class YHDan extends Component {
     }
 
     pressPop(rowData){
-        var Data=rowData.Formno;
-        if(this.props.YHDan){
-            this.props.YHDan(Data)
+        var Formno=rowData.Formno;
+        var shopcode=rowData.shopcode;
+        if(this.props.YHDan||this.props.reloadShopname||this.props.DepName||this.props.DepCode){
+            this.props.YHDan(Formno);
+            this.props.reloadShopname(shopcode);
+            this.props.DepName(rowData.depname);
+            this.props.DepCode(rowData.depcode);
         }
         this.props.navigator.pop();
     }
@@ -121,6 +123,9 @@ export default class YHDan extends Component {
             <TouchableOpacity style={styles.header} onPress={()=>this.pressPop(rowData)}>
                 <View style={styles.coding}>
                     <Text style={styles.codingText}>{rowData.Formno}</Text>
+                </View>
+                <View style={styles.coding}>
+                    <Text style={styles.codingText}>{rowData.depname}</Text>
                 </View>
             </TouchableOpacity>
         )
@@ -153,6 +158,9 @@ export default class YHDan extends Component {
                     <View style={styles.head}>
                         <View style={styles.coding}>
                             <Text style={styles.codingText}>要货单号</Text>
+                        </View>
+                        <View style={styles.coding}>
+                            <Text style={styles.codingText}>品类</Text>
                         </View>
                     </View>
                     {

@@ -91,20 +91,7 @@ export default class PinLei extends Component {
             };
             this.props.navigator.push(nextRoute);
             if(this.state.invoice=="门店要货"){
-                Storage.delete('OrgFormno');
-                Storage.delete('scode');
-                Storage.delete('shildshop');
-                Storage.delete('YuanDan');
-                Storage.delete('Screen');
-                Storage.delete('StateMent');
-                Storage.delete('BQNumber');
-                Storage.delete('YdCountm');
-                Storage.delete('Modify');
-                if(this.state.DepName1==""&&this.state.DepCode1==""){
-                    Storage.delete('DepCode');
-                }else{
-                    Storage.save('DepCode', this.state.DepCode1);
-                }
+                this.delete();
                 Storage.save('Name', '门店要货');
                 Storage.save('FormType', 'YWYW');
                 Storage.save('ProYH', 'ProYH');
@@ -115,18 +102,7 @@ export default class PinLei extends Component {
                 Storage.save('history', 'App_Client_ProYHQ');
                 Storage.save('historyClass', 'App_Client_ProYHDetailQ');
             }else if(this.state.invoice=="实时盘点"){
-                Storage.delete('OrgFormno');
-                Storage.delete('shildshop');
-                Storage.delete('YuanDan');
-                Storage.delete('StateMent');
-                Storage.delete('BQNumber');
-                Storage.delete('YdCountm');
-                Storage.delete('Modify');
-                if(this.state.DepName1==""&&this.state.DepCode1==""){
-                    Storage.delete('DepCode');
-                }else{
-                    Storage.save('DepCode', this.state.DepCode1);
-                }
+                this.delete();
                 Storage.save('Date', data);
                 Storage.save('Name', '实时盘点');
                 Storage.save('Document', "实时盘点");
@@ -139,19 +115,7 @@ export default class PinLei extends Component {
                 Storage.save('history', 'App_Client_ProCurrPCQ');
                 Storage.save('historyClass', 'App_Client_ProCurrPCDetailQ');
             }else if(this.state.invoice=="商品损溢"){
-                Storage.delete('OrgFormno');
-                Storage.delete('scode');
-                Storage.delete('shildshop');
-                Storage.delete('YuanDan');
-                Storage.delete('Screen');
-                Storage.delete('StateMent');
-                Storage.delete('BQNumber');
-                Storage.delete('Modify');
-                if(this.state.DepName1==""&&this.state.DepCode1==""){
-                    Storage.delete('DepCode');
-                }else{
-                    Storage.save('DepCode', this.state.DepCode1);
-                }
+                this.delete();
                 Storage.save('Name','商品损溢');
                 Storage.save('FormType','SYYW');
                 Storage.save('ProYH','ProSY');
@@ -166,18 +130,7 @@ export default class PinLei extends Component {
                 Storage.save('history', 'App_Client_ProSYQ');
                 Storage.save('historyClass', 'App_Client_ProSYDetailQ');
             }else if(this.state.invoice=="标签采集"){
-                Storage.delete('OrgFormno');
-                Storage.delete('scode');
-                Storage.delete('shildshop');
-                Storage.delete('YuanDan');
-                Storage.delete('Screen');
-                Storage.delete('StateMent');
-                Storage.delete('Modify');
-                if(this.state.DepName1==""&&this.state.DepCode1==""){
-                    Storage.delete('DepCode');
-                }else{
-                    Storage.save('DepCode', this.state.DepCode1);
-                }
+                this.delete();
                 Storage.save('Date', data);
                 Storage.save('YdCountm', '5');
                 Storage.save('BQNumber', '3');
@@ -185,6 +138,15 @@ export default class PinLei extends Component {
                 Storage.save('Name', '标签采集');
                 Storage.save('ProYH', 'BJQ');
                 Storage.save('valueOf', 'App_Client_BJQ');
+            }else if(this.state.invoice=="售价调整"){
+                this.delete();
+                Storage.save('Name', '售价调整');
+                Storage.save('FormType', 'TJYW');
+                Storage.save('ProYH', 'ProTJQ');
+                Storage.save('Date', data);
+                Storage.save('valueOf', 'App_Client_ProTJ');//门店要货提交
+                Storage.save('history', 'App_Client_ProTJQ');//门店要货查询
+                Storage.save('historyClass', 'App_Client_ProTJDetailQ');//门店要货明细查询
             }
         }else if(this.state.Disting=="1"){
             var date = new Date();
@@ -195,42 +157,18 @@ export default class PinLei extends Component {
             };
             this.props.navigator.push(nextRoute);
             if(this.state.invoice=="门店要货"){
-                Storage.delete('OrgFormno');
-                Storage.delete('scode');
-                Storage.delete('shildshop');
-                Storage.delete('YuanDan');
-                Storage.delete('Screen');
-                Storage.delete('StateMent');
-                Storage.delete('BQNumber');
-                Storage.delete('YdCountm');
-                Storage.delete('Modify');
-                if(this.state.DepName1==""&&this.state.DepCode1==""){
-                    Storage.delete('DepCode');
-                }else{
-                    Storage.save('DepCode', this.state.DepCode1);
-                }
+                this.delete();
                 Storage.save('Name', '门店要货');
                 Storage.save('FormType', 'YWYW');
                 Storage.save('ProYH', 'ProYH');
                 Storage.save('YdCountm', '1');
                 Storage.save('Date', data);
-                //将内容保存到本地数据库
                 Storage.save('valueOf', 'App_Client_ProYH');
                 Storage.save('history', 'App_Client_ProYHQ');
                 Storage.save('historyClass', 'App_Client_ProYHDetailQ');
-            }else if(this.state.invoice=="实时盘点"){
-                Storage.delete('OrgFormno');
-                Storage.delete('shildshop');
-                Storage.delete('YuanDan');
-                Storage.delete('StateMent');
-                Storage.delete('BQNumber');
-                Storage.delete('YdCountm');
-                Storage.delete('Modify');
-                if(this.state.DepName1==""&&this.state.DepCode1==""){
-                    Storage.delete('DepCode');
-                }else{
-                    Storage.save('DepCode', this.state.DepCode1);
-                }
+            }
+            else if(this.state.invoice=="实时盘点"){
+                this.delete();
                 Storage.save('Date', data);
                 Storage.save('Name', '实时盘点');
                 Storage.save('Document', "实时盘点");
@@ -242,20 +180,9 @@ export default class PinLei extends Component {
                 Storage.save('valueOf', 'App_Client_ProCurrPC');
                 Storage.save('history', 'App_Client_ProCurrPCQ');
                 Storage.save('historyClass', 'App_Client_ProCurrPCDetailQ');
-            }else if(this.state.invoice=="商品损溢"){
-                Storage.delete('OrgFormno');
-                Storage.delete('scode');
-                Storage.delete('shildshop');
-                Storage.delete('YuanDan');
-                Storage.delete('Screen');
-                Storage.delete('StateMent');
-                Storage.delete('BQNumber');
-                Storage.delete('Modify');
-                if(this.state.DepName1==""&&this.state.DepCode1==""){
-                    Storage.delete('DepCode');
-                }else{
-                    Storage.save('DepCode', this.state.DepCode1);
-                }
+            }
+            else if(this.state.invoice=="商品损溢"){
+                this.delete();
                 Storage.save('Name','商品损溢');
                 Storage.save('FormType','SYYW');
                 Storage.save('ProYH','ProSY');
@@ -269,19 +196,9 @@ export default class PinLei extends Component {
                 Storage.save('valueOf', 'App_Client_ProSY');
                 Storage.save('history', 'App_Client_ProSYQ');
                 Storage.save('historyClass', 'App_Client_ProSYDetailQ');
-            }else if(this.state.invoice=="标签采集"){
-                Storage.delete('OrgFormno');
-                Storage.delete('scode');
-                Storage.delete('shildshop');
-                Storage.delete('YuanDan');
-                Storage.delete('Screen');
-                Storage.delete('StateMent');
-                Storage.delete('Modify');
-                if(this.state.DepName1==""&&this.state.DepCode1==""){
-                    Storage.delete('DepCode');
-                }else{
-                    Storage.save('DepCode', this.state.DepCode1);
-                }
+            }
+            else if(this.state.invoice=="标签采集"){
+                this.delete();
                 Storage.save('Date', data);
                 Storage.save('YdCountm', '5');
                 Storage.save('BQNumber', '3');
@@ -290,8 +207,37 @@ export default class PinLei extends Component {
                 Storage.save('ProYH', 'BJQ');
                 Storage.save('valueOf', 'App_Client_BJQ');
             }
+            else if(this.state.invoice=="售价调整"){
+                this.delete();
+                Storage.save('Name', '售价调整');
+                Storage.save('FormType', 'TJYW');
+                Storage.save('ProYH', 'ProTJQ');
+                Storage.save('Date', data);
+                Storage.save('valueOf', 'App_Client_ProTJ');//门店要货提交
+                Storage.save('history', 'App_Client_ProTJQ');//门店要货查询
+                Storage.save('historyClass', 'App_Client_ProTJDetailQ');//门店要货明细查询
+            }
         }
 
+    }
+
+    delete(){
+        Storage.delete('OrgFormno');
+        Storage.delete('scode');
+        Storage.delete('shildshop');
+        Storage.delete('YuanDan');
+        Storage.delete('Screen');
+        Storage.delete('StateMent');
+        Storage.delete('BQNumber');
+        Storage.delete('YdCountm');
+        Storage.delete('Modify');
+        Storage.delete("PeiSong");
+        Storage.delete('StateMent');
+        if(this.state.DepName1==""&&this.state.DepCode1==""){
+            Storage.delete('DepCode');
+        }else{
+            Storage.save('DepCode', this.state.DepCode1);
+        }
     }
 
     render() {

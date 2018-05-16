@@ -1,5 +1,7 @@
 /**
- * 商品采购第二分页
+ * Sample React Native App
+ * https://github.com/facebook/react-native
+ * @flow
  */
 
 import React, { Component } from 'react';
@@ -10,67 +12,57 @@ import {
     View,
     Image,
     TextInput,
-    ToastAndroid,
     TouchableOpacity,
 } from 'react-native';
-
-import Index from "./Index";
-import Search from "./Search";
-import ProductCG_list from "./ProductCG_list";
 import PinLeiData from "../YHDan/PinLeiData";
-import NetUtils from "../utils/NetUtils";
-import Storage from '../utils/Storage';
-import ModalDropdown from 'native';
-
-export default class ProductCG extends Component {
+import JiGou from "../PSDan/JiGou";
+import YHSearch from "./YHSearch";
+export default class myproject extends Component {
     constructor(props){
         super(props);
         this.state = {
-            show:false,
-            Number:"",
-            sCode1:"",
-            active:"",
+            JiGou:'',
             DepName1:"",
             DepCode1:"",
             invoice:this.props.invoice ? this.props.invoice : "",
+            OrgFormno:this.props.OrgFormno ? this.props.OrgFormno : "",
         };
     }
 
     componentDidMount(){
-        Storage.get('Disting').then((tags)=>{
-            this.setState({
-                Disting:tags
-            })
-        })
+
     }
 
     Return(){
-        var nextRoute={
-            name:"Index",
-            component:Index
-        };
-        this.props.navigator.push(nextRoute)
+        this.props.navigator.pop();
     }
 
-    onclick(){
+    /**
+     * 机构
+     * @constructor
+     */
+    JiGouOnclick(){
         var nextRoute={
-            name:"ProductCG_list",
-            component:ProductCG_list,
+            name:"JiGou",
+            component:JiGou,
             params: {
-                reloadView:(sCode)=>this._reloadView(sCode)
+                reloadShopname:(JiGou)=>this._reloadShopname(JiGou)
             }
         };
         this.props.navigator.push(nextRoute)
     }
 
-    _reloadView(sCode) {
-        sCode = String(sCode);
+    _reloadShopname(JiGou) {
+        JiGou = String(JiGou);
         this.setState({
-            sCode1:sCode,
+            JiGou:JiGou,
         });
     }
-
-    ShoppData() {
+    /**
+     * 品类
+     * @constructor
+     */
+    ShoppData(){
         var nextRoute = {
             name: "ProductCG_list",
             component: PinLeiData,
@@ -95,81 +87,20 @@ export default class ProductCG extends Component {
         });
     }
 
+    /**
+     * 确定按钮（返回要货查询展示界面）
+     * @constructor
+     */
     Button(){
-        if(this.state.Disting=="0") {
-            var str=this.state.sCode1;
-            if(this.state.sCode1==""){
-                ToastAndroid.show("请选择供应商",ToastAndroid.SHORT);
-                return;
-            }else{
-                var date = new Date();
-                var data=JSON.stringify(date.getTime());
-                var nextRoute={
-                    name:"Index",
-                    component:Index,
-                };
-                this.props.navigator.push(nextRoute);
-                Storage.delete('OrgFormno');
-                Storage.delete('shildshop');
-                Storage.delete('StateMent');
-                Storage.delete('BQNumber');
-                Storage.delete('YuanDan');
-                Storage.delete('Screen');
-                Storage.delete('Modify');
-                Storage.delete("PeiSong");
-                if(this.state.DepName1==""&&this.state.DepCode1==""){
-                    Storage.delete('DepCode');
-                }else{
-                    Storage.save('DepCode', this.state.DepCode1);
-                }
-                Storage.save('Name','商品采购');
-                Storage.save('FormType','CGYW');
-                Storage.save('valueOf','App_Client_ProCG');
-                Storage.save('history','App_Client_ProCGQ');
-                Storage.save('historyClass','App_Client_ProCGDetailQ');
-                Storage.save('ProYH','ProCG');
-                Storage.save('YdCountm','3');
-                Storage.save('Date',data);
-                Storage.save("scode",str);
+        var nextRoute = {
+            name: "YHSearch",
+            component: YHSearch,
+            params: {
+                JiGou:this.state.JiGou,
+                DepCode:this.state.DepCode1,
             }
-        }else if(this.state.Disting=="1"){
-            var str=this.state.sCode1;
-            if(this.state.sCode1==""){
-                ToastAndroid.show("请选择供应商",ToastAndroid.SHORT);
-                return;
-            }else{
-                var date = new Date();
-                var data=JSON.stringify(date.getTime());
-                var nextRoute={
-                    name:"Search",
-                    component:Search,
-                };
-                this.props.navigator.push(nextRoute);
-                Storage.delete('OrgFormno');
-                Storage.delete('shildshop');
-                Storage.delete('StateMent');
-                Storage.delete('BQNumber');
-                Storage.delete('YuanDan');
-                Storage.delete('Screen');
-                Storage.delete('Modify');
-                Storage.delete("PeiSong");
-                if(this.state.DepName1==""&&this.state.DepCode1==""){
-                    Storage.delete('DepCode');
-                }else{
-                    Storage.save('DepCode', this.state.DepCode1);
-                }
-                Storage.save('Name','商品采购');
-                Storage.save('FormType','CGYW');
-                Storage.save('valueOf','App_Client_ProCG');
-                Storage.save('history','App_Client_ProCGQ');
-                Storage.save('historyClass','App_Client_ProCGDetailQ');
-                Storage.save('ProYH','ProCG');
-                Storage.save('YdCountm','3');
-                Storage.save('Date',data);
-                Storage.save("scode",str);
-            }
-        }
-
+        };
+        this.props.navigator.push(nextRoute)
     }
 
     render() {
@@ -186,22 +117,22 @@ export default class ProductCG extends Component {
                 </View>
                 <View style={styles.ContList}>
                     <View style={styles.listleft}>
-                        <Text style={styles.listLeftText}>供应商:</Text>
+                        <Text style={styles.listLeftText}>机构:</Text>
                     </View>
-                    <TouchableOpacity style={styles.listcont} onPress={this.onclick.bind(this)}>
+                    <TouchableOpacity style={styles.listcont} onPress={this.JiGouOnclick.bind(this)}>
                         <TextInput
                             style={styles.TextInput1}
                             autofocus={true}
                             editable={false}
-                            defaultValue ={this.state.sCode1}
+                            defaultValue ={this.state.JiGou}
                             numberoflines={1}
-                            placeholder="请选择供应商"
+                            placeholder="请选择机构"
                             textalign="center"
                             underlineColorAndroid='transparent'
                             placeholderTextColor="#cccccc"
                         />
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={this.onclick.bind(this)}>
+                    <TouchableOpacity onPress={this.JiGouOnclick.bind(this)}>
                         <Image source={require("../images/2_03.png")}></Image>
                     </TouchableOpacity>
                 </View>
@@ -308,6 +239,3 @@ const styles = StyleSheet.create({
         textAlign:"center"
     }
 });
-
-
-

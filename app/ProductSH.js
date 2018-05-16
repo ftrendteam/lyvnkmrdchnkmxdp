@@ -80,7 +80,8 @@ export default class ProductCG extends Component {
             params: {
                 SearchShopname:(Suppcode)=>this.SearchShopname(Suppcode),
                 SearchShopname1:(Suppcode1)=>this.SearchShopname1(Suppcode1),
-                // reloadShopname:(shopname)=>this._reloadShopname(shopname)
+                DepName: (DepName) => this._DepName(DepName),
+                DepCode: (DepCode) => this._DepCode(DepCode),
             }
         };
         this.props.navigator.push(nextRoute)
@@ -149,7 +150,8 @@ export default class ProductCG extends Component {
                 this.props.navigator.push(nextRoute);
                 Storage.delete('StateMent');
                 Storage.delete('BQNumber');
-                if(this.state.DepName1==""&&this.state.DepCode1==""){
+                Storage.delete("PeiSong");
+                if(this.state.DepCode1==""||this.state.DepCode1==0){
                     Storage.delete('DepCode');
                 }else{
                     Storage.save('DepCode', this.state.DepCode1);
@@ -189,7 +191,8 @@ export default class ProductCG extends Component {
                 this.props.navigator.push(nextRoute);
                 Storage.delete('StateMent');
                 Storage.delete('BQNumber');
-                if(this.state.DepName1==""&&this.state.DepCode1==""){
+                Storage.delete("PeiSong");
+                if(this.state.DepCode1==""||this.state.DepCode1==0){
                     Storage.delete('DepCode');
                 }else{
                     Storage.save('DepCode', this.state.DepCode1);

@@ -28,7 +28,7 @@ export default class Distrition extends Component {
             sCode1:"",
             active:"",
             DepCode1:"",
-            DepCode1:"",
+            DepName1:"",
             invoice:this.props.invoice ? this.props.invoice : "",
         };
     }
@@ -56,6 +56,7 @@ export default class Distrition extends Component {
             sCode1:sCode,
         });
     }
+
     /**
      *
      * 确定按钮点击跳转至商品列表
@@ -77,7 +78,8 @@ export default class Distrition extends Component {
             Storage.delete('StateMent');
             Storage.delete('BQNumber');
             Storage.delete('Modify');
-            if(this.state.DepName1==""&&this.state.DepCode1==""){
+            Storage.delete("PeiSong");
+            if(this.state.DepCode1==""||this.state.DepCode1==0){
                 Storage.delete('DepCode');
             }else{
                 Storage.save('DepCode', this.state.DepCode1);
@@ -110,7 +112,8 @@ export default class Distrition extends Component {
             Storage.delete('StateMent');
             Storage.delete('BQNumber');
             Storage.delete('Modify');
-            if(this.state.DepName1==""&&this.state.DepCode1==""){
+            Storage.delete("PeiSong");
+            if(this.state.DepCode1==""||this.state.DepCode1==0){
                 Storage.delete('DepCode');
             }else{
                 Storage.save('DepCode', this.state.DepCode1);
@@ -130,7 +133,6 @@ export default class Distrition extends Component {
         }
     }
 
-
     /**
      *
      * 单号点击查询
@@ -141,7 +143,9 @@ export default class Distrition extends Component {
             name:"Distrition_list",
             component:Distrition_list,
             params: {
-                reloadView:(sCode)=>this._reloadView(sCode)
+                reloadView:(sCode)=>this._reloadView(sCode),
+                DepName:(DepName)=>this._DepName(DepName),
+                DepCode:(DepCode)=>this._DepCode(DepCode),
             }
         };
         this.props.navigator.push(nextRoute)
@@ -161,6 +165,7 @@ export default class Distrition extends Component {
         };
         this.props.navigator.push(nextRoute)
     }
+
     _DepName(DepName) {
         DepName = String(DepName);
         this.setState({

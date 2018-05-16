@@ -19,6 +19,7 @@ import JiGou from "./JiGou";
 import YHDan from "./YHDan";
 import CKu from "./CKu";
 import PinLeiData from "../YHDan/PinLeiData";
+import ShoppingCart from "../app/ShoppingCart";//清单
 import Storage from '../utils/Storage';
 import ModalDropdown from 'native';
 
@@ -80,6 +81,9 @@ export default class PSDan extends Component {
             component:YHDan,
             params: {
                 YHDan:(YHDan)=>this._YHDan(YHDan),
+                reloadShopname:(JiGou)=>this._reloadShopname(JiGou),
+                DepName: (DepName) => this._DepName(DepName),
+                DepCode: (DepCode) => this._DepCode(DepCode),
                 JiGou: this.state.JiGou,
             }
         };
@@ -155,24 +159,34 @@ export default class PSDan extends Component {
                 var str2=this.state.JiGou;
                 var date = new Date();
                 var data=JSON.stringify(date.getTime());
-                var nextRoute={
-                    name:"Index",
-                    component:Index,
-                };
-                this.props.navigator.push(nextRoute);
+                if(this.state.YHDan==""){
+                    var nextRoute={
+                        name:"Index",
+                        component:Index,
+                    };
+                    this.props.navigator.push(nextRoute);
+                    Storage.delete("PeiSong");
+                }else{
+                    var nextRoute={
+                        name:"ShoppingCart",
+                        component:ShoppingCart,
+                    };
+                    this.props.navigator.push(nextRoute);
+                    Storage.save('PeiSong',"商品配送");
+                }
                 Storage.delete('scode');
                 Storage.delete('StateMent');
                 Storage.delete('BQNumber');
                 Storage.delete('YuanDan');
                 Storage.delete('YdCountm');
                 Storage.delete('Modify');
-                if(this.state.DepName1==""&&this.state.DepCode1==""){
+                if(this.state.DepCode1==""&&this.state.DepCode1==0){
                     Storage.delete('DepCode');
                 }else{
                     Storage.save('DepCode', this.state.DepCode1);
                 }
                 if(this.state.YHDan==""){
-                    Storage.save('YdCountm',"1");
+                    Storage.save('YdCountm',"6");
                 }else{
                     Storage.save('YdCountm',"2");
                 }
@@ -199,24 +213,34 @@ export default class PSDan extends Component {
                 var str2=this.state.JiGou;
                 var date = new Date();
                 var data=JSON.stringify(date.getTime());
-                var nextRoute={
-                    name:"Search",
-                    component:Search,
-                };
-                this.props.navigator.push(nextRoute);
+                if(this.state.YHDan==""){
+                    var nextRoute={
+                        name:"Search",
+                        component:Search,
+                    };
+                    this.props.navigator.push(nextRoute);
+                    Storage.delete("PeiSong");
+                }else{
+                    var nextRoute={
+                        name:"ShoppingCart",
+                        component:ShoppingCart,
+                    };
+                    this.props.navigator.push(nextRoute);
+                    Storage.save('PeiSong',"商品配送");
+                }
                 Storage.delete('scode');
                 Storage.delete('StateMent');
                 Storage.delete('BQNumber');
                 Storage.delete('YuanDan');
                 Storage.delete('YdCountm');
                 Storage.delete('Modify');
-                if(this.state.DepName1==""&&this.state.DepCode1==""){
+                if(this.state.DepCode1==""&&this.state.DepCode1==0){
                     Storage.delete('DepCode');
                 }else{
                     Storage.save('DepCode', this.state.DepCode1);
                 }
                 if(this.state.YHDan==""){
-                    Storage.save('YdCountm',"1");
+                    Storage.save('YdCountm',"6");
                 }else{
                     Storage.save('YdCountm',"2");
                 }
