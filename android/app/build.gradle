@@ -96,8 +96,8 @@ android {
         applicationId "com.smartpos.hspos"
         minSdkVersion 16
         targetSdkVersion 22
-        versionCode 21
-        versionName "1.2.2"
+        versionCode 23
+        versionName "1.2.4"
         ndk {
             abiFilters "armeabi","armeabi-v7a", "x86"
         }
@@ -118,7 +118,7 @@ android {
             reset()
             enable enableSeparateBuildPerCPUArchitecture
             universalApk false  // If true, also generate a universal APK
-            include "armeabi-v7a", "x86"
+            include "armeabi","armeabi-v7a", "x86"
         }
     }
     buildTypes {
