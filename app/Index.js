@@ -3271,12 +3271,14 @@ export default class Index extends Component {
                                         商品配送
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={[styles.ModalHeadImage, {borderRightWidth: 1, borderRightColor: "#f2f2f2"}]} onPress={this.YHSearch.bind(this)}>
+                                <TouchableOpacity
+                                    style={[styles.ModalHeadImage, {borderRightWidth: 1, borderRightColor: "#f2f2f2"}]}
+                                    onPress={this.PriceTZ.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
-                                        <Image source={require("../images/1_61.png")}/>
+                                        <Image source={require("../images/1_58.png")}/>
                                     </Text>
                                     <Text style={styles.ModalHeadText}>
-                                        要货查询
+                                        售价调整
                                     </Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity
@@ -3327,6 +3329,14 @@ export default class Index extends Component {
                                 <Image source={require("../images/1_48.png")} style={styles.ModalImageLine}/>
                             </View>
                             <View style={[styles.ModalHead, {marginBottom: 10}]}>
+                                <TouchableOpacity style={[styles.ModalHeadImage, {borderRightWidth: 1, borderRightColor: "#f2f2f2"}]} onPress={this.YHSearch.bind(this)}>
+                                    <Text style={styles.ModalHeadImage1}>
+                                        <Image source={require("../images/1_61.png")}/>
+                                    </Text>
+                                    <Text style={styles.ModalHeadText}>
+                                        要货查询
+                                    </Text>
+                                </TouchableOpacity>
                                 <TouchableOpacity
                                     style={[styles.ModalHeadImage, {borderRightWidth: 1, borderRightColor: "#f2f2f2"}]}
                                     onPress={this.StateMent.bind(this)}>
@@ -3338,7 +3348,7 @@ export default class Index extends Component {
                                     </Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity
-                                    style={[styles.ModalHeadImage, {borderRightWidth: 1, borderRightColor: "#f2f2f2"}]}
+                                    style={styles.ModalHeadImage}
                                     onPress={this.pullOut.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_56.png")}/>
@@ -3347,6 +3357,11 @@ export default class Index extends Component {
                                         退出账号
                                     </Text>
                                 </TouchableOpacity>
+                            </View>
+                            <View style={styles.ModalLine}>
+                                <Image source={require("../images/1_48.png")} style={styles.ModalImageLine}/>
+                            </View>
+                            <View style={[styles.ModalHead, {marginBottom: 10}]}>
                                 <TouchableOpacity
                                     onPress={this.UpData.bind(this)}
                                     style={[styles.ModalHeadImage, {borderRightWidth: 1, borderRightColor: "#f2f2f2"}]}>
@@ -3357,8 +3372,9 @@ export default class Index extends Component {
                                         数据更新
                                     </Text>
                                 </TouchableOpacity>
+                                <TouchableOpacity style={styles.ModalHeadImage}></TouchableOpacity>
+                                <TouchableOpacity style={styles.ModalHeadImage}></TouchableOpacity>
                             </View>
-
                         </View>
                     </ScrollView>
                 </Modal>
