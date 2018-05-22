@@ -61,15 +61,19 @@ export default class YHSearch extends Component {
                     depcode:this.state.DepCode,
                     Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_ProZYHQ" + "##" + Date.parse(new Date()) + "##" + "PosControlCs")+'',
                 };
-                console.log(JSON.stringify(params))
                 FetchUtils.post(LinkUrl,JSON.stringify(params)).then((data)=>{
                     if(data.retcode == 1){
                         var detailinfo = data.DetailInfo;
-                        console.log("data.DetailInfo",JSON.stringify(data.DetailInfo))
                         this.dataRows = this.dataRows.concat(detailinfo);
-                        this.setState({
-                            dataSource:this.state.dataSource.cloneWithRows(this.dataRows)
-                        })
+                        if(detailinfo==null){
+                            this.setState({
+                                dataRows:"",
+                            })
+                        }else{
+                            this.setState({
+                                dataSource:this.state.dataSource.cloneWithRows(this.dataRows)
+                            })
+                        }
                     }else{
                         alert(JSON.stringify(data))
                     }
@@ -212,12 +216,20 @@ export default class YHSearch extends Component {
                             <Text style={styles.TitleCodingText}>数量</Text>
                         </View>
                     </View>
-                    <ListView
-                        style = {styles.scrollview}
-                        dataSource={this.state.dataSource}
-                        showsVerticalScrollIndicator={true}
-                        renderRow={this._renderRow.bind(this)}
-                    />
+                    {
+                        (this.state.dataRows == "") ?
+                            <View style={styles.Null}>
+                                <Text style={styles.NullText}>
+                                    没有搜索到相关商品~~~
+                                </Text>
+                            </View> :
+                            <ListView
+                                style = {styles.scrollview}
+                                dataSource={this.state.dataSource}
+                                showsVerticalScrollIndicator={true}
+                                renderRow={this._renderRow.bind(this)}
+                            />
+                    }
                 </View>
                 <Modal
                     animationType='fade'
@@ -342,5 +354,15 @@ const styles = StyleSheet.create({
     TextLoading:{
         fontSize:17,
         color:"#ffffff"
+    },
+    Null: {
+        marginLeft: 25,
+        marginRight: 25,
+        marginTop: 120,
+    },
+    NullText: {
+        color: "#cccccc",
+        fontSize: 20,
+        textAlign: "center"
     },
 });

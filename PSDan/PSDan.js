@@ -155,16 +155,13 @@ export default class PSDan extends Component {
                 ToastAndroid.show("仓库不能为空",ToastAndroid.SHORT);
                 return;
             }else{
-                var str1=this.state.YHDan;
-                var str2=this.state.JiGou;
-                var date = new Date();
-                var data=JSON.stringify(date.getTime());
                 if(this.state.YHDan==""){
                     var nextRoute={
                         name:"Index",
                         component:Index,
                     };
                     this.props.navigator.push(nextRoute);
+                    this.Data();
                     Storage.delete("PeiSong");
                 }else{
                     var nextRoute={
@@ -172,34 +169,9 @@ export default class PSDan extends Component {
                         component:ShoppingCart,
                     };
                     this.props.navigator.push(nextRoute);
+                    this.Data();
                     Storage.save('PeiSong',"商品配送");
                 }
-                Storage.delete('scode');
-                Storage.delete('StateMent');
-                Storage.delete('BQNumber');
-                Storage.delete('YuanDan');
-                Storage.delete('YdCountm');
-                Storage.delete('Modify');
-                if(this.state.DepCode1==""&&this.state.DepCode1==0){
-                    Storage.delete('DepCode');
-                }else{
-                    Storage.save('DepCode', this.state.DepCode1);
-                }
-                if(this.state.YHDan==""){
-                    Storage.save('YdCountm',"6");
-                }else{
-                    Storage.save('YdCountm',"2");
-                }
-                Storage.save('Date',data);
-                Storage.save('Screen', '1');
-                Storage.save('Name','商品配送');
-                Storage.save('shildshop',str2);
-                Storage.save('OrgFormno',str1);
-                Storage.save('FormType', 'PSYW');
-                Storage.save('CKu',this.state.CKu);
-                Storage.save('valueOf','App_Client_ProPS');
-                Storage.save('history','App_Client_ProPSQ');
-                Storage.save('historyClass','App_Client_ProPSDetailQ');
             }
         }else if(this.state.Disting=="1"){
             if(this.state.JiGou==''){
@@ -209,16 +181,13 @@ export default class PSDan extends Component {
                 ToastAndroid.show("仓库不能为空",ToastAndroid.SHORT);
                 return;
             }else{
-                var str1=this.state.YHDan;
-                var str2=this.state.JiGou;
-                var date = new Date();
-                var data=JSON.stringify(date.getTime());
                 if(this.state.YHDan==""){
                     var nextRoute={
                         name:"Search",
                         component:Search,
                     };
                     this.props.navigator.push(nextRoute);
+                    this.Data();
                     Storage.delete("PeiSong");
                 }else{
                     var nextRoute={
@@ -226,36 +195,45 @@ export default class PSDan extends Component {
                         component:ShoppingCart,
                     };
                     this.props.navigator.push(nextRoute);
+                    this.Data();
                     Storage.save('PeiSong',"商品配送");
                 }
-                Storage.delete('scode');
-                Storage.delete('StateMent');
-                Storage.delete('BQNumber');
-                Storage.delete('YuanDan');
-                Storage.delete('YdCountm');
-                Storage.delete('Modify');
-                if(this.state.DepCode1==""&&this.state.DepCode1==0){
-                    Storage.delete('DepCode');
-                }else{
-                    Storage.save('DepCode', this.state.DepCode1);
-                }
-                if(this.state.YHDan==""){
-                    Storage.save('YdCountm',"6");
-                }else{
-                    Storage.save('YdCountm',"2");
-                }
-                Storage.save('Date',data);
-                Storage.save('Screen', '1');
-                Storage.save('Name','商品配送');
-                Storage.save('OrgFormno',str1);
-                Storage.save('shildshop',str2);
-                Storage.save('FormType', 'PSYW');
-                Storage.save('CKu',this.state.CKu);
-                Storage.save('valueOf','App_Client_ProPS');
-                Storage.save('history','App_Client_ProPSQ');
-                Storage.save('historyClass','App_Client_ProPSDetailQ');
             }
         }
+    }
+
+    Data(){
+        var str1=this.state.YHDan;
+        var str2=this.state.JiGou;
+        var date = new Date();
+        var data=JSON.stringify(date.getTime());
+        Storage.delete('scode');
+        Storage.delete('StateMent');
+        Storage.delete('BQNumber');
+        Storage.delete('YuanDan');
+        Storage.delete('YdCountm');
+        Storage.delete('Modify');
+        if(this.state.DepCode1==""&&this.state.DepCode1==0){
+            Storage.delete('DepCode');
+        }else{
+            Storage.save('DepCode', this.state.DepCode1);
+        }
+        if(this.state.YHDan==""){
+            Storage.save('YdCountm',"6");
+        }else{
+            Storage.save('YdCountm',"2");
+        }
+        Storage.save('Date',data);
+        Storage.save('Screen', '1');
+        Storage.save('Name','商品配送');
+        Storage.save('shildshop',str2);
+        Storage.save('OrgFormno',str1);
+        Storage.save('FormType', 'PSYW');
+        Storage.save('CKu',this.state.CKu);
+        Storage.save('FormCheck', 'PSYW');//要货查询审核按钮
+        Storage.save('valueOf','App_Client_ProPS');
+        Storage.save('history','App_Client_ProPSQ');
+        Storage.save('historyClass','App_Client_ProPSDetailQ');
     }
 
     render() {

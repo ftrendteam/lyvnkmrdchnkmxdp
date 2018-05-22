@@ -60,9 +60,6 @@ export default class Query extends Component {
 
     Home(){
         if(this.state.Disting=="0") {
-            var str=this.state.sCode1;
-            var date = new Date();
-            var data=JSON.stringify(date.getTime());
             if(this.state.sCode1==""){
                 ToastAndroid.show("请选择原始单号",ToastAndroid.SHORT);
                 return;
@@ -72,35 +69,9 @@ export default class Query extends Component {
                     component:Index
                 };
                 this.props.navigator.push(nextRoute);
-                Storage.delete('OrgFormno');
-                Storage.delete('Screen');
-                Storage.delete('scode');
-                Storage.delete('shildshop');
-                Storage.delete('StateMent');
-                Storage.delete('BQNumber');
-                Storage.delete('YuanDan');
-                Storage.delete('YdCountm');
-                Storage.delete('Modify');
-                Storage.delete("PeiSong");
-                if(this.state.DepName1==""&&this.state.DepCode1==""){
-                    Storage.delete('DepCode');
-                }else{
-                    Storage.save('DepCode', this.state.DepCode1);
-                }
-                Storage.save('YdCountm', '3');
-                Storage.save('OrgFormno',str);
-                Storage.save('Date',data);
-                Storage.save('Name','商品盘点');
-                Storage.save('valueOf','App_Client_ProPC');
-                Storage.save('history','App_Client_ProPCQ');
-                Storage.save('historyClass','App_Client_ProPCDetailQ');
-                Storage.save('ProYH','ProPC');
-                Storage.save('Document', "商品盘点");
+                this.Data();
             }
         }else if(this.state.Disting=="1") {
-            var str = this.state.sCode1;
-            var date = new Date();
-            var data = JSON.stringify(date.getTime());
             if (this.state.sCode1 == "") {
                 ToastAndroid.show("请选择原始单号",ToastAndroid.SHORT);
                 return;
@@ -110,32 +81,40 @@ export default class Query extends Component {
                     component: Search
                 };
                 this.props.navigator.push(nextRoute);
-                Storage.delete('OrgFormno');
-                Storage.delete('Screen');
-                Storage.delete('scode');
-                Storage.delete('shildshop');
-                Storage.delete('StateMent');
-                Storage.delete('BQNumber');
-                Storage.delete('YuanDan');
-                Storage.delete('YdCountm');
-                Storage.delete('Modify');
-                Storage.delete("PeiSong");
-                if(this.state.DepName1==""&&this.state.DepCode1==""){
-                    Storage.delete('DepCode');
-                }else{
-                    Storage.save('DepCode', this.state.DepCode1);
-                }
-                Storage.save('YdCountm', '3');
-                Storage.save('OrgFormno', str);
-                Storage.save('Date', data);
-                Storage.save('Name', '商品盘点');
-                Storage.save('valueOf', 'App_Client_ProPC');
-                Storage.save('history', 'App_Client_ProPCQ');
-                Storage.save('historyClass', 'App_Client_ProPCDetailQ');
-                Storage.save('ProYH', 'ProPC');
-                Storage.save('Document', "商品盘点");
+                this.Data();
             }
         }
+    }
+
+    Data(){
+        var str=this.state.sCode1;
+        var date = new Date();
+        var data=JSON.stringify(date.getTime());
+        Storage.delete('OrgFormno');
+        Storage.delete('Screen');
+        Storage.delete('scode');
+        Storage.delete('shildshop');
+        Storage.delete('StateMent');
+        Storage.delete('BQNumber');
+        Storage.delete('YuanDan');
+        Storage.delete('YdCountm');
+        Storage.delete('Modify');
+        Storage.delete("PeiSong");
+        if(this.state.DepName1==""&&this.state.DepCode1==""){
+            Storage.delete('DepCode');
+        }else{
+            Storage.save('DepCode', this.state.DepCode1);
+        }
+        Storage.save('YdCountm', '3');
+        Storage.save('OrgFormno',str);
+        Storage.save('Date',data);
+        Storage.save('Name','商品盘点');
+        Storage.save('FormCheck', 'PCYW');//要货查询审核按钮
+        Storage.save('valueOf','App_Client_ProPC');
+        Storage.save('history','App_Client_ProPCQ');
+        Storage.save('historyClass','App_Client_ProPCDetailQ');
+        Storage.save('ProYH','ProPC');
+        Storage.save('Document', "商品盘点");
     }
 
     Search(){

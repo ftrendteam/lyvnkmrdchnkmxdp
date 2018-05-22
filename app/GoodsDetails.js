@@ -130,20 +130,68 @@ export default class GoodsDetails extends Component {
     }
 
     GoodsDetails(){
-          this.props.navigator.pop();
+        var nextRoute = {
+            name: "HistoricalDocument",
+            component: HistoricalDocument
+        };
+        this.props.navigator.push(nextRoute)
+    }
+
+    ShenHeButton(){
+        Storage.get('code').then((ShopCode) => {
+            Storage.get('LinkUrl').then((LinkUrl) => {
+                Storage.get("usercode").then((usercode) => {
+                    Storage.get("username").then((username) => {
+                        Storage.get("FormCheck").then((FormCheck) => {
+                            Storage.get('OrgFormno').then((OrgFormno)=>{
+                                let params = {
+                                    reqCode: "App_PosReq",
+                                    reqDetailCode: "App_Client_FormCheck",
+                                    ClientCode: this.state.ClientCode,
+                                    sDateTime: Date.parse(new Date()),
+                                    Sign: NetUtils.MD5("App_PosReq" + "##" + "App_Client_FormCheck" + "##" + Date.parse(new Date()) + "##" + "PosControlCs") + '',
+                                    ShopCode: ShopCode,
+                                    ChildShopCode: "",
+                                    Formno: this.state.Formno,
+                                    OrgFormno: "",
+                                    Usercode: usercode,
+                                    Username: username,
+                                    FormType: FormCheck,
+
+                                };
+                                FetchUtils.post(LinkUrl,JSON.stringify(params)).then((data) => {
+                                    this.DataShop=[];
+                                    if (data.retcode == 1) {
+                                        if(this.state.checktype=="未审核"){
+                                            this.setState({
+                                                checktype: "已审核",
+                                            })
+                                        }
+                                    } else {
+                                        alert(JSON.stringify(data))
+                                    }
+                                }, (err) => {
+                                    alert("网络请求失败");
+                                })
+                            })
+                        })
+                    })
+                })
+            })
+        })
     }
 
    _renderRow(rowData, sectionID, rowID){
         return (
             <ScrollView style={styles.shoprow} horizontal={true}>
                 <View style={styles.Direction}>
-                    <View style={[styles.ShopList1,{width:70,}]}>
+                    <View style={[{width:80,marginRight:5}]}>
                         <Text style={styles.Name1}>{rowData.prodname}</Text>
                     </View>
-                    <View style={[styles.ShopList1,{width:70,}]}>
+                    <View style={[{width:80,marginRight:5}]}>
                         <Text style={styles.Name1}>{rowData.prototal}</Text>
                     </View>
-                    <View style={[styles.ShopList1,{width:70,}]}>
+                    <View style={[{width:80,marginRight:5}]}>
                         <Text style={styles.Name1}>{rowData.countm}</Text>
                     </View>
                     <View style={styles.ShopList1}>
@@ -153,6 +201,7 @@ export default class GoodsDetails extends Component {
             </ScrollView>
         );
    }
+
   render() {
     return (
       <View style={styles.container}>
@@ -182,10 +231,18 @@ export default class GoodsDetails extends Component {
                 </View>
             </View>
             <View style={styles.List}>
-                <View style={[styles.ListLeft,{flex:1}]}>
+                <View style={[styles.ListLeft,{flex:2}]}>
                     <Text style={styles.ListText}>单据状态：</Text>
                     <Text style={[styles.ListText,{color:"#ff4e4e"}]}>{this.state.checktype}</Text>
                 </View>
+                {
+                    (this.state.checktype=="已审核")?
+                        null
+                        :
+                        <TouchableOpacity style={styles.ShenHe} onPress={this.ShenHeButton.bind(this)}>
+                            <Text style={styles.ShenHe_text}>审核</Text>
+                        </TouchableOpacity>
+                    }
             </View>
             <View style={styles.List}>
                 <View style={styles.ListLeft}>
@@ -220,9 +277,18 @@ export default class GoodsDetails extends Component {
         </View>
         <View style={styles.ShopCont}>
             <View style={styles.ShopList}>
-                <Text style={[styles.Name,{width:70,}]}>名称</Text>
-                <Text style={[styles.Name,{width:70,}]}>金额</Text>
-                <Text style={[styles.Name,{width:705,}]}>数量</Text>
+                <View style={[{width:80,}]}>
+                    <Text style={styles.Name}>名称</Text>
+                </View>
+                <View style={[{width:80,}]}>
+                    <Text style={styles.Name}>金额</Text>
+                </View>
+                <View style={[{width:80,}]}>
+                    <Text style={styles.Name}>数量</Text>
+                </View>
+                <View style={styles.ShopList1}>
+                    <Text style={styles.Name}></Text>
+                </View>
             </View>
             <ListView
             style={styles.listViewStyle}
@@ -265,7 +331,8 @@ const styles = StyleSheet.create({
         backgroundColor:"#fffbe7"
    },
    List:{
-        marginBottom:15,
+        height:32,
+        marginBottom:10,
         flexDirection:"row",
    },
    ListText:{
@@ -287,9 +354,9 @@ const styles = StyleSheet.create({
    ShopList:{
         paddingLeft:25,
         paddingRight:25,
-        paddingTop:20,
-        paddingBottom:20,
-        alignItems:"center",
+        paddingTop:15,
+        paddingBottom:15,
+        height:55,
         flexDirection:"row",
    },
    ShopCont:{
@@ -315,8 +382,6 @@ const styles = StyleSheet.create({
         borderBottomColor:"#f2f2f2",
     },
    ShopList1:{
-        marginRight:25,
-        overflow:"hidden",
         flex:1
    },
    Name1:{
@@ -330,5 +395,19 @@ const styles = StyleSheet.create({
    },
    listViewStyle:{
         marginBottom:280,
-   }
+        backgroundColor:"#ffffff"
+   },
+    ShenHe: {
+        flex:1,
+        height:30,
+        paddingTop:5,
+        paddingBottom:5,
+        borderRadius:5,
+        backgroundColor:"#ffba00"
+    },
+    ShenHe_text:{
+        textAlign:"center",
+        color:"#ffffff",
+        fontSize:16,
+    },
 });

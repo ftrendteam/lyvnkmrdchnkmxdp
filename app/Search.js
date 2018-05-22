@@ -65,6 +65,9 @@ export default class Search extends Component {
             Price:"",
             OptValue:"",
             IsIntCount:"",
+            NewNumber:"",
+            SJTZ:"",
+            PriceText:1,
             OrderDetails:1,
             Show: false,
             emptydata:false,
@@ -159,34 +162,79 @@ export default class Search extends Component {
                                                         })
                                                     }
                                                     this.setState({
-                                                        ProdName: rows.item(0).ProdName,
+                                                        ProdName: row.ProdName,
                                                         ShopPrice: ShopPrice,
-                                                        Pid: rows.item(0).Pid,
-                                                        Remark: rows.item(0).ShopRemark,
-                                                        prototal: rows.item(0).ShopAmount,
-                                                        ProdCode: rows.item(0).ProdCode,
-                                                        DepCode: rows.item(0).DepCode1,
-                                                        SuppCode: rows.item(0).SuppCode,
-                                                        BarCode: rows.item(0).BarCode,
+                                                        Pid: row.Pid,
+                                                        Remark: row.ShopRemark,
+                                                        prototal: row.ShopAmount,
+                                                        ProdCode: row.ProdCode,
+                                                        DepCode: row.DepCode1,
+                                                        SuppCode: row.SuppCode,
+                                                        BarCode: row.BarCode,
                                                         ydcountm: countm,
                                                         focus: true,
                                                         Search: "",
                                                         modal: 1,
-                                                        IsIntCount:rows.item(0).IsIntCount
+                                                        IsIntCount:row.IsIntCount
+                                                    })
+                                                }else if(this.state.name=="售价调整"){
+                                                    dbAdapter.selectShopInfoData(rowData.Pid).then((datas)=> {
+                                                        if(datas.length==0){
+                                                            this.setState({
+                                                                ProdName: row.ProdName,
+                                                                ShopPrice: row.ShopPrice,
+                                                                Pid: row.Pid,
+                                                                Number1: "",
+                                                                Remark: row.ShopRemark,
+                                                                prototal: row.ShopAmount,
+                                                                ProdCode: row.ProdCode,
+                                                                DepCode: row.DepCode1,
+                                                                SuppCode: row.SuppCode,
+                                                                BarCode: row.BarCode,
+                                                                NewNumber: data.ydcountm,
+                                                                focus: true,
+                                                                Search:"",
+                                                                PriceText:"",
+                                                                modal:1,
+                                                                IsIntCount:row.IsIntCount
+                                                            })
+                                                        }else{
+                                                            for (let i = 0; i < datas.length; i++) {
+                                                                var data = datas.item(i);
+                                                                this.setState({
+                                                                    ProdName: row.ProdName,
+                                                                    ShopPrice: row.ShopPrice,
+                                                                    Pid: row.Pid,
+                                                                    Number1: 1,
+                                                                    Remark: row.ShopRemark,
+                                                                    prototal: row.ShopAmount,
+                                                                    ProdCode: row.ProdCode,
+                                                                    DepCode: row.DepCode1,
+                                                                    SuppCode: row.SuppCode,
+                                                                    BarCode: row.BarCode,
+                                                                    NewNumber: data.ydcountm,
+                                                                    focus: true,
+                                                                    Search:"",
+                                                                    PriceText:"",
+                                                                    modal:1,
+                                                                    IsIntCount:row.IsIntCount
+                                                                })
+                                                            }
+                                                        }
                                                     })
                                                 }else {
-                                                    if(this.state.name=="标签采集"&&rows.item(0).ShopNumber == 0){
+                                                    if(this.state.name=="标签采集"&&row.ShopNumber == 0){
                                                         this.setState({
                                                             Number1: 1,
                                                         })
                                                     }else{
                                                         this.setState({
                                                             numberFormat2:numberFormat2,
-                                                            Number1: rows.item(0).ShopNumber,
+                                                            Number1: row.ShopNumber,
                                                         })
                                                     }
 
-                                                    if(this.state.name!=="标签采集"&&rows.item(0).ShopNumber == 0){
+                                                    if(this.state.name!=="标签采集"&&row.ShopNumber == 0){
                                                         this.setState({
                                                             numberFormat2:0.00,
                                                             Number1: '',
@@ -198,27 +246,27 @@ export default class Search extends Component {
                                                         })
                                                     }
                                                     this.setState({
-                                                        ProdName: rows.item(0).ProdName,
-                                                        ShopPrice: rows.item(0).ShopPrice,
-                                                        Pid: rows.item(0).Pid,
-                                                        Remark: rows.item(0).ShopRemark,
-                                                        prototal: rows.item(0).ShopAmount,
-                                                        ProdCode: rows.item(0).ProdCode,
-                                                        DepCode: rows.item(0).DepCode1,
-                                                        SuppCode: rows.item(0).SuppCode,
-                                                        BarCode: rows.item(0).BarCode,
+                                                        ProdName: row.ProdName,
+                                                        ShopPrice: row.ShopPrice,
+                                                        Pid: row.Pid,
+                                                        Remark: row.ShopRemark,
+                                                        prototal: row.ShopAmount,
+                                                        ProdCode: row.ProdCode,
+                                                        DepCode: row.DepCode1,
+                                                        SuppCode: row.SuppCode,
+                                                        BarCode: row.BarCode,
                                                         ydcountm: countm,
                                                         focus: true,
                                                         Search: "",
                                                         modal: 1,
-                                                        IsIntCount:rows.item(0).IsIntCount
+                                                        IsIntCount:row.IsIntCount
                                                     })
                                                 }
                                             }
                                         }else{
-                                            let numberFormat2 = NumberUtils.numberFormat2((rows.item(0).ShopNumber)*(rows.item(0).ShopPrice));
+                                            let numberFormat2 = NumberUtils.numberFormat2((row.ShopNumber)*(rows.ShopPrice));
                                             if (this.state.name == "商品采购" || this.state.name == "协配采购" || this.state.Modify == 1) {
-                                                if(rows.item(0).ShopNumber == 0){
+                                                if(row.ShopNumber == 0){
                                                     this.setState({
                                                         numberFormat2:0.00,
                                                         Number1: '',
@@ -226,24 +274,69 @@ export default class Search extends Component {
                                                 }else{
                                                     this.setState({
                                                         numberFormat2:numberFormat2,
-                                                        Number1: rows.item(0).ShopNumber,
+                                                        Number1: row.ShopNumber,
                                                     })
                                                 }
                                                 this.setState({
-                                                    ProdName: rows.item(0).ProdName,
+                                                    ProdName: row.ProdName,
                                                     ShopPrice: ShopPrice,
-                                                    Pid: rows.item(0).Pid,
-                                                    Remark: rows.item(0).ShopRemark,
-                                                    prototal: rows.item(0).ShopAmount,
-                                                    ProdCode: rows.item(0).ProdCode,
-                                                    DepCode: rows.item(0).DepCode1,
-                                                    SuppCode: rows.item(0).SuppCode,
-                                                    BarCode: rows.item(0).BarCode,
+                                                    Pid: row.Pid,
+                                                    Remark: row.ShopRemark,
+                                                    prototal: row.ShopAmount,
+                                                    ProdCode: row.ProdCode,
+                                                    DepCode: row.DepCode1,
+                                                    SuppCode: row.SuppCode,
+                                                    BarCode: row.BarCode,
                                                     ydcountm: countm,
                                                     focus: true,
                                                     Search: "",
                                                     modal: 1,
-                                                    IsIntCount:rows.item(0).IsIntCount
+                                                    IsIntCount:row.IsIntCount
+                                                })
+                                            }else if(this.state.name=="售价调整"){
+                                                dbAdapter.selectShopInfoData(rowData.Pid).then((datas)=> {
+                                                    if(datas.length==0){
+                                                        this.setState({
+                                                            ProdName: row.ProdName,
+                                                            ShopPrice: row.ShopPrice,
+                                                            Pid: row.Pid,
+                                                            Number1: "",
+                                                            Remark: row.ShopRemark,
+                                                            prototal: row.ShopAmount,
+                                                            ProdCode: row.ProdCode,
+                                                            DepCode: row.DepCode1,
+                                                            SuppCode: row.SuppCode,
+                                                            BarCode: row.BarCode,
+                                                            NewNumber: data.ydcountm,
+                                                            focus: true,
+                                                            Search:"",
+                                                            PriceText:"",
+                                                            modal:1,
+                                                            IsIntCount:row.IsIntCount
+                                                        })
+                                                    }else{
+                                                        for (let i = 0; i < datas.length; i++) {
+                                                            var data = datas.item(i);
+                                                            this.setState({
+                                                                ProdName: row.ProdName,
+                                                                ShopPrice: row.ShopPrice,
+                                                                Pid: row.Pid,
+                                                                Number1: 1,
+                                                                Remark: row.ShopRemark,
+                                                                prototal: row.ShopAmount,
+                                                                ProdCode: row.ProdCode,
+                                                                DepCode: row.DepCode1,
+                                                                SuppCode: row.SuppCode,
+                                                                BarCode: row.BarCode,
+                                                                NewNumber: data.ydcountm,
+                                                                focus: true,
+                                                                Search:"",
+                                                                PriceText:"",
+                                                                modal:1,
+                                                                IsIntCount:row.IsIntCount
+                                                            })
+                                                        }
+                                                    }
                                                 })
                                             }else {
                                                 if(this.state.name=="标签采集"&&rows.item(0).ShopNumber == 0){
@@ -253,11 +346,11 @@ export default class Search extends Component {
                                                 }else{
                                                     this.setState({
                                                         numberFormat2:numberFormat2,
-                                                        Number1: rows.item(0).ShopNumber,
+                                                        Number1: row.ShopNumber,
                                                     })
                                                 }
 
-                                                if(this.state.name!=="标签采集"&&rows.item(0).ShopNumber == 0){
+                                                if(this.state.name!=="标签采集"&&row.ShopNumber == 0){
                                                     this.setState({
                                                         numberFormat2:0.00,
                                                         Number1: '',
@@ -269,20 +362,20 @@ export default class Search extends Component {
                                                     })
                                                 }
                                                 this.setState({
-                                                    ProdName: rows.item(0).ProdName,
-                                                    ShopPrice: rows.item(0).ShopPrice,
-                                                    Pid: rows.item(0).Pid,
-                                                    Remark: rows.item(0).ShopRemark,
-                                                    prototal: rows.item(0).ShopAmount,
-                                                    ProdCode: rows.item(0).ProdCode,
-                                                    DepCode: rows.item(0).DepCode1,
-                                                    SuppCode: rows.item(0).SuppCode,
-                                                    BarCode: rows.item(0).BarCode,
+                                                    ProdName: row.ProdName,
+                                                    ShopPrice: row.ShopPrice,
+                                                    Pid: row.Pid,
+                                                    Remark: row.ShopRemark,
+                                                    prototal: row.ShopAmount,
+                                                    ProdCode: row.ProdCode,
+                                                    DepCode: row.DepCode1,
+                                                    SuppCode: row.SuppCode,
+                                                    BarCode: row.BarCode,
                                                     ydcountm: countm,
                                                     focus: true,
                                                     Search: "",
                                                     modal: 1,
-                                                    IsIntCount:rows.item(0).IsIntCount
+                                                    IsIntCount:row.IsIntCount
                                                 })
                                             }
                                         }
@@ -388,6 +481,51 @@ export default class Search extends Component {
                                                                     modal:1,
                                                                     IsIntCount:row.IsIntCount
                                                                 })
+                                                            }else if(this.state.name=="售价调整"){
+                                                                dbAdapter.selectShopInfoData(rowData.Pid).then((datas)=> {
+                                                                    if(datas.length==0){
+                                                                        this.setState({
+                                                                            ProdName: row.ProdName,
+                                                                            ShopPrice: row.ShopPrice,
+                                                                            Pid: row.Pid,
+                                                                            Number1: "",
+                                                                            Remark: row.ShopRemark,
+                                                                            prototal: row.ShopAmount,
+                                                                            ProdCode: row.ProdCode,
+                                                                            DepCode: row.DepCode1,
+                                                                            SuppCode: row.SuppCode,
+                                                                            BarCode: row.BarCode,
+                                                                            NewNumber: data.ydcountm,
+                                                                            focus: true,
+                                                                            Search:"",
+                                                                            PriceText:"",
+                                                                            modal:1,
+                                                                            IsIntCount:row.IsIntCount
+                                                                        })
+                                                                    }else{
+                                                                        for (let i = 0; i < datas.length; i++) {
+                                                                            var data = datas.item(i);
+                                                                            this.setState({
+                                                                                ProdName: rows.item(0).ProdName,
+                                                                                ShopPrice: rows.item(0).ShopPrice,
+                                                                                Pid: rows.item(0).Pid,
+                                                                                Number1: 1,
+                                                                                Remark: row.ShopRemark,
+                                                                                prototal: row.ShopAmount,
+                                                                                ProdCode: row.ProdCode,
+                                                                                DepCode: row.DepCode1,
+                                                                                SuppCode: row.SuppCode,
+                                                                                BarCode: row.BarCode,
+                                                                                NewNumber: data.ydcountm,
+                                                                                focus: true,
+                                                                                Search:"",
+                                                                                PriceText:"",
+                                                                                modal:1,
+                                                                                IsIntCount:row.IsIntCount
+                                                                            })
+                                                                        }
+                                                                    }
+                                                                })
                                                             }else {
                                                                 if(this.state.name=="标签采集"&&row.ShopNumber == 0){
                                                                     this.setState({
@@ -456,6 +594,51 @@ export default class Search extends Component {
                                                                 Search:"",
                                                                 modal:1,
                                                                 IsIntCount:row.IsIntCount
+                                                            })
+                                                        }else if(this.state.name=="售价调整"){
+                                                            dbAdapter.selectShopInfoData(rowData.Pid).then((datas)=> {
+                                                                if(datas.length==0){
+                                                                    this.setState({
+                                                                        ProdName: row.ProdName,
+                                                                        ShopPrice: row.ShopPrice,
+                                                                        Pid: row.Pid,
+                                                                        Number1: "",
+                                                                        Remark: row.ShopRemark,
+                                                                        prototal: row.ShopAmount,
+                                                                        ProdCode: row.ProdCode,
+                                                                        DepCode: row.DepCode1,
+                                                                        SuppCode: row.SuppCode,
+                                                                        BarCode: row.BarCode,
+                                                                        NewNumber: data.ydcountm,
+                                                                        focus: true,
+                                                                        Search:"",
+                                                                        PriceText:"",
+                                                                        modal:1,
+                                                                        IsIntCount:row.IsIntCount
+                                                                    })
+                                                                }else{
+                                                                    for (let i = 0; i < datas.length; i++) {
+                                                                        var data = datas.item(i);
+                                                                        this.setState({
+                                                                            ProdName: row.ProdName,
+                                                                            ShopPrice: row.ShopPrice,
+                                                                            Pid: row.Pid,
+                                                                            Number1: 1,
+                                                                            Remark: row.ShopRemark,
+                                                                            prototal: row.ShopAmount,
+                                                                            ProdCode: row.ProdCode,
+                                                                            DepCode: row.DepCode1,
+                                                                            SuppCode: row.SuppCode,
+                                                                            BarCode: row.BarCode,
+                                                                            NewNumber: data.ydcountm,
+                                                                            focus: true,
+                                                                            Search:"",
+                                                                            PriceText:"",
+                                                                            modal:1,
+                                                                            IsIntCount:row.IsIntCount
+                                                                        })
+                                                                    }
+                                                                }
                                                             })
                                                         }else {
                                                             if(this.state.name=="标签采集"&&row.ShopNumber == 0){
@@ -645,6 +828,7 @@ export default class Search extends Component {
                                 FetchUtil.post(LinkUrl, JSON.stringify(params)).then((data) => {
                                     var countm = JSON.stringify(data.countm);
                                     var ShopPrice = JSON.stringify(data.ShopPrice);
+                                    alert(JSON.stringify(data))
                                     if (data.retcode == 1) {
                                         for (let i = 0; i < rows.length; i++) {
                                             var row = rows.item(i);
@@ -677,9 +861,53 @@ export default class Search extends Component {
                                                             SuppCode: rowData.SuppCode,
                                                             BarCode: rowData.BarCode,
                                                             ydcountm: countm,
+                                                            PriceText:"",
                                                             Search:"",
                                                             modal:1,
                                                             IsIntCount:row.IsIntCount
+                                                        })
+                                                    }else if(this.state.name=="售价调整"){
+                                                        dbAdapter.selectShopInfoData(rowData.Pid).then((datas)=> {
+                                                            if(datas.length==0){
+                                                                this.setState({
+                                                                    ShopPrice: ShopPrice,
+                                                                    ProdName: rowData.ProdName,
+                                                                    Pid: rowData.Pid,
+                                                                    Number1: 1,
+                                                                    Remark: rowData.ShopRemark,
+                                                                    prototal: rowData.prototal,
+                                                                    ProdCode: rowData.ProdCode,
+                                                                    DepCode: rowData.DepCode1,
+                                                                    SuppCode: rowData.SuppCode,
+                                                                    BarCode: rowData.BarCode,
+                                                                    NewNumber: "",
+                                                                    Search:"",
+                                                                    PriceText:"",
+                                                                    modal:1,
+                                                                    IsIntCount:row.IsIntCount
+                                                                })
+                                                            }else{
+                                                                for (let i = 0; i < datas.length; i++) {
+                                                                    var data = datas.item(i);
+                                                                    this.setState({
+                                                                        ShopPrice: ShopPrice,
+                                                                        ProdName: rowData.ProdName,
+                                                                        Pid: rowData.Pid,
+                                                                        Number1: 1,
+                                                                        Remark: rowData.ShopRemark,
+                                                                        prototal: rowData.prototal,
+                                                                        ProdCode: rowData.ProdCode,
+                                                                        DepCode: rowData.DepCode1,
+                                                                        SuppCode: rowData.SuppCode,
+                                                                        BarCode: rowData.BarCode,
+                                                                        NewNumber: data.ydcountm,
+                                                                        Search:"",
+                                                                        PriceText:"",
+                                                                        modal:1,
+                                                                        IsIntCount:row.IsIntCount
+                                                                    })
+                                                                }
+                                                            }
                                                         })
                                                     }else {
                                                         if(this.state.name=="标签采集"&&rowData.ShopNumber == 0){
@@ -715,6 +943,7 @@ export default class Search extends Component {
                                                             SuppCode: rowData.SuppCode,
                                                             BarCode: rowData.BarCode,
                                                             ydcountm: countm,
+                                                            PriceText:"",
                                                             Search:"",
                                                             modal:1,
                                                             IsIntCount:row.IsIntCount
@@ -746,9 +975,53 @@ export default class Search extends Component {
                                                         SuppCode: rowData.SuppCode,
                                                         BarCode: rowData.BarCode,
                                                         ydcountm: countm,
+                                                        PriceText:"",
                                                         Search:"",
                                                         modal:1,
                                                         IsIntCount:row.IsIntCount
+                                                    })
+                                                }else if(this.state.name=="售价调整"){
+                                                    dbAdapter.selectShopInfoData(rowData.Pid).then((datas)=> {
+                                                        if(datas.length==0){
+                                                            this.setState({
+                                                                ShopPrice: ShopPrice,
+                                                                ProdName: rowData.ProdName,
+                                                                Pid: rowData.Pid,
+                                                                Number1: 1,
+                                                                Remark: rowData.ShopRemark,
+                                                                prototal: rowData.prototal,
+                                                                ProdCode: rowData.ProdCode,
+                                                                DepCode: rowData.DepCode1,
+                                                                SuppCode: rowData.SuppCode,
+                                                                BarCode: rowData.BarCode,
+                                                                NewNumber: "",
+                                                                Search:"",
+                                                                PriceText:"",
+                                                                modal:1,
+                                                                IsIntCount:row.IsIntCount
+                                                            })
+                                                        }else{
+                                                            for (let i = 0; i < datas.length; i++) {
+                                                                var data = datas.item(i);
+                                                                this.setState({
+                                                                    ShopPrice: ShopPrice,
+                                                                    ProdName: rowData.ProdName,
+                                                                    Pid: rowData.Pid,
+                                                                    Number1: 1,
+                                                                    Remark: rowData.ShopRemark,
+                                                                    prototal: rowData.prototal,
+                                                                    ProdCode: rowData.ProdCode,
+                                                                    DepCode: rowData.DepCode1,
+                                                                    SuppCode: rowData.SuppCode,
+                                                                    BarCode: rowData.BarCode,
+                                                                    NewNumber: data.ydcountm,
+                                                                    Search:"",
+                                                                    PriceText:"",
+                                                                    modal:1,
+                                                                    IsIntCount:row.IsIntCount
+                                                                })
+                                                            }
+                                                        }
                                                     })
                                                 }else {
                                                     if(this.state.name=="标签采集"&&rowData.ShopNumber == 0){
@@ -777,6 +1050,7 @@ export default class Search extends Component {
                                                         SuppCode: rowData.SuppCode,
                                                         BarCode: rowData.BarCode,
                                                         ydcountm: countm,
+                                                        PriceText:"",
                                                         Search:"",
                                                         modal:1,
                                                         IsIntCount:row.IsIntCount
@@ -1892,6 +2166,42 @@ export default class Search extends Component {
         return false;
     };
 
+    /**
+     * 售价调整代码
+     * @returns {XML}
+     */
+    NewNumber(){
+
+    }
+
+    PressPop(){
+        var shopInfoData = [];
+        var shopInfo = {};
+        shopInfo.Pid = this.state.Pid;
+        shopInfo.ProdCode = this.state.ProdCode;
+        shopInfo.prodname = this.state.ProdName;
+        shopInfo.countm = this.state.Number1;
+        shopInfo.ShopPrice = this.state.ShopPrice;
+        shopInfo.prototal = "";
+        shopInfo.promemo = this.state.Remark;
+        shopInfo.DepCode = this.state.DepCode;
+        shopInfo.ydcountm = this.state.NewNumber;
+        shopInfo.SuppCode = this.state.SuppCode;
+        shopInfo.BarCode = this.state.BarCode;
+        shopInfoData.push(shopInfo);
+        //调用插入表方法
+        dbAdapter.insertShopInfo(shopInfoData);
+        this.setState({
+            Number1: "",
+            NewNumber:"",
+            ShopPrice: "",
+            Remark: "",
+            ProdName: "",
+            modal:"",
+            PriceText:1,
+        })
+
+    }
     render() {
         return (
             <View style={styles.container}>
@@ -1933,197 +2243,282 @@ export default class Search extends Component {
                         <View style={styles.Text1}><Text style={styles.Text}>取消</Text></View>
                     </TouchableOpacity>
                 </View>
-
                 {
-                    (this.state.Search=="")?
-                        <ScrollView style={styles.ScrollView}>
-                            <View style={styles.Cont}>
-                                <View style={styles.List}>
-                                    <Text style={styles.left}>名称</Text>
-                                    <Text style={styles.right}>{this.state.ProdName}</Text>
-                                </View>
-                                <View style={styles.List}>
-                                    {
-                                        (this.state.modal=="1")?
-                                            <View style={styles.left1}>
-                                                <Text style={styles.left}>数量</Text>
-
-                                                <View style={styles.onPrice}>
-                                                    {
-                                                        (this.state.PriceText == 1) ?
-                                                            <TouchableOpacity style={styles.NumBer} onPress={this.NumberButton.bind(this)}>
-                                                                <Text style={styles.PriceText}>{this.state.Number1}</Text>
-                                                            </TouchableOpacity>
-                                                            :
-                                                            <TextInput
-                                                                style={styles.Number}
-                                                                returnKeyType='search'
-                                                                autoFocus={true}
-                                                                underlineColorAndroid='transparent'
-                                                                keyboardType="numeric"
-                                                                value={this.state.Number1.toString()}
-                                                                placeholderTextColor="#333333"
-                                                                onChangeText={(value)=>{this.setState({Number1:value})}}
-                                                                onSubmitEditing={this.onNumber.bind(this)}
-                                                                onEndEditing = {this.onSubmitEditing.bind(this)}
-                                                            />
-                                                    }
-                                                </View>
-                                            </View>
-                                            :
-                                            <View style={styles.left1}>
-                                                <Text style={styles.left}>数量</Text>
-                                            </View>
-                                    }
-                                    <View style={styles.right1}>
-                                        <TouchableOpacity style={styles.sublime} onPress={this.clear.bind(this)}><Image source={require("../images/1_09.png")}/></TouchableOpacity>
-                                        <TouchableOpacity style={styles.sublime} onPress={this.add.bind(this)}><Image source={require("../images/1_15.png")}/></TouchableOpacity>
-                                        <TouchableOpacity style={styles.sublime} onPress={this.subtraction.bind(this)}><Image source={require("../images/1_13.png")}/></TouchableOpacity>
+                    (this.state.name == "售价调整") ?
+                        <View style={styles.ScrollView}>
+                            {
+                                (this.state.Search=="")?
+                                <View>
+                                    <View style={styles.List}>
+                                        <Text style={styles.left}>名称</Text>
+                                        <Text style={styles.right}>{this.state.ProdName}</Text>
                                     </View>
-                                </View>
-                                {
-                                    (this.state.YdCountm == 1||this.state.YdCountm == 6||this.state.YdCountm == 5) ?
-                                        <View style={styles.List}>
-                                            <View style={styles.left2}>
-                                                <Text style={styles.left}>现在库存</Text>
-                                                <Text style={styles.Price1}>{this.state.ydcountm}</Text>
-                                            </View>
-                                        </View> : null
-                                }
-                                {
-                                    (this.state.YdCountm == 2||this.state.name=="商品配送") ?
-                                        <View style={styles.List}>
-                                            <View style={styles.left2}>
-                                                <Text style={styles.left}>原单数量</Text>
-                                                <Text style={styles.Price1}>{this.state.ydcountm}</Text>
-                                            </View>
-                                        </View> : null
-                                }
-                                <View style={styles.List}>
-                                    <View style={styles.left2}>
-                                        {
-                                            (this.state.name=="商品配送")?
-                                                <Text style={styles.left}>配送单价</Text>
-                                                :
-                                                <Text style={styles.left}>单价</Text>
-                                        }
-                                        {
-                                            (this.state.name=="商品采购"&&this.state.OptValue==1||this.state.name=="协配采购"&&this.state.OptValue==1||this.state.name=="移动销售"||this.state.Modify==1&&this.state.OptValue==1)?
-                                                <View style={styles.onPrice}>
-                                                    {
-                                                        (this.state.OnPrice==1)?
-                                                            <TextInput
-                                                                autoFocus={true}
-                                                                returnKeyType='search'
-                                                                style={styles.Number}
-                                                                underlineColorAndroid='transparent'
-                                                                keyboardType="numeric"
-                                                                value={this.state.ShopPrice.toString()}
-                                                                placeholderTextColor="#333333"
-                                                                onChangeText={(value)=>{
-                                                                    this.setState({
-                                                                        ShopPrice:value
-                                                                    })
-                                                                }}
-                                                                onSubmitEditing={this.onEndEditing.bind(this)}
-                                                                onEndEditing = {this.onEndEditing.bind(this)}
-                                                            />
-                                                            :
-                                                            <TouchableOpacity onPress={this.PriceButton.bind(this)}>
-                                                                <Text style={styles.PriceText}>{this.state.ShopPrice}</Text>
-                                                            </TouchableOpacity>
-
-                                                    }
-                                                </View>
-                                                :
-                                                <Text style={styles.Price1}>{this.state.ShopPrice}</Text>
-                                        }
-                                    </View>
-                                    <View style={styles.right2}>
-                                        <Text style={styles.price}>元/件</Text>
-                                    </View>
-                                </View>
-                                {
-                                    (this.state.YdCountm == 5) ?
-                                        null :
-                                        <View style={styles.List}>
-                                            <View style={styles.left2}>
+                                    <View style={styles.List}>
+                                        <View style={styles.left1}>
+                                            <Text style={styles.left}>新价格</Text>
+                                            <View style={styles.onPrice}>
                                                 {
-                                                    (this.state.name=="商品配送")?
-                                                        <Text style={styles.left}>配送金额</Text>
-                                                        :
-                                                        <Text style={styles.left}>金额</Text>
+                                                    (this.state.PriceText == 1) ?
+                                                        <TouchableOpacity style={styles.NumBer} onPress={this.NumberButton.bind(this)}>
+                                                            <Text style={styles.PriceText}>{this.state.NewNumber}</Text>
+                                                        </TouchableOpacity>
+                                                    :
+                                                        <TextInput
+                                                            style={styles.Number}
+                                                            returnKeyType='search'
+                                                            autoFocus={true}
+                                                            underlineColorAndroid='transparent'
+                                                            keyboardType="numeric"
+                                                            value={this.state.NewNumber.toString()}
+                                                            placeholderTextColor="#333333"
+                                                            onChangeText={(value)=>{this.setState({NewNumber:value})}}
+                                                            onSubmitEditing={this.NewNumber.bind(this)}
+                                                        />
                                                 }
-                                                {
-                                                    (this.state.name=="商品采购"&&this.state.OptValue==1||this.state.name=="协配采购"&&this.state.OptValue==1||this.state.name=="移动销售"||this.state.Modify==1&&this.state.OptValue==1)?
-                                                        <View style={styles.onPrice}>
-                                                            {
-                                                                (this.state.Total == 1) ?
-                                                                    <TextInput
-                                                                        autoFocus={true}
-                                                                        returnKeyType='search'
-                                                                        style={styles.Number}
-                                                                        underlineColorAndroid='transparent'
-                                                                        keyboardType="numeric"
-                                                                        value={this.state.numberFormat2.toString()}
-                                                                        placeholderTextColor="#333333"
-                                                                        onChangeText={(value)=>{
-                                                                            this.setState({
-                                                                                numberFormat2:value
-                                                                            })
-                                                                        }}
-                                                                        onSubmitEditing={this.TotalButton.bind(this)}
-                                                                        onEndEditing = {this.numberFormat2.bind(this)}
-                                                                    />
-                                                                    :
-                                                                    <TouchableOpacity onPress={this.NumberFormat.bind(this)}>
-                                                                        <Text style={styles.PriceText}>{this.state.numberFormat2}</Text>
-                                                                    </TouchableOpacity>
-                                                            }
-                                                        </View>
-                                                        :
-                                                        <Text style={styles.Price1}>{this.state.numberFormat2}</Text>
-                                                }
-                                            </View>
-                                            <View style={styles.right2}>
-                                                <Text style={styles.price}>元</Text>
                                             </View>
                                         </View>
-                                }
-                                <View style={[styles.List, {paddingTop: 10,}]}>
-                                    <View style={styles.left2}>
-                                        <Text style={[styles.left, {marginTop: 9,}]}>备注</Text>
-                                        <TextInput
-                                            style={[styles.Number1,{fontSize:14}]}
-                                            placeholder="暂无备注"
-                                            placeholderTextColor="#999999"
-                                            underlineColorAndroid='transparent'
-                                            value={this.state.Remark.toString()}
-                                            onChangeText={(value) => {
-                                                this.setState({Remark: value})
-                                            }}/>
                                     </View>
+                                    <View style={styles.List}>
+                                        <View style={styles.left2}>
+                                            <Text style={styles.left}>单价</Text>
+                                            <Text style={styles.Price1}>{this.state.ShopPrice}</Text>
+                                        </View>
+                                        <View style={styles.right2}>
+                                            <Text style={styles.price}>元/件</Text>
+                                        </View>
+                                    </View>
+                                    <View style={[styles.List, {paddingTop: 10,}]}>
+                                        <View style={styles.left2}>
+                                            <Text style={[styles.left, {marginTop: 9,}]}>备注</Text>
+                                            <TextInput
+                                                style={[styles.Number1,{fontSize:14}]}
+                                                placeholder="暂无备注"
+                                                placeholderTextColor="#999999"
+                                                underlineColorAndroid='transparent'
+                                                value={this.state.Remark.toString()}
+                                                onChangeText={(value) => {
+                                                    this.setState({Remark: value})
+                                                }}/>
+                                        </View>
+                                    </View>
+                                    <TouchableOpacity style={styles.button} onPress={this.PressPop.bind(this)}>
+                                        <Text style={styles.ButtonText}>确定</Text>
+                                    </TouchableOpacity>
                                 </View>
-                                <TouchableOpacity style={styles.button} onPress={this.pressPop.bind(this)}>
-                                    <Text style={styles.ButtonText}>确定</Text>
-                                </TouchableOpacity>
-                            </View>
-                        </ScrollView>
+                            :
+                                <View style={styles.BlockList}>
+                                    {
+                                        (this.state.dataRows == "") ?
+                                            <View style={styles.Null}>
+                                                <Text style={styles.NullText}>
+                                                    没有搜索到相关商品~~~
+                                                </Text>
+                                            </View> :
+                                            <ListView
+                                                dataSource={this.state.dataSource}
+                                                showsVerticalScrollIndicator={true}
+                                                renderRow={this._renderRow.bind(this)}
+                                                ref="myInput"
+                                            />
+                                    }
+                                </View>
+                            }
+                        </View>
                         :
-                        <View style={styles.BlockList}>
+                        //非售价调整显示页面
+                        <View style={styles.out}>
                             {
-                                (this.state.dataRows == "") ?
-                                    <View style={styles.Null}>
-                                        <Text style={styles.NullText}>
-                                            没有搜索到相关商品~~~
-                                        </Text>
-                                    </View> :
-                                    <ListView
-                                        dataSource={this.state.dataSource}
-                                        showsVerticalScrollIndicator={true}
-                                        renderRow={this._renderRow.bind(this)}
-                                        ref="myInput"
-                                    />
+                                (this.state.Search=="")?
+                                    <ScrollView style={styles.ScrollView}>
+                                        <View style={styles.Cont}>
+                                            <View style={styles.List}>
+                                                <Text style={styles.left}>名称</Text>
+                                                <Text style={styles.right}>{this.state.ProdName}</Text>
+                                            </View>
+                                            <View style={styles.List}>
+                                                {
+                                                    (this.state.modal=="1")?
+                                                        <View style={styles.left1}>
+                                                            <Text style={styles.left}>数量</Text>
+
+                                                            <View style={styles.onPrice}>
+                                                                {
+                                                                    (this.state.PriceText == 1) ?
+                                                                        <TouchableOpacity style={styles.NumBer} onPress={this.NumberButton.bind(this)}>
+                                                                            <Text style={styles.PriceText}>{this.state.Number1}</Text>
+                                                                        </TouchableOpacity>
+                                                                        :
+                                                                        <TextInput
+                                                                            style={styles.Number}
+                                                                            returnKeyType='search'
+                                                                            autoFocus={true}
+                                                                            underlineColorAndroid='transparent'
+                                                                            keyboardType="numeric"
+                                                                            value={this.state.Number1.toString()}
+                                                                            placeholderTextColor="#333333"
+                                                                            onChangeText={(value)=>{this.setState({Number1:value})}}
+                                                                            onSubmitEditing={this.onNumber.bind(this)}
+                                                                            onEndEditing = {this.onSubmitEditing.bind(this)}
+                                                                        />
+                                                                }
+                                                            </View>
+                                                        </View>
+                                                        :
+                                                        <View style={styles.left1}>
+                                                            <Text style={styles.left}>数量</Text>
+                                                        </View>
+                                                }
+                                                <View style={styles.right1}>
+                                                    <TouchableOpacity style={styles.sublime} onPress={this.clear.bind(this)}><Image source={require("../images/1_09.png")}/></TouchableOpacity>
+                                                    <TouchableOpacity style={styles.sublime} onPress={this.add.bind(this)}><Image source={require("../images/1_15.png")}/></TouchableOpacity>
+                                                    <TouchableOpacity style={styles.sublime} onPress={this.subtraction.bind(this)}><Image source={require("../images/1_13.png")}/></TouchableOpacity>
+                                                </View>
+                                            </View>
+                                            {
+                                                (this.state.YdCountm == 1||this.state.YdCountm == 6||this.state.YdCountm == 5) ?
+                                                    <View style={styles.List}>
+                                                        <View style={styles.left2}>
+                                                            <Text style={styles.left}>现在库存</Text>
+                                                            <Text style={styles.Price1}>{this.state.ydcountm}</Text>
+                                                        </View>
+                                                    </View> : null
+                                            }
+                                            {
+                                                (this.state.YdCountm == 2||this.state.name=="商品配送") ?
+                                                    <View style={styles.List}>
+                                                        <View style={styles.left2}>
+                                                            <Text style={styles.left}>原单数量</Text>
+                                                            <Text style={styles.Price1}>{this.state.ydcountm}</Text>
+                                                        </View>
+                                                    </View> : null
+                                            }
+                                            <View style={styles.List}>
+                                                <View style={styles.left2}>
+                                                    {
+                                                        (this.state.name=="商品配送")?
+                                                            <Text style={styles.left}>配送单价</Text>
+                                                            :
+                                                            <Text style={styles.left}>单价</Text>
+                                                    }
+                                                    {
+                                                        (this.state.name=="商品采购"&&this.state.OptValue==1||this.state.name=="协配采购"&&this.state.OptValue==1||this.state.name=="移动销售"||this.state.Modify==1&&this.state.OptValue==1)?
+                                                            <View style={styles.onPrice}>
+                                                                {
+                                                                    (this.state.OnPrice==1)?
+                                                                        <TextInput
+                                                                            autoFocus={true}
+                                                                            returnKeyType='search'
+                                                                            style={styles.Number}
+                                                                            underlineColorAndroid='transparent'
+                                                                            keyboardType="numeric"
+                                                                            value={this.state.ShopPrice.toString()}
+                                                                            placeholderTextColor="#333333"
+                                                                            onChangeText={(value)=>{
+                                                                                this.setState({
+                                                                                    ShopPrice:value
+                                                                                })
+                                                                            }}
+                                                                            onSubmitEditing={this.onEndEditing.bind(this)}
+                                                                            onEndEditing = {this.onEndEditing.bind(this)}
+                                                                        />
+                                                                        :
+                                                                        <TouchableOpacity onPress={this.PriceButton.bind(this)}>
+                                                                            <Text style={styles.PriceText}>{this.state.ShopPrice}</Text>
+                                                                        </TouchableOpacity>
+
+                                                                }
+                                                            </View>
+                                                            :
+                                                            <Text style={styles.Price1}>{this.state.ShopPrice}</Text>
+                                                    }
+                                                </View>
+                                                <View style={styles.right2}>
+                                                    <Text style={styles.price}>元/件</Text>
+                                                </View>
+                                            </View>
+                                            {
+                                                (this.state.YdCountm == 5) ?
+                                                    null :
+                                                    <View style={styles.List}>
+                                                        <View style={styles.left2}>
+                                                            {
+                                                                (this.state.name=="商品配送")?
+                                                                    <Text style={styles.left}>配送金额</Text>
+                                                                    :
+                                                                    <Text style={styles.left}>金额</Text>
+                                                            }
+                                                            {
+                                                                (this.state.name=="商品采购"&&this.state.OptValue==1||this.state.name=="协配采购"&&this.state.OptValue==1||this.state.name=="移动销售"||this.state.Modify==1&&this.state.OptValue==1)?
+                                                                    <View style={styles.onPrice}>
+                                                                        {
+                                                                            (this.state.Total == 1) ?
+                                                                                <TextInput
+                                                                                    autoFocus={true}
+                                                                                    returnKeyType='search'
+                                                                                    style={styles.Number}
+                                                                                    underlineColorAndroid='transparent'
+                                                                                    keyboardType="numeric"
+                                                                                    value={this.state.numberFormat2.toString()}
+                                                                                    placeholderTextColor="#333333"
+                                                                                    onChangeText={(value)=>{
+                                                                                        this.setState({
+                                                                                            numberFormat2:value
+                                                                                        })
+                                                                                    }}
+                                                                                    onSubmitEditing={this.TotalButton.bind(this)}
+                                                                                    onEndEditing = {this.numberFormat2.bind(this)}
+                                                                                />
+                                                                                :
+                                                                                <TouchableOpacity onPress={this.NumberFormat.bind(this)}>
+                                                                                    <Text style={styles.PriceText}>{this.state.numberFormat2}</Text>
+                                                                                </TouchableOpacity>
+                                                                        }
+                                                                    </View>
+                                                                    :
+                                                                    <Text style={styles.Price1}>{this.state.numberFormat2}</Text>
+                                                            }
+                                                        </View>
+                                                        <View style={styles.right2}>
+                                                            <Text style={styles.price}>元</Text>
+                                                        </View>
+                                                    </View>
+                                            }
+                                            <View style={[styles.List, {paddingTop: 10,}]}>
+                                                <View style={styles.left2}>
+                                                    <Text style={[styles.left, {marginTop: 9,}]}>备注</Text>
+                                                    <TextInput
+                                                        style={[styles.Number1,{fontSize:14}]}
+                                                        placeholder="暂无备注"
+                                                        placeholderTextColor="#999999"
+                                                        underlineColorAndroid='transparent'
+                                                        value={this.state.Remark.toString()}
+                                                        onChangeText={(value) => {
+                                                            this.setState({Remark: value})
+                                                        }}/>
+                                                </View>
+                                            </View>
+                                            <TouchableOpacity style={styles.button} onPress={this.pressPop.bind(this)}>
+                                                <Text style={styles.ButtonText}>确定</Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                    </ScrollView>
+                                    :
+                                    <View style={styles.BlockList}>
+                                        {
+                                            (this.state.dataRows == "") ?
+                                                <View style={styles.Null}>
+                                                    <Text style={styles.NullText}>
+                                                        没有搜索到相关商品~~~
+                                                    </Text>
+                                                </View> :
+                                                <ListView
+                                                    dataSource={this.state.dataSource}
+                                                    showsVerticalScrollIndicator={true}
+                                                    renderRow={this._renderRow.bind(this)}
+                                                    ref="myInput"
+                                                />
+                                        }
+                                    </View>
                             }
                         </View>
                 }
@@ -2153,6 +2548,9 @@ export default class Search extends Component {
 }
 
 const styles = StyleSheet.create({
+    out:{
+        flex:1
+    },
     container: {
         flex: 1,
         backgroundColor: '#f2f2f2',
@@ -2348,7 +2746,6 @@ const styles = StyleSheet.create({
     button: {
         marginTop: 30,
         marginBottom:15,
-        flex: 1,
         marginLeft: 25,
         marginRight: 25,
         backgroundColor: "#ff4e4e",

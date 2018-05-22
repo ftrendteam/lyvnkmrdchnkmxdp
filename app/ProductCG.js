@@ -97,79 +97,60 @@ export default class ProductCG extends Component {
 
     Button(){
         if(this.state.Disting=="0") {
-            var str=this.state.sCode1;
             if(this.state.sCode1==""){
                 ToastAndroid.show("请选择供应商",ToastAndroid.SHORT);
                 return;
             }else{
-                var date = new Date();
-                var data=JSON.stringify(date.getTime());
                 var nextRoute={
                     name:"Index",
                     component:Index,
                 };
                 this.props.navigator.push(nextRoute);
-                Storage.delete('OrgFormno');
-                Storage.delete('shildshop');
-                Storage.delete('StateMent');
-                Storage.delete('BQNumber');
-                Storage.delete('YuanDan');
-                Storage.delete('Screen');
-                Storage.delete('Modify');
-                Storage.delete("PeiSong");
-                if(this.state.DepName1==""&&this.state.DepCode1==""){
-                    Storage.delete('DepCode');
-                }else{
-                    Storage.save('DepCode', this.state.DepCode1);
-                }
-                Storage.save('Name','商品采购');
-                Storage.save('FormType','CGYW');
-                Storage.save('valueOf','App_Client_ProCG');
-                Storage.save('history','App_Client_ProCGQ');
-                Storage.save('historyClass','App_Client_ProCGDetailQ');
-                Storage.save('ProYH','ProCG');
-                Storage.save('YdCountm','3');
-                Storage.save('Date',data);
-                Storage.save("scode",str);
+                this.Data();
             }
         }else if(this.state.Disting=="1"){
-            var str=this.state.sCode1;
             if(this.state.sCode1==""){
                 ToastAndroid.show("请选择供应商",ToastAndroid.SHORT);
                 return;
             }else{
-                var date = new Date();
-                var data=JSON.stringify(date.getTime());
                 var nextRoute={
                     name:"Search",
                     component:Search,
                 };
                 this.props.navigator.push(nextRoute);
-                Storage.delete('OrgFormno');
-                Storage.delete('shildshop');
-                Storage.delete('StateMent');
-                Storage.delete('BQNumber');
-                Storage.delete('YuanDan');
-                Storage.delete('Screen');
-                Storage.delete('Modify');
-                Storage.delete("PeiSong");
-                if(this.state.DepName1==""&&this.state.DepCode1==""){
-                    Storage.delete('DepCode');
-                }else{
-                    Storage.save('DepCode', this.state.DepCode1);
-                }
-                Storage.save('Name','商品采购');
-                Storage.save('FormType','CGYW');
-                Storage.save('valueOf','App_Client_ProCG');
-                Storage.save('history','App_Client_ProCGQ');
-                Storage.save('historyClass','App_Client_ProCGDetailQ');
-                Storage.save('ProYH','ProCG');
-                Storage.save('YdCountm','3');
-                Storage.save('Date',data);
-                Storage.save("scode",str);
+                this.Data();
             }
         }
 
+    }
+
+    Data(){
+        var str=this.state.sCode1;
+        var date = new Date();
+        var data=JSON.stringify(date.getTime());
+        Storage.delete('OrgFormno');
+        Storage.delete('shildshop');
+        Storage.delete('StateMent');
+        Storage.delete('BQNumber');
+        Storage.delete('YuanDan');
+        Storage.delete('Screen');
+        Storage.delete('Modify');
+        Storage.delete("PeiSong");
+        if(this.state.DepName1==""&&this.state.DepCode1==""){
+            Storage.delete('DepCode');
+        }else{
+            Storage.save('DepCode', this.state.DepCode1);
+        }
+        Storage.save('Name','商品采购');
+        Storage.save('FormType','CGYW');
+        Storage.save('FormCheck', 'CGYW');//要货查询审核按钮
+        Storage.save('valueOf','App_Client_ProCG');
+        Storage.save('history','App_Client_ProCGQ');
+        Storage.save('historyClass','App_Client_ProCGDetailQ');
+        Storage.save('ProYH','ProCG');
+        Storage.save('YdCountm','3');
+        Storage.save('Date',data);
+        Storage.save("scode",str);
     }
 
     render() {

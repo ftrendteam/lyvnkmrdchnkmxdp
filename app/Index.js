@@ -47,6 +47,7 @@ import Shopsearch from "../StockEnquiries/Shopsearch";//点击商品 商品查�
 import SearchData from "../StockEnquiries/SearchData";//搜索页面 商品查询
 import PSDan from "../PSDan/PSDan";//商品配送
 import YHSearch from "../YHSearch/YHSearch";//要货查询
+import Set from "../AppSet/Set";//设置
 import NetUtils from "../utils/NetUtils";
 import FetchUtil from "../utils/FetchUtils";//网络请求封装
 import UpData from "../utils/UpData";//数据更新
@@ -302,6 +303,49 @@ export default class Index extends Component {
                                                                                             }
                                                                                         })
                                                                                     }
+                                                                                }else if(this.state.head=="售价调整"){
+                                                                                    dbAdapter.selectShopInfoData(row.Pid).then((datas)=> {
+                                                                                        if(datas.length==0){
+                                                                                            this.props.navigator.push({
+                                                                                                component: OrderDetails,
+                                                                                                params: {
+                                                                                                    ProdName: row.ProdName,
+                                                                                                    ShopPrice: ShopPrice,
+                                                                                                    Pid: row.Pid,
+                                                                                                    countm: row.ShopNumber,
+                                                                                                    promemo: row.ShopRemark,
+                                                                                                    prototal: row.ShopAmount,
+                                                                                                    ProdCode: row.ProdCode,
+                                                                                                    DepCode: row.DepCode1,
+                                                                                                    SuppCode: row.SuppCode,
+                                                                                                    ydcountm: "",
+                                                                                                    BarCode: row.BarCode,
+                                                                                                    IsIntCount:row.IsIntCount
+                                                                                                }
+                                                                                            })
+                                                                                        }else{
+                                                                                            for (let i = 0; i < datas.length; i++) {
+                                                                                                var data = datas.item(i);
+                                                                                                this.props.navigator.push({
+                                                                                                    component: OrderDetails,
+                                                                                                    params: {
+                                                                                                        ProdName: row.ProdName,
+                                                                                                        ShopPrice: ShopPrice,
+                                                                                                        Pid: row.Pid,
+                                                                                                        countm: row.ShopNumber,
+                                                                                                        promemo: row.ShopRemark,
+                                                                                                        prototal: row.ShopAmount,
+                                                                                                        ProdCode: row.ProdCode,
+                                                                                                        DepCode: row.DepCode1,
+                                                                                                        SuppCode: row.SuppCode,
+                                                                                                        ydcountm: data.ydcountm,
+                                                                                                        BarCode: row.BarCode,
+                                                                                                        IsIntCount:row.IsIntCount
+                                                                                                    }
+                                                                                                })
+                                                                                            }
+                                                                                        }
+                                                                                    })
                                                                                 } else {
                                                                                     this.props.navigator.push({
                                                                                         component: OrderDetails,
@@ -430,6 +474,49 @@ export default class Index extends Component {
                                                                                         }
                                                                                     })
                                                                                 }
+                                                                            }else if(this.state.head=="售价调整"){
+                                                                                dbAdapter.selectShopInfoData(row.Pid).then((datas)=> {
+                                                                                    if(datas.length==0){
+                                                                                        this.props.navigator.push({
+                                                                                            component: OrderDetails,
+                                                                                            params: {
+                                                                                                ProdName: row.ProdName,
+                                                                                                ShopPrice: ShopPrice,
+                                                                                                Pid: row.Pid,
+                                                                                                countm: row.ShopNumber,
+                                                                                                promemo: row.ShopRemark,
+                                                                                                prototal: row.ShopAmount,
+                                                                                                ProdCode: row.ProdCode,
+                                                                                                DepCode: row.DepCode1,
+                                                                                                SuppCode: row.SuppCode,
+                                                                                                ydcountm: "",
+                                                                                                BarCode: row.BarCode,
+                                                                                                IsIntCount:row.IsIntCount
+                                                                                            }
+                                                                                        })
+                                                                                    }else{
+                                                                                        for (let i = 0; i < datas.length; i++) {
+                                                                                            var data = datas.item(i);
+                                                                                            this.props.navigator.push({
+                                                                                                component: OrderDetails,
+                                                                                                params: {
+                                                                                                    ProdName: row.ProdName,
+                                                                                                    ShopPrice: ShopPrice,
+                                                                                                    Pid: row.Pid,
+                                                                                                    countm: row.ShopNumber,
+                                                                                                    promemo: row.ShopRemark,
+                                                                                                    prototal: row.ShopAmount,
+                                                                                                    ProdCode: row.ProdCode,
+                                                                                                    DepCode: row.DepCode1,
+                                                                                                    SuppCode: row.SuppCode,
+                                                                                                    ydcountm: data.ydcountm,
+                                                                                                    BarCode: row.BarCode,
+                                                                                                    IsIntCount:row.IsIntCount
+                                                                                                }
+                                                                                            })
+                                                                                        }
+                                                                                    }
+                                                                                })
                                                                             } else {
                                                                                 this.props.navigator.push({
                                                                                     component: OrderDetails,
@@ -578,7 +665,50 @@ export default class Index extends Component {
                                                                                             }
                                                                                         })
                                                                                     }
-                                                                                } else {
+                                                                                } else if(this.state.head=="售价调整"){
+                                                                                    dbAdapter.selectShopInfoData(row.Pid).then((datas)=> {
+                                                                                        if(datas.length==0){
+                                                                                            this.props.navigator.push({
+                                                                                                component: OrderDetails,
+                                                                                                params: {
+                                                                                                    ProdName: row.ProdName,
+                                                                                                    ShopPrice: ShopPrice,
+                                                                                                    Pid: row.Pid,
+                                                                                                    countm: row.ShopNumber,
+                                                                                                    promemo: row.ShopRemark,
+                                                                                                    prototal: row.ShopAmount,
+                                                                                                    ProdCode: row.ProdCode,
+                                                                                                    DepCode: row.DepCode1,
+                                                                                                    SuppCode: row.SuppCode,
+                                                                                                    ydcountm: "",
+                                                                                                    BarCode: row.BarCode,
+                                                                                                    IsIntCount:row.IsIntCount
+                                                                                                }
+                                                                                            })
+                                                                                        }else{
+                                                                                            for (let i = 0; i < datas.length; i++) {
+                                                                                                var data = datas.item(i);
+                                                                                                this.props.navigator.push({
+                                                                                                    component: OrderDetails,
+                                                                                                    params: {
+                                                                                                        ProdName: row.ProdName,
+                                                                                                        ShopPrice: ShopPrice,
+                                                                                                        Pid: row.Pid,
+                                                                                                        countm: row.ShopNumber,
+                                                                                                        promemo: row.ShopRemark,
+                                                                                                        prototal: row.ShopAmount,
+                                                                                                        ProdCode: row.ProdCode,
+                                                                                                        DepCode: row.DepCode1,
+                                                                                                        SuppCode: row.SuppCode,
+                                                                                                        ydcountm: data.ydcountm,
+                                                                                                        BarCode: row.BarCode,
+                                                                                                        IsIntCount:row.IsIntCount
+                                                                                                    }
+                                                                                                })
+                                                                                            }
+                                                                                        }
+                                                                                    })
+                                                                                }else {
                                                                                     this.props.navigator.push({
                                                                                         component: OrderDetails,
                                                                                         params: {
@@ -706,6 +836,49 @@ export default class Index extends Component {
                                                                                         }
                                                                                     })
                                                                                 }
+                                                                            }else if(this.state.head=="售价调整"){
+                                                                                dbAdapter.selectShopInfoData(row.Pid).then((datas)=> {
+                                                                                    if(datas.length==0){
+                                                                                        this.props.navigator.push({
+                                                                                            component: OrderDetails,
+                                                                                            params: {
+                                                                                                ProdName: row.ProdName,
+                                                                                                ShopPrice: ShopPrice,
+                                                                                                Pid: row.Pid,
+                                                                                                countm: row.ShopNumber,
+                                                                                                promemo: row.ShopRemark,
+                                                                                                prototal: row.ShopAmount,
+                                                                                                ProdCode: row.ProdCode,
+                                                                                                DepCode: row.DepCode1,
+                                                                                                SuppCode: row.SuppCode,
+                                                                                                ydcountm: "",
+                                                                                                BarCode: row.BarCode,
+                                                                                                IsIntCount:row.IsIntCount
+                                                                                            }
+                                                                                        })
+                                                                                    }else{
+                                                                                        for (let i = 0; i < datas.length; i++) {
+                                                                                            var data = datas.item(i);
+                                                                                            this.props.navigator.push({
+                                                                                                component: OrderDetails,
+                                                                                                params: {
+                                                                                                    ProdName: row.ProdName,
+                                                                                                    ShopPrice: ShopPrice,
+                                                                                                    Pid: row.Pid,
+                                                                                                    countm: row.ShopNumber,
+                                                                                                    promemo: row.ShopRemark,
+                                                                                                    prototal: row.ShopAmount,
+                                                                                                    ProdCode: row.ProdCode,
+                                                                                                    DepCode: row.DepCode1,
+                                                                                                    SuppCode: row.SuppCode,
+                                                                                                    ydcountm: data.ydcountm,
+                                                                                                    BarCode: row.BarCode,
+                                                                                                    IsIntCount:row.IsIntCount
+                                                                                                }
+                                                                                            })
+                                                                                        }
+                                                                                    }
+                                                                                })
                                                                             } else {
                                                                                 this.props.navigator.push({
                                                                                     component: OrderDetails,
@@ -851,6 +1024,49 @@ export default class Index extends Component {
                                                                                     }
                                                                                 })
                                                                             }
+                                                                        }else if(this.state.head=="售价调整"){
+                                                                            dbAdapter.selectShopInfoData(row.Pid).then((datas)=> {
+                                                                                if(datas.length==0){
+                                                                                    this.props.navigator.push({
+                                                                                        component: OrderDetails,
+                                                                                        params: {
+                                                                                            ProdName: row.ProdName,
+                                                                                            ShopPrice: ShopPrice,
+                                                                                            Pid: row.Pid,
+                                                                                            countm: row.ShopNumber,
+                                                                                            promemo: row.ShopRemark,
+                                                                                            prototal: row.ShopAmount,
+                                                                                            ProdCode: row.ProdCode,
+                                                                                            DepCode: row.DepCode1,
+                                                                                            SuppCode: row.SuppCode,
+                                                                                            ydcountm: "",
+                                                                                            BarCode: row.BarCode,
+                                                                                            IsIntCount:row.IsIntCount
+                                                                                        }
+                                                                                    })
+                                                                                }else{
+                                                                                    for (let i = 0; i < datas.length; i++) {
+                                                                                        var data = datas.item(i);
+                                                                                        this.props.navigator.push({
+                                                                                            component: OrderDetails,
+                                                                                            params: {
+                                                                                                ProdName: row.ProdName,
+                                                                                                ShopPrice: ShopPrice,
+                                                                                                Pid: row.Pid,
+                                                                                                countm: row.ShopNumber,
+                                                                                                promemo: row.ShopRemark,
+                                                                                                prototal: row.ShopAmount,
+                                                                                                ProdCode: row.ProdCode,
+                                                                                                DepCode: row.DepCode1,
+                                                                                                SuppCode: row.SuppCode,
+                                                                                                ydcountm: data.ydcountm,
+                                                                                                BarCode: row.BarCode,
+                                                                                                IsIntCount:row.IsIntCount
+                                                                                            }
+                                                                                        })
+                                                                                    }
+                                                                                }
+                                                                            })
                                                                         } else {
                                                                             this.props.navigator.push({
                                                                                 component: OrderDetails,
@@ -978,6 +1194,49 @@ export default class Index extends Component {
                                                                                 }
                                                                             })
                                                                         }
+                                                                    }else if(this.state.head=="售价调整"){
+                                                                        dbAdapter.selectShopInfoData(row.Pid).then((datas)=> {
+                                                                            if(datas.length==0){
+                                                                                this.props.navigator.push({
+                                                                                    component: OrderDetails,
+                                                                                    params: {
+                                                                                        ProdName: row.ProdName,
+                                                                                        ShopPrice: ShopPrice,
+                                                                                        Pid: row.Pid,
+                                                                                        countm: row.ShopNumber,
+                                                                                        promemo: row.ShopRemark,
+                                                                                        prototal: row.ShopAmount,
+                                                                                        ProdCode: row.ProdCode,
+                                                                                        DepCode: row.DepCode1,
+                                                                                        SuppCode: row.SuppCode,
+                                                                                        ydcountm: "",
+                                                                                        BarCode: row.BarCode,
+                                                                                        IsIntCount:row.IsIntCount
+                                                                                    }
+                                                                                })
+                                                                            }else{
+                                                                                for (let i = 0; i < datas.length; i++) {
+                                                                                    var data = datas.item(i);
+                                                                                    this.props.navigator.push({
+                                                                                        component: OrderDetails,
+                                                                                        params: {
+                                                                                            ProdName: row.ProdName,
+                                                                                            ShopPrice: ShopPrice,
+                                                                                            Pid: row.Pid,
+                                                                                            countm: row.ShopNumber,
+                                                                                            promemo: row.ShopRemark,
+                                                                                            prototal: row.ShopAmount,
+                                                                                            ProdCode: row.ProdCode,
+                                                                                            DepCode: row.DepCode1,
+                                                                                            SuppCode: row.SuppCode,
+                                                                                            ydcountm: data.ydcountm,
+                                                                                            BarCode: row.BarCode,
+                                                                                            IsIntCount:row.IsIntCount
+                                                                                        }
+                                                                                    })
+                                                                                }
+                                                                            }
+                                                                        })
                                                                     } else {
                                                                         this.props.navigator.push({
                                                                             component: OrderDetails,
@@ -1487,7 +1746,7 @@ export default class Index extends Component {
                                                                                 ShopPrice: ShopPrice,
                                                                                 Pid: item.item.Pid,
                                                                                 countm: item.item.ShopNumber,
-                                                                                promemo: item.item.promemo,
+                                                                                promemo: row.ShopRemark,
                                                                                 prototal: item.item.prototal,
                                                                                 ProdCode: item.item.ProdCode,
                                                                                 DepCode: item.item.DepCode1,
@@ -1505,7 +1764,7 @@ export default class Index extends Component {
                                                                                 ShopPrice: item.item.ShopPrice,
                                                                                 Pid: item.item.Pid,
                                                                                 countm: item.item.ShopNumber,
-                                                                                promemo: item.item.promemo,
+                                                                                promemo: row.ShopRemark,
                                                                                 prototal: item.item.prototal,
                                                                                 ProdCode: item.item.ProdCode,
                                                                                 DepCode: item.item.DepCode1,
@@ -1527,7 +1786,7 @@ export default class Index extends Component {
                                                                                     ShopPrice: ShopPrice,
                                                                                     Pid: item.item.Pid,
                                                                                     countm: item.item.ShopNumber,
-                                                                                    promemo: item.item.promemo,
+                                                                                    promemo: row.ShopRemark,
                                                                                     prototal: item.item.prototal,
                                                                                     ProdCode: item.item.ProdCode,
                                                                                     DepCode: item.item.DepCode1,
@@ -1547,7 +1806,7 @@ export default class Index extends Component {
                                                                                         ShopPrice: ShopPrice,
                                                                                         Pid: item.item.Pid,
                                                                                         countm: item.item.ShopNumber,
-                                                                                        promemo: item.item.promemo,
+                                                                                        promemo: row.ShopRemark,
                                                                                         prototal: item.item.prototal,
                                                                                         ProdCode: item.item.ProdCode,
                                                                                         DepCode: item.item.DepCode1,
@@ -1587,7 +1846,7 @@ export default class Index extends Component {
                                                                             ShopPrice: ShopPrice,
                                                                             Pid: item.item.Pid,
                                                                             countm: item.item.ShopNumber,
-                                                                            promemo: item.item.promemo,
+                                                                            promemo: row.ShopRemark,
                                                                             prototal: item.item.prototal,
                                                                             ProdCode: item.item.ProdCode,
                                                                             DepCode: item.item.DepCode1,
@@ -1682,7 +1941,7 @@ export default class Index extends Component {
                                                                             ShopPrice: ShopPrice,
                                                                             Pid: item.item.Pid,
                                                                             countm: item.item.ShopNumber,
-                                                                            promemo: item.item.promemo,
+                                                                            promemo: row.ShopRemark,
                                                                             prototal: item.item.prototal,
                                                                             ProdCode: item.item.ProdCode,
                                                                             DepCode: item.item.DepCode1,
@@ -1700,7 +1959,7 @@ export default class Index extends Component {
                                                                             ShopPrice: item.item.ShopPrice,
                                                                             Pid: item.item.Pid,
                                                                             countm: item.item.ShopNumber,
-                                                                            promemo: item.item.promemo,
+                                                                            promemo: row.ShopRemark,
                                                                             prototal: item.item.prototal,
                                                                             ProdCode: item.item.ProdCode,
                                                                             DepCode: item.item.DepCode1,
@@ -1721,7 +1980,7 @@ export default class Index extends Component {
                                                                                 ShopPrice: ShopPrice,
                                                                                 Pid: item.item.Pid,
                                                                                 countm: item.item.ShopNumber,
-                                                                                promemo: item.item.promemo,
+                                                                                promemo: row.ShopRemark,
                                                                                 prototal: item.item.prototal,
                                                                                 ProdCode: item.item.ProdCode,
                                                                                 DepCode: item.item.DepCode1,
@@ -1741,7 +2000,7 @@ export default class Index extends Component {
                                                                                     ShopPrice: ShopPrice,
                                                                                     Pid: item.item.Pid,
                                                                                     countm: item.item.ShopNumber,
-                                                                                    promemo: item.item.promemo,
+                                                                                    promemo: row.ShopRemark,
                                                                                     prototal: item.item.prototal,
                                                                                     ProdCode: item.item.ProdCode,
                                                                                     DepCode: item.item.DepCode1,
@@ -1781,7 +2040,7 @@ export default class Index extends Component {
                                                                         ShopPrice: ShopPrice,
                                                                         Pid: item.item.Pid,
                                                                         countm: item.item.ShopNumber,
-                                                                        promemo: item.item.promemo,
+                                                                        promemo: row.ShopRemark,
                                                                         prototal: item.item.prototal,
                                                                         ProdCode: item.item.ProdCode,
                                                                         DepCode: item.item.DepCode1,
@@ -1858,7 +2117,7 @@ export default class Index extends Component {
                                     Storage.save("invoice", "门店要货");
                                     var nextRoute = {
                                         name: "门店要货",
-                                        component: PinLei,
+                                        component: PinLei,//YHDan文件夹
                                         params: {
                                             invoice:"门店要货"
                                         }
@@ -1897,7 +2156,7 @@ export default class Index extends Component {
                     if (this.state.Disting == "0" || this.state.Disting == "1") {
                         var nextRoute = {
                             name: "商品损溢",
-                            component: SunYi,
+                            component: SunYi,//app文件夹
                             params: {
                                 invoice:"商品损溢"
                             }
@@ -1934,7 +2193,7 @@ export default class Index extends Component {
                         Storage.save("invoice", "实时盘点");
                         var nextRoute = {
                             name: "实时盘点",
-                            component: PinLei,
+                            component: PinLei,//app文件夹
                             params: {
                                 invoice:"实时盘点"
                             }
@@ -1969,7 +2228,7 @@ export default class Index extends Component {
                         Storage.save('invoice', '商品盘点');
                         var nextRoute = {
                             name: "主页",
-                            component: Query,
+                            component: Query,//app文件夹
                             params: {
                                 invoice:"商品盘点"
                             }
@@ -2008,7 +2267,7 @@ export default class Index extends Component {
                                     Storage.save("invoice", "配送收货");
                                     var nextRoute = {
                                         name: "主页",
-                                        component: Distrition,
+                                        component: Distrition,//app文件夹
                                         params: {
                                             invoice:"配送收货"
                                         }
@@ -2052,7 +2311,7 @@ export default class Index extends Component {
                                     Storage.save("invoice", "商品采购");
                                     var nextRoute = {
                                         name: "主页",
-                                        component: ProductCG,
+                                        component: ProductCG,//app文件夹
                                         params: {
                                             invoice:"商品采购"
                                         }
@@ -2095,7 +2354,7 @@ export default class Index extends Component {
                                     Storage.save("invoice", "商品验收");
                                     var nextRoute = {
                                         name: "主页",
-                                        component: ProductYS,
+                                        component: ProductYS,//app文件夹
                                         params: {
                                             invoice:"商品验收"
                                         }
@@ -2138,7 +2397,7 @@ export default class Index extends Component {
                                     Storage.save("invoice", "协配采购");
                                     var nextRoute = {
                                         name: "主页",
-                                        component: ProductXP,
+                                        component: ProductXP,//app文件夹
                                         params: {
                                             invoice:"协配采购"
                                         }
@@ -2183,7 +2442,7 @@ export default class Index extends Component {
                                     Storage.save("invoice", "协配收货");
                                     var nextRoute = {
                                         name: "主页",
-                                        component: ProductSH,
+                                        component: ProductSH,//app文件夹
                                         params: {
                                             invoice:"协配收货"
                                         }
@@ -2226,16 +2485,14 @@ export default class Index extends Component {
                         Storage.save("invoice", "商品配送");
                         var nextRoute = {
                             name: "商品配送",
-                            component: PSDan,
+                            component: PSDan,//app文件夹
                             params: {
                                 invoice:"商品配送"
                             }
                         };
                         this.props.navigator.push(nextRoute);
                         this._setModalVisible();
-                        if (this.state.Disting == "1") {
-                            DeviceEventEmitter.removeAllListeners();
-                        }
+                        DeviceEventEmitter.removeAllListeners();
                     } else {
                         this.Promp();
                     }
@@ -2285,7 +2542,7 @@ export default class Index extends Component {
                                             } else {
                                                 var nextRoute = {
                                                     name: "移动销售",
-                                                    component: SellData,
+                                                    component: SellData,//Sell文件夹
                                                 };
                                                 this.props.navigator.push(nextRoute);
                                                 this._setModalVisible();
@@ -2391,7 +2648,7 @@ export default class Index extends Component {
                         Storage.save("invoice", "标签采集");
                         var nextRoute = {
                             name: "标签采集",
-                            component: PinLei,
+                            component: PinLei,//YHDan文件夹
                             params: {
                                 invoice:"标签采集"
                             }
@@ -2422,7 +2679,7 @@ export default class Index extends Component {
         } else {
             var nextRoute = {
                 name: "库存查询",
-                component: StockEnquiries
+                component: StockEnquiries,//StockEnquiries文件夹
             };
             this.props.navigator.push(nextRoute);
             this._setModalVisible();
@@ -2474,7 +2731,7 @@ export default class Index extends Component {
                     if (this.state.Disting == "0" || this.state.Disting == "1") {
                         var nextRoute = {
                             name: "要货查询",
-                            component: YHSearch,
+                            component: YHSearch,//YHSearch文件夹
                         };
                         this.props.navigator.push(nextRoute);
                         this._setModalVisible();
@@ -2506,7 +2763,7 @@ export default class Index extends Component {
                         Storage.save("invoice", "售价调整");
                         var nextRoute = {
                             name: "售价调整",
-                            component: PinLei,
+                            component: PinLei,//YHDan文件夹
                             params: {
                                 invoice:"售价调整"
                             }
@@ -2525,6 +2782,26 @@ export default class Index extends Component {
         }
     }
 
+    /**
+     * 设置
+     */
+
+    AppSet(){
+        var nextRoute = {
+            name: "设置",
+            component: Set,//AppSet文件夹
+            params: {
+                invoice:"设置"
+            }
+        };
+        this.props.navigator.push(nextRoute);
+        this._setModalVisible();
+        DeviceEventEmitter.removeAllListeners();
+    }
+
+    /**
+     * 退出
+     */
     pullOut() {
         this._setModalVisible();
         if (this.state.ShopCar1 > 0) {
@@ -2876,8 +3153,7 @@ export default class Index extends Component {
                 for (let i = 0; i < rows.length; i++) {
                     var row = rows.item(i);
                     priductData.push(row);
-                }
-                ;
+                };
                 if (this.state.depcode != lastDepCode) {
                     this.productData.splice(0, this.productData.length);
                     lastDepCode = this.state.depcode;
@@ -3349,6 +3625,21 @@ export default class Index extends Component {
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     style={styles.ModalHeadImage}
+                                    onPress={this.AppSet.bind(this)}>
+                                    <Text style={styles.ModalHeadImage1}>
+                                        <Image source={require("../images/1_56.png")}/>
+                                    </Text>
+                                    <Text style={styles.ModalHeadText}>
+                                        设置
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={styles.ModalLine}>
+                                <Image source={require("../images/1_48.png")} style={styles.ModalImageLine}/>
+                            </View>
+                            <View style={[styles.ModalHead, {marginBottom: 10}]}>
+                                <TouchableOpacity
+                                    style={[styles.ModalHeadImage, {borderRightWidth: 1, borderRightColor: "#f2f2f2"}]}
                                     onPress={this.pullOut.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_56.png")}/>
@@ -3357,11 +3648,6 @@ export default class Index extends Component {
                                         退出账号
                                     </Text>
                                 </TouchableOpacity>
-                            </View>
-                            <View style={styles.ModalLine}>
-                                <Image source={require("../images/1_48.png")} style={styles.ModalImageLine}/>
-                            </View>
-                            <View style={[styles.ModalHead, {marginBottom: 10}]}>
                                 <TouchableOpacity
                                     onPress={this.UpData.bind(this)}
                                     style={[styles.ModalHeadImage, {borderRightWidth: 1, borderRightColor: "#f2f2f2"}]}>

@@ -26,7 +26,7 @@ export default class GoodsDetails extends Component {
             ProdName:this.props.ProdName ? this.props.ProdName : "",
             Pid:this.props.Pid ? this.props.Pid : "",
             ShopPrice:this.props.ShopPrice ? this.props.ShopPrice : "",
-            Remark:this.props.Remark ? this.props.Remark : "",
+            promemo:this.props.promemo ? this.props.promemo : "",
             Number:this.props.countm ? this.props.countm : "",
             DepCode:this.props.DepCode ? this.props.DepCode : "",
             ydcountm:this.props.ydcountm ? this.props.ydcountm : "",
@@ -164,6 +164,8 @@ export default class GoodsDetails extends Component {
                             OnPrice:1,
                             PriceText:1
                         });
+                    }else{
+                        this.Shopinfo();
                     }
                 }
             })
@@ -172,7 +174,8 @@ export default class GoodsDetails extends Component {
                 OnPrice:1,
                 PriceText:1
             });
-        }else{
+        }
+        else{
             if(this.state.YdCountm==6&&this.state.ydcountm==0){
                 ToastAndroid.show('库存为0，该商品不能进行配送', ToastAndroid.SHORT);
             } else {
@@ -182,100 +185,12 @@ export default class GoodsDetails extends Component {
                             var number = this.state.Number;//获取数量的数字
                             if(parseInt(number)==number){
                                 if(this.state.name=="实时盘点"||this.state.name=="商品盘点"){
-                                    var shopInfoData = [];
-                                    var shopInfo = {};
-                                    shopInfo.Pid = this.state.Pid;
-                                    shopInfo.ProdCode=this.state.ProdCode;
-                                    shopInfo.prodname = this.state.ProdName;
-                                    shopInfo.countm = this.state.Number;
-                                    shopInfo.ShopPrice = this.state.ShopPrice;
-                                    if(this.state.YdCountm == 5){
-                                        shopInfo.prototal = "0";
-                                    }else{
-                                        shopInfo.prototal = NumberUtils.numberFormat2(ShopPrice);
-                                    }
-                                    shopInfo.promemo = this.state.Remark;
-                                    shopInfo.DepCode = this.state.DepCode;
-                                    shopInfo.ydcountm = this.state.ydcountm;
-                                    shopInfo.SuppCode = this.state.SuppCode;
-                                    shopInfo.BarCode = this.state.BarCode;
-                                    shopInfoData.push(shopInfo);
-                                    //调用插入表方法
-                                    dbAdapter.insertShopInfo(shopInfoData);
-                                    if(this.state.name=="移动销售"){
-                                        var nextRoute={
-                                            name:"移动销售",
-                                            component:Sell,
-                                        };
-                                        this.props.navigator.push(nextRoute);
-                                    }else if(this.state.ShoppData=="清单"){
-                                        var nextRoute={
-                                            name:"清单",
-                                            component:ShoppingCart,
-                                            params:{
-                                                DepCode:this.state.DepCode,
-                                            }
-                                        };
-                                        this.props.navigator.push(nextRoute);
-                                    }else{
-                                        var nextRoute={
-                                            name:"主页",
-                                            component:Index,
-                                            params:{
-                                                DepCode:this.state.DepCode,
-                                            }
-                                        };
-                                        this.props.navigator.push(nextRoute);
-                                    }
+                                    this.Shopinfo();//调用插入shopinfo表
                                 }else{
                                     if(this.state.Number==0){
                                         ToastAndroid.show('商品数量不能为空', ToastAndroid.SHORT);
                                     }else{
-                                        var shopInfoData = [];
-                                        var shopInfo = {};
-                                        shopInfo.Pid = this.state.Pid;
-                                        shopInfo.ProdCode=this.state.ProdCode;
-                                        shopInfo.prodname = this.state.ProdName;
-                                        shopInfo.countm = this.state.Number;
-                                        shopInfo.ShopPrice = this.state.ShopPrice;
-                                        if(this.state.YdCountm == 5){
-                                            shopInfo.prototal = "0";
-                                        }else{
-                                            shopInfo.prototal = NumberUtils.numberFormat2(ShopPrice);
-                                        }
-                                        shopInfo.promemo = this.state.Remark;
-                                        shopInfo.DepCode = this.state.DepCode;
-                                        shopInfo.ydcountm = this.state.ydcountm;
-                                        shopInfo.SuppCode = this.state.SuppCode;
-                                        shopInfo.BarCode = this.state.BarCode;
-                                        shopInfoData.push(shopInfo);
-                                        //调用插入表方法
-                                        dbAdapter.insertShopInfo(shopInfoData);
-                                        if(this.state.name=="移动销售"){
-                                            var nextRoute={
-                                                name:"移动销售",
-                                                component:Sell,
-                                            };
-                                            this.props.navigator.push(nextRoute);
-                                        }else if(this.state.ShoppData=="清单"){
-                                            var nextRoute={
-                                                name:"清单",
-                                                component:ShoppingCart,
-                                                params:{
-                                                    DepCode:this.state.DepCode,
-                                                }
-                                            };
-                                            this.props.navigator.push(nextRoute);
-                                        }else{
-                                            var nextRoute={
-                                                name:"主页",
-                                                component:Index,
-                                                params:{
-                                                    DepCode:this.state.DepCode,
-                                                }
-                                            };
-                                            this.props.navigator.push(nextRoute);
-                                        }
+                                        this.Shopinfo();
                                     }
                                 }
                             }else{
@@ -283,100 +198,12 @@ export default class GoodsDetails extends Component {
                             }
                         }else {
                             if(this.state.name=="实时盘点"||this.state.name=="商品盘点"){
-                                var shopInfoData = [];
-                                var shopInfo = {};
-                                shopInfo.Pid = this.state.Pid;
-                                shopInfo.ProdCode=this.state.ProdCode;
-                                shopInfo.prodname = this.state.ProdName;
-                                shopInfo.countm = this.state.Number;
-                                shopInfo.ShopPrice = this.state.ShopPrice;
-                                if(this.state.YdCountm == 5){
-                                    shopInfo.prototal = "0";
-                                }else{
-                                    shopInfo.prototal = NumberUtils.numberFormat2(ShopPrice);
-                                }
-                                shopInfo.promemo = this.state.Remark;
-                                shopInfo.DepCode = this.state.DepCode;
-                                shopInfo.ydcountm = this.state.ydcountm;
-                                shopInfo.SuppCode = this.state.SuppCode;
-                                shopInfo.BarCode = this.state.BarCode;
-                                shopInfoData.push(shopInfo);
-                                //调用插入表方法
-                                dbAdapter.insertShopInfo(shopInfoData);
-                                if(this.state.name=="移动销售"){
-                                    var nextRoute={
-                                        name:"移动销售",
-                                        component:Sell,
-                                    };
-                                    this.props.navigator.push(nextRoute);
-                                }else if(this.state.ShoppData=="清单"){
-                                    var nextRoute={
-                                        name:"清单",
-                                        component:ShoppingCart,
-                                        params:{
-                                            DepCode:this.state.DepCode,
-                                        }
-                                    };
-                                    this.props.navigator.push(nextRoute);
-                                }else{
-                                    var nextRoute={
-                                        name:"主页",
-                                        component:Index,
-                                        params:{
-                                            DepCode:this.state.DepCode,
-                                        }
-                                    };
-                                    this.props.navigator.push(nextRoute);
-                                }
+                                this.Shopinfo();
                             }else{
                                 if(this.state.Number==0){
                                     ToastAndroid.show('商品数量不能为空', ToastAndroid.SHORT);
                                 }else{
-                                    var shopInfoData = [];
-                                    var shopInfo = {};
-                                    shopInfo.Pid = this.state.Pid;
-                                    shopInfo.ProdCode=this.state.ProdCode;
-                                    shopInfo.prodname = this.state.ProdName;
-                                    shopInfo.countm = this.state.Number;
-                                    shopInfo.ShopPrice = this.state.ShopPrice;
-                                    if(this.state.YdCountm == 5){
-                                        shopInfo.prototal = "0";
-                                    }else{
-                                        shopInfo.prototal = NumberUtils.numberFormat2(ShopPrice);
-                                    }
-                                    shopInfo.promemo = this.state.Remark;
-                                    shopInfo.DepCode = this.state.DepCode;
-                                    shopInfo.ydcountm = this.state.ydcountm;
-                                    shopInfo.SuppCode = this.state.SuppCode;
-                                    shopInfo.BarCode = this.state.BarCode;
-                                    shopInfoData.push(shopInfo);
-                                    //调用插入表方法
-                                    dbAdapter.insertShopInfo(shopInfoData);
-                                    if(this.state.name=="移动销售"){
-                                        var nextRoute={
-                                            name:"移动销售",
-                                            component:Sell,
-                                        };
-                                        this.props.navigator.push(nextRoute);
-                                    }else if(this.state.ShoppData=="清单"){
-                                        var nextRoute={
-                                            name:"清单",
-                                            component:ShoppingCart,
-                                            params:{
-                                                DepCode:this.state.DepCode,
-                                            }
-                                        };
-                                        this.props.navigator.push(nextRoute);
-                                    }else{
-                                        var nextRoute={
-                                            name:"主页",
-                                            component:Index,
-                                            params:{
-                                                DepCode:this.state.DepCode,
-                                            }
-                                        };
-                                        this.props.navigator.push(nextRoute);
-                                    }
+                                    this.Shopinfo();
                                 }
                             }
                         }
@@ -388,100 +215,12 @@ export default class GoodsDetails extends Component {
                         var number = this.state.Number;//获取数量的数字
                         if(parseInt(number)==number){
                             if(this.state.name=="实时盘点"||this.state.name=="商品盘点"){
-                                var shopInfoData = [];
-                                var shopInfo = {};
-                                shopInfo.Pid = this.state.Pid;
-                                shopInfo.ProdCode=this.state.ProdCode;
-                                shopInfo.prodname = this.state.ProdName;
-                                shopInfo.countm = this.state.Number;
-                                shopInfo.ShopPrice = this.state.ShopPrice;
-                                if(this.state.YdCountm == 5){
-                                    shopInfo.prototal = "0";
-                                }else{
-                                    shopInfo.prototal = NumberUtils.numberFormat2(ShopPrice);
-                                }
-                                shopInfo.promemo = this.state.Remark;
-                                shopInfo.DepCode = this.state.DepCode;
-                                shopInfo.ydcountm = this.state.ydcountm;
-                                shopInfo.SuppCode = this.state.SuppCode;
-                                shopInfo.BarCode = this.state.BarCode;
-                                shopInfoData.push(shopInfo);
-                                //调用插入表方法
-                                dbAdapter.insertShopInfo(shopInfoData);
-                                if(this.state.name=="移动销售"){
-                                    var nextRoute={
-                                        name:"移动销售",
-                                        component:Sell,
-                                    };
-                                    this.props.navigator.push(nextRoute);
-                                }else if(this.state.ShoppData=="清单"){
-                                    var nextRoute={
-                                        name:"清单",
-                                        component:ShoppingCart,
-                                        params:{
-                                            DepCode:this.state.DepCode,
-                                        }
-                                    };
-                                    this.props.navigator.push(nextRoute);
-                                }else{
-                                    var nextRoute={
-                                        name:"主页",
-                                        component:Index,
-                                        params:{
-                                            DepCode:this.state.DepCode,
-                                        }
-                                    };
-                                    this.props.navigator.push(nextRoute);
-                                }
+                                this.Shopinfo();
                             }else{
                                 if(this.state.Number==0){
                                     ToastAndroid.show('商品数量不能为空', ToastAndroid.SHORT);
                                 }else{
-                                    var shopInfoData = [];
-                                    var shopInfo = {};
-                                    shopInfo.Pid = this.state.Pid;
-                                    shopInfo.ProdCode=this.state.ProdCode;
-                                    shopInfo.prodname = this.state.ProdName;
-                                    shopInfo.countm = this.state.Number;
-                                    shopInfo.ShopPrice = this.state.ShopPrice;
-                                    if(this.state.YdCountm == 5){
-                                        shopInfo.prototal = "0";
-                                    }else{
-                                        shopInfo.prototal = NumberUtils.numberFormat2(ShopPrice);
-                                    }
-                                    shopInfo.promemo = this.state.Remark;
-                                    shopInfo.DepCode = this.state.DepCode;
-                                    shopInfo.ydcountm = this.state.ydcountm;
-                                    shopInfo.SuppCode = this.state.SuppCode;
-                                    shopInfo.BarCode = this.state.BarCode;
-                                    shopInfoData.push(shopInfo);
-                                    //调用插入表方法
-                                    dbAdapter.insertShopInfo(shopInfoData);
-                                    if(this.state.name=="移动销售"){
-                                        var nextRoute={
-                                            name:"移动销售",
-                                            component:Sell,
-                                        };
-                                        this.props.navigator.push(nextRoute);
-                                    }else if(this.state.ShoppData=="清单"){
-                                        var nextRoute={
-                                            name:"清单",
-                                            component:ShoppingCart,
-                                            params:{
-                                                DepCode:this.state.DepCode,
-                                            }
-                                        };
-                                        this.props.navigator.push(nextRoute);
-                                    }else{
-                                        var nextRoute={
-                                            name:"主页",
-                                            component:Index,
-                                            params:{
-                                                DepCode:this.state.DepCode,
-                                            }
-                                        };
-                                        this.props.navigator.push(nextRoute);
-                                    }
+                                    this.Shopinfo();
                                 }
                             }
                         }else{
@@ -489,105 +228,67 @@ export default class GoodsDetails extends Component {
                         }
                     }else {
                         if(this.state.name=="实时盘点"||this.state.name=="商品盘点"){
-                            var shopInfoData = [];
-                            var shopInfo = {};
-                            shopInfo.Pid = this.state.Pid;
-                            shopInfo.ProdCode=this.state.ProdCode;
-                            shopInfo.prodname = this.state.ProdName;
-                            shopInfo.countm = this.state.Number;
-                            shopInfo.ShopPrice = this.state.ShopPrice;
-                            if(this.state.YdCountm == 5){
-                                shopInfo.prototal = "0";
-                            }else{
-                                shopInfo.prototal = NumberUtils.numberFormat2(ShopPrice);
-                            }
-                            shopInfo.promemo = this.state.Remark;
-                            shopInfo.DepCode = this.state.DepCode;
-                            shopInfo.ydcountm = this.state.ydcountm;
-                            shopInfo.SuppCode = this.state.SuppCode;
-                            shopInfo.BarCode = this.state.BarCode;
-                            shopInfoData.push(shopInfo);
-                            //调用插入表方法
-                            dbAdapter.insertShopInfo(shopInfoData);
-                            if(this.state.name=="移动销售"){
-                                var nextRoute={
-                                    name:"移动销售",
-                                    component:Sell,
-                                };
-                                this.props.navigator.push(nextRoute);
-                            }else if(this.state.ShoppData=="清单"){
-                                var nextRoute={
-                                    name:"清单",
-                                    component:ShoppingCart,
-                                    params:{
-                                        DepCode:this.state.DepCode,
-                                    }
-                                };
-                                this.props.navigator.push(nextRoute);
-                            }else{
-                                var nextRoute={
-                                    name:"主页",
-                                    component:Index,
-                                    params:{
-                                        DepCode:this.state.DepCode,
-                                    }
-                                };
-                                this.props.navigator.push(nextRoute);
-                            }
+                            this.Shopinfo();
                         }else{
                             if(this.state.Number==0){
                                 ToastAndroid.show('商品数量不能为空', ToastAndroid.SHORT);
                             }else{
-                                var shopInfoData = [];
-                                var shopInfo = {};
-                                shopInfo.Pid = this.state.Pid;
-                                shopInfo.ProdCode=this.state.ProdCode;
-                                shopInfo.prodname = this.state.ProdName;
-                                shopInfo.countm = this.state.Number;
-                                shopInfo.ShopPrice = this.state.ShopPrice;
-                                if(this.state.YdCountm == 5){
-                                    shopInfo.prototal = "0";
-                                }else{
-                                    shopInfo.prototal = NumberUtils.numberFormat2(ShopPrice);
-                                }
-                                shopInfo.promemo = this.state.Remark;
-                                shopInfo.DepCode = this.state.DepCode;
-                                shopInfo.ydcountm = this.state.ydcountm;
-                                shopInfo.SuppCode = this.state.SuppCode;
-                                shopInfo.BarCode = this.state.BarCode;
-                                shopInfoData.push(shopInfo);
-                                //调用插入表方法
-                                dbAdapter.insertShopInfo(shopInfoData);
-                                if(this.state.name=="移动销售"){
-                                    var nextRoute={
-                                        name:"移动销售",
-                                        component:Sell,
-                                    };
-                                    this.props.navigator.push(nextRoute);
-                                }else if(this.state.ShoppData=="清单"){
-                                    var nextRoute={
-                                        name:"清单",
-                                        component:ShoppingCart,
-                                        params:{
-                                            DepCode:this.state.DepCode,
-                                        }
-                                    };
-                                    this.props.navigator.push(nextRoute);
-                                }else{
-                                    var nextRoute={
-                                        name:"主页",
-                                        component:Index,
-                                        params:{
-                                            DepCode:this.state.DepCode,
-                                        }
-                                    };
-                                    this.props.navigator.push(nextRoute);
-                                }
+                                this.Shopinfo();
                             }
                         }
                     }
                 }
             }
+        }
+    }
+
+    Shopinfo(){
+        var ShopPrice = (this.state.Number * this.state.ShopPrice);
+        var shopInfoData = [];
+        var shopInfo = {};
+        shopInfo.Pid = this.state.Pid;
+        shopInfo.ProdCode=this.state.ProdCode;
+        shopInfo.prodname = this.state.ProdName;
+        shopInfo.countm = this.state.Number;
+        shopInfo.ShopPrice = this.state.ShopPrice;
+        if(this.state.YdCountm == 5){
+            shopInfo.prototal = "0";
+        }else{
+            shopInfo.prototal = NumberUtils.numberFormat2(ShopPrice);
+        }
+        shopInfo.promemo = this.state.promemo;
+        shopInfo.DepCode = this.state.DepCode;
+        shopInfo.ydcountm = this.state.ydcountm;
+        shopInfo.SuppCode = this.state.SuppCode;
+        shopInfo.BarCode = this.state.BarCode;
+        shopInfoData.push(shopInfo);
+        //调用插入表方法
+        dbAdapter.insertShopInfo(shopInfoData);
+        if(this.state.name=="移动销售"){
+            var nextRoute={
+                name:"移动销售",
+                component:Sell,
+            };
+            this.props.navigator.push(nextRoute);
+        }else if(this.state.ShoppData=="清单"){
+            var nextRoute={
+                name:"清单",
+                component:ShoppingCart,
+                params:{
+                    DepCode:this.state.DepCode,
+                }
+            };
+            this.props.navigator.push(nextRoute);
+        }else{
+            // alert(this.state.name)
+            var nextRoute={
+                name:"主页",
+                component:Index,
+                params:{
+                    DepCode:this.state.DepCode,
+                }
+            };
+            this.props.navigator.push(nextRoute);
         }
     }
 
@@ -738,7 +439,7 @@ export default class GoodsDetails extends Component {
                                         } else {
                                             shopInfo.prototal = this.state.numberFormat2;
                                         }
-                                        shopInfo.promemo = this.state.Remark;
+                                        shopInfo.promemo = this.state.promemo;
                                         shopInfo.DepCode = this.state.DepCode;
                                         shopInfo.ydcountm = this.state.ydcountm;
                                         shopInfo.SuppCode = this.state.SuppCode;
@@ -786,7 +487,7 @@ export default class GoodsDetails extends Component {
                                             } else {
                                                 shopInfo.prototal = this.state.numberFormat2;
                                             }
-                                            shopInfo.promemo = this.state.Remark;
+                                            shopInfo.promemo = this.state.promemo;
                                             shopInfo.DepCode = this.state.DepCode;
                                             shopInfo.ydcountm = this.state.ydcountm;
                                             shopInfo.SuppCode = this.state.SuppCode;
@@ -838,7 +539,7 @@ export default class GoodsDetails extends Component {
                                     } else {
                                         shopInfo.prototal = this.state.numberFormat2;
                                     }
-                                    shopInfo.promemo = this.state.Remark;
+                                    shopInfo.promemo = this.state.promemo;
                                     shopInfo.DepCode = this.state.DepCode;
                                     shopInfo.ydcountm = this.state.ydcountm;
                                     shopInfo.SuppCode = this.state.SuppCode;
@@ -886,7 +587,7 @@ export default class GoodsDetails extends Component {
                                         } else {
                                             shopInfo.prototal = this.state.numberFormat2;
                                         }
-                                        shopInfo.promemo = this.state.Remark;
+                                        shopInfo.promemo = this.state.promemo;
                                         shopInfo.DepCode = this.state.DepCode;
                                         shopInfo.ydcountm = this.state.ydcountm;
                                         shopInfo.SuppCode = this.state.SuppCode;
@@ -943,7 +644,7 @@ export default class GoodsDetails extends Component {
                                     } else {
                                         shopInfo.prototal = this.state.numberFormat2;
                                     }
-                                    shopInfo.promemo = this.state.Remark;
+                                    shopInfo.promemo = this.state.promemo;
                                     shopInfo.DepCode = this.state.DepCode;
                                     shopInfo.ydcountm = this.state.ydcountm;
                                     shopInfo.SuppCode = this.state.SuppCode;
@@ -991,7 +692,7 @@ export default class GoodsDetails extends Component {
                                         } else {
                                             shopInfo.prototal = this.state.numberFormat2;
                                         }
-                                        shopInfo.promemo = this.state.Remark;
+                                        shopInfo.promemo = this.state.promemo;
                                         shopInfo.DepCode = this.state.DepCode;
                                         shopInfo.ydcountm = this.state.ydcountm;
                                         shopInfo.SuppCode = this.state.SuppCode;
@@ -1043,7 +744,7 @@ export default class GoodsDetails extends Component {
                                 } else {
                                     shopInfo.prototal = this.state.numberFormat2;
                                 }
-                                shopInfo.promemo = this.state.Remark;
+                                shopInfo.promemo = this.state.promemo;
                                 shopInfo.DepCode = this.state.DepCode;
                                 shopInfo.ydcountm = this.state.ydcountm;
                                 shopInfo.SuppCode = this.state.SuppCode;
@@ -1091,7 +792,7 @@ export default class GoodsDetails extends Component {
                                     } else {
                                         shopInfo.prototal = this.state.numberFormat2;
                                     }
-                                    shopInfo.promemo = this.state.Remark;
+                                    shopInfo.promemo = this.state.promemo;
                                     shopInfo.DepCode = this.state.DepCode;
                                     shopInfo.ydcountm = this.state.ydcountm;
                                     shopInfo.SuppCode = this.state.SuppCode;
@@ -1170,7 +871,7 @@ export default class GoodsDetails extends Component {
                                     shopInfo.countm = this.state.BQNumber;
                                     shopInfo.ShopPrice = this.state.ShopPrice;
                                     shopInfo.prototal = "0";
-                                    shopInfo.promemo = this.state.Remark;
+                                    shopInfo.promemo = this.state.promemo;
                                     shopInfo.DepCode = this.state.DepCode;
                                     shopInfo.ydcountm = this.state.ydcountm;
                                     shopInfo.SuppCode = this.state.SuppCode;
@@ -1216,7 +917,7 @@ export default class GoodsDetails extends Component {
                                     shopInfo.countm = this.state.Number;
                                     shopInfo.ShopPrice = this.state.ShopPrice;
                                     shopInfo.prototal = this.state.numberFormat2;
-                                    shopInfo.promemo = this.state.Remark;
+                                    shopInfo.promemo = this.state.promemo;
                                     shopInfo.DepCode = this.state.DepCode;
                                     shopInfo.ydcountm = this.state.ydcountm;
                                     shopInfo.SuppCode = this.state.SuppCode;
@@ -1256,7 +957,7 @@ export default class GoodsDetails extends Component {
                                         shopInfo.countm = this.state.Number;
                                         shopInfo.ShopPrice = this.state.ShopPrice;
                                         shopInfo.prototal = this.state.numberFormat2;
-                                        shopInfo.promemo = this.state.Remark;
+                                        shopInfo.promemo = this.state.promemo;
                                         shopInfo.DepCode = this.state.DepCode;
                                         shopInfo.ydcountm = this.state.ydcountm;
                                         shopInfo.SuppCode = this.state.SuppCode;
@@ -1309,7 +1010,7 @@ export default class GoodsDetails extends Component {
                             }else{
                                 shopInfo.prototal = this.state.numberFormat2;
                             }
-                            shopInfo.promemo = this.state.Remark;
+                            shopInfo.promemo = this.state.promemo;
                             shopInfo.DepCode = this.state.DepCode;
                             shopInfo.ydcountm = this.state.ydcountm;
                             shopInfo.SuppCode = this.state.SuppCode;
@@ -1358,7 +1059,7 @@ export default class GoodsDetails extends Component {
                                 }else{
                                     shopInfo.prototal = this.state.numberFormat2;
                                 }
-                                shopInfo.promemo = this.state.Remark;
+                                shopInfo.promemo = this.state.promemo;
                                 shopInfo.DepCode = this.state.DepCode;
                                 shopInfo.ydcountm = this.state.ydcountm;
                                 shopInfo.SuppCode = this.state.SuppCode;
@@ -1416,7 +1117,7 @@ export default class GoodsDetails extends Component {
                                 shopInfo.countm = this.state.BQNumber;
                                 shopInfo.ShopPrice = this.state.ShopPrice;
                                 shopInfo.prototal = "0";
-                                shopInfo.promemo = this.state.Remark;
+                                shopInfo.promemo = this.state.promemo;
                                 shopInfo.DepCode = this.state.DepCode;
                                 shopInfo.ydcountm = this.state.ydcountm;
                                 shopInfo.SuppCode = this.state.SuppCode;
@@ -1462,7 +1163,7 @@ export default class GoodsDetails extends Component {
                                 shopInfo.countm = this.state.Number;
                                 shopInfo.ShopPrice = this.state.ShopPrice;
                                 shopInfo.prototal = this.state.numberFormat2;
-                                shopInfo.promemo = this.state.Remark;
+                                shopInfo.promemo = this.state.promemo;
                                 shopInfo.DepCode = this.state.DepCode;
                                 shopInfo.ydcountm = this.state.ydcountm;
                                 shopInfo.SuppCode = this.state.SuppCode;
@@ -1502,7 +1203,7 @@ export default class GoodsDetails extends Component {
                                     shopInfo.countm = this.state.Number;
                                     shopInfo.ShopPrice = this.state.ShopPrice;
                                     shopInfo.prototal = this.state.numberFormat2;
-                                    shopInfo.promemo = this.state.Remark;
+                                    shopInfo.promemo = this.state.promemo;
                                     shopInfo.DepCode = this.state.DepCode;
                                     shopInfo.ydcountm = this.state.ydcountm;
                                     shopInfo.SuppCode = this.state.SuppCode;
@@ -1555,7 +1256,7 @@ export default class GoodsDetails extends Component {
                         }else{
                             shopInfo.prototal = this.state.numberFormat2;
                         }
-                        shopInfo.promemo = this.state.Remark;
+                        shopInfo.promemo = this.state.promemo;
                         shopInfo.DepCode = this.state.DepCode;
                         shopInfo.ydcountm = this.state.ydcountm;
                         shopInfo.SuppCode = this.state.SuppCode;
@@ -1604,7 +1305,7 @@ export default class GoodsDetails extends Component {
                             }else{
                                 shopInfo.prototal = this.state.numberFormat2;
                             }
-                            shopInfo.promemo = this.state.Remark;
+                            shopInfo.promemo = this.state.promemo;
                             shopInfo.DepCode = this.state.DepCode;
                             shopInfo.ydcountm = this.state.ydcountm;
                             shopInfo.SuppCode = this.state.SuppCode;
@@ -1653,7 +1354,7 @@ export default class GoodsDetails extends Component {
         shopInfo.countm = 1;
         shopInfo.ShopPrice = this.state.ShopPrice;
         shopInfo.prototal = "";
-        shopInfo.promemo = this.state.Remark;
+        shopInfo.promemo = this.state.promemo;
         shopInfo.DepCode = this.state.DepCode;
         shopInfo.ydcountm = this.state.NewNumber;
         shopInfo.SuppCode = this.state.SuppCode;
@@ -1661,14 +1362,22 @@ export default class GoodsDetails extends Component {
         shopInfoData.push(shopInfo);
         //调用插入表方法
         dbAdapter.insertShopInfo(shopInfoData);
-        var nextRoute={
-            name:"主页",
-            component:Index,
-            params:{
-                DepCode:this.state.DepCode,
-            }
-        };
-        this.props.navigator.push(nextRoute);
+        if(this.state.ShoppData=="清单"){
+            var nextRoute={
+                name:"清单",
+                component:ShoppingCart,
+            };
+            this.props.navigator.push(nextRoute);
+        }else{
+            var nextRoute={
+                name:"主页",
+                component:Index,
+                params:{
+                    DepCode:this.state.DepCode,
+                }
+            };
+            this.props.navigator.push(nextRoute);
+        }
     }
 
   render() {
@@ -1721,7 +1430,7 @@ export default class GoodsDetails extends Component {
                                                 value={this.state.BQNumber.toString()}
                                                 placeholderTextColor="#333333"
                                                 onChangeText={(value)=>{this.setState({BQNumber:value})}}
-                                                onSubmitEditing={this.onSubmitEditing.bind(this)}
+                                                onSubmitEditing={this.pressPop.bind(this)}
                                                 onEndEditing = {this.onSubmitEditing.bind(this)}
                                             />
                                         </View>
@@ -1885,9 +1594,9 @@ export default class GoodsDetails extends Component {
                                     placeholder="暂无备注"
                                     placeholderTextColor="#999999"
                                     maxLength={50}
-                                    value={this.state.Remark.toString()}
+                                    value={this.state.promemo.toString()}
                                     underlineColorAndroid='transparent'
-                                    onChangeText={(value)=>{this.setState({Remark:value})}}/>
+                                    onChangeText={(value)=>{this.setState({promemo:value})}}/>
                             </View>
                         </View>
                 }
