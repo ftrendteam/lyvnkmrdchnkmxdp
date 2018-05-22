@@ -2,6 +2,9 @@ package com.smartpos.utils;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.telephony.TelephonyManager;
+import android.text.TextUtils;
+import java.util.UUID;
+
 public class SystemUtils{
 
      /**
@@ -41,6 +44,17 @@ public class SystemUtils{
         try {
             TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
             imei = tm.getDeviceId();
+            if(TextUtils.isEmpty(imei)){
+                String tmDevice, tmSerial, tmPhone, androidId;
+                tmDevice = "" + tm.getDeviceId();
+                tmSerial = "" + tm.getSimSerialNumber();
+                androidId = "" + android.provider.Settings.Secure.getString(context
+                        .getContentResolver(), android.provider.Settings.Secure
+                        .ANDROID_ID);
+                UUID deviceUuid = new UUID(androidId.hashCode(), ((long) tmDevice
+                        .hashCode() << 32) | tmSerial.hashCode());
+                imei = deviceUuid.toString();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
