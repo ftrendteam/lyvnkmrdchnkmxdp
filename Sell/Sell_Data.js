@@ -34,19 +34,13 @@ export default class SellData extends Component {
             Number:"",
             ShopCode:"",
             PosCode:"",
-            invoice:"",
+            invoice:this.props.invoice ? this.props.invoice : "",
             active:"",
             linkurl:"",
         };
     }
 
     componentDidMount(){
-        Storage.get('invoice').then((tags)=>{
-            this.setState({
-                invoice:tags
-            })
-        })
-
         Storage.get('Disting').then((tags)=>{
             this.setState({
                 Disting:tags
@@ -147,6 +141,8 @@ export default class SellData extends Component {
                                     Storage.save('Name', '移动销售');
                                     Storage.save("Num", "1");
                                     Storage.save("inoNum", "1");
+                                    Storage.save("invoice", "移动销售");
+                                    Storage.save('YdCountm', '4');
                                       NumFormatUtils.createLsNo().then((data) => {
                                         Storage.save("LsNo",data);
                                       });

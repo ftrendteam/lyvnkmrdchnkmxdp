@@ -167,7 +167,8 @@ export default class PinLei extends Component {
                 Storage.save('ProYH', 'ProYH');
                 Storage.save('YdCountm', '1');
                 Storage.save('Date', data);
-                Storage.save('FormCheck', 'YWYW');
+                //将内容保存到本地数据库
+                Storage.save('FormCheck', 'YHYW');//要货查询审核按钮
                 Storage.save('valueOf', 'App_Client_ProYH');
                 Storage.save('history', 'App_Client_ProYHQ');
                 Storage.save('historyClass', 'App_Client_ProYHDetailQ');

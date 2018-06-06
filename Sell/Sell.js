@@ -26,6 +26,7 @@ import Swiper from 'react-native-swiper';
 import DBAdapter from "../adapter/DBAdapter";
 import DeCodePrePrint18 from "../utils/DeCodePrePrint18";
 import FetchUtil from "../utils/FetchUtils";
+import NumberUtils from "../utils/NumberUtils";
 import VipPrice from "../utils/VipPrice";
 import NumFormatUtils from "../utils/NumFormatUtils";
 import {SwipeListView} from 'react-native-swipe-list-view';
@@ -105,51 +106,97 @@ export default class Sell extends Component {
             var shopAmount = 0;
             var ShopPrice = 0;
             var vipPrice = 0;
-            for (let i = 0; i < rows.length; i++) {
-                var row = rows.item(i);
-                ShopPrice = BigDecimalUtils.multiply(row.ShopNumber, row.ShopPrice, 2);
-                shopAmount = BigDecimalUtils.add(shopAmount, ShopPrice, 2);
-                //Storage.save("vipPrice", JSON.stringify(shopAmount));
-                var number = row.ShopNumber;
-                shopnumber = BigDecimalUtils.add(shopnumber, row.ShopNumber);//parseInt(row.ShopNumber);
-                //if(this.state.VipCardNo !==""){
-                //    vipPrice = VipPrice.vipPrice(TblRow1[0],this.VipTblRow);
-                //}
-                //var VIPprice = BigDecimalUtils.subtract(shopAmount,vipPrice,2);
-                this.dataRow.push(row);
-                this.TblRow.push(row);
-            }
-            if (this.dataRow == 0) {
+            var VIPprice = 0;
+            if (rows.length == 0) {
                 this.modal();
                 return;
             } else {
                 Storage.get("VipInfo").then((data) => {
-                    var VIPprice = shopAmount;
-                    if (data != null && data != "undefined") {
+                    for (let i = 0; i < rows.length; i++) {
+                        var row = rows.item(i);
+                        ShopPrice = BigDecimalUtils.multiply(row.ShopNumber, row.ShopPrice, 2);
+                        shopAmount = BigDecimalUtils.add(shopAmount, ShopPrice, 2);
+                        var number = row.ShopNumber;
+                        shopnumber = BigDecimalUtils.add(shopnumber, row.ShopNumber);
+                        VIPprice += Number(row.ShopAmount);
+                        this.dataRow.push(row);
+                        this.TblRow.push(row);
+                    }
+                    var SHopAMount = NumberUtils.numberFormat2(VIPprice);
+                    this.setState({
+                        ShopNumber: shopnumber,
+                        ShopAmount: SHopAMount,
+                        dataSource: this.state.dataSource.cloneWithRows(this.dataRow),
+                    });
+                    if(data!==null){
                         var row = JSON.parse(data);
                         TblRow1 = row;
                         VipCardNo = row.CardFaceNo;//卡号
                         BalanceTotal = row.BalanceTotal;//余额
                         JfBal = row.JfBal;//积分
                         CardTypeCode = row.CardTypeCode;
-
-                        let vipPrice = VipPrice.vipPrice(row, this.TblRow);
-                        VIPprice = BigDecimalUtils.subtract(shopAmount, vipPrice, 2);
                         this.setState({
                             VipCardNo: VipCardNo,
                             BalanceTotal: BalanceTotal,
                             JfBal: JfBal,
-                            ShopAmount: VIPprice,
                             vipPrice: vipPrice,
                             CardTypeCode: CardTypeCode
                         });
+                        Storage.get('ShopCode').then((ShopCode) => {
+                            Storage.get('PosCode').then((PosCode) => {
+                                let params = {
+                                    TblName: "ReadVipInfo",
+                                    CardFaceNo: VipCardNo,
+                                    Mobile: "",
+                                    ShopCode: ShopCode,
+                                    PosCode: PosCode,
+                                    IsChuZhi: "",
+                                };
+                                Storage.get('LinkUrl').then((tags) => {
+                                    FetchUtil.post(tags, JSON.stringify(params)).then((data) => {
+                                        if (data.retcode == 1) {
+                                            var TblRow = data.TblRow;
+                                            var VipCardNo;
+                                            var BalanceTotal;
+                                            var JfBal;
+                                            var CardFaceNo;
+                                            var CardTypeCode;
+                                            var ShopAmount=0;
+                                            for (let i = 0; i < TblRow.length; i++) {
+                                                var row = TblRow[i];
+                                                Storage.save("VipInfo", JSON.stringify(row));
+                                                VipCardNo = row.CardFaceNo;//卡号
+                                                BalanceTotal = JSON.stringify(row.BalanceTotal);//余额
+                                                JfBal = JSON.stringify(row.JfBal);//积分
+                                                CardTypeCode = JSON.stringify(row.CardTypeCode);
+                                            };
+                                            let vipPrice = VipPrice.vipPrice(TblRow[0], this.TblRow);
+                                            var VIPprice = BigDecimalUtils.subtract(this.state.ShopAmount, vipPrice, 2);
+                                            TblRow1 = data.TblRow;
+                                            for (let i = 0; i < this.TblRow.length; i++) {
+                                                var TblRow = this.TblRow[i];
+                                                ShopAmount+=Number(TblRow.ShopAmount);
+                                            }
+                                            this.setState({
+                                                VipCardNo: VipCardNo,
+                                                BalanceTotal: BalanceTotal,
+                                                JfBal: JfBal,
+                                                ShopAmount: ShopAmount,
+                                                vipPrice: vipPrice,
+                                                CardTypeCode: CardTypeCode
+                                            });
+                                        } else {
+                                            alert(JSON.stringify(data));
+                                        }
+                                    }, (err) => {
+                                        alert("网络请求失败");
+                                    })
+                                })
+                            })
+                        })
                     }
-                    this.setState({
-                        ShopNumber: shopnumber,//数量
-                        ShopAmount: VIPprice,//总金额this.dataRow
-                        dataSource: this.state.dataSource.cloneWithRows(this.dataRow),
-                    })
-                });
+                })
+
                 this.modal();
             }
         })
@@ -480,12 +527,14 @@ export default class Sell extends Component {
                 Storage.get('LinkUrl').then((tags) => {
                     FetchUtil.post(tags, JSON.stringify(params)).then((data) => {
                         if (data.retcode == 1) {
+                            // alert(JSON.stringify(data))
                             var TblRow = data.TblRow;
                             var VipCardNo;
                             var BalanceTotal;
                             var JfBal;
                             var CardFaceNo;
                             var CardTypeCode;
+                            var ShopAmount=0;
                             for (let i = 0; i < TblRow.length; i++) {
                                 var row = TblRow[i];
                                 Storage.save("VipInfo", JSON.stringify(row));
@@ -493,16 +542,19 @@ export default class Sell extends Component {
                                 BalanceTotal = JSON.stringify(row.BalanceTotal);//余额
                                 JfBal = JSON.stringify(row.JfBal);//积分
                                 CardTypeCode = JSON.stringify(row.CardTypeCode);
-                            }
-                            ;
+                            };
                             let vipPrice = VipPrice.vipPrice(TblRow[0], this.TblRow);
                             var VIPprice = BigDecimalUtils.subtract(this.state.ShopAmount, vipPrice, 2);
                             TblRow1 = data.TblRow;
+                            for (let i = 0; i < this.TblRow.length; i++) {
+                                var TblRow = this.TblRow[i];
+                                ShopAmount+=Number(TblRow.ShopAmount);
+                            }
                             this.setState({
                                 VipCardNo: VipCardNo,
                                 BalanceTotal: BalanceTotal,
                                 JfBal: JfBal,
-                                ShopAmount: VIPprice,
+                                ShopAmount: ShopAmount,
                                 vipPrice: vipPrice,
                                 CardTypeCode: CardTypeCode
                             });
@@ -510,7 +562,7 @@ export default class Sell extends Component {
                             this.Member();
                         } else {
                             this.modal();
-                            alert(JSON.stringify(data));
+                            alert(data.msg)
                         }
                     }, (err) => {
                         alert("网络请求失败");
@@ -580,22 +632,6 @@ export default class Sell extends Component {
     }
 
     ReturnGoods() {
-        // Storage.get('ShopCode').then((ShopCode) => {
-        //     Storage.get('PosCode').then((PosCode) => {
-        //         let params = {
-        //             TblName: "VipCardPay_Ret",
-        //             PayOrderNo: this.state.numform,
-        //             CardPwd: "",
-        //             shopcode: ShopCode,
-        //             poscode: PosCode,
-        //             CardFaceNo: "",
-        //             OrderTotal: "",
-        //             SaleTotal: "",
-        //             JfValue: "",
-        //             TransFlag: "",
-        //         }
-        //     })
-        // })
         this.setState({
             name: "退货"
         });
@@ -1208,7 +1244,7 @@ const styles = StyleSheet.create({
     },
     InputingRight: {
         flex: 1,
-        height: 45,
+        height: 40,
         backgroundColor: "#ffffff",
         borderRadius: 5,
     },

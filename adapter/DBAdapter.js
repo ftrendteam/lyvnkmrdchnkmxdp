@@ -544,10 +544,10 @@ export default class DBAdapter extends SQLiteOpenHelper {
     /***
      * 修改某个商品的数量-1
      */
-    upDataShopInfoCountmSub(ProdCode) {
+    upDataShopInfoCountmSub(ProdCode,prototal) {
         return new Promise((resolve, reject) => {
             db.transaction((tx) => {
-                tx.executeSql("update shopInfo set countm=countm-1 where ProdCode='" + ProdCode + "'", [], (tx, results) => {
+                tx.executeSql("update shopInfo set countm=countm-1 ,prototal='"+prototal+"' where ProdCode='" + ProdCode + "'", [], (tx, results) => {
                     try {
                         resolve(true);
                     } catch (err) {
@@ -559,6 +559,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
             });
         });
     }
+
 
     /***
      * 删除shopInfo 表中某一条数据

@@ -101,7 +101,7 @@ export default class  login extends Component{
                 }else{
                    this._setModalVisible();
                    var msg=data.msg;
-                   alert(JSON.stringify(msg))
+                   alert(JSON.stringify(msg)+"标识码:"+IMEI)
                 }
             },(err)=>{
                 this._setModalVisible();

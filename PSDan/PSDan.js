@@ -224,7 +224,11 @@ export default class PSDan extends Component {
             Storage.save('YdCountm',"2");
         }
         Storage.save('Date',data);
-        Storage.save('Screen', '1');
+        if(this.state.YHDan==""){
+            Storage.save('Screen', '2');
+        }else{
+            Storage.save('Screen', '1');
+        }
         Storage.save('Name','商品配送');
         Storage.save('shildshop',str2);
         Storage.save('OrgFormno',str1);

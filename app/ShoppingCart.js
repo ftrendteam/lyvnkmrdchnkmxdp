@@ -226,7 +226,7 @@ export default class ShoppingCart extends Component {
                                                     this.setState({
                                                         ShopNumber:ShopNumber,//数量
                                                         ShopAmount:NumberUtils.numberFormat2(shopAmount),//总金额
-                                                        ds:this.state.ds.cloneWithRows(this.DataShop)
+                                                        ds:this.state.ds.cloneWithRows(this.DataShop),
                                                     })
                                                 }
                                             })
@@ -237,6 +237,7 @@ export default class ShoppingCart extends Component {
                         })
                     }else{
                         this.shopinfo();
+                        this.modal();
                     }
                 })
             } else{
@@ -1322,7 +1323,12 @@ export default class ShoppingCart extends Component {
                     <View style={styles.serial}>
                         <Text style={styles.SerialText}>{rowData.serial}.</Text>
                     </View>
-                    <Text style={[styles.Name,styles.Name1]}>{rowData.prodcode}</Text>
+                    {
+                        (rowData.barCode == "") ?
+                            <Text style={[styles.Name,styles.Name1]}>{rowData.prodcode}</Text>
+                            :
+                            <Text style={[styles.Name,styles.Name1]}>{rowData.barCode}</Text>
+                    }
                     <Text style={[styles.Name,styles.Name1]}>{rowData.prodname}</Text>
                 </View>
                 {
@@ -1451,57 +1457,63 @@ export default class ShoppingCart extends Component {
             Storage.get('LinkUrl').then((LinkUrl) => {
                 Storage.get('userName').then((userName)=>{
                     Storage.get('PeiSong').then((PeiSong) => {
-                        dbAdapter.selectShopInfoData(rowData.Pid).then((rows)=> {
-                            for (let i = 0; i < rows.length; i++) {
-                                var row = rows.item(i);
-                                if(PeiSong=="商品配送"){
-                                    var SuppCode="";
-                                }else{
-                                    var SuppCode=rowData.SuppCode;
-                                }
-                                let params = {
-                                    reqCode:"App_PosReq",
-                                    reqDetailCode:"App_Client_CurrProdQry",
-                                    ClientCode:this.state.ClientCode,
-                                    sDateTime:"2017-08-09 12:12:12",
-                                    Sign:NetUtils.MD5("App_PosReq" + "##" +"App_Client_CurrProdQry" + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
-                                    username:userName,
-                                    usercode:this.state.Usercode,
-                                    SuppCode:SuppCode,
-                                    ShopCode:this.state.ShopCode,
-                                    ChildShopCode:this.state.ChildShopCode,
-                                    ProdCode:rowData.prodcode,
-                                    OrgFormno:this.state.OrgFormno,
-                                    FormType:FormType,
-                                };
-                                FetchUtils.post(LinkUrl,JSON.stringify(params)).then((data)=>{
-                                    var ydcountm=JSON.stringify(data.countm);
-                                    var ShopPrice=JSON.stringify(data.ShopPrice);
-                                    if(data.retcode == 1){
-                                        Storage.save("ShoppData", "清单");
-                                        this.props.navigator.push({
-                                            component:OrderDetails,
-                                            params:{
-                                                ProdName:rowData.prodname,
-                                                ShopPrice:rowData.ProPrice,
-                                                countm:rowData.countm,
-                                                Pid:row.pid,
-                                                ProdCode:rowData.prodcode,
-                                                DepCode:rowData.DepCode,
-                                                ydcountm:row.ydcountm,
-                                                SuppCode: row.SuppCode,
-                                                BarCode: row.BarCode,
-                                                promemo:row.promemo,
-                                                IsIntCount:row.IsIntCount
-                                            }
-                                        })
-                                    }else{
-                                        alert(JSON.stringify(data))
-                                    }
-                                },(err)=>{
-                                    alert("网络请求失败");
-                                })
+                        dbAdapter.selectAidCode(rowData.prodcode, 1).then((rowdata) => {
+                            for (let i = 0; i < rowdata.length; i++) {
+                                var rowdatas = rowdata.item(i);
                             }
+                            dbAdapter.selectShopInfoData(rowData.Pid).then((rows) => {
+                                for (let i = 0; i < rows.length; i++) {
+                                    var row = rows.item(i);
+                                    // alert(JSON.stringify(row.ydcountm))
+                                    if (PeiSong == "商品配送") {
+                                        var SuppCode = "";
+                                    } else {
+                                        var SuppCode = rowData.SuppCode;
+                                    }
+                                    let params = {
+                                        reqCode: "App_PosReq",
+                                        reqDetailCode: "App_Client_CurrProdQry",
+                                        ClientCode: this.state.ClientCode,
+                                        sDateTime: "2017-08-09 12:12:12",
+                                        Sign: NetUtils.MD5("App_PosReq" + "##" + "App_Client_CurrProdQry" + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs") + '',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
+                                        username: userName,
+                                        usercode: this.state.Usercode,
+                                        SuppCode: SuppCode,
+                                        ShopCode: this.state.ShopCode,
+                                        ChildShopCode: this.state.ChildShopCode,
+                                        ProdCode: rowData.prodcode,
+                                        OrgFormno: this.state.OrgFormno,
+                                        FormType: FormType,
+                                    };
+                                    FetchUtils.post(LinkUrl, JSON.stringify(params)).then((data) => {
+                                        var ydcountm = JSON.stringify(data.countm);
+                                        var ShopPrice = JSON.stringify(data.ShopPrice);
+                                        if (data.retcode == 1) {
+                                            Storage.save("ShoppData", "清单");
+                                            this.props.navigator.push({
+                                                component: OrderDetails,
+                                                params: {
+                                                    ProdName: rowData.prodname,
+                                                    ShopPrice: rowData.ProPrice,
+                                                    countm: rowData.countm,
+                                                    Pid: row.pid,
+                                                    ProdCode: rowData.prodcode,
+                                                    DepCode: rowData.DepCode,
+                                                    ydcountm: JSON.stringify(row.ydcountm),
+                                                    SuppCode: row.SuppCode,
+                                                    BarCode: row.BarCode,
+                                                    promemo: row.promemo,
+                                                    IsIntCount: rowdatas.IsIntCount
+                                                }
+                                            })
+                                        } else {
+                                            alert(JSON.stringify(data))
+                                        }
+                                    }, (err) => {
+                                        alert("网络请求失败");
+                                    })
+                                }
+                            })
                         })
                     })
                 })
@@ -1615,10 +1627,15 @@ export default class ShoppingCart extends Component {
                                                 if(this.state.Screen!=="1"||this.state.Screen!=="2"||this.screen==""||scode==null){
                                                     this.Wait();
                                                     this.Succeed();
+                                                    Storage.get('Radio').then((Radio) => {
+                                                      if(Radio==0){
+                                                          this.Set();
+                                                      }
+                                                    })
                                                 }
                                             }else{
                                                 this.Wait();
-                                                alert(JSON.stringify(data))
+                                                alert(data.msg)
                                             }
                                         },(err)=>{
                                             alert("网络请求失败");
@@ -1639,13 +1656,18 @@ export default class ShoppingCart extends Component {
                                             if(this.state.Screen!=="1"||this.state.Screen!=="2"||this.screen==""||scode==null){
                                                 this.Wait();
                                                 this.Succeed();
+                                                Storage.get('Radio').then((Radio) => {
+                                                    if(Radio==0){
+                                                        this.Set();
+                                                    }
+                                                })
                                             }
                                             this.setState({
                                                 SUbmit:'',
                                             })
                                         }else{
                                             this.Wait();
-                                            alert(JSON.stringify(data))
+                                            alert(data.msg)
                                         }
                                     },(err)=>{
                                         alert("网络请求失败");
@@ -1719,11 +1741,16 @@ export default class ShoppingCart extends Component {
                                 if (data.retcode == 1) {
                                     this.ScreenBod();
                                     this.Succeed();
+                                    Storage.get('Radio').then((Radio) => {
+                                        if(Radio==0){
+                                            this.Set();
+                                        }
+                                    })
                                     this.setState({
                                         SUbmit:'',
                                     })
                                 } else {
-                                    alert(JSON.stringify(data))
+                                    alert(data.msg)
                                 }
                             },(err)=>{
                                 alert("网络请求失败");
@@ -1733,6 +1760,81 @@ export default class ShoppingCart extends Component {
                 })
             })
         }
+    }
+
+    /**
+     *打印设置
+     */
+    Set(){
+        if(this.state.Name=="售价调整"||this.state.Name=="标签采集"){
+            console.log("hello")
+        }else{
+            Storage.get('Pid').then((Pid) => {
+                Storage.get('code').then((ShopName) => {
+                    Storage.get('MenDianName').then((MenDianName) => {
+                        Storage.get('usercode').then((usercode) => {
+                            Storage.get('userName').then((userName) => {
+                                var now = new Date();
+                                var year = now.getFullYear();
+                                var month = now.getMonth() + 1;
+                                var day = now.getDate();
+                                var hh = now.getHours();
+                                var mm = now.getMinutes();
+                                var ss = now.getSeconds();
+                                if (month >= 1 && month <= 9) {
+                                    month = "0" + month;
+                                }
+                                if (day >= 1 && day <= 9) {
+                                    day = "0" + day;
+                                }
+                                if (hh >= 1 && hh <= 9) {
+                                    hh = "0" + hh;
+                                }
+                                if (mm >= 1 && mm <= 9) {
+                                    mm = "0" + mm;
+                                }
+                                if (ss >= 1 && ss <= 9) {
+                                    ss = "0" + ss;
+                                }
+                                NativeModules.AndroidPrintInterface.initPrint();
+                                NativeModules.AndroidPrintInterface.setFontSize(30, 26, 0x26,);
+                                NativeModules.AndroidPrintInterface.print(" " + " " + " " + " " + " " + " " + " " + " " + MenDianName+"\n");
+                                NativeModules.AndroidPrintInterface.print("\n");
+                                NativeModules.AndroidPrintInterface.setFontSize(20, 20, 0x22);
+                                NativeModules.AndroidPrintInterface.print("服务员：" + userName + "\n");
+                                NativeModules.AndroidPrintInterface.print("当前单据：" + this.state.head + "\n");
+                                if (hh < 12) {
+                                    var hours = "上午"
+                                } else if (hh >= 12) {
+                                    var hours = "下午"
+                                }
+                                NativeModules.AndroidPrintInterface.print(year + "年" + month + "月" + day + "日" + " " + hours + hh + ":" + mm + ":" + ss + "\n");
+                                NativeModules.AndroidPrintInterface.print("------------------------------------------------------------" + "\n");
+                                NativeModules.AndroidPrintInterface.print("名称" + " " + " " + " " + " " + " " + " " + " " + " " + " " + " " + "数量" + " " + " " + " " + " " + "单价" + " " + " " + " " + " " + "小计" + "\n");
+                                NativeModules.AndroidPrintInterface.print("\n");
+                                for (let i = 0; i < this.DataShop.length; i++) {
+                                    var DataRows = this.DataShop[i];
+                                    if (DataRows.barCode == "") {
+                                        var barCode = DataRows.prodcode;
+                                    } else {
+                                        var barCode = DataRows.barCode;
+                                    }
+                                    NativeModules.AndroidPrintInterface.print(DataRows.prodname + " " + " " + " " + " " + barCode + "\n");
+                                    NativeModules.AndroidPrintInterface.print(" " + " " + " " + " " + " " + " " + " " + " " + " " + " " + " " + " " + " " + " " + DataRows.shopnumber + " " +" " +" " +" " + " " + " " + " " + DataRows.ProPrice + " " + " " + " " + " " + DataRows.ShopAmount + "\n");
+                                    NativeModules.AndroidPrintInterface.print("\n");
+                                }
+                                NativeModules.AndroidPrintInterface.print("总价：" + this.state.ShopAmount + "\n");
+                                NativeModules.AndroidPrintInterface.print("\n");
+                                NativeModules.AndroidPrintInterface.print("\n");
+                                NativeModules.AndroidPrintInterface.print("\n");
+                                NativeModules.AndroidPrintInterface.startPrint();
+                            })
+                        })
+                    })
+                })
+            })
+        }
+
     }
 
     _Screen(rowData, sectionID, rowID){

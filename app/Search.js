@@ -21,6 +21,7 @@ import {
 } from 'react-native';
 
 import Index from "./Index";
+import Sell from "../Sell/Sell";//销售付款页面
 import ShoppingCart from "./ShoppingCart";
 import NetUtils from "../utils/NetUtils";
 import NumberUtils from "../utils/NumberUtils";
@@ -67,6 +68,7 @@ export default class Search extends Component {
             IsIntCount:"",
             NewNumber:"",
             SJTZ:"",
+            BqYs:"",
             PriceText:1,
             OrderDetails:1,
             Show: false,
@@ -79,7 +81,7 @@ export default class Search extends Component {
     }
     componentWillMount() {
        /* if (Platform.OS === 'android') {*/
-            BackAndroid.addEventListener('hardwareBackPress', this.onBackAndroid);
+            // BackAndroid.addEventListener('hardwareBackPress', this.onBackAndroid);
             // this.handleBackButton = this.onBackAndroid.bind(this);
 
         // }
@@ -697,6 +699,11 @@ export default class Search extends Component {
             this.setState({
                 name: tags
             })
+            if(tags=="标签采集"||tags=="移动销售"){
+                this.setState({
+                    BqYs: "1",
+                })
+            }
         });
 
         Storage.get('username').then((tags) => {
@@ -757,20 +764,19 @@ export default class Search extends Component {
 
     Close() {
         DeviceEventEmitter.removeAllListeners();
-        if(this.state.ShoppData=="清单"){
+        if(this.state.name=="移动销售"){
+            var nextRoute = {
+                name: "Sell",
+                component: Sell
+            };
+            this.props.navigator.push(nextRoute);
+        }else{
             var nextRoute = {
                 name: "清单",
                 component: ShoppingCart,
             };
             this.props.navigator.push(nextRoute);
-        }else{
-            var nextRoute = {
-                name: "主页",
-                component: Index,
-            };
-            this.props.navigator.push(nextRoute);
         }
-
     }
 
     inputOnBlur(value) {
@@ -828,7 +834,6 @@ export default class Search extends Component {
                                 FetchUtil.post(LinkUrl, JSON.stringify(params)).then((data) => {
                                     var countm = JSON.stringify(data.countm);
                                     var ShopPrice = JSON.stringify(data.ShopPrice);
-                                    alert(JSON.stringify(data))
                                     if (data.retcode == 1) {
                                         for (let i = 0; i < rows.length; i++) {
                                             var row = rows.item(i);
@@ -910,7 +915,7 @@ export default class Search extends Component {
                                                             }
                                                         })
                                                     }else {
-                                                        if(this.state.name=="标签采集"&&rowData.ShopNumber == 0){
+                                                        if(this.state.BqYs=="1"&&rowData.ShopNumber == 0){
                                                             this.setState({
                                                                 Number1: 1,
                                                             })
@@ -921,7 +926,7 @@ export default class Search extends Component {
                                                             })
                                                         }
 
-                                                        if(this.state.name!=="标签采集"&&rowData.ShopNumber == 0){
+                                                        if(this.state.BqYs==""&&rowData.ShopNumber == 0){
                                                             this.setState({
                                                                 numberFormat2:0.00,
                                                                 Number1: '',
@@ -1024,11 +1029,11 @@ export default class Search extends Component {
                                                         }
                                                     })
                                                 }else {
-                                                    if(this.state.name=="标签采集"&&rowData.ShopNumber == 0){
+                                                    if(this.state.BqYs=="1"&&rowData.ShopNumber == 0){
                                                         this.setState({
                                                             Number1: 1,
                                                         })
-                                                    }else if(this.state.name!=="标签采集"&&rowData.ShopNumber == 0){
+                                                    }else if(this.state.BqYs==""&&rowData.ShopNumber == 0){
                                                         this.setState({
                                                             numberFormat2:0.00,
                                                             Number1: '',
@@ -1321,7 +1326,7 @@ export default class Search extends Component {
                                     if(this.state.name=="标签采集"){
                                         shopInfo.prototal = "0";
                                     }else{
-                                        shopInfo.prototal = NumberUtils.numberFormat2(ShopPrice);
+                                        shopInfo.prototal = NumberUtils.numberFormat2(shopprice);
                                     }
                                     shopInfo.promemo = this.state.Remark;
                                     shopInfo.DepCode = this.state.DepCode;
@@ -2161,10 +2166,10 @@ export default class Search extends Component {
      *
      * 物理键返回按钮
      */
-    onBackAndroid = () => {
-        ToastAndroid.show('再按一次退出应用');
-        return false;
-    };
+    // onBackAndroid = () => {
+    //     ToastAndroid.show('再按一次退出应用');
+    //     return false;
+    // };
 
     /**
      * 售价调整代码

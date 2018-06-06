@@ -187,7 +187,6 @@ export default class HistoricalDocument extends Component {
                         if (data.retcode == 1) {
                             var DetailInfo1 = data.DetailInfo1;
                             this.dataRows = this.dataRows.concat(DetailInfo1);
-                            console.log(JSON.stringify(this.dataRows))
                             if (this.dataRows == 0) {
                                 return;
                             } else {
@@ -202,6 +201,7 @@ export default class HistoricalDocument extends Component {
                         }
                     }, (err) => {
                         alert("网络请求失败");
+                        this._setModalVisible();
                     })
                 })
             });
@@ -262,9 +262,15 @@ export default class HistoricalDocument extends Component {
                                             dataSource: this.state.dataSource.cloneWithRows(this.dataRows)
                                         })
                                     } else {
-                                        alert(JSON.stringify(data));
+                                        var msg=data.msg;
+                                        if(msg=="判断用户的权限出错"){
+                                            alert("用户没有权限")
+                                        }else{
+                                            alert(JSON.stringify(data));
+                                        }
                                     }
                                 }, (err) => {
+                                    this._setModalVisible();
                                     alert("网络请求失败");
                                 })
                             })
