@@ -24,6 +24,7 @@ export default class FetchUtils {
       fetch(url, {
         method: 'GET',
         headers: headers,
+          timeout:15,
       }).then((response) => {
         if (response.ok) {
           return response.json();
@@ -55,12 +56,12 @@ export default class FetchUtils {
           "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
         },
         body: 'jsonStr=' +requstBody,
+          timeout:15,
       }).then((response) => response.text()).then((responseText) => {
         
         let jsonResult = JSON.parse(responseText);
         resolve(jsonResult);
       }).catch((err) => {
-        
           reject(err);
       })
     })

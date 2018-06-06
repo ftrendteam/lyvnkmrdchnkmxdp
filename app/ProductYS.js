@@ -86,90 +86,65 @@ export default class ProductCG extends Component {
 
     Button(){
         if(this.state.Disting=="0") {
-            var date = new Date();
-            var data=JSON.stringify(date.getTime());
-            var str=this.state.sCode1;
-            var str1=this.state.suppcode1;
             if(this.state.sCode1==""){
                 ToastAndroid.show("请选择供应商",ToastAndroid.SHORT);
                 return;
             }else{
-                Storage.delete('YuanDan');
                 var nextRoute={
                     name:"Index",
                     component:Index,
                 };
                 this.props.navigator.push(nextRoute);
-                Storage.delete('shildshop');
-                Storage.delete('StateMent');
-                Storage.delete('BQNumber');
-                Storage.delete("PeiSong");
-                if(this.state.DepCode1==""||this.state.DepCode1==0){
-                    Storage.delete('DepCode');
-                }else{
-                    Storage.save('DepCode', this.state.DepCode1);
-                }
-                Storage.save('YdCountm', '2');
-                Storage.save('OrgFormno',str1);
-                Storage.save('Name','商品验收');
-                Storage.save('FormType','YSYW');
-                Storage.save('valueOf','App_Client_ProYS');
-                Storage.save('history','App_Client_ProYSQ');
-                Storage.save('historyClass','App_Client_ProYSDetailQ');
-                Storage.save('ProYH','ProYS');
-                Storage.save('YuanDan','1');
-                Storage.save('Screen','1');
-                Storage.save('Date',data);
-                Storage.save("scode",str);
-                if(this.state.suppcode1==""){
-                    Storage.save('Modify', '1');
-                }else{
-                    Storage.delete('Modify');
-                }
+                this.Data();
             }
-        }else if(this.state.Disting=="1"){
-            var date = new Date();
-            var data=JSON.stringify(date.getTime());
-            var str=this.state.sCode1;
-            var str1=this.state.suppcode1;
+        }
+        else if(this.state.Disting=="1"){
+
             if(this.state.sCode1==""){
                 ToastAndroid.show("请选择供应商",ToastAndroid.SHORT);
                 return;
             }else{
-                var date = new Date();
-                var data=JSON.stringify(date.getTime());
                 var nextRoute={
                     name:"Search",
                     component:Search,
                 };
                 this.props.navigator.push(nextRoute);
-                Storage.delete('shildshop');
-                Storage.delete('StateMent');
-                Storage.delete('BQNumber');
-                Storage.delete("PeiSong");
-                if(this.state.DepCode1==""||this.state.DepCode1==0){
-                    Storage.delete('DepCode');
-                }else{
-                    Storage.save('DepCode', this.state.DepCode1);
-                }
-                Storage.save('YdCountm', '2');
-                Storage.save('OrgFormno',str1);
-                Storage.save('Name','商品验收');
-                Storage.save('FormType','YSYW');
-                Storage.save('valueOf','App_Client_ProYS');
-                Storage.save('history','App_Client_ProYSQ');
-                Storage.save('historyClass','App_Client_ProYSDetailQ');
-                Storage.save('ProYH','ProYS');
-                Storage.save('YuanDan','1');
-                Storage.save('Screen','1');
-                Storage.save('Date',data);
-                Storage.save("scode",str);
-                if(this.state.suppcode1==""){
-                    Storage.save('Modify', '1');
-                }else{
-                    Storage.delete('Modify');
-                }
+                this.Data();
             }
+        }
+    }
+
+    Data(){
+        var date = new Date();
+        var data=JSON.stringify(date.getTime());
+        var str=this.state.sCode1;
+        var str1=this.state.suppcode1;
+        Storage.delete('shildshop');
+        Storage.delete('StateMent');
+        Storage.delete('BQNumber');
+        Storage.delete("PeiSong");
+        if(this.state.DepCode1==""||this.state.DepCode1==0){
+            Storage.delete('DepCode');
+        }else{
+            Storage.save('DepCode', this.state.DepCode1);
+        }
+        Storage.save('YdCountm', '2');
+        Storage.save('OrgFormno',str1);
+        Storage.save('Name','商品验收');
+        Storage.save('FormType','YSYW');
+        Storage.save('FormCheck', 'YSYW');//要货查询审核按钮
+        Storage.save('valueOf','App_Client_ProYS');
+        Storage.save('history','App_Client_ProYSQ');
+        Storage.save('historyClass','App_Client_ProYSDetailQ');
+        Storage.save('ProYH','ProYS');
+        Storage.save('YuanDan','1');
+        Storage.save('Screen','1');
+        Storage.save('Date',data);
+        Storage.save("scode",str);
+        if(this.state.suppcode1==""){
+            Storage.save('Modify', '1');
+        }else{
+            Storage.delete('Modify');
         }
     }
 
@@ -206,6 +181,7 @@ export default class ProductCG extends Component {
             DepName1:DepName,
         });
     }
+
     _DepCode(DepCode) {
         DepCode = String(DepCode);
         this.setState({

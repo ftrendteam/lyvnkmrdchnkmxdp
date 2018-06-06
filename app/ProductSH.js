@@ -134,11 +134,6 @@ export default class ProductCG extends Component {
 
     Button(){
         if(this.state.Disting=="0") {
-            var date = new Date();
-            var data=JSON.stringify(date.getTime());
-            var str=this.state.sCode1;
-            var str1=this.state.shopname1;
-            var str2=this.state.suppcode1;
             if(this.state.sCode1==""){
                 ToastAndroid.show("请选择供应商",ToastAndroid.SHORT);
                 return;
@@ -148,38 +143,9 @@ export default class ProductCG extends Component {
                     component:Index,
                 };
                 this.props.navigator.push(nextRoute);
-                Storage.delete('StateMent');
-                Storage.delete('BQNumber');
-                Storage.delete("PeiSong");
-                if(this.state.DepCode1==""||this.state.DepCode1==0){
-                    Storage.delete('DepCode');
-                }else{
-                    Storage.save('DepCode', this.state.DepCode1);
-                }
-                Storage.save('YdCountm', '2');
-                Storage.save('OrgFormno',str2);
-                Storage.save('Name','协配收货');
-                Storage.save('FormType','XPYSYW');
-                Storage.save('valueOf','App_Client_ProXPYS');
-                Storage.save('history','App_Client_ProXPYSQ');
-                Storage.save('historyClass','App_Client_ProXPYSDetailQ');
-                Storage.save('ProYH','ProXPYS');
-                Storage.save('YuanDan','1');
-                Storage.save('Screen','1');
-                Storage.save('shopPandian','App_Client_NOYSXPCGQ');
-                Storage.save('Date',data);
-                Storage.save("scode",str);
-                Storage.save('shildshop',str1);
-                if(this.state.suppcode1==""){
-                    Storage.save('Modify', '1');
-                }
+                this.Data();
             }
         }else if(this.state.Disting=="1"){
-            var date = new Date();
-            var data=JSON.stringify(date.getTime());
-            var str=this.state.sCode1;
-            var str1=this.state.shopname1;
-            var str2=this.state.suppcode1;
             if(this.state.sCode1==""){
                 ToastAndroid.show("请选择供应商",ToastAndroid.SHORT);
                 return;
@@ -189,34 +155,44 @@ export default class ProductCG extends Component {
                     component: Search,
                 };
                 this.props.navigator.push(nextRoute);
-                Storage.delete('StateMent');
-                Storage.delete('BQNumber');
-                Storage.delete("PeiSong");
-                if(this.state.DepCode1==""||this.state.DepCode1==0){
-                    Storage.delete('DepCode');
-                }else{
-                    Storage.save('DepCode', this.state.DepCode1);
-                }
-                Storage.save('YdCountm', '2');
-                Storage.save('OrgFormno',str2);
-                Storage.save('Name','协配收货');
-                Storage.save('FormType','XPYSYW');
-                Storage.save('valueOf','App_Client_ProXPYS');
-                Storage.save('history','App_Client_ProXPYSQ');
-                Storage.save('historyClass','App_Client_ProXPYSDetailQ');
-                Storage.save('ProYH','ProXPYS');
-                Storage.save('YuanDan','1');
-                Storage.save('Screen','1');
-                Storage.save('shopPandian','App_Client_NOYSXPCGQ');
-                Storage.save('Date',data);
-                Storage.save("scode",str);
-                Storage.save('shildshop',str1);
-                if(this.state.suppcode1==""){
-                    Storage.save('Modify', '1');
-                }
+                this.Data();
             }
         }
 
+    }
+
+    Data(){
+        var date = new Date();
+        var data=JSON.stringify(date.getTime());
+        var str=this.state.sCode1;
+        var str1=this.state.shopname1;
+        var str2=this.state.suppcode1;
+        Storage.delete('StateMent');
+        Storage.delete('BQNumber');
+        Storage.delete("PeiSong");
+        if(this.state.DepCode1==""||this.state.DepCode1==0){
+            Storage.delete('DepCode');
+        }else{
+            Storage.save('DepCode', this.state.DepCode1);
+        }
+        Storage.save('YdCountm', '2');
+        Storage.save('OrgFormno',str2);
+        Storage.save('Name','协配收货');
+        Storage.save('FormType','XPYSYW');
+        Storage.save('FormCheck', 'XPYSYW');//要货查询审核按钮
+        Storage.save('valueOf','App_Client_ProXPYS');
+        Storage.save('history','App_Client_ProXPYSQ');
+        Storage.save('historyClass','App_Client_ProXPYSDetailQ');
+        Storage.save('ProYH','ProXPYS');
+        Storage.save('YuanDan','1');
+        Storage.save('Screen','1');
+        Storage.save('shopPandian','App_Client_NOYSXPCGQ');
+        Storage.save('Date',data);
+        Storage.save("scode",str);
+        Storage.save('shildshop',str1);
+        if(this.state.suppcode1==""){
+            Storage.save('Modify', '1');
+        }
     }
 
     render() {

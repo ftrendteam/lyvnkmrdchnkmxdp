@@ -228,6 +228,7 @@ export default class admin extends Component {
                             strjj = ""+strin;
                             code = strjj.substring(strjj.indexOf('_') + 1,strjj.length).replace(/(^\s+)|(\s+$)/g, "");
                             Storage.save('code',code);
+                            Storage.save('MenDianName',this.state.shopname1);
                             Storage.save('username',Usercode);
                             Storage.save('Usercode',Usercode);
                             Storage.save('userpwd',UserPwd);
@@ -264,7 +265,8 @@ export default class admin extends Component {
                 name:"PickedDate_list",
                 component:PickedDate_list,
                 params: {
-                    reloadView:(sCode)=>this._reloadView(sCode)
+                    reloadView:(sCode)=>this._reloadView(sCode),
+                    ShopName:(shopname)=>this._ShopName(shopname),
                 }
             };
             this.props.navigator.push(nextRoute)
@@ -284,6 +286,13 @@ export default class admin extends Component {
         sCode = String(sCode);
         this.setState({
             sCode1:sCode,
+        });
+    }
+
+    _ShopName(shopname) {
+        shopname = String(shopname);
+        this.setState({
+            shopname1:shopname,
         });
     }
 

@@ -98,6 +98,7 @@ export default class PinLei extends Component {
                 Storage.save('YdCountm', '1');
                 Storage.save('Date', data);
                 //将内容保存到本地数据库
+                Storage.save('FormCheck', 'YHYW');//要货查询审核按钮
                 Storage.save('valueOf', 'App_Client_ProYH');
                 Storage.save('history', 'App_Client_ProYHQ');
                 Storage.save('historyClass', 'App_Client_ProYHDetailQ');
@@ -111,6 +112,7 @@ export default class PinLei extends Component {
                 Storage.save('YdCountm', '1');
                 Storage.save('Screen', '2');
                 Storage.save("scode", "1");
+                Storage.save('FormCheck', 'CUPCYW');
                 Storage.save('valueOf', 'App_Client_ProCurrPC');
                 Storage.save('history', 'App_Client_ProCurrPCQ');
                 Storage.save('historyClass', 'App_Client_ProCurrPCDetailQ');
@@ -126,6 +128,7 @@ export default class PinLei extends Component {
                     Storage.save('OrgFormno',"0");
                 }
                 Storage.save('Date',this.state.active);
+                Storage.save('FormCheck', 'SYYW');
                 Storage.save('valueOf', 'App_Client_ProSY');
                 Storage.save('history', 'App_Client_ProSYQ');
                 Storage.save('historyClass', 'App_Client_ProSYDetailQ');
@@ -144,6 +147,7 @@ export default class PinLei extends Component {
                 Storage.save('FormType', 'TJYW');
                 Storage.save('ProYH', 'ProTJQ');
                 Storage.save('Date', data);
+                Storage.save('FormCheck', 'TJYW');
                 Storage.save('valueOf', 'App_Client_ProTJ');//门店要货提交
                 Storage.save('history', 'App_Client_ProTJQ');//门店要货查询
                 Storage.save('historyClass', 'App_Client_ProTJDetailQ');//门店要货明细查询
@@ -163,6 +167,8 @@ export default class PinLei extends Component {
                 Storage.save('ProYH', 'ProYH');
                 Storage.save('YdCountm', '1');
                 Storage.save('Date', data);
+                //将内容保存到本地数据库
+                Storage.save('FormCheck', 'YHYW');//要货查询审核按钮
                 Storage.save('valueOf', 'App_Client_ProYH');
                 Storage.save('history', 'App_Client_ProYHQ');
                 Storage.save('historyClass', 'App_Client_ProYHDetailQ');
@@ -177,6 +183,7 @@ export default class PinLei extends Component {
                 Storage.save('YdCountm', '1');
                 Storage.save('Screen', '2');
                 Storage.save("scode", "1");
+                Storage.save('FormCheck', 'CUPCYW');
                 Storage.save('valueOf', 'App_Client_ProCurrPC');
                 Storage.save('history', 'App_Client_ProCurrPCQ');
                 Storage.save('historyClass', 'App_Client_ProCurrPCDetailQ');
@@ -193,6 +200,7 @@ export default class PinLei extends Component {
                     Storage.save('OrgFormno',"0");
                 }
                 Storage.save('Date',this.state.active);
+                Storage.save('FormCheck', 'SYYW');
                 Storage.save('valueOf', 'App_Client_ProSY');
                 Storage.save('history', 'App_Client_ProSYQ');
                 Storage.save('historyClass', 'App_Client_ProSYDetailQ');
@@ -213,6 +221,7 @@ export default class PinLei extends Component {
                 Storage.save('FormType', 'TJYW');
                 Storage.save('ProYH', 'ProTJQ');
                 Storage.save('Date', data);
+                Storage.save('FormCheck', 'TJYW');
                 Storage.save('valueOf', 'App_Client_ProTJ');//门店要货提交
                 Storage.save('history', 'App_Client_ProTJQ');//门店要货查询
                 Storage.save('historyClass', 'App_Client_ProTJDetailQ');//门店要货明细查询

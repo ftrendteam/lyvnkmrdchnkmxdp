@@ -19,7 +19,8 @@ import FetchUtils from "../utils/FetchUtils";
 import NetUtils from "../utils/NetUtils";
 import DBAdapter from "../adapter/DBAdapter";
 import Storage from "../utils/Storage";
-
+var {NativeModules} = require('react-native');
+var RNScannerAndroid = NativeModules.RNScannerAndroid;
 export default class GoodsDetails extends Component {
     constructor(props){
           super(props);
@@ -38,6 +39,7 @@ export default class GoodsDetails extends Component {
              depname:this.props.depname ? this.props.depname : "",
           };
           this.dataRows = [];
+        this.DataShop=[];
     }
 
     componentDidMount(){
@@ -100,8 +102,8 @@ export default class GoodsDetails extends Component {
                  prodcode:"",
              };
              FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
-                 console.log(JSON.stringify(data))
                  if(data.retcode == 1){
+                     alert(JSON.stringify(data))
                     var numbercode = data.DetailInfo1.storecode;
                     var numbershop = data.DetailInfo1.childshop;
                     var checktype = data.DetailInfo1.checktype;
@@ -113,6 +115,7 @@ export default class GoodsDetails extends Component {
                        shopnumber += parseInt(row.countm);
                     }
                     this.dataRows = this.dataRows.concat(DetailInfo2);
+                    this.DataShop=this.DataShop.concat(DetailInfo2);
                     this.setState({
                        dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
                        Number:shopnumber,
@@ -130,20 +133,143 @@ export default class GoodsDetails extends Component {
     }
 
     GoodsDetails(){
-          this.props.navigator.pop();
+        var nextRoute = {
+            name: "HistoricalDocument",
+            component: HistoricalDocument
+        };
+        this.props.navigator.push(nextRoute)
+    }
+
+    ShenHeButton(){
+        Storage.get('code').then((ShopCode) => {
+            Storage.get('LinkUrl').then((LinkUrl) => {
+                Storage.get("usercode").then((usercode) => {
+                    Storage.get("username").then((username) => {
+                        Storage.get("FormCheck").then((FormCheck) => {
+                            Storage.get('OrgFormno').then((OrgFormno)=>{
+                                let params = {
+                                    reqCode: "App_PosReq",
+                                    reqDetailCode: "App_Client_FormCheck",
+                                    ClientCode: this.state.ClientCode,
+                                    sDateTime: Date.parse(new Date()),
+                                    Sign: NetUtils.MD5("App_PosReq" + "##" + "App_Client_FormCheck" + "##" + Date.parse(new Date()) + "##" + "PosControlCs") + '',
+                                    ShopCode: ShopCode,
+                                    ChildShopCode: "",
+                                    Formno: this.state.Formno,
+                                    OrgFormno: "",
+                                    Usercode: usercode,
+                                    Username: username,
+                                    FormType: FormCheck,
+
+                                };
+                                FetchUtils.post(LinkUrl,JSON.stringify(params)).then((data) => {
+                                    this.DataShop=[];
+                                    if (data.retcode == 1) {
+                                        if(this.state.checktype=="未审核"){
+                                            this.setState({
+                                                checktype: "已审核",
+                                            })
+                                        }
+                                    } else {
+                                        var msg=data.msg;
+                                        if(msg=="判断用户的权限出错"){
+                                            alert("用户没有权限")
+                                        }else{
+                                            alert(JSON.stringify(data));
+                                        }
+                                    }
+                                }, (err) => {
+                                    alert("网络请求失败");
+                                })
+                            })
+                        })
+                    })
+                })
+            })
+        })
+    }
+
+    DaYin(){
+        Storage.get('Pid').then((Pid) => {
+            Storage.get('code').then((ShopName) => {
+                Storage.get('MenDianName').then((MenDianName) => {
+                    Storage.get('usercode').then((usercode) => {
+                        Storage.get('userName').then((userName) => {
+                            Storage.get('Name').then((Name) => {
+                                var now = new Date();
+                                var year = now.getFullYear();
+                                var month = now.getMonth() + 1;
+                                var day = now.getDate();
+                                var hh = now.getHours();
+                                var mm = now.getMinutes();
+                                var ss = now.getSeconds();
+                                if (month >= 1 && month <= 9) {
+                                    month = "0" + month;
+                                }
+                                if (day >= 1 && day <= 9) {
+                                    day = "0" + day;
+                                }
+                                if (hh >= 1 && hh <= 9) {
+                                    hh = "0" + hh;
+                                }
+                                if (mm >= 1 && mm <= 9) {
+                                    mm = "0" + mm;
+                                }
+                                if (ss >= 1 && ss <= 9) {
+                                    ss = "0" + ss;
+                                }
+                                NativeModules.AndroidPrintInterface.initPrint();
+                                NativeModules.AndroidPrintInterface.setFontSize(30, 26, 0x26,);
+                                NativeModules.AndroidPrintInterface.print(" " + " " + " " + " " + " " + " " + " " + " " + MenDianName+"\n");
+                                NativeModules.AndroidPrintInterface.print("\n");
+                                NativeModules.AndroidPrintInterface.setFontSize(20, 20, 0x22);
+                                NativeModules.AndroidPrintInterface.print("服务员：" + userName + "\n");
+                                NativeModules.AndroidPrintInterface.print("当前单据：" + Name + "\n");
+                                if (hh < 12) {
+                                    var hours = "上午"
+                                } else if (hh >= 12) {
+                                    var hours = "下午"
+                                }
+                                NativeModules.AndroidPrintInterface.print(year + "年" + month + "月" + day + "日" + " " + hours + hh + ":" + mm + ":" + ss + "\n");
+                                NativeModules.AndroidPrintInterface.print("------------------------------------------------------------" + "\n");
+                                NativeModules.AndroidPrintInterface.print("名称" + " " + " " + " " + " " + " " + " " + " " + " " + " " + " " + "数量" + " " + " " + " " + " " + "单价" + " " + " " + " " + " " + "小计" + "\n");
+                                NativeModules.AndroidPrintInterface.print("\n");
+                                for (let i = 0; i < this.DataShop.length; i++) {
+                                    var DataRows = this.DataShop[i];
+                                    alert(JSON.stringify(DataRows))
+                                    if (DataRows.barCode == "") {
+                                        var barCode = DataRows.prodcode;
+                                    } else {
+                                        var barCode = DataRows.barCode;
+                                    }
+                                    NativeModules.AndroidPrintInterface.print(DataRows.prodname + " " + " " + " " + " " + barCode + "\n");
+                                    NativeModules.AndroidPrintInterface.print(" " + " " + " " + " " + " " + " " + " " + " " + " " + " " + " " + " " + " " + " " + DataRows.countm + " " +" " +" " +" " + " " + " " + " " + DataRows.ProPrice + " " + " " + " " + " " + DataRows.prototal + "\n");
+                                    NativeModules.AndroidPrintInterface.print("\n");
+                                }
+                                NativeModules.AndroidPrintInterface.print("总价：" +  + "\n");
+                                NativeModules.AndroidPrintInterface.print("\n");
+                                NativeModules.AndroidPrintInterface.print("\n");
+                                NativeModules.AndroidPrintInterface.print("\n");
+                                NativeModules.AndroidPrintInterface.startPrint();
+                            })
+                        })
+                    })
+                })
+            })
+        })
     }
 
    _renderRow(rowData, sectionID, rowID){
         return (
             <ScrollView style={styles.shoprow} horizontal={true}>
                 <View style={styles.Direction}>
-                    <View style={[styles.ShopList1,{width:70,}]}>
+                    <View style={[{width:80,marginRight:5}]}>
                         <Text style={styles.Name1}>{rowData.prodname}</Text>
                     </View>
-                    <View style={[styles.ShopList1,{width:70,}]}>
+                    <View style={[{width:80,marginRight:5}]}>
                         <Text style={styles.Name1}>{rowData.prototal}</Text>
                     </View>
-                    <View style={[styles.ShopList1,{width:70,}]}>
+                    <View style={[{width:80,marginRight:5}]}>
                         <Text style={styles.Name1}>{rowData.countm}</Text>
                     </View>
                     <View style={styles.ShopList1}>
@@ -153,6 +279,7 @@ export default class GoodsDetails extends Component {
             </ScrollView>
         );
    }
+
   render() {
     return (
       <View style={styles.container}>
@@ -166,10 +293,20 @@ export default class GoodsDetails extends Component {
         </View>
         <View style={styles.Cont}>
             <View style={styles.List}>
-                <View style={styles.ListLeft}>
-                    <Text style={styles.ListText}>仓库：</Text>
-                    <Text style={styles.ListText}>系统默认仓库</Text>
-                </View>
+                {
+                    (this.state.name=="门店要货")?
+                        null
+                        :
+                        <View style={styles.ListLeft}>
+                            {
+                                (this.state.reqDetailCode=="App_Client_ProCGDetailQ"||this.state.reqDetailCode=="App_Client_ProYSDetailQ"||this.state.reqDetailCode=="App_Client_ProXPDetailCGQ"||this.state.reqDetailCode=="App_Client_ProXPDetailYSQ")?
+                                    <Text style={styles.ListText}>供应商：</Text>
+                                    :
+                                    <Text style={styles.ListText}>仓库：</Text>
+                            }
+                            <Text style={styles.ListText}>{this.state.storecode}</Text>
+                        </View>
+                }
                 <View style={styles.ListRight}>
                     <Text style={styles.ListText}>货品数：</Text>
                     <Text style={styles.ListText}>{this.state.Number}</Text>
@@ -182,10 +319,20 @@ export default class GoodsDetails extends Component {
                 </View>
             </View>
             <View style={styles.List}>
-                <View style={[styles.ListLeft,{flex:1}]}>
+                <View style={[styles.ListLeft,{flex:2}]}>
                     <Text style={styles.ListText}>单据状态：</Text>
                     <Text style={[styles.ListText,{color:"#ff4e4e"}]}>{this.state.checktype}</Text>
                 </View>
+                {
+                    (this.state.checktype=="已审核")?
+                        <TouchableOpacity style={styles.ShenHe} onPress={this.DaYin.bind(this)}>
+                            <Text style={styles.ShenHe_text}>打印</Text>
+                        </TouchableOpacity>
+                        :
+                        <TouchableOpacity style={styles.ShenHe} onPress={this.ShenHeButton.bind(this)}>
+                            <Text style={styles.ShenHe_text}>审核</Text>
+                        </TouchableOpacity>
+                    }
             </View>
             <View style={styles.List}>
                 <View style={styles.ListLeft}>
@@ -200,15 +347,6 @@ export default class GoodsDetails extends Component {
                 </View>
             </View>
             {
-                (this.state.reqDetailCode=="App_Client_ProCGDetailQ"||this.state.reqDetailCode=="App_Client_ProYSDetailQ"||this.state.reqDetailCode=="App_Client_ProXPDetailCGQ"||this.state.reqDetailCode=="App_Client_ProXPDetailYSQ")?
-                    <View style={styles.List}>
-                        <View style={styles.ListLeft}>
-                            <Text style={styles.ListText}>供应商编码：</Text>
-                            <Text style={styles.ListText}>{this.state.storecode}</Text>
-                        </View>
-                    </View>:null
-            }
-            {
                 (this.state.reqDetailCode == "App_Client_ProXPDetailCGQ" || this.state.reqDetailCode == "App_Client_ProXPDetailYSQ") ?
                     <View style={styles.List}>
                         <View style={styles.ListLeft}>
@@ -220,9 +358,18 @@ export default class GoodsDetails extends Component {
         </View>
         <View style={styles.ShopCont}>
             <View style={styles.ShopList}>
-                <Text style={[styles.Name,{width:70,}]}>名称</Text>
-                <Text style={[styles.Name,{width:70,}]}>金额</Text>
-                <Text style={[styles.Name,{width:705,}]}>数量</Text>
+                <View style={[{width:80,}]}>
+                    <Text style={styles.Name}>名称</Text>
+                </View>
+                <View style={[{width:80,}]}>
+                    <Text style={styles.Name}>金额</Text>
+                </View>
+                <View style={[{width:80,}]}>
+                    <Text style={styles.Name}>数量</Text>
+                </View>
+                <View style={styles.ShopList1}>
+                    <Text style={styles.Name}></Text>
+                </View>
             </View>
             <ListView
             style={styles.listViewStyle}
@@ -265,7 +412,8 @@ const styles = StyleSheet.create({
         backgroundColor:"#fffbe7"
    },
    List:{
-        marginBottom:15,
+        height:32,
+        marginBottom:10,
         flexDirection:"row",
    },
    ListText:{
@@ -274,11 +422,11 @@ const styles = StyleSheet.create({
    },
    ListLeft:{
         flexDirection:"row",
+        flex:2,
    },
    ListRight:{
-        position:"absolute",
-        right:0,
         flexDirection:"row",
+        flex:1,
    },
     Listright:{
         flexDirection:"row",
@@ -287,9 +435,9 @@ const styles = StyleSheet.create({
    ShopList:{
         paddingLeft:25,
         paddingRight:25,
-        paddingTop:20,
-        paddingBottom:20,
-        alignItems:"center",
+        paddingTop:15,
+        paddingBottom:15,
+        height:55,
         flexDirection:"row",
    },
    ShopCont:{
@@ -315,8 +463,6 @@ const styles = StyleSheet.create({
         borderBottomColor:"#f2f2f2",
     },
    ShopList1:{
-        marginRight:25,
-        overflow:"hidden",
         flex:1
    },
    Name1:{
@@ -330,5 +476,19 @@ const styles = StyleSheet.create({
    },
    listViewStyle:{
         marginBottom:280,
-   }
+        backgroundColor:"#ffffff"
+   },
+    ShenHe: {
+        flex:1,
+        height:30,
+        paddingTop:4,
+        paddingBottom:5,
+        borderRadius:5,
+        backgroundColor:"#ffba00"
+    },
+    ShenHe_text:{
+        textAlign:"center",
+        color:"#ffffff",
+        fontSize:16,
+    },
 });

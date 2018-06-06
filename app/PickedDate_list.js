@@ -75,8 +75,9 @@ export default class PickedDate_list extends Component {
     }
 
     pressPop(rowData){
-        if(this.props.reloadView){
-            this.props.reloadView(rowData.shopname+'_'+rowData.shopcode)
+        if(this.props.reloadView||this.props.ShopName){
+            this.props.reloadView(rowData.shopname+'_'+rowData.shopcode);
+            this.props.ShopName(rowData.shopname)
         }
         this.props.navigator.pop();
     }

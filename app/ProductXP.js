@@ -115,10 +115,6 @@ export default class ProductCG extends Component {
 
     Button(){
         if(this.state.Disting=="0") {
-            var date = new Date();
-            var data=JSON.stringify(date.getTime());
-            var str=this.state.sCode1;
-            var str1=this.state.shopname1;
             if(this.state.sCode1==""){
                 ToastAndroid.show("请选择供应商",ToastAndroid.SHORT);
                 return;
@@ -131,34 +127,9 @@ export default class ProductCG extends Component {
                     component:Index,
                 };
                 this.props.navigator.push(nextRoute);
-                Storage.delete('YuanDan');
-                Storage.delete('Screen');
-                Storage.delete('OrgFormno');
-                Storage.delete('StateMent');
-                Storage.delete('BQNumber');
-                Storage.delete('Modify');
-                Storage.delete("PeiSong");
-                if(this.state.DepName1==""&&this.state.DepCode1==""){
-                    Storage.delete('DepCode');
-                }else{
-                    Storage.save('DepCode', this.state.DepCode1);
-                }
-                Storage.save('YdCountm', '3');
-                Storage.save('Name','协配采购');
-                Storage.save('FormType','XPCGYW');
-                Storage.save('valueOf','App_Client_ProXPCG');
-                Storage.save('history','App_Client_ProXPCGQ');
-                Storage.save('historyClass','App_Client_ProXPCGDetailQ');
-                Storage.save('ProYH','ProXPCG');
-                Storage.save('Date',data);
-                Storage.save("scode",str);
-                Storage.save('shildshop',str1);
+                this.Data();
             }
         }else if(this.state.Disting=="1"){
-            var date = new Date();
-            var data=JSON.stringify(date.getTime());
-            var str=this.state.sCode1;
-            var str1=this.state.shopname1;
             if(this.state.sCode1==""){
                 ToastAndroid.show("请选择供应商",ToastAndroid.SHORT);
                 return;
@@ -171,31 +142,40 @@ export default class ProductCG extends Component {
                     component:Search,
                 };
                 this.props.navigator.push(nextRoute);
-                Storage.delete('YuanDan');
-                Storage.delete('Screen');
-                Storage.delete('OrgFormno');
-                Storage.delete('StateMent');
-                Storage.delete('BQNumber');
-                Storage.delete('Modify');
-                Storage.delete("PeiSong");
-                if(this.state.DepName1==""&&this.state.DepCode1==""){
-                    Storage.delete('DepCode');
-                }else{
-                    Storage.save('DepCode', this.state.DepCode1);
-                }
-                Storage.save('YdCountm', '3');
-                Storage.save('Name','协配采购');
-                Storage.save('FormType','XPCGYW');
-                Storage.save('valueOf','App_Client_ProXPCG');
-                Storage.save('history','App_Client_ProXPCGQ');
-                Storage.save('historyClass','App_Client_ProXPCGDetailQ');
-                Storage.save('ProYH','ProXPCG');
-                Storage.save('Date',data);
-                Storage.save("scode",str);
-                Storage.save('shildshop',str1);
+                this.Data();
             }
         }
 
+    }
+
+    Data(){
+        var date = new Date();
+        var data=JSON.stringify(date.getTime());
+        var str=this.state.sCode1;
+        var str1=this.state.shopname1;
+        Storage.delete('YuanDan');
+        Storage.delete('Screen');
+        Storage.delete('OrgFormno');
+        Storage.delete('StateMent');
+        Storage.delete('BQNumber');
+        Storage.delete('Modify');
+        Storage.delete("PeiSong");
+        if(this.state.DepName1==""&&this.state.DepCode1==""){
+            Storage.delete('DepCode');
+        }else{
+            Storage.save('DepCode', this.state.DepCode1);
+        }
+        Storage.save('YdCountm', '3');
+        Storage.save('Name','协配采购');
+        Storage.save('FormType','XPCGYW');
+        Storage.save('FormCheck', 'XPCGYW');//要货查询审核按钮
+        Storage.save('valueOf','App_Client_ProXPCG');
+        Storage.save('history','App_Client_ProXPCGQ');
+        Storage.save('historyClass','App_Client_ProXPCGDetailQ');
+        Storage.save('ProYH','ProXPCG');
+        Storage.save('Date',data);
+        Storage.save("scode",str);
+        Storage.save('shildshop',str1);
     }
 
     render() {
