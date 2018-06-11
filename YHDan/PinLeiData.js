@@ -54,18 +54,7 @@ export default class PinLeiData extends Component {
     }
 
     Search(value){
-        if(value==""){
-            this.abc=[];
-            dbAdapter.selectAllData("tsuppset").then((rows)=>{
-                for(let i =0;i<rows.length;i++){
-                    var row = rows.item(i);
-                    this.abc.push(row);
-                }
-                this.setState({
-                    dataSource:this.state.dataSource.cloneWithRows(this.abc),
-                })
-            })
-        }else if(value!==""){
+        
             for (let i = 0; i < this.dataRows.length; i++) {
                 let dataRow = this.dataRows[i];
                 if (((dataRow.DepName + "").indexOf(value) >= 0)) {
@@ -77,7 +66,7 @@ export default class PinLeiData extends Component {
             this.setState({
                 dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
             })
-        }
+        
     }
 
     pressPop(rowData){
