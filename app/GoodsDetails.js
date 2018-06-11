@@ -1,17 +1,17 @@
 /**
  * 历史单据 每比单据详情列表
  */
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import {
-  AppRegistry,
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  ScrollView,
-  ListView,
-  ToastAndroid,
-  TouchableOpacity,
+    AppRegistry,
+    StyleSheet,
+    Text,
+    View,
+    Image,
+    ScrollView,
+    ListView,
+    ToastAndroid,
+    TouchableOpacity,
 } from 'react-native';
 
 import HistoricalDocument from "./HistoricalDocument";
@@ -19,120 +19,123 @@ import FetchUtils from "../utils/FetchUtils";
 import NetUtils from "../utils/NetUtils";
 import DBAdapter from "../adapter/DBAdapter";
 import Storage from "../utils/Storage";
+
 var {NativeModules} = require('react-native');
 var RNScannerAndroid = NativeModules.RNScannerAndroid;
 export default class GoodsDetails extends Component {
-    constructor(props){
-          super(props);
-          this.state = {
-             reqDetailCode:"",
-             ShopCountm:"",
-             Number:"",
-             storecode:"",
-             numbershop:"",
-             name:"",
-             checktype:"",
-             dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
-             Formno:this.props.Formno ? this.props.Formno : "",
-             FormDate:this.props.FormDate ? this.props.FormDate : "",
-             promemo:this.props.promemo ? this.props.promemo : "无",
-             depname:this.props.depname ? this.props.depname : "",
-          };
-          this.dataRows = [];
-        this.DataShop=[];
+    constructor(props) {
+        super(props);
+        this.state = {
+            reqDetailCode: "",
+            ShopCountm: "",
+            Number: "",
+            storecode: "",
+            numbershop: "",
+            name: "",
+            checktype: "",
+            prototal: "",
+            dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
+            Formno: this.props.Formno ? this.props.Formno : "",
+            FormDate: this.props.FormDate ? this.props.FormDate : "",
+            promemo: this.props.promemo ? this.props.promemo : "无",
+            depname: this.props.depname ? this.props.depname : "",
+        };
+        this.dataRows = [];
+        this.DataShop = [];
     }
 
-    componentDidMount(){
-         //获取本地数据库url
-         Storage.get('LinkUrl').then((tags) => {
+    componentDidMount() {
+        //获取本地数据库url
+        Storage.get('LinkUrl').then((tags) => {
             this.setState({
-                linkurl:tags
+                linkurl: tags
             })
-         });
+        });
 
-         //reqDetailCode
-          Storage.get('historyClass').then((tags) => {
-              this.setState({
-                  reqDetailCode: tags
-              });
-          });
-
-            Storage.get('Name').then((tags) => {
-                this.setState({
-                    name:tags
-                })
+        //reqDetailCode
+        Storage.get('historyClass').then((tags) => {
+            this.setState({
+                reqDetailCode: tags
             });
+        });
 
-         //username
-         Storage.get('username').then((tags) => {
-           this.setState({
-               Username: tags
-           });
-         });
+        Storage.get('Name').then((tags) => {
+            this.setState({
+                name: tags
+            })
+        });
 
-         //usercode
-         Storage.get('userpwd').then((tags) => {
-           this.setState({
-               Userpwd: tags
-           });
-         });
+        //username
+        Storage.get('username').then((tags) => {
+            this.setState({
+                Username: tags
+            });
+        });
 
-         Storage.get('code').then((tags) => {
-             Storage.get("usercode","").then((usercode)=>{
-                 Storage.get("username","").then((username)=>{
-                      let params = {
-                          ClientCode: this.state.ClientCode,
-                          username: this.state.Username,
-                          usercode: this.state.Userpwd,
-                      };
-                  });
-             });
-             let params = {
-                 reqCode:'App_PosReq',
-                 reqDetailCode:this.state.reqDetailCode,
-                 ClientCode:this.state.ClientCode,
-                 sDateTime:Date.parse(new Date()),
-                 Sign:NetUtils.MD5("App_PosReq" + "##" +this.state.reqDetailCode + "##" + Date.parse(new Date()) + "##" + "PosControlCs")+'',
-                 username:this.state.Username,
-                 usercode:this.state.Userpwd,
-                 BeginDate:"",
-                 EndDate:"",
-                 shopcode:tags,
-                 formno:this.state.Formno,
-                 prodcode:"",
-             };
-             FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
-                 if(data.retcode == 1){
-                     alert(JSON.stringify(data))
+        //usercode
+        Storage.get('userpwd').then((tags) => {
+            this.setState({
+                Userpwd: tags
+            });
+        });
+
+        Storage.get('code').then((tags) => {
+            Storage.get("usercode", "").then((usercode) => {
+                Storage.get("username", "").then((username) => {
+                    let params = {
+                        ClientCode: this.state.ClientCode,
+                        username: this.state.Username,
+                        usercode: this.state.Userpwd,
+                    };
+                });
+            });
+            let params = {
+                reqCode: 'App_PosReq',
+                reqDetailCode: this.state.reqDetailCode,
+                ClientCode: this.state.ClientCode,
+                sDateTime: Date.parse(new Date()),
+                Sign: NetUtils.MD5("App_PosReq" + "##" + this.state.reqDetailCode + "##" + Date.parse(new Date()) + "##" + "PosControlCs") + '',
+                username: this.state.Username,
+                usercode: this.state.Userpwd,
+                BeginDate: "",
+                EndDate: "",
+                shopcode: tags,
+                formno: this.state.Formno,
+                prodcode: "",
+            };
+            FetchUtils.post(this.state.linkurl, JSON.stringify(params)).then((data) => {
+                if (data.retcode == 1) {
                     var numbercode = data.DetailInfo1.storecode;
                     var numbershop = data.DetailInfo1.childshop;
                     var checktype = data.DetailInfo1.checktype;
+                    var prototal = data.DetailInfo1.prototal;
                     var DetailInfo2 = data.DetailInfo2;
                     var shopnumber = 0;
-                    for(let i =0;i<DetailInfo2.length;i++){
-                       var row = DetailInfo2[i];
-                       var number = row.countm;
-                       shopnumber += parseInt(row.countm);
+                    for (let i = 0; i < DetailInfo2.length; i++) {
+                        var row = DetailInfo2[i];
+                        var number = row.countm;
+                        shopnumber += parseInt(row.countm);
                     }
                     this.dataRows = this.dataRows.concat(DetailInfo2);
-                    this.DataShop=this.DataShop.concat(DetailInfo2);
+                    this.DataShop = this.DataShop.concat(DetailInfo2);
                     this.setState({
-                       dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
-                       Number:shopnumber,
-                       storecode:numbercode,
-                       numbershop:numbershop,
-                       checktype:checktype
+                        dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
+                        Number: shopnumber,
+                        storecode: numbercode,
+                        numbershop: numbershop,
+                        checktype: checktype,
+                        prototal: prototal,
                     })
-                 }else{
-                     alert(JSON.stringify(data))
-                 }
-             },(err)=>{
-                 alert("网络请求失败");
-             })
-         })
+                } else {
+                    alert(JSON.stringify(data))
+                }
+            }, (err) => {
+                alert("网络请求失败");
+            })
+        })
     }
 
-    GoodsDetails(){
+    GoodsDetails() {
         var nextRoute = {
             name: "HistoricalDocument",
             component: HistoricalDocument
@@ -140,13 +143,13 @@ export default class GoodsDetails extends Component {
         this.props.navigator.push(nextRoute)
     }
 
-    ShenHeButton(){
+    ShenHeButton() {
         Storage.get('code').then((ShopCode) => {
             Storage.get('LinkUrl').then((LinkUrl) => {
                 Storage.get("usercode").then((usercode) => {
                     Storage.get("username").then((username) => {
                         Storage.get("FormCheck").then((FormCheck) => {
-                            Storage.get('OrgFormno').then((OrgFormno)=>{
+                            Storage.get('OrgFormno').then((OrgFormno) => {
                                 let params = {
                                     reqCode: "App_PosReq",
                                     reqDetailCode: "App_Client_FormCheck",
@@ -162,19 +165,19 @@ export default class GoodsDetails extends Component {
                                     FormType: FormCheck,
 
                                 };
-                                FetchUtils.post(LinkUrl,JSON.stringify(params)).then((data) => {
-                                    this.DataShop=[];
+                                FetchUtils.post(LinkUrl, JSON.stringify(params)).then((data) => {
+                                    this.DataShop = [];
                                     if (data.retcode == 1) {
-                                        if(this.state.checktype=="未审核"){
+                                        if (this.state.checktype == "未审核") {
                                             this.setState({
                                                 checktype: "已审核",
                                             })
                                         }
                                     } else {
-                                        var msg=data.msg;
-                                        if(msg=="判断用户的权限出错"){
+                                        var msg = data.msg;
+                                        if (msg == "判断用户的权限出错") {
                                             alert("用户没有权限")
-                                        }else{
+                                        } else {
                                             alert(JSON.stringify(data));
                                         }
                                     }
@@ -189,7 +192,7 @@ export default class GoodsDetails extends Component {
         })
     }
 
-    DaYin(){
+    DaYin() {
         Storage.get('Pid').then((Pid) => {
             Storage.get('code').then((ShopName) => {
                 Storage.get('MenDianName').then((MenDianName) => {
@@ -220,7 +223,7 @@ export default class GoodsDetails extends Component {
                                 }
                                 NativeModules.AndroidPrintInterface.initPrint();
                                 NativeModules.AndroidPrintInterface.setFontSize(30, 26, 0x26,);
-                                NativeModules.AndroidPrintInterface.print(" " + " " + " " + " " + " " + " " + " " + " " + MenDianName+"\n");
+                                NativeModules.AndroidPrintInterface.print(" " + " " + " " + " " + " " + " " + " " + " " + MenDianName + "\n");
                                 NativeModules.AndroidPrintInterface.print("\n");
                                 NativeModules.AndroidPrintInterface.setFontSize(20, 20, 0x22);
                                 NativeModules.AndroidPrintInterface.print("服务员：" + userName + "\n");
@@ -236,17 +239,14 @@ export default class GoodsDetails extends Component {
                                 NativeModules.AndroidPrintInterface.print("\n");
                                 for (let i = 0; i < this.DataShop.length; i++) {
                                     var DataRows = this.DataShop[i];
-                                    alert(JSON.stringify(DataRows))
-                                    if (DataRows.barCode == "") {
-                                        var barCode = DataRows.prodcode;
-                                    } else {
-                                        var barCode = DataRows.barCode;
-                                    }
-                                    NativeModules.AndroidPrintInterface.print(DataRows.prodname + " " + " " + " " + " " + barCode + "\n");
-                                    NativeModules.AndroidPrintInterface.print(" " + " " + " " + " " + " " + " " + " " + " " + " " + " " + " " + " " + " " + " " + DataRows.countm + " " +" " +" " +" " + " " + " " + " " + DataRows.ProPrice + " " + " " + " " + " " + DataRows.prototal + "\n");
+                                    var num=DataRows.prototal/DataRows.countm;
+                                    var ProPrice=num.toFixed(2)
+                                    NativeModules.AndroidPrintInterface.print(DataRows.prodname + " " + " " + " " + " " + "\n");
+                                    NativeModules.AndroidPrintInterface.print(" " + " " + " " + " " + " " + " " + " " + " " + " " + " " + " " + " " + " " + " " + DataRows.countm + " " + " " + " " + " " + " " + " " + " " + ProPrice + " " + " " + " " + " " + DataRows.prototal + "\n");
                                     NativeModules.AndroidPrintInterface.print("\n");
                                 }
-                                NativeModules.AndroidPrintInterface.print("总价：" +  + "\n");
+                                NativeModules.AndroidPrintInterface.print("总价：" +this.state.prototal +"\n");
+                                NativeModules.AndroidPrintInterface.print("\n");
                                 NativeModules.AndroidPrintInterface.print("\n");
                                 NativeModules.AndroidPrintInterface.print("\n");
                                 NativeModules.AndroidPrintInterface.print("\n");
@@ -259,18 +259,18 @@ export default class GoodsDetails extends Component {
         })
     }
 
-   _renderRow(rowData, sectionID, rowID){
+    _renderRow(rowData, sectionID, rowID) {
         return (
             <ScrollView style={styles.shoprow} horizontal={true}>
                 <View style={styles.Direction}>
-                    <View style={[{width:80,marginRight:5}]}>
+                    <View style={[{width: 80, marginRight: 5}]}>
                         <Text style={styles.Name1}>{rowData.prodname}</Text>
                     </View>
-                    <View style={[{width:80,marginRight:5}]}>
-                        <Text style={styles.Name1}>{rowData.prototal}</Text>
-                    </View>
-                    <View style={[{width:80,marginRight:5}]}>
+                    <View style={[{width: 80, marginRight: 5}]}>
                         <Text style={styles.Name1}>{rowData.countm}</Text>
+                    </View>
+                    <View style={[{width: 80, marginRight: 5}]}>
+                        <Text style={styles.Name1}>{rowData.prototal}</Text>
                     </View>
                     <View style={styles.ShopList1}>
                         <Text style={styles.Name1}>{rowData.promemo}</Text>
@@ -278,109 +278,109 @@ export default class GoodsDetails extends Component {
                 </View>
             </ScrollView>
         );
-   }
+    }
 
-  render() {
-    return (
-      <View style={styles.container}>
-        <View style={styles.header}>
-            <View style={styles.cont}>
-                <TouchableOpacity onPress={this.GoodsDetails.bind(this)}>
-                    <Image source={require("../images/2_01.png")} style={styles.HeaderImage}></Image>
-                </TouchableOpacity>
-                <Text style={styles.HeaderList}>{this.state.Formno}</Text>
-            </View>
-        </View>
-        <View style={styles.Cont}>
-            <View style={styles.List}>
-                {
-                    (this.state.name=="门店要货")?
-                        null
-                        :
-                        <View style={styles.ListLeft}>
-                            {
-                                (this.state.reqDetailCode=="App_Client_ProCGDetailQ"||this.state.reqDetailCode=="App_Client_ProYSDetailQ"||this.state.reqDetailCode=="App_Client_ProXPDetailCGQ"||this.state.reqDetailCode=="App_Client_ProXPDetailYSQ")?
-                                    <Text style={styles.ListText}>供应商：</Text>
-                                    :
-                                    <Text style={styles.ListText}>仓库：</Text>
-                            }
-                            <Text style={styles.ListText}>{this.state.storecode}</Text>
+    render() {
+        return (
+            <View style={styles.container}>
+                <View style={styles.header}>
+                    <View style={styles.cont}>
+                        <TouchableOpacity onPress={this.GoodsDetails.bind(this)}>
+                            <Image source={require("../images/2_01.png")} style={styles.HeaderImage}></Image>
+                        </TouchableOpacity>
+                        <Text style={styles.HeaderList}>{this.state.Formno}</Text>
+                    </View>
+                </View>
+                <View style={styles.Cont}>
+                    <View style={styles.List}>
+                        {
+                            (this.state.name == "门店要货") ?
+                                null
+                                :
+                                <View style={styles.ListLeft}>
+                                    {
+                                        (this.state.reqDetailCode == "App_Client_ProCGDetailQ" || this.state.reqDetailCode == "App_Client_ProYSDetailQ" || this.state.reqDetailCode == "App_Client_ProXPDetailCGQ" || this.state.reqDetailCode == "App_Client_ProXPDetailYSQ") ?
+                                            <Text style={styles.ListText}>供应商：</Text>
+                                            :
+                                            <Text style={styles.ListText}>仓库：</Text>
+                                    }
+                                    <Text style={styles.ListText}>{this.state.storecode}</Text>
+                                </View>
+                        }
+                        <View style={styles.ListRight}>
+                            <Text style={styles.ListText}>货品数：</Text>
+                            <Text style={styles.ListText}>{this.state.Number}</Text>
                         </View>
-                }
-                <View style={styles.ListRight}>
-                    <Text style={styles.ListText}>货品数：</Text>
-                    <Text style={styles.ListText}>{this.state.Number}</Text>
-                </View>
-            </View>
-            <View style={styles.List}>
-                <View style={[styles.ListLeft,{flex:1}]}>
-                    <Text style={styles.ListText}>单据备注：</Text>
-                    <Text style={styles.ListText}>{this.state.promemo}</Text>
-                </View>
-            </View>
-            <View style={styles.List}>
-                <View style={[styles.ListLeft,{flex:2}]}>
-                    <Text style={styles.ListText}>单据状态：</Text>
-                    <Text style={[styles.ListText,{color:"#ff4e4e"}]}>{this.state.checktype}</Text>
-                </View>
-                {
-                    (this.state.checktype=="已审核")?
-                        <TouchableOpacity style={styles.ShenHe} onPress={this.DaYin.bind(this)}>
-                            <Text style={styles.ShenHe_text}>打印</Text>
-                        </TouchableOpacity>
-                        :
-                        <TouchableOpacity style={styles.ShenHe} onPress={this.ShenHeButton.bind(this)}>
-                            <Text style={styles.ShenHe_text}>审核</Text>
-                        </TouchableOpacity>
-                    }
-            </View>
-            <View style={styles.List}>
-                <View style={styles.ListLeft}>
-                    <Text style={styles.ListText}>制单日期：</Text>
-                    <Text style={styles.ListText}>{this.state.FormDate}</Text>
-                </View>
-            </View>
-            <View style={styles.List}>
-                <View style={styles.ListLeft}>
-                    <Text style={styles.ListText}>商品品类：</Text>
-                    <Text style={styles.ListText}>{this.state.depname}</Text>
-                </View>
-            </View>
-            {
-                (this.state.reqDetailCode == "App_Client_ProXPDetailCGQ" || this.state.reqDetailCode == "App_Client_ProXPDetailYSQ") ?
+                    </View>
+                    <View style={styles.List}>
+                        <View style={[styles.ListLeft, {flex: 1}]}>
+                            <Text style={styles.ListText}>单据备注：</Text>
+                            <Text style={styles.ListText}>{this.state.promemo}</Text>
+                        </View>
+                    </View>
+                    <View style={styles.List}>
+                        <View style={[styles.ListLeft, {flex: 2}]}>
+                            <Text style={styles.ListText}>单据状态：</Text>
+                            <Text style={[styles.ListText, {color: "#ff4e4e"}]}>{this.state.checktype}</Text>
+                        </View>
+                        {
+                            (this.state.checktype == "已审核") ?
+                                <TouchableOpacity style={styles.ShenHe} onPress={this.DaYin.bind(this)}>
+                                    <Text style={styles.ShenHe_text}>打印</Text>
+                                </TouchableOpacity>
+                                :
+                                <TouchableOpacity style={styles.ShenHe} onPress={this.ShenHeButton.bind(this)}>
+                                    <Text style={styles.ShenHe_text}>审核</Text>
+                                </TouchableOpacity>
+                        }
+                    </View>
                     <View style={styles.List}>
                         <View style={styles.ListLeft}>
-                            <Text style={styles.ListText}>机构号：</Text>
-                            <Text style={styles.ListText}>{this.state.numbershop}</Text>
+                            <Text style={styles.ListText}>制单日期：</Text>
+                            <Text style={styles.ListText}>{this.state.FormDate}</Text>
                         </View>
-                    </View>:null
-            }
-        </View>
-        <View style={styles.ShopCont}>
-            <View style={styles.ShopList}>
-                <View style={[{width:80,}]}>
-                    <Text style={styles.Name}>名称</Text>
+                    </View>
+                    <View style={styles.List}>
+                        <View style={styles.ListLeft}>
+                            <Text style={styles.ListText}>商品品类：</Text>
+                            <Text style={styles.ListText}>{this.state.depname}</Text>
+                        </View>
+                    </View>
+                    {
+                        (this.state.reqDetailCode == "App_Client_ProXPDetailCGQ" || this.state.reqDetailCode == "App_Client_ProXPDetailYSQ") ?
+                            <View style={styles.List}>
+                                <View style={styles.ListLeft}>
+                                    <Text style={styles.ListText}>机构号：</Text>
+                                    <Text style={styles.ListText}>{this.state.numbershop}</Text>
+                                </View>
+                            </View> : null
+                    }
                 </View>
-                <View style={[{width:80,}]}>
-                    <Text style={styles.Name}>金额</Text>
-                </View>
-                <View style={[{width:80,}]}>
-                    <Text style={styles.Name}>数量</Text>
-                </View>
-                <View style={styles.ShopList1}>
-                    <Text style={styles.Name}></Text>
+                <View style={styles.ShopCont}>
+                    <View style={styles.ShopList}>
+                        <View style={[{width: 80,}]}>
+                            <Text style={styles.Name}>名称</Text>
+                        </View>
+                        <View style={[{width: 80,}]}>
+                            <Text style={styles.Name}>数量</Text>
+                        </View>
+                        <View style={[{width: 80,}]}>
+                            <Text style={styles.Name}>金额</Text>
+                        </View>
+                        <View style={styles.ShopList1}>
+                            <Text style={styles.Name}></Text>
+                        </View>
+                    </View>
+                    <ListView
+                        style={styles.listViewStyle}
+                        dataSource={this.state.dataSource}
+                        showsVerticalScrollIndicator={true}
+                        renderRow={this._renderRow.bind(this)}
+                    />
                 </View>
             </View>
-            <ListView
-            style={styles.listViewStyle}
-            dataSource={this.state.dataSource}
-            showsVerticalScrollIndicator={true}
-            renderRow={this._renderRow.bind(this)}
-            />
-        </View>
-      </View>
-    );
-  }
+        );
+    }
 }
 
 const styles = StyleSheet.create({
@@ -388,107 +388,107 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#f2f2f2',
     },
-    header:{
-        height:60,
-        backgroundColor:"#ff4e4e",
-        paddingTop:10,
+    header: {
+        height: 60,
+        backgroundColor: "#ff4e4e",
+        paddingTop: 10,
     },
-    cont:{
-        flexDirection:"row",
-        paddingLeft:16,
-        paddingRight:16,
+    cont: {
+        flexDirection: "row",
+        paddingLeft: 16,
+        paddingRight: 16,
     },
-    HeaderList:{
-        flex:6,
-        textAlign:"center",
-        color:"#ffffff",
-        fontSize:22,
-        marginTop:3,
+    HeaderList: {
+        flex: 6,
+        textAlign: "center",
+        color: "#ffffff",
+        fontSize: 22,
+        marginTop: 3,
     },
-    Cont:{
-        paddingLeft:25,
-        paddingRight:25,
-        paddingTop:15,
-        backgroundColor:"#fffbe7"
-   },
-   List:{
-        height:32,
-        marginBottom:10,
-        flexDirection:"row",
-   },
-   ListText:{
-        fontSize:16,
-        color:"#333333"
-   },
-   ListLeft:{
-        flexDirection:"row",
-        flex:2,
-   },
-   ListRight:{
-        flexDirection:"row",
-        flex:1,
-   },
-    Listright:{
-        flexDirection:"row",
-        flex:1
+    Cont: {
+        paddingLeft: 25,
+        paddingRight: 25,
+        paddingTop: 15,
+        backgroundColor: "#fffbe7"
     },
-   ShopList:{
-        paddingLeft:25,
-        paddingRight:25,
-        paddingTop:15,
-        paddingBottom:15,
-        height:55,
-        flexDirection:"row",
-   },
-   ShopCont:{
-        marginBottom:30,
-   },
-   Name:{
-       flex:1,
-       color:"#666666",
-       fontSize:16,
-       textAlign:"center"
-   },
-    shoprow:{
-        flex:1,
+    List: {
+        height: 32,
+        marginBottom: 10,
+        flexDirection: "row",
     },
-    Direction:{
-        paddingLeft:25,
-        paddingTop:20,
-        paddingBottom:20,
-        height:61,
-        flexDirection:"row",
-        backgroundColor:"#ffffff",
-        borderBottomWidth:1,
-        borderBottomColor:"#f2f2f2",
+    ListText: {
+        fontSize: 16,
+        color: "#333333"
     },
-   ShopList1:{
-        flex:1
-   },
-   Name1:{
-        flex:1,
-        color:"#333333",
-        fontSize:16,
-        textAlign:"center"
-   },
-   ContList:{
-        paddingBottom:50,
-   },
-   listViewStyle:{
-        marginBottom:280,
-        backgroundColor:"#ffffff"
-   },
+    ListLeft: {
+        flexDirection: "row",
+        flex: 2,
+    },
+    ListRight: {
+        flexDirection: "row",
+        flex: 1,
+    },
+    Listright: {
+        flexDirection: "row",
+        flex: 1
+    },
+    ShopList: {
+        paddingLeft: 25,
+        paddingRight: 25,
+        paddingTop: 15,
+        paddingBottom: 15,
+        height: 55,
+        flexDirection: "row",
+    },
+    ShopCont: {
+        marginBottom: 30,
+    },
+    Name: {
+        flex: 1,
+        color: "#666666",
+        fontSize: 16,
+        textAlign: "center"
+    },
+    shoprow: {
+        flex: 1,
+    },
+    Direction: {
+        paddingLeft: 25,
+        paddingTop: 20,
+        paddingBottom: 20,
+        height: 61,
+        flexDirection: "row",
+        backgroundColor: "#ffffff",
+        borderBottomWidth: 1,
+        borderBottomColor: "#f2f2f2",
+    },
+    ShopList1: {
+        flex: 1
+    },
+    Name1: {
+        flex: 1,
+        color: "#333333",
+        fontSize: 16,
+        textAlign: "center"
+    },
+    ContList: {
+        paddingBottom: 50,
+    },
+    listViewStyle: {
+        marginBottom: 280,
+        backgroundColor: "#ffffff"
+    },
     ShenHe: {
-        flex:1,
-        height:30,
-        paddingTop:4,
-        paddingBottom:5,
-        borderRadius:5,
-        backgroundColor:"#ffba00"
+        flex: 1,
+        height: 30,
+        paddingTop: 4,
+        paddingBottom: 5,
+        borderRadius: 5,
+        backgroundColor: "#ffba00"
     },
-    ShenHe_text:{
-        textAlign:"center",
-        color:"#ffffff",
-        fontSize:16,
+    ShenHe_text: {
+        textAlign: "center",
+        color: "#ffffff",
+        fontSize: 16,
     },
 });

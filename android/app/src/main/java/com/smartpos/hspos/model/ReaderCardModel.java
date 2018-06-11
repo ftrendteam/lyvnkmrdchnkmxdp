@@ -12,11 +12,15 @@ public class ReaderCardModel{
     private String deviceModel=SystemUtils.getDeviceModel();
 
     public void open(){
-        A90ReadCard.open();
+        if("A90".equals(deviceModel)){
+            A90ReadCard.open();
+         }
     }
 
     public void close(){
-        A90ReadCard.close();
+        if("A90".equals(deviceModel)){
+                  A90ReadCard.close();
+        }
     }
 
     public String read(String key){

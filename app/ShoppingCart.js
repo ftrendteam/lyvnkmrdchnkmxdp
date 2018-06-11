@@ -236,7 +236,6 @@ export default class ShoppingCart extends Component {
                             })
                         })
                     }else{
-                        this.shopinfo();
                         this.modal();
                     }
                 })
