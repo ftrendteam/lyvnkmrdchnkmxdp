@@ -5,6 +5,7 @@
 import StringUtils from './StringUtils';
 
 let deCode;
+let flagLength=2;
 let dbAdapter;
 let strWeightLen;
 let strLength;
@@ -20,11 +21,17 @@ export default class DeCodePrePrint18 {
   
   deCodePreFlag = () => {
     let flag = StringUtils.subStr(0, 2, deCode);
-    if ("27"==flag) {
-      return true;
-    } else if ("13"==flag) {
-      return true;
-    } else {
+    if(deCode.length==18){
+      if ("27"==flag) {
+        return true;
+      } else if ("13"==flag) {
+        
+        return true;
+      } else {
+        
+        return true;
+      }
+    }else{
       return false;
     }
   }
@@ -35,16 +42,27 @@ export default class DeCodePrePrint18 {
   async deCodeProdCode() {
       return new Promise((resolve, reject) => {
           dbAdapter.selectKgOpt("ScalePluLength").then((datas) => {
+            dbAdapter.selectKgOpt("ScalePreFlag").then((flags)=>{
               let dataLen = datas.length;
               if (dataLen != 0) {
-                  strLength = datas.item(0).OptValue;
-                  if (strLength == "") {
-                      strLength = "5";
-                  }
-              } else {
+                strLength = datas.item(0).OptValue;
+                if (strLength == "") {
                   strLength = "5";
+                }
+              } else {
+                strLength = "5";
               }
-              resolve(StringUtils.subStr(2, (2 + Number(strLength)), deCode));
+              let flagsLen = flags.length;
+              if (flagsLen != 0) {
+                flagLength= flags.item(0).OptValue.length;
+                if (flagLength == "") {
+                  flagLength = 2;
+                }
+              } else {
+                flagLength = 2;
+              }
+              resolve(StringUtils.subStr(flagLength, (flagLength + Number(strLength)), deCode));
+            });
           });
       });
   }
@@ -82,12 +100,13 @@ export default class DeCodePrePrint18 {
         this.braMode().then((mode) => {
           let deTotil;
           if ("0" == mode) {
-            deTotil = deCode.substring(2 + Number(strLength) + Number(strWeightLen), 18 - 1);
+            deTotil = deCode.substring(flagLength + Number(strLength) + Number(strWeightLen), 18 - 1);
           } else {
-            deTotil = deCode.substring(2 + Number(strLength), 18 - 1 - Number(strWeightLen));
+            deTotil = deCode.substring(flagLength + Number(strLength), 18 - 1 - Number(strWeightLen));
           }
           //let v = bigDecimal.accMul(Number(deTotil), Number(strDegree));
           let v = parseFloat(Number(deTotil) * Number(strDegree)).toFixed(fixed);
+          alert(v)
           resolve(v);
         });
       });
@@ -146,10 +165,10 @@ export default class DeCodePrePrint18 {
             let strWeight;
             if (mode == "0") {
               // 标识位+prodCode    重量长度
-              strWeight = StringUtils.subStr(2 + Number(strLength), 2 + Number(strLength) + Number(strWeightLen), deCode);
+              strWeight = StringUtils.subStr(flagLength + Number(strLength), flagLength + Number(strLength) + Number(strWeightLen), deCode);
             } else {
               // 标识位+prodCode+价格长度
-              strWeight = StringUtils.subStr(2 + Number(strLength) + (18 - 1 - 2 - Number(strLength) - Number(strWeightLen)), 18 - 1, deCode);
+              strWeight = StringUtils.subStr(flagLength + Number(strLength) + (18 - 1 - flagLength - Number(strLength) - Number(strWeightLen)), 18 - 1, deCode);
             }
             let douWeight = parseFloat(Number(strWeight) * Number(strWeightQTR)).toFixed(fixed);
             resolve(douWeight);
