@@ -106,7 +106,6 @@ export default class DeCodePrePrint18 {
           }
           //let v = bigDecimal.accMul(Number(deTotil), Number(strDegree));
           let v = parseFloat(Number(deTotil) * Number(strDegree)).toFixed(fixed);
-          alert(v)
           resolve(v);
         });
       });

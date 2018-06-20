@@ -116,6 +116,7 @@ export default class Distrition_list extends Component {
     }
 
     Return(){
+        this.refs.textInput.blur();
         this.props.navigator.pop();
     }
 
@@ -137,6 +138,7 @@ export default class Distrition_list extends Component {
     }
 
     pressPop(rowData){
+        this.refs.textInput.blur();
         if(this.props.reloadView||this.props.DepName||this.props.DepCode){
             if(this.state.shopPandian=='App_Client_NOYSPSQ'){
                 this.props.reloadView(rowData.Formno);
@@ -150,6 +152,7 @@ export default class Distrition_list extends Component {
     }
 
     pressPop1(rowData){
+        this.refs.textInput.blur();
         if(this.props.SearchShopname||this.props.SearchShopname1||this.props.DepName||this.props.DepCode){
             if(this.state.shopPandian=='App_Client_NOYSCGQ'||this.state.shopPandian=='App_Client_NOYSXPCGQ'){
                 this.props.SearchShopname(rowData.Formno);
@@ -198,7 +201,7 @@ export default class Distrition_list extends Component {
             <View style={styles.container}>
                 <View style={styles.Title}>
                     <TextInput
-                        autofocus="{true}"
+                        ref="textInput"
                         returnKeyType="search"
                         placeholder="搜索相关单号"
                         placeholderColor="#323232"
@@ -249,6 +252,7 @@ export default class Distrition_list extends Component {
                                 </Text>
                             </View>:
                             <ListView
+                                keyboardShouldPersistTaps={"handled"}
                                 style={styles.scrollview}
                                 enableEmptySections = {true}
                                 dataSource={this.state.dataSource}

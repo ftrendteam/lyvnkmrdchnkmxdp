@@ -59,12 +59,10 @@ export default class CKu extends Component {
                     ShopCode:this.state.JiGou,
                     Sign:NetUtils.MD5("App_PosReq" + "##" +'App_Client_ShopStoreQ' + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',
                 };
-                console.log(JSON.stringify(params))
                 FetchUtils.post(LinkUrl,JSON.stringify(params)).then((data)=>{
                     if(data.retcode == 1){
                         var DetailInfo = data.DetailInfo;
                         this.dataRows = this.dataRows.concat(DetailInfo);
-                        console.log('aaaa',this.dataRows)
                         this.setState({
                             dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
                         })
@@ -80,6 +78,7 @@ export default class CKu extends Component {
     }
 
     Return(){
+        this.refs.textInput.blur();
         this.props.navigator.pop();
     }
 
@@ -100,6 +99,7 @@ export default class CKu extends Component {
     }
 
     pressPop(rowData){
+        this.refs.textInput.blur();
         var Data=rowData.storecode;
         if(this.props.YHDan){
             this.props.YHDan(Data)
@@ -125,7 +125,7 @@ export default class CKu extends Component {
             <View style={styles.container}>
                 <View style={styles.Title}>
                     <TextInput
-                        autofocus="{true}"
+                        ref="textInput"
                         returnKeyType="search"
                         placeholder="搜索相关单号"
                         placeholderColor="#323232"
@@ -153,6 +153,7 @@ export default class CKu extends Component {
                         </View>
                     </View>
                     <ListView
+                        keyboardShouldPersistTaps={"handled"}
                         style={styles.scrollview}
                         dataSource={this.state.dataSource}
                         showsVerticalScrollIndicator={true}

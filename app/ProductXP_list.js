@@ -62,6 +62,7 @@ export default class ProductXP_list extends Component {
     }
 
     Return(){
+        this.refs.textInput.blur();
         this.props.navigator.pop();
     }
 
@@ -82,6 +83,7 @@ export default class ProductXP_list extends Component {
     }
 
     pressPop(rowData){
+        this.refs.textInput.blur();
         var Data=rowData.shopcode;
         if(this.props.reloadShopname){
             this.props.reloadShopname(Data)
@@ -107,7 +109,7 @@ export default class ProductXP_list extends Component {
             <View style={styles.container}>
                 <View style={styles.Title}>
                     <TextInput
-                        autofocus="{true}"
+                        ref="textInput"
                         returnKeyType="search"
                         placeholder="搜索相关单号"
                         placeholderColor="#323232"
@@ -143,6 +145,7 @@ export default class ProductXP_list extends Component {
                                 </Text>
                             </View> :
                             <ListView
+                                keyboardShouldPersistTaps={"handled"}
                                 style={styles.scrollview}
                                 enableEmptySections = {true}
                                 dataSource={this.state.dataSource}

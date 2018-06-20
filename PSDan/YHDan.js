@@ -87,6 +87,7 @@ export default class YHDan extends Component {
     }
 
     Return(){
+        this.refs.textInput.blur();
         this.props.navigator.pop();
     }
 
@@ -107,6 +108,7 @@ export default class YHDan extends Component {
     }
 
     pressPop(rowData){
+        this.refs.textInput.blur();
         var Formno=rowData.Formno;
         var shopcode=rowData.shopcode;
         if(this.props.YHDan||this.props.reloadShopname||this.props.DepName||this.props.DepCode){
@@ -136,7 +138,7 @@ export default class YHDan extends Component {
             <View style={styles.container}>
                 <View style={styles.Title}>
                     <TextInput
-                        autofocus="{true}"
+                        ref="textInput"
                         returnKeyType="search"
                         placeholder="搜索相关单号"
                         placeholderColor="#323232"
@@ -171,6 +173,7 @@ export default class YHDan extends Component {
                                 </Text>
                             </View> :
                             <ListView
+                                keyboardShouldPersistTaps={"handled"}
                                 style={styles.scrollview}
                                 dataSource={this.state.dataSource}
                                 showsVerticalScrollIndicator={true}

@@ -124,17 +124,19 @@ export default class YHSearch extends Component {
                 })
             })
         }else if(value!==""){
-            for (let i = 0; i < this.dataRows.length; i++) {
-                let dataRow = this.dataRows[i];
-                if (((dataRow.prodname + "").indexOf(value) >= 0)) {
-                    var str = this.dataRows.splice(i,1);
-                    this.dataRows.unshift(str[0]);
-                    // break;
+            if(this.state.dataRows!==""){
+                for (let i = 0; i < this.dataRows.length; i++) {
+                    let dataRow = this.dataRows[i];
+                    if (((dataRow.prodname + "").indexOf(value) >= 0)) {
+                        var str = this.dataRows.splice(i,1);
+                        this.dataRows.unshift(str[0]);
+                        // break;
+                    }
                 }
+                this.setState({
+                    dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
+                })
             }
-            this.setState({
-                dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
-            })
         }
     }
 

@@ -143,6 +143,7 @@ export default class PinLeiData extends Component {
                         </View>
                     </TouchableOpacity>
                     <ListView
+                        keyboardShouldPersistTaps={"handled"}
                         style={styles.scrollview}
                         enableEmptySections = {true}
                         dataSource={this.state.dataSource}

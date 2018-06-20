@@ -1,12 +1,14 @@
 rootProject.name = 'myproject'
+
+include ':react-native-linear-gradient'
+project(':react-native-linear-gradient').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-linear-gradient/android')
+
 include ':react-native-fs'
 project(':react-native-fs').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-fs/android')
 
 include ':app'
-include ':react-native-datetime'
-project(':react-native-datetime').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-datetime/android')
-include ':react-native-camera'
-project(':react-native-camera').projectDir = new File(rootProject.projectDir,'../node_modules/react-native-camera/android')
+include ':react-native-dateandtime'
+project(':react-native-dateandtime').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-dateandtime/android')
 include ':react-native-picker'
 project(':react-native-picker').projectDir = new File(rootProject.projectDir,'../node_modules/react-native-picker/android')
 

@@ -55,9 +55,10 @@ import UpData from "../utils/UpData";//数据更新
 import DBAdapter from "../adapter/DBAdapter";//接口页面
 import Storage from '../utils/Storage';//保存 获取
 import DeCodePrePrint18 from "../utils/DeCodePrePrint18";//商品扫码
-import DeCodePrePrint from  "../utils/DeCodePrePrint";
+import DeCodePrePrint from "../utils/DeCodePrePrint";
 import SideMenu from 'react-native-side-menu';
 import BigDecimalUtils from "../utils/BigDecimalUtils";
+
 var {NativeModules} = require('react-native');
 var RNScannerAndroid = NativeModules.RNScannerAndroid;
 
@@ -134,13 +135,13 @@ export default class Index extends Component {
     History() {
         if (this.state.head == "标签采集") {
             ToastAndroid.show('暂不支持该业务', ToastAndroid.SHORT)
-        } else if(this.state.head == "移动销售"){
+        } else if (this.state.head == "移动销售") {
             var nextRoute = {
                 name: "销售",
                 component: SellDan
             };
             this.props.navigator.push(nextRoute)
-        }else {
+        } else {
             var nextRoute = {
                 name: "主页",
                 component: HistoricalDocument
@@ -196,24 +197,203 @@ export default class Index extends Component {
                                     this._Emptydata();
                                 } else {
                                     if ((reminder.length == 18 && decodepreprint.deCodePreFlag())) {
-                                        new Promise.all([decodepreprint.deCodeProdCode(),decodepreprint.deCodeTotal(),decodepreprint.deCodeWeight()]).then((results) => {
-                                            if(results.length==3){
+                                        new Promise.all([decodepreprint.deCodeProdCode(), decodepreprint.deCodeTotal(), decodepreprint.deCodeWeight()]).then((results) => {
+                                            if (results.length == 3) {
                                                 let prodCode = results[0];
                                                 let total = results[1];
                                                 let weight = results[2];
                                                 dbAdapter.selectAidCode(prodCode, 1).then((product) => {
-                                                    if(product.length==0){
-                                                        ToastAndroid.show("商品不存在",ToastAndroid.SHORT);
+                                                    if (product.length == 0) {
+                                                        ToastAndroid.show("商品不存在", ToastAndroid.SHORT);
                                                         return;
                                                     }
                                                     for (let i = 0; i < product.length; i++) {
+                                                        let countm;
                                                         var row = product.item(i);
-                                                        if(DepCode!==null) {
-                                                            if (row.DepCode1 !== DepCode) {
-                                                                ToastAndroid.show("请选择该品类下的商品",ToastAndroid.SHORT);
-                                                                return;
-                                                            } else {
-                                                                if(this.state.head =="移动销售"){
+                                                        dbAdapter.selectShopInfoData(row.Pid).then((datas) => {
+                                                            if (datas.length == 0) {
+                                                                countm=weight;
+                                                            }else{
+                                                                countm=row.ShopNumber;
+                                                            }
+                                                            if (DepCode !== null) {
+                                                                if (row.DepCode1 !== DepCode) {
+                                                                    ToastAndroid.show("请选择该品类下的商品", ToastAndroid.SHORT);
+                                                                    return;
+                                                                } else {
+                                                                    if (this.state.head == "移动销售") {
+                                                                        var shopnumber = 0;
+                                                                        var shopAmount = 0;
+                                                                        this.props.navigator.push({
+                                                                            component: OrderDetails,
+                                                                            params: {
+                                                                                ProdName: row.ProdName,
+                                                                                ShopPrice: row.StdPrice,
+                                                                                Pid: row.Pid,
+                                                                                countm: countm,
+                                                                                promemo: row.ShopRemark,
+                                                                                prototal: total,
+                                                                                ProdCode: row.ProdCode,
+                                                                                DepCode: row.DepCode1,
+                                                                                SuppCode: row.SuppCode,
+                                                                                ydcountm: "",
+                                                                                BarCode: row.BarCode,
+                                                                                IsIntCount: row.IsIntCount,
+                                                                                SaoMa:1,
+                                                                            }
+                                                                        })
+                                                                        DeviceEventEmitter.removeAllListeners();
+                                                                        this.setState({
+                                                                            OrderDetails: '',
+                                                                        })
+                                                                    } else {
+                                                                        let params = {
+                                                                            reqCode: "App_PosReq",
+                                                                            reqDetailCode: "App_Client_CurrProdQry",
+                                                                            ClientCode: this.state.ClientCode,
+                                                                            sDateTime: Date.parse(new Date()),
+                                                                            Sign: NetUtils.MD5("App_PosReq" + "##" +
+                                                                                "App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs") + '',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
+                                                                            username: userName,
+                                                                            usercode: this.state.Usercode,
+                                                                            SuppCode: row.SuppCode,
+                                                                            ShopCode: this.state.ShopCode,
+                                                                            ChildShopCode: this.state.ChildShopCode,
+                                                                            ProdCode: row.ProdCode,
+                                                                            OrgFormno: this.state.OrgFormno,
+                                                                            FormType: FormType,
+                                                                        };
+                                                                        FetchUtil.post(LinkUrl, JSON.stringify(params)).then((data) => {
+                                                                            var countm = JSON.stringify(data.countm);
+                                                                            var ShopPrice = JSON.stringify(data.ShopPrice);
+                                                                            if (data.retcode == 1) {
+                                                                                if (this.state.head == "商品查询") {
+                                                                                    this.props.navigator.push({
+                                                                                        component: Shopsearch,
+                                                                                        params: {
+                                                                                            ProdCode: row.ProdCode,
+                                                                                            DepCode: row.DepCode1,
+                                                                                        }
+                                                                                    })
+                                                                                    DeviceEventEmitter.removeAllListeners();
+                                                                                    this.setState({
+                                                                                        OrderDetails: '',
+                                                                                    })
+                                                                                } else {
+                                                                                    if (this.state.head == "商品采购" || this.state.head == "协配采购" || this.state.Modify == 1) {
+                                                                                        if (row.ShopNumber == 0) {
+                                                                                            this.props.navigator.push({
+                                                                                                component: OrderDetails,
+                                                                                                params: {
+                                                                                                    ProdName: row.ProdName,
+                                                                                                    ShopPrice: ShopPrice,
+                                                                                                    Pid: row.Pid,
+                                                                                                    countm: countm,
+                                                                                                    promemo: row.ShopRemark,
+                                                                                                    prototal: row.ShopAmount,
+                                                                                                    ProdCode: row.ProdCode,
+                                                                                                    DepCode: row.DepCode1,
+                                                                                                    SuppCode: row.SuppCode,
+                                                                                                    ydcountm: countm,
+                                                                                                    BarCode: row.BarCode,
+                                                                                                    IsIntCount: row.IsIntCount
+                                                                                                }
+                                                                                            })
+                                                                                        } else {
+                                                                                            this.props.navigator.push({
+                                                                                                component: OrderDetails,
+                                                                                                params: {
+                                                                                                    ProdName: row.ProdName,
+                                                                                                    ShopPrice: row.ShopPrice,
+                                                                                                    Pid: row.Pid,
+                                                                                                    countm: countm,
+                                                                                                    promemo: row.ShopRemark,
+                                                                                                    prototal: row.ShopAmount,
+                                                                                                    ProdCode: row.ProdCode,
+                                                                                                    DepCode: row.DepCode1,
+                                                                                                    SuppCode: row.SuppCode,
+                                                                                                    ydcountm: countm,
+                                                                                                    BarCode: row.BarCode,
+                                                                                                    IsIntCount: row.IsIntCount
+                                                                                                }
+                                                                                            })
+                                                                                        }
+                                                                                    } else if (this.state.head == "售价调整") {
+                                                                                        dbAdapter.selectShopInfoData(row.Pid).then((datas) => {
+                                                                                            if (datas.length == 0) {
+                                                                                                this.props.navigator.push({
+                                                                                                    component: OrderDetails,
+                                                                                                    params: {
+                                                                                                        ProdName: row.ProdName,
+                                                                                                        ShopPrice: ShopPrice,
+                                                                                                        Pid: row.Pid,
+                                                                                                        countm: countm,
+                                                                                                        promemo: row.ShopRemark,
+                                                                                                        prototal: row.ShopAmount,
+                                                                                                        ProdCode: row.ProdCode,
+                                                                                                        DepCode: row.DepCode1,
+                                                                                                        SuppCode: row.SuppCode,
+                                                                                                        ydcountm: "",
+                                                                                                        BarCode: row.BarCode,
+                                                                                                        IsIntCount: row.IsIntCount
+                                                                                                    }
+                                                                                                })
+                                                                                            } else {
+                                                                                                for (let i = 0; i < datas.length; i++) {
+                                                                                                    var data = datas.item(i);
+                                                                                                    this.props.navigator.push({
+                                                                                                        component: OrderDetails,
+                                                                                                        params: {
+                                                                                                            ProdName: row.ProdName,
+                                                                                                            ShopPrice: ShopPrice,
+                                                                                                            Pid: row.Pid,
+                                                                                                            countm: countm,
+                                                                                                            promemo: row.ShopRemark,
+                                                                                                            prototal: row.ShopAmount,
+                                                                                                            ProdCode: row.ProdCode,
+                                                                                                            DepCode: row.DepCode1,
+                                                                                                            SuppCode: row.SuppCode,
+                                                                                                            ydcountm: data.ydcountm,
+                                                                                                            BarCode: row.BarCode,
+                                                                                                            IsIntCount: row.IsIntCount
+                                                                                                        }
+                                                                                                    })
+                                                                                                }
+                                                                                            }
+                                                                                        })
+                                                                                    } else {
+                                                                                        this.props.navigator.push({
+                                                                                            component: OrderDetails,
+                                                                                            params: {
+                                                                                                ProdName: row.ProdName,
+                                                                                                ShopPrice: ShopPrice,
+                                                                                                Pid: row.Pid,
+                                                                                                countm: countm,
+                                                                                                promemo: row.ShopRemark,
+                                                                                                prototal: row.ShopAmount,
+                                                                                                ProdCode: row.ProdCode,
+                                                                                                DepCode: row.DepCode1,
+                                                                                                SuppCode: row.SuppCode,
+                                                                                                ydcountm: countm,
+                                                                                                BarCode: row.BarCode,
+                                                                                                IsIntCount: row.IsIntCount
+                                                                                            }
+                                                                                        })
+                                                                                    }
+                                                                                    DeviceEventEmitter.removeAllListeners();
+                                                                                    this.setState({
+                                                                                        OrderDetails: '',
+                                                                                    })
+                                                                                }
+                                                                            } else {
+                                                                                alert(JSON.stringify(data))
+                                                                            }
+                                                                        })
+                                                                    }
+                                                                }
+                                                            }
+                                                            else {
+                                                                if (this.state.head == "移动销售") {
                                                                     var shopnumber = 0;
                                                                     var shopAmount = 0;
                                                                     this.props.navigator.push({
@@ -222,7 +402,7 @@ export default class Index extends Component {
                                                                             ProdName: row.ProdName,
                                                                             ShopPrice: row.StdPrice,
                                                                             Pid: row.Pid,
-                                                                            countm: weight,
+                                                                            countm: countm,
                                                                             promemo: row.ShopRemark,
                                                                             prototal: total,
                                                                             ProdCode: row.ProdCode,
@@ -230,14 +410,15 @@ export default class Index extends Component {
                                                                             SuppCode: row.SuppCode,
                                                                             ydcountm: "",
                                                                             BarCode: row.BarCode,
-                                                                            IsIntCount:row.IsIntCount
+                                                                            IsIntCount: row.IsIntCount,
+                                                                            SaoMa:1,
                                                                         }
                                                                     })
                                                                     DeviceEventEmitter.removeAllListeners();
                                                                     this.setState({
                                                                         OrderDetails: '',
                                                                     })
-                                                                }else{
+                                                                } else {
                                                                     let params = {
                                                                         reqCode: "App_PosReq",
                                                                         reqDetailCode: "App_Client_CurrProdQry",
@@ -272,14 +453,14 @@ export default class Index extends Component {
                                                                                 })
                                                                             } else {
                                                                                 if (this.state.head == "商品采购" || this.state.head == "协配采购" || this.state.Modify == 1) {
-                                                                                    if(row.ShopNumber == 0){
+                                                                                    if (row.ShopNumber == 0) {
                                                                                         this.props.navigator.push({
                                                                                             component: OrderDetails,
                                                                                             params: {
                                                                                                 ProdName: row.ProdName,
                                                                                                 ShopPrice: ShopPrice,
                                                                                                 Pid: row.Pid,
-                                                                                                countm: row.ShopNumber,
+                                                                                                countm: countm,
                                                                                                 promemo: row.ShopRemark,
                                                                                                 prototal: row.ShopAmount,
                                                                                                 ProdCode: row.ProdCode,
@@ -287,17 +468,17 @@ export default class Index extends Component {
                                                                                                 SuppCode: row.SuppCode,
                                                                                                 ydcountm: countm,
                                                                                                 BarCode: row.BarCode,
-                                                                                                IsIntCount:row.IsIntCount
+                                                                                                IsIntCount: row.IsIntCount
                                                                                             }
                                                                                         })
-                                                                                    }else{
+                                                                                    } else {
                                                                                         this.props.navigator.push({
                                                                                             component: OrderDetails,
                                                                                             params: {
                                                                                                 ProdName: row.ProdName,
                                                                                                 ShopPrice: row.ShopPrice,
                                                                                                 Pid: row.Pid,
-                                                                                                countm: row.ShopNumber,
+                                                                                                countm: countm,
                                                                                                 promemo: row.ShopRemark,
                                                                                                 prototal: row.ShopAmount,
                                                                                                 ProdCode: row.ProdCode,
@@ -305,20 +486,20 @@ export default class Index extends Component {
                                                                                                 SuppCode: row.SuppCode,
                                                                                                 ydcountm: countm,
                                                                                                 BarCode: row.BarCode,
-                                                                                                IsIntCount:row.IsIntCount
+                                                                                                IsIntCount: row.IsIntCount
                                                                                             }
                                                                                         })
                                                                                     }
-                                                                                }else if(this.state.head=="售价调整"){
-                                                                                    dbAdapter.selectShopInfoData(row.Pid).then((datas)=> {
-                                                                                        if(datas.length==0){
+                                                                                } else if (this.state.head == "售价调整") {
+                                                                                    dbAdapter.selectShopInfoData(row.Pid).then((datas) => {
+                                                                                        if (datas.length == 0) {
                                                                                             this.props.navigator.push({
                                                                                                 component: OrderDetails,
                                                                                                 params: {
                                                                                                     ProdName: row.ProdName,
                                                                                                     ShopPrice: ShopPrice,
                                                                                                     Pid: row.Pid,
-                                                                                                    countm: row.ShopNumber,
+                                                                                                    countm: countm,
                                                                                                     promemo: row.ShopRemark,
                                                                                                     prototal: row.ShopAmount,
                                                                                                     ProdCode: row.ProdCode,
@@ -326,10 +507,10 @@ export default class Index extends Component {
                                                                                                     SuppCode: row.SuppCode,
                                                                                                     ydcountm: "",
                                                                                                     BarCode: row.BarCode,
-                                                                                                    IsIntCount:row.IsIntCount
+                                                                                                    IsIntCount: row.IsIntCount
                                                                                                 }
                                                                                             })
-                                                                                        }else{
+                                                                                        } else {
                                                                                             for (let i = 0; i < datas.length; i++) {
                                                                                                 var data = datas.item(i);
                                                                                                 this.props.navigator.push({
@@ -338,7 +519,7 @@ export default class Index extends Component {
                                                                                                         ProdName: row.ProdName,
                                                                                                         ShopPrice: ShopPrice,
                                                                                                         Pid: row.Pid,
-                                                                                                        countm: row.ShopNumber,
+                                                                                                        countm: countm,
                                                                                                         promemo: row.ShopRemark,
                                                                                                         prototal: row.ShopAmount,
                                                                                                         ProdCode: row.ProdCode,
@@ -346,7 +527,7 @@ export default class Index extends Component {
                                                                                                         SuppCode: row.SuppCode,
                                                                                                         ydcountm: data.ydcountm,
                                                                                                         BarCode: row.BarCode,
-                                                                                                        IsIntCount:row.IsIntCount
+                                                                                                        IsIntCount: row.IsIntCount
                                                                                                     }
                                                                                                 })
                                                                                             }
@@ -359,7 +540,7 @@ export default class Index extends Component {
                                                                                             ProdName: row.ProdName,
                                                                                             ShopPrice: ShopPrice,
                                                                                             Pid: row.Pid,
-                                                                                            countm: row.ShopNumber,
+                                                                                            countm: countm,
                                                                                             promemo: row.ShopRemark,
                                                                                             prototal: row.ShopAmount,
                                                                                             ProdCode: row.ProdCode,
@@ -367,7 +548,7 @@ export default class Index extends Component {
                                                                                             SuppCode: row.SuppCode,
                                                                                             ydcountm: countm,
                                                                                             BarCode: row.BarCode,
-                                                                                            IsIntCount:row.IsIntCount
+                                                                                            IsIntCount: row.IsIntCount
                                                                                         }
                                                                                     })
                                                                                 }
@@ -382,200 +563,32 @@ export default class Index extends Component {
                                                                     })
                                                                 }
                                                             }
-                                                        }
-                                                        else{
-                                                            if(this.state.head =="移动销售"){
-                                                                var shopnumber = 0;
-                                                                var shopAmount = 0;
-                                                                this.props.navigator.push({
-                                                                    component: OrderDetails,
-                                                                    params: {
-                                                                        ProdName: row.ProdName,
-                                                                        ShopPrice: row.StdPrice,
-                                                                        Pid: row.Pid,
-                                                                        countm: weight,
-                                                                        promemo: row.ShopRemark,
-                                                                        prototal: total,
-                                                                        ProdCode: row.ProdCode,
-                                                                        DepCode: row.DepCode1,
-                                                                        SuppCode: row.SuppCode,
-                                                                        ydcountm: "",
-                                                                        BarCode: row.BarCode,
-                                                                        IsIntCount:row.IsIntCount
-                                                                    }
-                                                                })
-                                                                DeviceEventEmitter.removeAllListeners();
-                                                                this.setState({
-                                                                    OrderDetails: '',
-                                                                })
-                                                            }else{
-                                                                let params = {
-                                                                    reqCode: "App_PosReq",
-                                                                    reqDetailCode: "App_Client_CurrProdQry",
-                                                                    ClientCode: this.state.ClientCode,
-                                                                    sDateTime: Date.parse(new Date()),
-                                                                    Sign: NetUtils.MD5("App_PosReq" + "##" +
-                                                                        "App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs") + '',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
-                                                                    username: userName,
-                                                                    usercode: this.state.Usercode,
-                                                                    SuppCode: row.SuppCode,
-                                                                    ShopCode: this.state.ShopCode,
-                                                                    ChildShopCode: this.state.ChildShopCode,
-                                                                    ProdCode: row.ProdCode,
-                                                                    OrgFormno: this.state.OrgFormno,
-                                                                    FormType: FormType,
-                                                                };
-                                                                FetchUtil.post(LinkUrl, JSON.stringify(params)).then((data) => {
-                                                                    var countm = JSON.stringify(data.countm);
-                                                                    var ShopPrice = JSON.stringify(data.ShopPrice);
-                                                                    if (data.retcode == 1) {
-                                                                        if (this.state.head == "商品查询") {
-                                                                            this.props.navigator.push({
-                                                                                component: Shopsearch,
-                                                                                params: {
-                                                                                    ProdCode: row.ProdCode,
-                                                                                    DepCode: row.DepCode1,
-                                                                                }
-                                                                            })
-                                                                            DeviceEventEmitter.removeAllListeners();
-                                                                            this.setState({
-                                                                                OrderDetails: '',
-                                                                            })
-                                                                        } else {
-                                                                            if (this.state.head == "商品采购" || this.state.head == "协配采购" || this.state.Modify == 1) {
-                                                                                if(row.ShopNumber == 0){
-                                                                                    this.props.navigator.push({
-                                                                                        component: OrderDetails,
-                                                                                        params: {
-                                                                                            ProdName: row.ProdName,
-                                                                                            ShopPrice: ShopPrice,
-                                                                                            Pid: row.Pid,
-                                                                                            countm: row.ShopNumber,
-                                                                                            promemo: row.ShopRemark,
-                                                                                            prototal: row.ShopAmount,
-                                                                                            ProdCode: row.ProdCode,
-                                                                                            DepCode: row.DepCode1,
-                                                                                            SuppCode: row.SuppCode,
-                                                                                            ydcountm: countm,
-                                                                                            BarCode: row.BarCode,
-                                                                                            IsIntCount:row.IsIntCount
-                                                                                        }
-                                                                                    })
-                                                                                }else{
-                                                                                    this.props.navigator.push({
-                                                                                        component: OrderDetails,
-                                                                                        params: {
-                                                                                            ProdName: row.ProdName,
-                                                                                            ShopPrice: row.ShopPrice,
-                                                                                            Pid: row.Pid,
-                                                                                            countm: row.ShopNumber,
-                                                                                            promemo: row.ShopRemark,
-                                                                                            prototal: row.ShopAmount,
-                                                                                            ProdCode: row.ProdCode,
-                                                                                            DepCode: row.DepCode1,
-                                                                                            SuppCode: row.SuppCode,
-                                                                                            ydcountm: countm,
-                                                                                            BarCode: row.BarCode,
-                                                                                            IsIntCount:row.IsIntCount
-                                                                                        }
-                                                                                    })
-                                                                                }
-                                                                            }else if(this.state.head=="售价调整"){
-                                                                                dbAdapter.selectShopInfoData(row.Pid).then((datas)=> {
-                                                                                    if(datas.length==0){
-                                                                                        this.props.navigator.push({
-                                                                                            component: OrderDetails,
-                                                                                            params: {
-                                                                                                ProdName: row.ProdName,
-                                                                                                ShopPrice: ShopPrice,
-                                                                                                Pid: row.Pid,
-                                                                                                countm: row.ShopNumber,
-                                                                                                promemo: row.ShopRemark,
-                                                                                                prototal: row.ShopAmount,
-                                                                                                ProdCode: row.ProdCode,
-                                                                                                DepCode: row.DepCode1,
-                                                                                                SuppCode: row.SuppCode,
-                                                                                                ydcountm: "",
-                                                                                                BarCode: row.BarCode,
-                                                                                                IsIntCount:row.IsIntCount
-                                                                                            }
-                                                                                        })
-                                                                                    }else{
-                                                                                        for (let i = 0; i < datas.length; i++) {
-                                                                                            var data = datas.item(i);
-                                                                                            this.props.navigator.push({
-                                                                                                component: OrderDetails,
-                                                                                                params: {
-                                                                                                    ProdName: row.ProdName,
-                                                                                                    ShopPrice: ShopPrice,
-                                                                                                    Pid: row.Pid,
-                                                                                                    countm: row.ShopNumber,
-                                                                                                    promemo: row.ShopRemark,
-                                                                                                    prototal: row.ShopAmount,
-                                                                                                    ProdCode: row.ProdCode,
-                                                                                                    DepCode: row.DepCode1,
-                                                                                                    SuppCode: row.SuppCode,
-                                                                                                    ydcountm: data.ydcountm,
-                                                                                                    BarCode: row.BarCode,
-                                                                                                    IsIntCount:row.IsIntCount
-                                                                                                }
-                                                                                            })
-                                                                                        }
-                                                                                    }
-                                                                                })
-                                                                            } else {
-                                                                                this.props.navigator.push({
-                                                                                    component: OrderDetails,
-                                                                                    params: {
-                                                                                        ProdName: row.ProdName,
-                                                                                        ShopPrice: ShopPrice,
-                                                                                        Pid: row.Pid,
-                                                                                        countm: row.ShopNumber,
-                                                                                        promemo: row.ShopRemark,
-                                                                                        prototal: row.ShopAmount,
-                                                                                        ProdCode: row.ProdCode,
-                                                                                        DepCode: row.DepCode1,
-                                                                                        SuppCode: row.SuppCode,
-                                                                                        ydcountm: countm,
-                                                                                        BarCode: row.BarCode,
-                                                                                        IsIntCount:row.IsIntCount
-                                                                                    }
-                                                                                })
-                                                                            }
-                                                                            DeviceEventEmitter.removeAllListeners();
-                                                                            this.setState({
-                                                                                OrderDetails: '',
-                                                                            })
-                                                                        }
-                                                                    } else {
-                                                                        alert(JSON.stringify(data))
-                                                                    }
-                                                                })
-                                                            }
-                                                        }
+                                                        })
                                                     }
                                                 })
                                             }
                                         });
                                     }
-                                    else if((reminder.length==13&&deCode13.deCodePreFlag(reminder))){//13位条码解析
-                                        new Promise.all([deCode13.deCodeProdCode(reminder,dbAdapter),deCode13.deCodeTotile(reminder,dbAdapter)]).then((result)=>{
-                                            if(result.length==2){
-                                                let prodCode = result[0];
-                                                let price = result[1];
+                                    else if ((reminder.length == 13 && deCode13.deCodePreFlag(reminder))) {//13位条码解析
+                                        new Promise.all([deCode13.deCodeProdCode(reminder, dbAdapter), deCode13.deCodeTotile(reminder, dbAdapter)]).then((result) => {
+                                            if (result.length == 2) {
+                                                let prodCode = result[0];//解析出来的prodcode用来selectaidcode接口传入prodcode
+                                                let total = result[1];
+
                                                 dbAdapter.selectAidCode(prodCode, 1).then((rows) => {
-                                                    if(rows.length==0){
-                                                        ToastAndroid.show("商品不存在",ToastAndroid.SHORT);
+                                                    if (rows.length == 0) {
+                                                        ToastAndroid.show("商品不存在", ToastAndroid.SHORT);
                                                         return;
                                                     }
                                                     for (let i = 0; i < rows.length; i++) {
                                                         var row = rows.item(i);
-                                                        if(DepCode!==null) {
+
+                                                        if (DepCode !== null) {
                                                             if (row.DepCode1 !== DepCode) {
-                                                                ToastAndroid.show("请选择该品类下的商品",ToastAndroid.SHORT);
+                                                                ToastAndroid.show("请选择该品类下的商品", ToastAndroid.SHORT);
                                                                 return;
                                                             } else {
-                                                                if(this.state.head =="移动销售"){
+                                                                if (this.state.head == "移动销售") {
                                                                     var shopnumber = 0;
                                                                     var shopAmount = 0;
                                                                     this.props.navigator.push({
@@ -584,7 +597,7 @@ export default class Index extends Component {
                                                                             ProdName: row.ProdName,
                                                                             ShopPrice: row.StdPrice,
                                                                             Pid: row.Pid,
-                                                                            countm: row.ShopNumber,
+                                                                            countm: countm,
                                                                             promemo: row.ShopRemark,
                                                                             prototal: price,
                                                                             ProdCode: row.ProdCode,
@@ -592,14 +605,14 @@ export default class Index extends Component {
                                                                             SuppCode: row.SuppCode,
                                                                             ydcountm: "",
                                                                             BarCode: row.BarCode,
-                                                                            IsIntCount:row.IsIntCount
+                                                                            IsIntCount: row.IsIntCount
                                                                         }
                                                                     })
                                                                     DeviceEventEmitter.removeAllListeners();
                                                                     this.setState({
                                                                         OrderDetails: '',
                                                                     })
-                                                                }else{
+                                                                } else {
                                                                     let params = {
                                                                         reqCode: "App_PosReq",
                                                                         reqDetailCode: "App_Client_CurrProdQry",
@@ -634,14 +647,14 @@ export default class Index extends Component {
                                                                                 })
                                                                             } else {
                                                                                 if (this.state.head == "商品采购" || this.state.head == "协配采购" || this.state.Modify == 1) {
-                                                                                    if(row.ShopNumber == 0){
+                                                                                    if (row.ShopNumber == 0) {
                                                                                         this.props.navigator.push({
                                                                                             component: OrderDetails,
                                                                                             params: {
                                                                                                 ProdName: row.ProdName,
                                                                                                 ShopPrice: ShopPrice,
                                                                                                 Pid: row.Pid,
-                                                                                                countm: row.ShopNumber,
+                                                                                                countm: countm,
                                                                                                 promemo: row.ShopRemark,
                                                                                                 prototal: row.ShopAmount,
                                                                                                 ProdCode: row.ProdCode,
@@ -649,10 +662,10 @@ export default class Index extends Component {
                                                                                                 SuppCode: row.SuppCode,
                                                                                                 ydcountm: countm,
                                                                                                 BarCode: row.BarCode,
-                                                                                                IsIntCount:row.IsIntCount
+                                                                                                IsIntCount: row.IsIntCount
                                                                                             }
                                                                                         })
-                                                                                    }else{
+                                                                                    } else {
                                                                                         this.props.navigator.push({
                                                                                             component: OrderDetails,
                                                                                             params: {
@@ -667,20 +680,20 @@ export default class Index extends Component {
                                                                                                 SuppCode: row.SuppCode,
                                                                                                 ydcountm: countm,
                                                                                                 BarCode: row.BarCode,
-                                                                                                IsIntCount:row.IsIntCount
+                                                                                                IsIntCount: row.IsIntCount
                                                                                             }
                                                                                         })
                                                                                     }
-                                                                                } else if(this.state.head=="售价调整"){
-                                                                                    dbAdapter.selectShopInfoData(row.Pid).then((datas)=> {
-                                                                                        if(datas.length==0){
+                                                                                } else if (this.state.head == "售价调整") {
+                                                                                    dbAdapter.selectShopInfoData(row.Pid).then((datas) => {
+                                                                                        if (datas.length == 0) {
                                                                                             this.props.navigator.push({
                                                                                                 component: OrderDetails,
                                                                                                 params: {
                                                                                                     ProdName: row.ProdName,
                                                                                                     ShopPrice: ShopPrice,
                                                                                                     Pid: row.Pid,
-                                                                                                    countm: row.ShopNumber,
+                                                                                                    countm: countm,
                                                                                                     promemo: row.ShopRemark,
                                                                                                     prototal: row.ShopAmount,
                                                                                                     ProdCode: row.ProdCode,
@@ -688,10 +701,10 @@ export default class Index extends Component {
                                                                                                     SuppCode: row.SuppCode,
                                                                                                     ydcountm: "",
                                                                                                     BarCode: row.BarCode,
-                                                                                                    IsIntCount:row.IsIntCount
+                                                                                                    IsIntCount: row.IsIntCount
                                                                                                 }
                                                                                             })
-                                                                                        }else{
+                                                                                        } else {
                                                                                             for (let i = 0; i < datas.length; i++) {
                                                                                                 var data = datas.item(i);
                                                                                                 this.props.navigator.push({
@@ -700,7 +713,7 @@ export default class Index extends Component {
                                                                                                         ProdName: row.ProdName,
                                                                                                         ShopPrice: ShopPrice,
                                                                                                         Pid: row.Pid,
-                                                                                                        countm: row.ShopNumber,
+                                                                                                        countm: countm,
                                                                                                         promemo: row.ShopRemark,
                                                                                                         prototal: row.ShopAmount,
                                                                                                         ProdCode: row.ProdCode,
@@ -708,20 +721,20 @@ export default class Index extends Component {
                                                                                                         SuppCode: row.SuppCode,
                                                                                                         ydcountm: data.ydcountm,
                                                                                                         BarCode: row.BarCode,
-                                                                                                        IsIntCount:row.IsIntCount
+                                                                                                        IsIntCount: row.IsIntCount
                                                                                                     }
                                                                                                 })
                                                                                             }
                                                                                         }
                                                                                     })
-                                                                                }else {
+                                                                                } else {
                                                                                     this.props.navigator.push({
                                                                                         component: OrderDetails,
                                                                                         params: {
                                                                                             ProdName: row.ProdName,
                                                                                             ShopPrice: ShopPrice,
                                                                                             Pid: row.Pid,
-                                                                                            countm: row.ShopNumber,
+                                                                                            countm: countm,
                                                                                             promemo: row.ShopRemark,
                                                                                             prototal: row.ShopAmount,
                                                                                             ProdCode: row.ProdCode,
@@ -729,7 +742,7 @@ export default class Index extends Component {
                                                                                             SuppCode: row.SuppCode,
                                                                                             ydcountm: countm,
                                                                                             BarCode: row.BarCode,
-                                                                                            IsIntCount:row.IsIntCount
+                                                                                            IsIntCount: row.IsIntCount
                                                                                         }
                                                                                     })
                                                                                 }
@@ -745,8 +758,8 @@ export default class Index extends Component {
                                                                 }
                                                             }
                                                         }
-                                                        else{
-                                                            if(this.state.head =="移动销售"){
+                                                        else {
+                                                            if (this.state.head == "移动销售") {
                                                                 var shopnumber = 0;
                                                                 var shopAmount = 0;
                                                                 this.props.navigator.push({
@@ -755,7 +768,7 @@ export default class Index extends Component {
                                                                         ProdName: row.ProdName,
                                                                         ShopPrice: row.StdPrice,
                                                                         Pid: row.Pid,
-                                                                        countm: row.ShopNumber,
+                                                                        countm: countm,
                                                                         promemo: row.ShopRemark,
                                                                         prototal: price,
                                                                         ProdCode: row.ProdCode,
@@ -763,14 +776,14 @@ export default class Index extends Component {
                                                                         SuppCode: row.SuppCode,
                                                                         ydcountm: "",
                                                                         BarCode: row.BarCode,
-                                                                        IsIntCount:row.IsIntCount
+                                                                        IsIntCount: row.IsIntCount
                                                                     }
                                                                 })
                                                                 DeviceEventEmitter.removeAllListeners();
                                                                 this.setState({
                                                                     OrderDetails: '',
                                                                 })
-                                                            }else{
+                                                            } else {
                                                                 let params = {
                                                                     reqCode: "App_PosReq",
                                                                     reqDetailCode: "App_Client_CurrProdQry",
@@ -805,14 +818,14 @@ export default class Index extends Component {
                                                                             })
                                                                         } else {
                                                                             if (this.state.head == "商品采购" || this.state.head == "协配采购" || this.state.Modify == 1) {
-                                                                                if(row.ShopNumber == 0){
+                                                                                if (row.ShopNumber == 0) {
                                                                                     this.props.navigator.push({
                                                                                         component: OrderDetails,
                                                                                         params: {
                                                                                             ProdName: row.ProdName,
                                                                                             ShopPrice: ShopPrice,
                                                                                             Pid: row.Pid,
-                                                                                            countm: row.ShopNumber,
+                                                                                            countm: countm,
                                                                                             promemo: row.ShopRemark,
                                                                                             prototal: row.ShopAmount,
                                                                                             ProdCode: row.ProdCode,
@@ -820,17 +833,17 @@ export default class Index extends Component {
                                                                                             SuppCode: row.SuppCode,
                                                                                             ydcountm: countm,
                                                                                             BarCode: row.BarCode,
-                                                                                            IsIntCount:row.IsIntCount
+                                                                                            IsIntCount: row.IsIntCount
                                                                                         }
                                                                                     })
-                                                                                }else{
+                                                                                } else {
                                                                                     this.props.navigator.push({
                                                                                         component: OrderDetails,
                                                                                         params: {
                                                                                             ProdName: row.ProdName,
                                                                                             ShopPrice: row.ShopPrice,
                                                                                             Pid: row.Pid,
-                                                                                            countm: row.ShopNumber,
+                                                                                            countm: countm,
                                                                                             promemo: row.ShopRemark,
                                                                                             prototal: row.ShopAmount,
                                                                                             ProdCode: row.ProdCode,
@@ -838,20 +851,20 @@ export default class Index extends Component {
                                                                                             SuppCode: row.SuppCode,
                                                                                             ydcountm: countm,
                                                                                             BarCode: row.BarCode,
-                                                                                            IsIntCount:row.IsIntCount
+                                                                                            IsIntCount: row.IsIntCount
                                                                                         }
                                                                                     })
                                                                                 }
-                                                                            }else if(this.state.head=="售价调整"){
-                                                                                dbAdapter.selectShopInfoData(row.Pid).then((datas)=> {
-                                                                                    if(datas.length==0){
+                                                                            } else if (this.state.head == "售价调整") {
+                                                                                dbAdapter.selectShopInfoData(row.Pid).then((datas) => {
+                                                                                    if (datas.length == 0) {
                                                                                         this.props.navigator.push({
                                                                                             component: OrderDetails,
                                                                                             params: {
                                                                                                 ProdName: row.ProdName,
                                                                                                 ShopPrice: ShopPrice,
                                                                                                 Pid: row.Pid,
-                                                                                                countm: row.ShopNumber,
+                                                                                                countm: countm,
                                                                                                 promemo: row.ShopRemark,
                                                                                                 prototal: row.ShopAmount,
                                                                                                 ProdCode: row.ProdCode,
@@ -859,10 +872,10 @@ export default class Index extends Component {
                                                                                                 SuppCode: row.SuppCode,
                                                                                                 ydcountm: "",
                                                                                                 BarCode: row.BarCode,
-                                                                                                IsIntCount:row.IsIntCount
+                                                                                                IsIntCount: row.IsIntCount
                                                                                             }
                                                                                         })
-                                                                                    }else{
+                                                                                    } else {
                                                                                         for (let i = 0; i < datas.length; i++) {
                                                                                             var data = datas.item(i);
                                                                                             this.props.navigator.push({
@@ -871,7 +884,7 @@ export default class Index extends Component {
                                                                                                     ProdName: row.ProdName,
                                                                                                     ShopPrice: ShopPrice,
                                                                                                     Pid: row.Pid,
-                                                                                                    countm: row.ShopNumber,
+                                                                                                    countm: countm,
                                                                                                     promemo: row.ShopRemark,
                                                                                                     prototal: row.ShopAmount,
                                                                                                     ProdCode: row.ProdCode,
@@ -879,7 +892,7 @@ export default class Index extends Component {
                                                                                                     SuppCode: row.SuppCode,
                                                                                                     ydcountm: data.ydcountm,
                                                                                                     BarCode: row.BarCode,
-                                                                                                    IsIntCount:row.IsIntCount
+                                                                                                    IsIntCount: row.IsIntCount
                                                                                                 }
                                                                                             })
                                                                                         }
@@ -892,7 +905,7 @@ export default class Index extends Component {
                                                                                         ProdName: row.ProdName,
                                                                                         ShopPrice: ShopPrice,
                                                                                         Pid: row.Pid,
-                                                                                        countm: row.ShopNumber,
+                                                                                        countm: countm,
                                                                                         promemo: row.ShopRemark,
                                                                                         prototal: row.ShopAmount,
                                                                                         ProdCode: row.ProdCode,
@@ -900,7 +913,7 @@ export default class Index extends Component {
                                                                                         SuppCode: row.SuppCode,
                                                                                         ydcountm: countm,
                                                                                         BarCode: row.BarCode,
-                                                                                        IsIntCount:row.IsIntCount
+                                                                                        IsIntCount: row.IsIntCount
                                                                                     }
                                                                                 })
                                                                             }
@@ -923,18 +936,18 @@ export default class Index extends Component {
                                     else {
                                         //商品查询
                                         dbAdapter.selectAidCode(reminder, 1).then((rows) => {
-                                            if(rows.length==0){
-                                                ToastAndroid.show("商品不存在",ToastAndroid.SHORT);
+                                            if (rows.length == 0) {
+                                                ToastAndroid.show("商品不存在", ToastAndroid.SHORT);
                                                 return;
                                             }
                                             for (let i = 0; i < rows.length; i++) {
                                                 var row = rows.item(i);
-                                                if(DepCode!==null) {
+                                                if (DepCode !== null) {
                                                     if (row.DepCode1 !== DepCode) {
-                                                        ToastAndroid.show("请选择该品类下的商品",ToastAndroid.SHORT);
+                                                        ToastAndroid.show("请选择该品类下的商品", ToastAndroid.SHORT);
                                                         return;
                                                     } else {
-                                                        if(this.state.head =="移动销售"){
+                                                        if (this.state.head == "移动销售") {
                                                             var shopnumber = 0;
                                                             var shopAmount = 0;
                                                             this.props.navigator.push({
@@ -951,14 +964,14 @@ export default class Index extends Component {
                                                                     SuppCode: row.SuppCode,
                                                                     ydcountm: "",
                                                                     BarCode: row.BarCode,
-                                                                    IsIntCount:row.IsIntCount
+                                                                    IsIntCount: row.IsIntCount
                                                                 }
                                                             })
                                                             DeviceEventEmitter.removeAllListeners();
                                                             this.setState({
                                                                 OrderDetails: '',
                                                             })
-                                                        }else{
+                                                        } else {
                                                             let params = {
                                                                 reqCode: "App_PosReq",
                                                                 reqDetailCode: "App_Client_CurrProdQry",
@@ -993,7 +1006,7 @@ export default class Index extends Component {
                                                                         })
                                                                     } else {
                                                                         if (this.state.head == "商品采购" || this.state.head == "协配采购" || this.state.Modify == 1) {
-                                                                            if(row.ShopNumber == 0){
+                                                                            if (row.ShopNumber == 0) {
                                                                                 this.props.navigator.push({
                                                                                     component: OrderDetails,
                                                                                     params: {
@@ -1008,10 +1021,10 @@ export default class Index extends Component {
                                                                                         SuppCode: row.SuppCode,
                                                                                         ydcountm: countm,
                                                                                         BarCode: row.BarCode,
-                                                                                        IsIntCount:row.IsIntCount
+                                                                                        IsIntCount: row.IsIntCount
                                                                                     }
                                                                                 })
-                                                                            }else{
+                                                                            } else {
                                                                                 this.props.navigator.push({
                                                                                     component: OrderDetails,
                                                                                     params: {
@@ -1026,13 +1039,13 @@ export default class Index extends Component {
                                                                                         SuppCode: row.SuppCode,
                                                                                         ydcountm: countm,
                                                                                         BarCode: row.BarCode,
-                                                                                        IsIntCount:row.IsIntCount
+                                                                                        IsIntCount: row.IsIntCount
                                                                                     }
                                                                                 })
                                                                             }
-                                                                        }else if(this.state.head=="售价调整"){
-                                                                            dbAdapter.selectShopInfoData(row.Pid).then((datas)=> {
-                                                                                if(datas.length==0){
+                                                                        } else if (this.state.head == "售价调整") {
+                                                                            dbAdapter.selectShopInfoData(row.Pid).then((datas) => {
+                                                                                if (datas.length == 0) {
                                                                                     this.props.navigator.push({
                                                                                         component: OrderDetails,
                                                                                         params: {
@@ -1047,10 +1060,10 @@ export default class Index extends Component {
                                                                                             SuppCode: row.SuppCode,
                                                                                             ydcountm: "",
                                                                                             BarCode: row.BarCode,
-                                                                                            IsIntCount:row.IsIntCount
+                                                                                            IsIntCount: row.IsIntCount
                                                                                         }
                                                                                     })
-                                                                                }else{
+                                                                                } else {
                                                                                     for (let i = 0; i < datas.length; i++) {
                                                                                         var data = datas.item(i);
                                                                                         this.props.navigator.push({
@@ -1067,7 +1080,7 @@ export default class Index extends Component {
                                                                                                 SuppCode: row.SuppCode,
                                                                                                 ydcountm: data.ydcountm,
                                                                                                 BarCode: row.BarCode,
-                                                                                                IsIntCount:row.IsIntCount
+                                                                                                IsIntCount: row.IsIntCount
                                                                                             }
                                                                                         })
                                                                                     }
@@ -1088,7 +1101,7 @@ export default class Index extends Component {
                                                                                     SuppCode: row.SuppCode,
                                                                                     ydcountm: countm,
                                                                                     BarCode: row.BarCode,
-                                                                                    IsIntCount:row.IsIntCount
+                                                                                    IsIntCount: row.IsIntCount
                                                                                 }
                                                                             })
                                                                         }
@@ -1103,8 +1116,8 @@ export default class Index extends Component {
                                                             })
                                                         }
                                                     }
-                                                }else{
-                                                    if(this.state.head =="移动销售"){
+                                                } else {
+                                                    if (this.state.head == "移动销售") {
                                                         var shopnumber = 0;
                                                         var shopAmount = 0;
                                                         this.props.navigator.push({
@@ -1121,14 +1134,14 @@ export default class Index extends Component {
                                                                 SuppCode: row.SuppCode,
                                                                 ydcountm: "",
                                                                 BarCode: row.BarCode,
-                                                                IsIntCount:row.IsIntCount
+                                                                IsIntCount: row.IsIntCount
                                                             }
                                                         })
                                                         DeviceEventEmitter.removeAllListeners();
                                                         this.setState({
                                                             OrderDetails: '',
                                                         })
-                                                    }else{
+                                                    } else {
                                                         let params = {
                                                             reqCode: "App_PosReq",
                                                             reqDetailCode: "App_Client_CurrProdQry",
@@ -1163,7 +1176,7 @@ export default class Index extends Component {
                                                                     })
                                                                 } else {
                                                                     if (this.state.head == "商品采购" || this.state.head == "协配采购" || this.state.Modify == 1) {
-                                                                        if(row.ShopNumber == 0){
+                                                                        if (row.ShopNumber == 0) {
                                                                             this.props.navigator.push({
                                                                                 component: OrderDetails,
                                                                                 params: {
@@ -1178,10 +1191,10 @@ export default class Index extends Component {
                                                                                     SuppCode: row.SuppCode,
                                                                                     ydcountm: countm,
                                                                                     BarCode: row.BarCode,
-                                                                                    IsIntCount:row.IsIntCount
+                                                                                    IsIntCount: row.IsIntCount
                                                                                 }
                                                                             })
-                                                                        }else{
+                                                                        } else {
                                                                             this.props.navigator.push({
                                                                                 component: OrderDetails,
                                                                                 params: {
@@ -1196,13 +1209,13 @@ export default class Index extends Component {
                                                                                     SuppCode: row.SuppCode,
                                                                                     ydcountm: countm,
                                                                                     BarCode: row.BarCode,
-                                                                                    IsIntCount:row.IsIntCount
+                                                                                    IsIntCount: row.IsIntCount
                                                                                 }
                                                                             })
                                                                         }
-                                                                    }else if(this.state.head=="售价调整"){
-                                                                        dbAdapter.selectShopInfoData(row.Pid).then((datas)=> {
-                                                                            if(datas.length==0){
+                                                                    } else if (this.state.head == "售价调整") {
+                                                                        dbAdapter.selectShopInfoData(row.Pid).then((datas) => {
+                                                                            if (datas.length == 0) {
                                                                                 this.props.navigator.push({
                                                                                     component: OrderDetails,
                                                                                     params: {
@@ -1217,10 +1230,10 @@ export default class Index extends Component {
                                                                                         SuppCode: row.SuppCode,
                                                                                         ydcountm: "",
                                                                                         BarCode: row.BarCode,
-                                                                                        IsIntCount:row.IsIntCount
+                                                                                        IsIntCount: row.IsIntCount
                                                                                     }
                                                                                 })
-                                                                            }else{
+                                                                            } else {
                                                                                 for (let i = 0; i < datas.length; i++) {
                                                                                     var data = datas.item(i);
                                                                                     this.props.navigator.push({
@@ -1237,7 +1250,7 @@ export default class Index extends Component {
                                                                                             SuppCode: row.SuppCode,
                                                                                             ydcountm: data.ydcountm,
                                                                                             BarCode: row.BarCode,
-                                                                                            IsIntCount:row.IsIntCount
+                                                                                            IsIntCount: row.IsIntCount
                                                                                         }
                                                                                     })
                                                                                 }
@@ -1258,7 +1271,7 @@ export default class Index extends Component {
                                                                                 SuppCode: row.SuppCode,
                                                                                 ydcountm: countm,
                                                                                 BarCode: row.BarCode,
-                                                                                IsIntCount:row.IsIntCount
+                                                                                IsIntCount: row.IsIntCount
                                                                             }
                                                                         })
                                                                     }
@@ -1395,35 +1408,38 @@ export default class Index extends Component {
     //获取左侧商品品类信息、商品总数、触发第一个列表
     _fetch() {
         let ShopCar1 = 0;
-        var priductdata=0;
+        var priductdata = 0;
         let DepCode;
         let priductData = [];
         dbAdapter.selectTDepSet('1').then((rows) => {
             for (let i = 0; i < rows.length; i++) {
                 var row = rows.item(i);
                 this.dataRows.push(row);
+                var ShopCar = rows.item(0).DepCode;
+                ShopCar1 = BigDecimalUtils.add(row.ShopNumber, ShopCar1, 2);
+            };
+            //判断修改数量页面传过来depcode是否为空
+            if (this.state.depcode == "") {
+                DepCode=ShopCar;
+                this.setState({
+                    depcode: ShopCar,
+                    currentindex: ShopCar,
+                });
+                lastDepCode = ShopCar;
+            } else {
+                DepCode=this.state.depcode;
+                this.setState({
+                    currentindex: this.state.depcode,
+                });
             }
-            this.setState({
-                dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
-            })
-            for (let j = 0; j < this.dataRows.length; j++) {
-                var Data=this.dataRows[j];
-                if(j==0){
-                    DepCode=Data.DepCode
-                }
-            }
-            //触发第一个左侧品类
+            //获取商品总数（DepCode为类别的depcode）
             dbAdapter.selectProduct1(DepCode, 1).then((rows) => {
                 for (let i = 0; i < rows.length; i++) {
                     var row = rows.item(i);
-                }
+                };
                 priductdata = JSON.stringify(row.countn);
             });
-            var DEPCODE = (DepCode);
-            this.setState({
-                depcode: DEPCODE,
-                // isloading: true,
-            })
+            //触发第一个左侧品类
             dbAdapter.selectProduct(DepCode, page, 1).then((rows) => {
                 if (lastDepCode !== "") {
                     page = 1;
@@ -1431,27 +1447,18 @@ export default class Index extends Component {
                 for (let i = 0; i < rows.length; i++) {
                     var row = rows.item(i);
                     priductData.push(row);
-                }
+                };
                 total = priductdata;
                 totalPage = total % 9 == 0 ? total / 9 : Math.floor(total / 9) + 1;
                 this.productData = priductData;
                 this.setState({
-                    currentindex: this.state.depcode,
+                    dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
+                    ShopCar1: ShopCar1,
+                    Page: priductdata,
                     data: priductData,
                     isloading: false,
                 });
             });
-        });
-        //获取商品总数
-        dbAdapter.selectProduct1(1, 1).then((rows) => {
-            for (let i = 0; i < rows.length; i++) {
-                var row = rows.item(i);
-            }
-            ;
-            var priductdata = JSON.stringify(row.countn);
-            this.setState({
-                Page: priductdata,
-            })
         });
         this._fetch1();
     }
@@ -1461,6 +1468,7 @@ export default class Index extends Component {
             for (let i = 0; i < rows.length; i++) {
                 var row = rows.item(i);
             }
+            ;
         });
         dbAdapter.selectShopInfoAllCountm().then((rows) => {
             let ShopCar = rows.item(0).countm;
@@ -1490,11 +1498,11 @@ export default class Index extends Component {
 
     //商品品类获取品类下商品
     _pressRow(rowData) {
-        var priductdata=0
+        var priductdata = 0;
+        let priductData = [];
         if (lastDepCode == "") {
             lastDepCode = rowData.DepCode;
-        }
-        if (lastDepCode !== '') {
+        } else if (lastDepCode !== '') {
             page = 1;
         }
         dbAdapter.selectProduct1(rowData.DepCode, 1).then((rows) => {
@@ -1503,12 +1511,10 @@ export default class Index extends Component {
             }
             priductdata = JSON.stringify(row.countn);
         });
-        let priductData = [];
-        var DEPCODE = (rowData.DepCode);
         this.setState({
-            depcode: DEPCODE,
-            // isloading: true,
-        })
+            depcode: rowData.DepCode,
+            currentindex: rowData.DepCode,
+        });
         dbAdapter.selectProduct(rowData.DepCode, page, 1).then((rows) => {
             for (let i = 0; i < rows.length; i++) {
                 var row = rows.item(i);
@@ -1521,17 +1527,16 @@ export default class Index extends Component {
             this.setState({
                 data: priductData,
                 isloading: false,
-                currentindex: rowData.DepCode
-            })
+                dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
+            });
             if (totalPage == 0) {
                 this.setState({
                     nomore: false,
-                })
-            }
-            if (totalPage > 0) {
+                });
+            } else if (totalPage > 0) {
                 this.setState({
                     nomore: true,
-                })
+                });
             }
         });
         this._fetch1();
@@ -1590,27 +1595,27 @@ export default class Index extends Component {
         //     })
         //     return;
         // }else {
-        item.item.ShopNumber = BigDecimalUtils.subtract(item.item.ShopNumber ,1,2);
-        if(item.item.ShopNumber<=0){
-            item.item.ShopNumber=0;
+        item.item.ShopNumber = BigDecimalUtils.subtract(item.item.ShopNumber, 1, 2);
+        if (item.item.ShopNumber <= 0) {
+            item.item.ShopNumber = 0;
         }
         let select = 0;
         for (let i = 0; i < this.dataRows.length; i++) {
             if (item.item.DepCode1 == this.dataRows[i].DepCode) {//判断当前品类是否相等
                 select = i;
                 let ShopNumber = this.dataRows[i].ShopNumber;
-                this.dataRows[i].ShopNumber = BigDecimalUtils.subtract(ShopNumber,1,2);
-                if(this.dataRows[i].ShopNumber<=0){
-                    this.dataRows[i].ShopNumber=0;
+                this.dataRows[i].ShopNumber = BigDecimalUtils.subtract(ShopNumber, 1, 2);
+                if (this.dataRows[i].ShopNumber <= 0) {
+                    this.dataRows[i].ShopNumber = 0;
                 }
                 this.setState({
                     dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
                 })
             }
         }
-        var prototal=Number(item.item.ShopNumber*item.item.ShopPrice);
-        var disCount=BigDecimalUtils.multiply(item.item.ShopNumber,item.item.ShopPrice);
-        dbAdapter.upDataShopInfoCountmSub(item.item.ProdCode,disCount).then((rows) => {
+        var prototal = Number(item.item.ShopNumber * item.item.ShopPrice);
+        var disCount = BigDecimalUtils.multiply(item.item.ShopNumber, item.item.ShopPrice);
+        dbAdapter.upDataShopInfoCountmSub(item.item.ProdCode, disCount).then((rows) => {
         });
         if (item.item.ShopNumber == "0") {
             if (this.state.head !== "实时盘点" || this.state.head !== "商品盘点") {
@@ -1654,12 +1659,12 @@ export default class Index extends Component {
                 dbAdapter.selectAidCode(item.item.ProdCode, 1).then((rows) => {
                     for (let i = 0; i < rows.length; i++) {
                         var row = rows.item(i);
-                        if(DepCode!==null) {
+                        if (DepCode !== null) {
                             if (row.DepCode1 !== DepCode) {
-                                ToastAndroid.show("请选择该品类下的商品",ToastAndroid.SHORT);
+                                ToastAndroid.show("请选择该品类下的商品", ToastAndroid.SHORT);
                                 return;
                             } else {
-                                if(this.state.head =="移动销售"){
+                                if (this.state.head == "移动销售") {
                                     var shopnumber = 0;
                                     var shopAmount = 0;
                                     this.props.navigator.push({
@@ -1676,10 +1681,10 @@ export default class Index extends Component {
                                             SuppCode: item.item.SuppCode,
                                             ydcountm: "",
                                             BarCode: item.item.BarCode,
-                                            IsIntCount:row.IsIntCount
+                                            IsIntCount: row.IsIntCount
                                         }
                                     })
-                                }else{
+                                } else {
                                     Storage.get('FormType').then((FormType) => {
                                         Storage.get('LinkUrl').then((LinkUrl) => {
                                             Storage.get('Modify').then((Modify) => {
@@ -1714,7 +1719,7 @@ export default class Index extends Component {
                                                                 })
                                                             } else {
                                                                 if (this.state.head == "商品采购" || this.state.head == "协配采购" || this.state.Modify == 1) {
-                                                                    if(item.item.ShopNumber == 0){
+                                                                    if (item.item.ShopNumber == 0) {
                                                                         this.props.navigator.push({
                                                                             component: OrderDetails,
                                                                             params: {
@@ -1729,10 +1734,10 @@ export default class Index extends Component {
                                                                                 SuppCode: item.item.SuppCode,
                                                                                 ydcountm: countm,
                                                                                 BarCode: item.item.BarCode,
-                                                                                IsIntCount:row.IsIntCount
+                                                                                IsIntCount: row.IsIntCount
                                                                             }
                                                                         })
-                                                                    }else{
+                                                                    } else {
                                                                         this.props.navigator.push({
                                                                             component: OrderDetails,
                                                                             params: {
@@ -1747,14 +1752,14 @@ export default class Index extends Component {
                                                                                 SuppCode: item.item.SuppCode,
                                                                                 ydcountm: row.ydcountm,
                                                                                 BarCode: item.item.BarCode,
-                                                                                IsIntCount:row.IsIntCount
+                                                                                IsIntCount: row.IsIntCount
                                                                             }
                                                                         })
                                                                     }
 
-                                                                }else if(this.state.head=="售价调整"){
-                                                                    dbAdapter.selectShopInfoData(item.item.Pid).then((datas)=> {
-                                                                        if(datas.length==0){
+                                                                } else if (this.state.head == "售价调整") {
+                                                                    dbAdapter.selectShopInfoData(item.item.Pid).then((datas) => {
+                                                                        if (datas.length == 0) {
                                                                             this.props.navigator.push({
                                                                                 component: OrderDetails,
                                                                                 params: {
@@ -1769,10 +1774,10 @@ export default class Index extends Component {
                                                                                     SuppCode: item.item.SuppCode,
                                                                                     ydcountm: "",
                                                                                     BarCode: item.item.BarCode,
-                                                                                    IsIntCount:row.IsIntCount
+                                                                                    IsIntCount: row.IsIntCount
                                                                                 }
                                                                             })
-                                                                        }else{
+                                                                        } else {
                                                                             for (let i = 0; i < datas.length; i++) {
                                                                                 var data = datas.item(i);
                                                                                 this.props.navigator.push({
@@ -1789,33 +1794,33 @@ export default class Index extends Component {
                                                                                         SuppCode: item.item.SuppCode,
                                                                                         ydcountm: data.ydcountm,
                                                                                         BarCode: item.item.BarCode,
-                                                                                        IsIntCount:row.IsIntCount
+                                                                                        IsIntCount: row.IsIntCount
                                                                                     }
                                                                                 })
                                                                             }
                                                                         }
                                                                     })
                                                                 } else {
-                                                                    if(this.state.head=="标签采集"&&row.ShopNumber == 0){
+                                                                    if (this.state.head == "标签采集" && row.ShopNumber == 0) {
                                                                         this.setState({
                                                                             Number1: 1,
                                                                         })
-                                                                    }else{
+                                                                    } else {
                                                                         this.setState({
                                                                             Number1: row.ShopNumber,
                                                                         })
                                                                     }
 
-                                                                    if(this.state.name!=="标签采集"&&row.ShopNumber == 0){
+                                                                    if (this.state.name !== "标签采集" && row.ShopNumber == 0) {
                                                                         this.setState({
                                                                             Number1: '',
                                                                         })
-                                                                    }else{
+                                                                    } else {
                                                                         this.setState({
                                                                             Number1: row.ShopNumber,
                                                                         })
                                                                     }
-                                                                    this.props.navigator.push({
+                                                                    this.props.navigator.popToTop({
                                                                         component: OrderDetails,
                                                                         params: {
                                                                             ProdName: item.item.ProdName,
@@ -1829,7 +1834,7 @@ export default class Index extends Component {
                                                                             SuppCode: item.item.SuppCode,
                                                                             ydcountm: countm,
                                                                             BarCode: item.item.BarCode,
-                                                                            IsIntCount:row.IsIntCount
+                                                                            IsIntCount: row.IsIntCount
                                                                         }
                                                                     })
                                                                 }
@@ -1844,8 +1849,8 @@ export default class Index extends Component {
                                     })
                                 }
                             }
-                        }else{
-                            if(this.state.head =="移动销售"){
+                        } else {
+                            if (this.state.head == "移动销售") {
                                 var shopnumber = 0;
                                 var shopAmount = 0;
                                 this.props.navigator.push({
@@ -1862,10 +1867,10 @@ export default class Index extends Component {
                                         SuppCode: item.item.SuppCode,
                                         ydcountm: "",
                                         BarCode: item.item.BarCode,
-                                        IsIntCount:row.IsIntCount
+                                        IsIntCount: row.IsIntCount
                                     }
                                 })
-                            }else{
+                            } else {
                                 Storage.get('FormType').then((FormType) => {
                                     Storage.get('LinkUrl').then((LinkUrl) => {
                                         Storage.get('Modify').then((Modify) => {
@@ -1900,7 +1905,7 @@ export default class Index extends Component {
                                                             })
                                                         } else {
                                                             if (this.state.head == "商品采购" || this.state.head == "协配采购" || this.state.Modify == 1) {
-                                                                if(item.item.ShopNumber == 0){
+                                                                if (item.item.ShopNumber == 0) {
                                                                     this.props.navigator.push({
                                                                         component: OrderDetails,
                                                                         params: {
@@ -1915,10 +1920,10 @@ export default class Index extends Component {
                                                                             SuppCode: item.item.SuppCode,
                                                                             ydcountm: countm,
                                                                             BarCode: item.item.BarCode,
-                                                                            IsIntCount:row.IsIntCount
+                                                                            IsIntCount: row.IsIntCount
                                                                         }
                                                                     })
-                                                                }else{
+                                                                } else {
                                                                     this.props.navigator.push({
                                                                         component: OrderDetails,
                                                                         params: {
@@ -1933,13 +1938,13 @@ export default class Index extends Component {
                                                                             SuppCode: item.item.SuppCode,
                                                                             ydcountm: countm,
                                                                             BarCode: item.item.BarCode,
-                                                                            IsIntCount:row.IsIntCount
+                                                                            IsIntCount: row.IsIntCount
                                                                         }
                                                                     })
                                                                 }
-                                                            }else if(this.state.head=="售价调整"){
-                                                                dbAdapter.selectShopInfoData(item.item.Pid).then((datas)=> {
-                                                                    if(datas.length==0){
+                                                            } else if (this.state.head == "售价调整") {
+                                                                dbAdapter.selectShopInfoData(item.item.Pid).then((datas) => {
+                                                                    if (datas.length == 0) {
                                                                         this.props.navigator.push({
                                                                             component: OrderDetails,
                                                                             params: {
@@ -1954,10 +1959,10 @@ export default class Index extends Component {
                                                                                 SuppCode: item.item.SuppCode,
                                                                                 ydcountm: "",
                                                                                 BarCode: item.item.BarCode,
-                                                                                IsIntCount:row.IsIntCount
+                                                                                IsIntCount: row.IsIntCount
                                                                             }
                                                                         })
-                                                                    }else{
+                                                                    } else {
                                                                         for (let i = 0; i < datas.length; i++) {
                                                                             var data = datas.item(i);
                                                                             this.props.navigator.push({
@@ -1974,28 +1979,28 @@ export default class Index extends Component {
                                                                                     SuppCode: item.item.SuppCode,
                                                                                     ydcountm: data.ydcountm,
                                                                                     BarCode: item.item.BarCode,
-                                                                                    IsIntCount:row.IsIntCount
+                                                                                    IsIntCount: row.IsIntCount
                                                                                 }
                                                                             })
                                                                         }
                                                                     }
                                                                 })
                                                             } else {
-                                                                if(this.state.head=="标签采集"&&rows.item(0).ShopNumber == 0){
+                                                                if (this.state.head == "标签采集" && rows.item(0).ShopNumber == 0) {
                                                                     this.setState({
                                                                         Number1: 1,
                                                                     })
-                                                                }else{
+                                                                } else {
                                                                     this.setState({
                                                                         Number1: row.ShopNumber,
                                                                     })
                                                                 }
 
-                                                                if(this.state.name!=="标签采集"&&rows.item(0).ShopNumber == 0){
+                                                                if (this.state.name !== "标签采集" && rows.item(0).ShopNumber == 0) {
                                                                     this.setState({
                                                                         Number1: '',
                                                                     })
-                                                                }else{
+                                                                } else {
                                                                     this.setState({
                                                                         Number1: row.ShopNumber,
                                                                     })
@@ -2014,7 +2019,7 @@ export default class Index extends Component {
                                                                         SuppCode: item.item.SuppCode,
                                                                         ydcountm: countm,
                                                                         BarCode: item.item.BarCode,
-                                                                        IsIntCount:row.IsIntCount
+                                                                        IsIntCount: row.IsIntCount
                                                                     }
                                                                 })
                                                             }
@@ -2061,13 +2066,14 @@ export default class Index extends Component {
             pressStatus: 0
         });
     }
+
     /**
      * 门店要货
      */
     YaoHuo() {
         if (this.state.ShopCar1 > 0) {
             this._setModalVisible();
-            ToastAndroid.show("商品未提交",ToastAndroid.SHORT);
+            ToastAndroid.show("商品未提交", ToastAndroid.SHORT);
             return;
         } else if (this.state.username == null) {
             this._setModalVisible();
@@ -2083,17 +2089,17 @@ export default class Index extends Component {
                                         name: "门店要货",
                                         component: PinLei,//YHDan文件夹
                                         params: {
-                                            invoice:"门店要货"
+                                            invoice: "门店要货"
                                         }
                                     };
                                     this.props.navigator.push(nextRoute);
                                     this._setModalVisible();
                                     DeviceEventEmitter.removeAllListeners();
-                                }else {
+                                } else {
                                     this.Promp();
                                 }
-                            }else {
-                                ToastAndroid.show("没有权限",ToastAndroid.SHORT);
+                            } else {
+                                ToastAndroid.show("没有权限", ToastAndroid.SHORT);
                                 return;
                             }
                         })
@@ -2104,13 +2110,14 @@ export default class Index extends Component {
             });
         }
     }
+
     /**
      * 商品损溢
      */
     SunYi() {
         if (this.state.ShopCar1 > 0) {
             this._setModalVisible();
-            ToastAndroid.show("商品未提交",ToastAndroid.SHORT);
+            ToastAndroid.show("商品未提交", ToastAndroid.SHORT);
             return;
         } else if (this.state.username == null) {
             this._setModalVisible();
@@ -2122,7 +2129,7 @@ export default class Index extends Component {
                             name: "商品损溢",
                             component: SunYi,//app文件夹
                             params: {
-                                invoice:"商品损溢"
+                                invoice: "商品损溢"
                             }
                         };
                         this.props.navigator.push(nextRoute);
@@ -2133,20 +2140,21 @@ export default class Index extends Component {
                     } else {
                         this.Promp();
                     }
-                }else{
-                    ToastAndroid.show("没有权限",ToastAndroid.SHORT);
+                } else {
+                    ToastAndroid.show("没有权限", ToastAndroid.SHORT);
                     return;
                 }
             })
         }
     }
+
     /**
      * 实时盘点
      */
     SSPanDian() {
         if (this.state.ShopCar1 > 0) {
             this._setModalVisible();
-            ToastAndroid.show("商品未提交",ToastAndroid.SHORT);
+            ToastAndroid.show("商品未提交", ToastAndroid.SHORT);
             return;
         } else if (this.state.username == null) {
             this._setModalVisible();
@@ -2159,29 +2167,30 @@ export default class Index extends Component {
                             name: "实时盘点",
                             component: PinLei,//app文件夹
                             params: {
-                                invoice:"实时盘点"
+                                invoice: "实时盘点"
                             }
                         };
                         this.props.navigator.push(nextRoute);
                         this._setModalVisible();
                         DeviceEventEmitter.removeAllListeners();
-                    }else {
+                    } else {
                         this.Promp();
                     }
-                }else{
-                    ToastAndroid.show("没有权限",ToastAndroid.SHORT);
+                } else {
+                    ToastAndroid.show("没有权限", ToastAndroid.SHORT);
                     return;
                 }
             })
         }
     }
+
     /**
      * 商品盘点
      */
     SPPanDian() {
         if (this.state.ShopCar1 > 0) {
             this._setModalVisible();
-            ToastAndroid.show("商品未提交",ToastAndroid.SHORT);
+            ToastAndroid.show("商品未提交", ToastAndroid.SHORT);
             return;
         } else if (this.state.username == null) {
             this._setModalVisible();
@@ -2194,7 +2203,7 @@ export default class Index extends Component {
                             name: "主页",
                             component: Query,//app文件夹
                             params: {
-                                invoice:"商品盘点"
+                                invoice: "商品盘点"
                             }
                         };
                         this.props.navigator.push(nextRoute);
@@ -2203,21 +2212,22 @@ export default class Index extends Component {
                     } else {
                         this.Promp();
                     }
-                }else{
-                    ToastAndroid.show("没有权限",ToastAndroid.SHORT);
+                } else {
+                    ToastAndroid.show("没有权限", ToastAndroid.SHORT);
                     return;
                 }
             })
         }
 
     }
+
     /**
      * 配送收货
      */
     PSShouHuo() {
         if (this.state.ShopCar1 > 0) {
             this._setModalVisible();
-            ToastAndroid.show("商品未提交",ToastAndroid.SHORT);
+            ToastAndroid.show("商品未提交", ToastAndroid.SHORT);
             return;
         } else if (this.state.username == null) {
             this._setModalVisible();
@@ -2233,7 +2243,7 @@ export default class Index extends Component {
                                         name: "主页",
                                         component: Distrition,//app文件夹
                                         params: {
-                                            invoice:"配送收货"
+                                            invoice: "配送收货"
                                         }
                                     };
                                     this.props.navigator.push(nextRoute);
@@ -2242,8 +2252,8 @@ export default class Index extends Component {
                                 } else {
                                     this.Promp();
                                 }
-                            }else{
-                                ToastAndroid.show("没有权限",ToastAndroid.SHORT);
+                            } else {
+                                ToastAndroid.show("没有权限", ToastAndroid.SHORT);
                                 return;
                             }
                         })
@@ -2255,13 +2265,14 @@ export default class Index extends Component {
         }
 
     }
+
     /**
      * 商品采购
      */
     SPCaiGou() {
         if (this.state.ShopCar1 > 0) {
             this._setModalVisible();
-            ToastAndroid.show("商品未提交",ToastAndroid.SHORT);
+            ToastAndroid.show("商品未提交", ToastAndroid.SHORT);
             return;
         } else if (this.state.username == null) {
             this._setModalVisible();
@@ -2277,7 +2288,7 @@ export default class Index extends Component {
                                         name: "主页",
                                         component: ProductCG,//app文件夹
                                         params: {
-                                            invoice:"商品采购"
+                                            invoice: "商品采购"
                                         }
                                     };
                                     this.props.navigator.push(nextRoute);
@@ -2286,8 +2297,8 @@ export default class Index extends Component {
                                 } else {
                                     this.Promp();
                                 }
-                            }else{
-                                ToastAndroid.show("没有权限",ToastAndroid.SHORT);
+                            } else {
+                                ToastAndroid.show("没有权限", ToastAndroid.SHORT);
                                 return;
                             }
                         })
@@ -2298,13 +2309,14 @@ export default class Index extends Component {
             });
         }
     }
+
     /**
      * 商品验收
      */
     SPYanShou() {
         if (this.state.ShopCar1 > 0) {
             this._setModalVisible();
-            ToastAndroid.show("商品未提交",ToastAndroid.SHORT);
+            ToastAndroid.show("商品未提交", ToastAndroid.SHORT);
             return;
         } else if (this.state.username == null) {
             this._setModalVisible();
@@ -2320,7 +2332,7 @@ export default class Index extends Component {
                                         name: "主页",
                                         component: ProductYS,//app文件夹
                                         params: {
-                                            invoice:"商品验收"
+                                            invoice: "商品验收"
                                         }
                                     };
                                     this.props.navigator.push(nextRoute);
@@ -2329,8 +2341,8 @@ export default class Index extends Component {
                                 } else {
                                     this.Promp();
                                 }
-                            }else{
-                                ToastAndroid.show("没有权限",ToastAndroid.SHORT);
+                            } else {
+                                ToastAndroid.show("没有权限", ToastAndroid.SHORT);
                                 return;
                             }
                         })
@@ -2341,13 +2353,14 @@ export default class Index extends Component {
             });
         }
     }
+
     /**
      * 协配采购
      */
     XPCaiGou() {
         if (this.state.ShopCar1 > 0) {
             this._setModalVisible();
-            ToastAndroid.show("商品未提交",ToastAndroid.SHORT);
+            ToastAndroid.show("商品未提交", ToastAndroid.SHORT);
             return;
         } else if (this.state.username == null) {
             this._setModalVisible();
@@ -2363,7 +2376,7 @@ export default class Index extends Component {
                                         name: "主页",
                                         component: ProductXP,//app文件夹
                                         params: {
-                                            invoice:"协配采购"
+                                            invoice: "协配采购"
                                         }
                                     };
                                     this.props.navigator.push(nextRoute);
@@ -2374,8 +2387,8 @@ export default class Index extends Component {
                                 } else {
                                     this.Promp();
                                 }
-                            }else{
-                                ToastAndroid.show("没有权限",ToastAndroid.SHORT);
+                            } else {
+                                ToastAndroid.show("没有权限", ToastAndroid.SHORT);
                                 return;
                             }
                         })
@@ -2386,13 +2399,14 @@ export default class Index extends Component {
             });
         }
     }
+
     /**
      * 协配收货
      */
     XPShouHuo() {
         if (this.state.ShopCar1 > 0) {
             this._setModalVisible();
-            ToastAndroid.show("商品未提交",ToastAndroid.SHORT);
+            ToastAndroid.show("商品未提交", ToastAndroid.SHORT);
             return;
         } else if (this.state.username == null) {
             this._setModalVisible();
@@ -2408,7 +2422,7 @@ export default class Index extends Component {
                                         name: "主页",
                                         component: ProductSH,//app文件夹
                                         params: {
-                                            invoice:"协配收货"
+                                            invoice: "协配收货"
                                         }
                                     };
                                     this.props.navigator.push(nextRoute);
@@ -2419,8 +2433,8 @@ export default class Index extends Component {
                                 } else {
                                     this.Promp();
                                 }
-                            }else{
-                                ToastAndroid.show("没有权限",ToastAndroid.SHORT);
+                            } else {
+                                ToastAndroid.show("没有权限", ToastAndroid.SHORT);
                                 return;
                             }
                         })
@@ -2432,13 +2446,14 @@ export default class Index extends Component {
 
         }
     }
+
     /**
      * 商品配送
      */
-    PSDan(){
+    PSDan() {
         if (this.state.ShopCar1 > 0) {
             this._setModalVisible();
-            ToastAndroid.show("商品未提交",ToastAndroid.SHORT);
+            ToastAndroid.show("商品未提交", ToastAndroid.SHORT);
             return;
         } else if (this.state.username == null) {
             this._setModalVisible();
@@ -2451,7 +2466,7 @@ export default class Index extends Component {
                             name: "商品配送",
                             component: PSDan,//app文件夹
                             params: {
-                                invoice:"商品配送"
+                                invoice: "商品配送"
                             }
                         };
                         this.props.navigator.push(nextRoute);
@@ -2460,8 +2475,8 @@ export default class Index extends Component {
                     } else {
                         this.Promp();
                     }
-                }else {
-                    ToastAndroid.show("没有权限",ToastAndroid.SHORT);
+                } else {
+                    ToastAndroid.show("没有权限", ToastAndroid.SHORT);
                     return;
                 }
             })
@@ -2474,12 +2489,12 @@ export default class Index extends Component {
     Sell() {
         if (this.state.ShopCar1 > 0) {
             this._setModalVisible();
-            ToastAndroid.show("商品未提交",ToastAndroid.SHORT);
+            ToastAndroid.show("商品未提交", ToastAndroid.SHORT);
             return;
         } else if (this.state.username == null) {
             this._setModalVisible();
         } else {
-            if (this.state.Disting == "0" ) {
+            if (this.state.Disting == "0") {
                 NativeModules.AndroidDeviceInfo.getIMEI((IMEI) => {
                     Storage.get('Bind').then((tags) => {
                         if (tags == "bindsucceed") {
@@ -2508,7 +2523,7 @@ export default class Index extends Component {
                                                     name: "移动销售",
                                                     component: SellData,//Sell文件夹
                                                     params: {
-                                                        invoice:"移动销售"
+                                                        invoice: "移动销售"
                                                     }
                                                 };
                                                 this.props.navigator.push(nextRoute);
@@ -2525,7 +2540,7 @@ export default class Index extends Component {
                                 name: "移动销售",
                                 component: SellData,
                                 params: {
-                                    invoice:"移动销售"
+                                    invoice: "移动销售"
                                 }
                             };
                             this.props.navigator.push(nextRoute);
@@ -2533,7 +2548,7 @@ export default class Index extends Component {
                         }
                     })
                 })
-            } else if(this.state.Disting == "1"){
+            } else if (this.state.Disting == "1") {
                 NativeModules.AndroidDeviceInfo.getIMEI((IMEI) => {
                     Storage.get('Bind').then((tags) => {
                         if (tags == "bindsucceed") {
@@ -2567,7 +2582,7 @@ export default class Index extends Component {
                                                     name: "移动销售",
                                                     component: SellData,
                                                     params: {
-                                                        invoice:"移动销售"
+                                                        invoice: "移动销售"
                                                     }
                                                 };
                                                 this.props.navigator.push(nextRoute);
@@ -2584,7 +2599,7 @@ export default class Index extends Component {
                                 name: "移动销售",
                                 component: SellData,
                                 params: {
-                                    invoice:"移动销售"
+                                    invoice: "移动销售"
                                 }
                             };
                             this.props.navigator.push(nextRoute);
@@ -2592,11 +2607,12 @@ export default class Index extends Component {
                         }
                     })
                 })
-            }else {
+            } else {
                 this.Promp();
             }
         }
     }
+
     /**
      * 标签采集
      */
@@ -2604,7 +2620,7 @@ export default class Index extends Component {
 
         if (this.state.ShopCar1 > 0) {
             this._setModalVisible();
-            ToastAndroid.show("商品未提交",ToastAndroid.SHORT);
+            ToastAndroid.show("商品未提交", ToastAndroid.SHORT);
             return;
         } else if (this.state.username == null) {
             this._setModalVisible();
@@ -2617,29 +2633,30 @@ export default class Index extends Component {
                             name: "标签采集",
                             component: PinLei,//YHDan文件夹
                             params: {
-                                invoice:"标签采集"
+                                invoice: "标签采集"
                             }
                         };
                         this.props.navigator.push(nextRoute);
                         this._setModalVisible();
                         DeviceEventEmitter.removeAllListeners();
-                    }else {
+                    } else {
                         this.Promp();
                     }
-                }else{
-                    ToastAndroid.show("没有权限",ToastAndroid.SHORT);
+                } else {
+                    ToastAndroid.show("没有权限", ToastAndroid.SHORT);
                     return;
                 }
             })
         }
     }
+
     /**
      * 库存查询
      */
     StockEnquiries() {
         if (this.state.ShopCar1 > 0) {
             this._setModalVisible();
-            ToastAndroid.show("商品未提交",ToastAndroid.SHORT);
+            ToastAndroid.show("商品未提交", ToastAndroid.SHORT);
             return;
         } else if (this.state.username == null) {
             this._setModalVisible();
@@ -2652,13 +2669,14 @@ export default class Index extends Component {
             this._setModalVisible();
         }
     }
+
     /**
      * 商品查询
      */
     ShopSearch() {
         if (this.state.ShopCar1 > 0) {
             this._setModalVisible();
-            ToastAndroid.show("商品未提交",ToastAndroid.SHORT);
+            ToastAndroid.show("商品未提交", ToastAndroid.SHORT);
             return;
         } else if (this.state.username == null) {
             this._setModalVisible();
@@ -2682,13 +2700,14 @@ export default class Index extends Component {
 
         }
     }
+
     /**
      * 要货查询
      */
-    YHSearch(){
+    YHSearch() {
         if (this.state.ShopCar1 > 0) {
             this._setModalVisible();
-            ToastAndroid.show("商品未提交",ToastAndroid.SHORT);
+            ToastAndroid.show("商品未提交", ToastAndroid.SHORT);
             return;
         } else if (this.state.username == null) {
             this._setModalVisible();
@@ -2705,20 +2724,21 @@ export default class Index extends Component {
                     } else {
                         this.Promp();
                     }
-                }else {
-                    ToastAndroid.show("没有权限",ToastAndroid.SHORT);
+                } else {
+                    ToastAndroid.show("没有权限", ToastAndroid.SHORT);
                     return;
                 }
             })
         }
     }
+
     /**
      * 售价调整
      */
-    PriceTZ(){
+    PriceTZ() {
         if (this.state.ShopCar1 > 0) {
             this._setModalVisible();
-            ToastAndroid.show("商品未提交",ToastAndroid.SHORT);
+            ToastAndroid.show("商品未提交", ToastAndroid.SHORT);
             return;
         } else if (this.state.username == null) {
             this._setModalVisible();
@@ -2731,44 +2751,46 @@ export default class Index extends Component {
                             name: "售价调整",
                             component: PinLei,//YHDan文件夹
                             params: {
-                                invoice:"售价调整"
+                                invoice: "售价调整"
                             }
                         };
                         this.props.navigator.push(nextRoute);
                         this._setModalVisible();
                         DeviceEventEmitter.removeAllListeners();
-                    }else {
+                    } else {
                         this.Promp();
                     }
-                }else {
-                    ToastAndroid.show("没有权限",ToastAndroid.SHORT);
+                } else {
+                    ToastAndroid.show("没有权限", ToastAndroid.SHORT);
                     return;
                 }
             })
         }
     }
+
     /**
      * 设置
      */
-    AppSet(){
+    AppSet() {
         var nextRoute = {
             name: "设置",
             component: Set,//AppSet文件夹
             params: {
-                invoice:"设置"
+                invoice: "设置"
             }
         };
         this.props.navigator.push(nextRoute);
         this._setModalVisible();
         DeviceEventEmitter.removeAllListeners();
     }
+
     /**
      * 退出
      */
     pullOut() {
         this._setModalVisible();
         if (this.state.ShopCar1 > 0) {
-            ToastAndroid.show("商品未提交",ToastAndroid.SHORT);
+            ToastAndroid.show("商品未提交", ToastAndroid.SHORT);
             return;
         } else {
             var nextRoute = {
@@ -2785,13 +2807,15 @@ export default class Index extends Component {
             Storage.delete('BQNumber');
             Storage.delete('YdCountm');
             Storage.delete('Modify');
+            Storage.delete('Radio');
+            Storage.delete('SaoMa');
         }
     }
 
     pullOut1() {
         this._StateMent();
         if (this.state.ShopCar1 > 0) {
-            ToastAndroid.show("商品未提交",ToastAndroid.SHORT);
+            ToastAndroid.show("商品未提交", ToastAndroid.SHORT);
             return;
         } else {
             var nextRoute = {
@@ -2826,7 +2850,7 @@ export default class Index extends Component {
     StateMent() {
         if (this.state.ShopCar1 > 0) {
             this._setModalVisible();
-            ToastAndroid.show("商品未提交",ToastAndroid.SHORT);
+            ToastAndroid.show("商品未提交", ToastAndroid.SHORT);
             return;
         } else if (this.state.username == null) {
             this._setModalVisible();
@@ -3060,7 +3084,7 @@ export default class Index extends Component {
         })
     }
 
-    PSDan1(){
+    PSDan1() {
         this._StateMent();
         var nextRoute = {
             name: "HistoricalDocument",
@@ -3069,11 +3093,11 @@ export default class Index extends Component {
         this.props.navigator.push(nextRoute);
         Storage.delete('Name');
         Storage.save('name', '商品配送');
-        Storage.save('history','App_Client_ProPSQ');
-        Storage.save('historyClass','App_Client_ProPSDetailQ');
+        Storage.save('history', 'App_Client_ProPSQ');
+        Storage.save('historyClass', 'App_Client_ProPSDetailQ');
     }
 
-    PriceTZ1(){
+    PriceTZ1() {
         this._StateMent();
         var nextRoute = {
             name: "HistoricalDocument",
@@ -3086,6 +3110,7 @@ export default class Index extends Component {
         Storage.save('history', 'App_Client_ProTJQ');//门店要货查询
         Storage.save('historyClass', 'App_Client_ProTJDetailQ');//门店要货明细查询
     }
+
     //FlatList加入kay值
     keyExtractor(item: Object, index: number) {
         return item.ProdName//FlatList使用json中的ProdName动态绑定key
@@ -3110,7 +3135,8 @@ export default class Index extends Component {
                 for (let i = 0; i < rows.length; i++) {
                     var row = rows.item(i);
                     priductData.push(row);
-                };
+                }
+                ;
                 if (this.state.depcode != lastDepCode) {
                     this.productData.splice(0, this.productData.length);
                     lastDepCode = this.state.depcode;
@@ -3247,7 +3273,7 @@ export default class Index extends Component {
      * 返回上一级
      * @returns {XML}
      */
-    Return(){
+    Return() {
         this._StateMent();
     }
 
@@ -3371,7 +3397,8 @@ export default class Index extends Component {
                         <View style={styles.ModalTitle}>
                             <TouchableOpacity style={styles.ModalLeft} onPress={this.ChuMo.bind(this)}>
                                 <View>
-                                    <Image source={this.state.pressStatus == 'pressin' ? require("../images/1_42.png") : require("../images/1_43.png")}/>
+                                    <Image
+                                        source={this.state.pressStatus == 'pressin' ? require("../images/1_42.png") : require("../images/1_43.png")}/>
                                 </View>
                                 <View>
                                     <Text style={styles.ModalImage}>
@@ -3387,7 +3414,8 @@ export default class Index extends Component {
                             </View>
                             <TouchableOpacity style={styles.ModalLeft} onPress={this.SaoMa.bind(this)}>
                                 <View style={[{marginLeft: 14}]}>
-                                    <Image source={this.state.PressStatus == 'Pressin' ? require("../images/1_42.png") : require("../images/1_43.png")}/>
+                                    <Image
+                                        source={this.state.PressStatus == 'Pressin' ? require("../images/1_42.png") : require("../images/1_43.png")}/>
                                 </View>
                                 <View>
                                     <Text style={styles.ModalImage}>
@@ -3545,7 +3573,9 @@ export default class Index extends Component {
                                         移动销售
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={[styles.ModalHeadImage, {borderRightWidth: 1, borderRightColor: "#f2f2f2"}]} onPress={this.ShopSearch.bind(this)}>
+                                <TouchableOpacity
+                                    style={[styles.ModalHeadImage, {borderRightWidth: 1, borderRightColor: "#f2f2f2"}]}
+                                    onPress={this.ShopSearch.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_61.png")}/>
                                     </Text>
@@ -3568,7 +3598,9 @@ export default class Index extends Component {
                                 <Image source={require("../images/1_48.png")} style={styles.ModalImageLine}/>
                             </View>
                             <View style={[styles.ModalHead, {marginBottom: 10}]}>
-                                <TouchableOpacity style={[styles.ModalHeadImage, {borderRightWidth: 1, borderRightColor: "#f2f2f2"}]} onPress={this.YHSearch.bind(this)}>
+                                <TouchableOpacity
+                                    style={[styles.ModalHeadImage, {borderRightWidth: 1, borderRightColor: "#f2f2f2"}]}
+                                    onPress={this.YHSearch.bind(this)}>
                                     <Text style={styles.ModalHeadImage1}>
                                         <Image source={require("../images/1_61.png")}/>
                                     </Text>
@@ -3826,7 +3858,8 @@ export default class Index extends Component {
                         <View style={styles.ModalTitle}>
                             <TouchableOpacity style={styles.ModalLeft} onPress={this.YeWu1.bind(this)}>
                                 <View>
-                                    <Image source={this.state.pressStatus == 'pressin' ? require("../images/1_42.png") : require("../images/1_43.png")}/>
+                                    <Image
+                                        source={this.state.pressStatus == 'pressin' ? require("../images/1_42.png") : require("../images/1_43.png")}/>
                                 </View>
                                 <View>
                                     <Text style={styles.ModalImage}>
@@ -3882,7 +3915,7 @@ export default class Index extends Component {
                                 </Text>
                             </View>
                             <TouchableOpacity onPress={this.Emptydata.bind(this)} style={styles.Button}>
-                                <Text style={[styles.ModalTitleText,{color:"#ffffff"}]}>
+                                <Text style={[styles.ModalTitleText, {color: "#ffffff"}]}>
                                     确定
                                 </Text>
                             </TouchableOpacity>
@@ -3896,7 +3929,8 @@ export default class Index extends Component {
                     }}
                     onRequestClose={() => {
                     }}>
-                    <Image source={require("../images/background.png")} style={[styles.ModalStyle, {justifyContent: 'center', alignItems: 'center',}]}>
+                    <Image source={require("../images/background.png")}
+                           style={[styles.ModalStyle, {justifyContent: 'center', alignItems: 'center',}]}>
                         <View style={styles.ModalStyleCont}>
                             <View style={styles.ModalStyleTitle}>
                                 <Text style={styles.ModalTitleText}>
@@ -3904,7 +3938,7 @@ export default class Index extends Component {
                                 </Text>
                             </View>
                             <TouchableOpacity onPress={this.Mode.bind(this)} style={styles.Button}>
-                                <Text style={[styles.ModalTitleText,{color:"#ffffff"}]}>
+                                <Text style={[styles.ModalTitleText, {color: "#ffffff"}]}>
                                     确定
                                 </Text>
                             </TouchableOpacity>
@@ -3928,7 +3962,7 @@ export default class Index extends Component {
                             </View>
                             <TouchableOpacity onPress={this.Mode1.bind(this)} style=
                                 {styles.Button}>
-                                <Text style={[styles.ModalTitleText,{color:"#ffffff"}]}>
+                                <Text style={[styles.ModalTitleText, {color: "#ffffff"}]}>
                                     确定
                                 </Text>
                             </TouchableOpacity>
@@ -3938,9 +3972,12 @@ export default class Index extends Component {
                 <Modal
                     transparent={true}
                     visible={this.state.Permissions}
-                    onShow={() => {}}
-                    onRequestClose={() => {}}>
-                    <Image source={require("../images/background.png")} style={[styles.ModalStyle, {justifyContent: 'center', alignItems: 'center',}]}>
+                    onShow={() => {
+                    }}
+                    onRequestClose={() => {
+                    }}>
+                    <Image source={require("../images/background.png")}
+                           style={[styles.ModalStyle, {justifyContent: 'center', alignItems: 'center',}]}>
                         <View style={styles.ModalStyleCont}>
                             <View style={styles.ModalStyleTitle}>
                                 <Text style={styles.ModalTitleText}>
@@ -3948,7 +3985,7 @@ export default class Index extends Component {
                                 </Text>
                             </View>
                             <TouchableOpacity onPress={this.MoDe.bind(this)} style={styles.Button}>
-                                <Text style={[styles.ModalTitleText,{color:"#ffffff"}]}>
+                                <Text style={[styles.ModalTitleText, {color: "#ffffff"}]}>
                                     确定
                                 </Text>
                             </TouchableOpacity>
@@ -3972,7 +4009,7 @@ export default class Index extends Component {
                             </View>
                             <TouchableOpacity onPress={this.MoDe1.bind(this)} style=
                                 {styles.Button}>
-                                <Text style={[styles.ModalTitleText,{color:"#ffffff"}]}>
+                                <Text style={[styles.ModalTitleText, {color: "#ffffff"}]}>
                                     确定
                                 </Text>
                             </TouchableOpacity>
@@ -3995,7 +4032,7 @@ export default class Index extends Component {
                                 </Text>
                             </View>
                             <TouchableOpacity onPress={this.MoDe2.bind(this)} style={styles.Button}>
-                                <Text style={[styles.ModalTitleText,{color:"#ffffff"}]}>
+                                <Text style={[styles.ModalTitleText, {color: "#ffffff"}]}>
                                     确定
                                 </Text>
                             </TouchableOpacity>
@@ -4012,7 +4049,8 @@ export default class Index extends Component {
                     }}>
                     <View style={styles.LoadCenter}>
                         <View style={styles.loading}>
-                            <ActivityIndicator key="1" color="#ffffff" size="large" style={styles.activity}></ActivityIndicator>
+                            <ActivityIndicator key="1" color="#ffffff" size="large"
+                                               style={styles.activity}></ActivityIndicator>
                             <Text style={styles.TextLoading}>更新数据中...</Text>
                         </View>
                     </View>
@@ -4024,7 +4062,8 @@ export default class Index extends Component {
                     }}
                     onRequestClose={() => {
                     }}>
-                    <Image source={require("../images/background.png")} style={[styles.ModalStyle, {justifyContent: 'center', alignItems: 'center',}]}>
+                    <Image source={require("../images/background.png")}
+                           style={[styles.ModalStyle, {justifyContent: 'center', alignItems: 'center',}]}>
                         <View style={styles.ModalStyleCont}>
                             <View style={styles.ModalStyleTitle}>
                                 <Text style={styles.ModalTitleText}>
@@ -4032,7 +4071,7 @@ export default class Index extends Component {
                                 </Text>
                             </View>
                             <TouchableOpacity onPress={this.Datacomplete.bind(this)} style={styles.Button}>
-                                <Text style={[styles.ModalTitleText,{color:"#ffffff"}]}>
+                                <Text style={[styles.ModalTitleText, {color: "#ffffff"}]}>
                                     确定
                                 </Text>
                             </TouchableOpacity>
@@ -4045,20 +4084,20 @@ export default class Index extends Component {
 }
 
 const styles = StyleSheet.create({
-    return:{
-        flex:1,
-        paddingTop:8,
-        paddingBottom:8,
-        marginTop:10,
-        marginLeft:30,
-        marginRight:30,
-        backgroundColor:"#ff4e4e",
-        borderRadius:5,
+    return: {
+        flex: 1,
+        paddingTop: 8,
+        paddingBottom: 8,
+        marginTop: 10,
+        marginLeft: 30,
+        marginRight: 30,
+        backgroundColor: "#ff4e4e",
+        borderRadius: 5,
     },
-    text:{
-        color:"#ffffff",
-        fontSize:16,
-        textAlign:"center",
+    text: {
+        color: "#ffffff",
+        fontSize: 16,
+        textAlign: "center",
     },
     container: {
         flex: 1,
@@ -4385,13 +4424,13 @@ const styles = StyleSheet.create({
         paddingTop: 25,
         paddingLeft: 10,
         paddingRight: 10,
-        borderRadius:5,
+        borderRadius: 5,
         backgroundColor: "#ffffff",
     },
     ModalStyleTitle: {
         paddingLeft: 88,
         paddingRight: 88,
-        paddingBottom:15,
+        paddingBottom: 15,
         borderBottomWidth: 1,
         borderBottomColor: "#f5f5f5",
     },
@@ -4401,12 +4440,12 @@ const styles = StyleSheet.create({
         textAlign: "center",
     },
     Button: {
-        paddingTop:12,
-        paddingBottom:12,
-        borderRadius:5,
+        paddingTop: 12,
+        paddingBottom: 12,
+        borderRadius: 5,
         marginTop: 20,
-        marginBottom:20,
-        backgroundColor:"#ff4e4e",
+        marginBottom: 20,
+        backgroundColor: "#ff4e4e",
     },
     LoadCenter: {
         flex: 1,

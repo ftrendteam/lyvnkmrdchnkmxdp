@@ -1020,10 +1020,24 @@ export default class DBAdapter extends SQLiteOpenHelper {
                     ",ifNull(b.promemo,'') as ShopRemark,c.depcode" + DepLevel + " as DepCode1 " +
                     " from product a left join shopInfo b on a.Pid=b.Pid  ";
                 ssql = ssql + " left join  tdepset c on c.IsDel='0' and a.depcode=c.depcode where a.IsDel='0' and prodtype<>'1'";
-                ssql = ssql + "  and (a.prodname like '%" + aidCode + "%' or a.aidcode like '%" + aidCode + "%' or a.prodcode like '%" + aidCode + "%' or a.barcode like '%" + aidCode + "%')";
+                //ssql = ssql + "  and (a.prodname like '%" + aidCode + "%' or a.aidcode like '%" + aidCode + "%' or a.prodcode like '%" + aidCode + "%' or a.barcode like '%" + aidCode + "%')";
+                ssql = ssql + " and (a.prodcode= '" + aidCode + "'  or a.barcode = '" + aidCode + "')";
                 ssql=ssql+" limit 20 ";
                 tx.executeSql(ssql, [], (tx, results) => {
-                    resolve(results.rows);
+                    if(results.rows.length==0){
+                        let sql = "select a.*,ifNull(b.countm,0) as ShopNumber,ifNull(b.ShopPrice,a.StdPrice) as ShopPrice ,ifNull(b.prototal,0) as ShopAmount   " +
+                            ",ifNull(b.promemo,'') as ShopRemark,c.depcode" + DepLevel + " as DepCode1 " +
+                            " from product a left join shopInfo b on a.Pid=b.Pid  ";
+                        sql = sql + " left join  tdepset c on c.IsDel='0' and a.depcode=c.depcode where a.IsDel='0' and prodtype<>'1'";
+                        sql = sql + "  and (a.prodname like '%" + aidCode + "%' or a.aidcode like '%" + aidCode + "%' or a.prodcode like '%" + aidCode + "%' or a.barcode like '%" + aidCode + "%')";
+                        sql=sql+" limit 20 ";
+                        tx.executeSql(sql, [], (tx, result) => {
+                            resolve(result.rows);
+                        });
+                    }else{
+                        resolve(results.rows);
+                    }
+
                 });
             }, (error) => {
                 this._errorCB('transaction', error);

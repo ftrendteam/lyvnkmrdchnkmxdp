@@ -34,7 +34,7 @@ export default class Shopsearch extends Component {
             Total:"",
             SuppCode:"",
             SuppName:"",
-            DepCode:"",
+            depcode:"",
             DepName:"",
             BrandCode:"",
             BrandName:"",
@@ -75,7 +75,6 @@ export default class Shopsearch extends Component {
                         Code: this.state.ProdCode,
                         UserCode: Usercode,
                     };
-                    // console.log(JSON.stringify(params))
                     FetchUtil.post(linkurl, JSON.stringify(params)).then((data) => {
                         // console.log(JSON.stringify(data))
                         if(data.retcode == 1){
@@ -93,7 +92,7 @@ export default class Shopsearch extends Component {
                             var Total;
                             var SuppCode;
                             var SuppName;
-                            var DepCode;
+                            var depcode;
                             var DepName;
                             var BrandCode;
                             var BrandName;
@@ -133,7 +132,7 @@ export default class Shopsearch extends Component {
                                 Total =  row.Total;
                                 SuppCode =  row.SuppCode;
                                 SuppName =  row.SuppName;
-                                DepCode =  row.DepCode;
+                                depcode =  row.DepCode;
                                 DepName =  row.DepName;
                                 BrandCode =  row.BrandCode;
                                 BrandName =  row.BrandName;
@@ -196,7 +195,7 @@ export default class Shopsearch extends Component {
                                 Total:Total,
                                 SuppCode:SuppCode,
                                 SuppName:SuppName,
-                                DepCode:DepCode,
+                                depcode:depcode,
                                 DepName:DepName,
                                 BrandCode:BrandCode,
                                 BrandName:BrandName,
@@ -225,17 +224,6 @@ export default class Shopsearch extends Component {
     }
 
     return(){
-        var nextRoute={
-            name:"主页",
-            component:Index,
-            params:{
-                DepCode:this.state.DepCode,
-            }
-        };
-        this.props.navigator.push(nextRoute);
-    }
-
-    PressPop(){
         var nextRoute={
             name:"主页",
             component:Index,
@@ -332,7 +320,7 @@ export default class Shopsearch extends Component {
                 <View style={styles.RowList}>
                     <View style={styles.LeftList}>
                         <Text style={styles.name}>品类编码：</Text>
-                        <Text style={styles.right}>{this.state.DepCode}</Text>
+                        <Text style={styles.right}>{this.state.depcode}</Text>
                     </View>
                 </View>
                 <View style={styles.RowList}>
@@ -461,9 +449,6 @@ export default class Shopsearch extends Component {
                         <Text style={styles.right}>{this.state.PriceFlag}</Text>
                     </View>
                 </View>
-                <TouchableOpacity style={styles.button} onPress={this.PressPop.bind(this)}>
-                    <Text style={styles.ButtonText}>确定</Text>
-                </TouchableOpacity>
             </ScrollView>
         );
     }

@@ -159,77 +159,87 @@ export default class ShoppingCart extends Component {
                                 Storage.get('shildshop').then((ChildShopCode)=>{
                                     Storage.get('code').then((ShopCode)=>{
                                         Storage.get('OrgFormno').then((OrgFormno)=>{
-                                            let params = {
-                                                reqCode: "App_PosReq",
-                                                reqDetailCode: "App_Client_ProPSYHDetailQ",
-                                                ClientCode: ClientCode,
-                                                sDateTime: Date.parse(new Date()),
-                                                Sign: NetUtils.MD5("App_PosReq" + "##" + "App_Client_ProPSYHDetailQ" + "##" + Date.parse(new Date()) + "##" + "PosControlCs") + '',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
-                                                ShopCode: ShopCode,
-                                                ChildShopCode: ChildShopCode,
-                                                OrgFormno: OrgFormno,
-                                            };
-                                            FetchUtils.post(LinkUrl, JSON.stringify(params)).then((data) => {
-                                                var DetailInfos =data.DetailInfo;
-                                                if(data.retcode == 1){
-                                                    var ShopNumber = 0;
-                                                    var shopAmount = 0;
-                                                    for(let i =0;i<DetailInfos.length;i++) {
-                                                        let detailInfo = DetailInfos[i];
-                                                        var shopInfoData = [];
-                                                        var shopInfo = {};
-                                                        var serial=i+1;
-                                                        var prodcode=detailInfo.prodcode;
-                                                        var countm=detailInfo.countm;
-                                                        var pid=detailInfo.pid;
-                                                        var promemo = "";
-                                                        var ydcountm = detailInfo.countm;
-                                                        var prodname=detailInfo.prodname;
-                                                        var shopnumber=detailInfo.countm;
-                                                        var ProPrice=detailInfo.ShopPrice;
-                                                        var ShopAmount=detailInfo.prototal;
-                                                        shopAmount += Number(ShopAmount);
-                                                        ShopNumber += Number(shopnumber);
-                                                        this.ds.push(detailInfo);
-                                                        var DataShop = {
-                                                            'serial':serial,
-                                                            'prodname':prodname,
-                                                            'barCode':"",
-                                                            'prodcode': prodcode,
-                                                            'shopnumber':shopnumber,
-                                                            'countm': countm,
-                                                            'ProPrice': ProPrice,
-                                                            'promemo': "",
-                                                            'ydcountm': ydcountm,
-                                                            'ShopAmount':ShopAmount,
-                                                            'SuppCode':"",
-                                                            'Pid':pid,
-                                                            'DepCode':"",
+                                            if(OrgFormno==null){
+                                                this.modal();
+                                            }else{
+                                                let params = {
+                                                    reqCode: "App_PosReq",
+                                                    reqDetailCode: "App_Client_ProPSYHDetailQ",
+                                                    ClientCode: ClientCode,
+                                                    sDateTime: Date.parse(new Date()),
+                                                    Sign: NetUtils.MD5("App_PosReq" + "##" + "App_Client_ProPSYHDetailQ" + "##" + Date.parse(new Date()) + "##" + "PosControlCs") + '',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
+                                                    ShopCode: ShopCode,
+                                                    ChildShopCode: ChildShopCode,
+                                                    OrgFormno: OrgFormno,
+                                                };
+                                                FetchUtils.post(LinkUrl, JSON.stringify(params)).then((data) => {
+                                                    var DetailInfos =data.DetailInfo;
+                                                    if(data.retcode == 1){
+                                                        var ShopNumber = 0;
+                                                        var shopAmount = 0;
+                                                        for(let i =0;i<DetailInfos.length;i++) {
+                                                            let detailInfo = DetailInfos[i];
+                                                            var shopInfoData = [];
+                                                            var shopInfo = {};
+                                                            var serial=i+1;
+                                                            var prodcode=detailInfo.prodcode;
+                                                            var countm=detailInfo.countm;
+                                                            var pid=detailInfo.pid;
+                                                            var promemo = "";
+                                                            var ydcountm = detailInfo.countm;
+                                                            var prodname=detailInfo.prodname;
+                                                            var shopnumber=detailInfo.countm;
+                                                            var ProPrice=detailInfo.ShopPrice;
+                                                            var ShopAmount=detailInfo.prototal;
+                                                            shopAmount += Number(ShopAmount);
+                                                            ShopNumber += Number(shopnumber);
+                                                            this.ds.push(detailInfo);
+                                                            var DataShop = {
+                                                                'serial':serial,
+                                                                'prodname':prodname,
+                                                                'barCode':"",
+                                                                'prodcode': prodcode,
+                                                                'shopnumber':shopnumber,
+                                                                'countm': countm,
+                                                                'ProPrice': ProPrice,
+                                                                'promemo': "",
+                                                                'ydcountm': ydcountm,
+                                                                'ShopAmount':ShopAmount,
+                                                                'SuppCode':"",
+                                                                'Pid':pid,
+                                                                'DepCode':"",
+                                                            }
+                                                            this.DataShop.push(DataShop);
+                                                            shopInfo.Pid = pid;
+                                                            shopInfo.ProdCode=prodcode;
+                                                            shopInfo.prodname = prodname;
+                                                            shopInfo.countm = countm;
+                                                            shopInfo.ShopPrice = ProPrice;
+                                                            shopInfo.prototal = ShopAmount;
+                                                            shopInfo.promemo = promemo;
+                                                            shopInfo.DepCode = "";
+                                                            shopInfo.ydcountm = ydcountm;
+                                                            shopInfo.SuppCode = "";
+                                                            shopInfo.BarCode = "";
+                                                            shopInfoData.push(shopInfo);
+                                                            //调用插入表方法
+                                                            dbAdapter.insertShopInfo(shopInfoData);
                                                         }
-                                                        this.DataShop.push(DataShop);
-                                                        shopInfo.Pid = pid;
-                                                        shopInfo.ProdCode=prodcode;
-                                                        shopInfo.prodname = prodname;
-                                                        shopInfo.countm = countm;
-                                                        shopInfo.ShopPrice = ProPrice;
-                                                        shopInfo.prototal = ShopAmount;
-                                                        shopInfo.promemo = promemo;
-                                                        shopInfo.DepCode = "";
-                                                        shopInfo.ydcountm = ydcountm;
-                                                        shopInfo.SuppCode = "";
-                                                        shopInfo.BarCode = "";
-                                                        shopInfoData.push(shopInfo);
-                                                        //调用插入表方法
-                                                        dbAdapter.insertShopInfo(shopInfoData);
+                                                        this.setState({
+                                                            ShopNumber:ShopNumber,//数量
+                                                            ShopAmount:NumberUtils.numberFormat2(shopAmount),//总金额
+                                                            ds:this.state.ds.cloneWithRows(this.DataShop),
+                                                        })
+                                                    }else{
+                                                        var msg=data.msg;
+                                                        alert(msg)
                                                     }
-                                                    this.modal();
-                                                    this.setState({
-                                                        ShopNumber:ShopNumber,//数量
-                                                        ShopAmount:NumberUtils.numberFormat2(shopAmount),//总金额
-                                                        ds:this.state.ds.cloneWithRows(this.DataShop),
-                                                    })
-                                                }
-                                            })
+                                                }, (err) => {
+                                                    alert("网络请求失败");
+                                                    this._setModalVisible();
+                                                })
+                                                this.modal();//弹层隐藏
+                                            }
                                         })
                                     })
                                 })
@@ -1892,6 +1902,8 @@ export default class ShoppingCart extends Component {
 
     //成功返回
     Return(){
+        Storage.delete('OrgFormno');
+        Storage.delete('shildshop');
         this.Succeed();
         this.DataSource();
     }
@@ -1993,6 +2005,8 @@ export default class ShoppingCart extends Component {
                     }
                 };
                 this.props.navigator.push(nextRoute);
+                Storage.delete('OrgFormno');
+                Storage.delete('shildshop');
                 this.DataSource();
             }
             if(tags=="门店要货"){
