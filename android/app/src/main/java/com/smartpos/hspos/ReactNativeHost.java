@@ -5,8 +5,7 @@ import android.app.Application;
 import com.beefe.picker.PickerViewPackage;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
-import com.keyee.datetime.*;
-import com.lwansbrough.RCTCamera.RCTCameraPackage;
+import com.wrp.datetime.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -29,8 +28,7 @@ public class ReactNativeHost extends com.facebook.react.ReactNativeHost {
     @Override
     protected List<ReactPackage> getPackages() {
         return Arrays.<ReactPackage>asList(
-                new RCTDateTimePickerPackage(),
-                new RCTCameraPackage(),
+             new DateTimePickerPackage(),
                 new PickerViewPackage(),
                 new SQLitePluginPackage(),
                 new JsScannerReactPackage(),

@@ -19,6 +19,7 @@ import HistoricalDocument from "./HistoricalDocument";
 import DateUtil from "../utils/DateUtil";
 import Storage from "../utils/Storage";
 import DateTimePicker from "react-native-datetime";
+import DatePicker from "react-native-dateandtime";
 
 let dateutil = new DateUtil();
 let db;
@@ -121,12 +122,12 @@ export default class Enquiries extends Component {
                 <View style={styles.ContList}>
                     <Text style={styles.ContLeft}>开始日期</Text>
                     <Text style={styles.Contright} onPress={(data)=>{this.showDateTimePicker(true)}}>{this.state.startDate.toString()}</Text>
-                    <DateTimePicker ref={(picker)=>{this.picker=picker}}/>
+                    <DatePicker ref={(picker)=>{this.picker=picker}}/>
                 </View>
                 <View style={styles.ContList}>
                     <Text style={styles.ContLeft}>结束日期</Text>
                     <Text style={styles.Contright} onPress={(data)=>{this.showDateTimePicker(false)}}>{this.state.endDate.toString()}</Text>
-                    <DateTimePicker ref={(picker)=>{this.picker=picker}}/>
+                    <DatePicker ref={(picker)=>{this.picker=picker}}/>
                 </View>
                 <View style={styles.ContList}>
                     <Text style={styles.ContLeft}>门店</Text>
@@ -234,6 +235,7 @@ const styles = StyleSheet.create({
     Contright:{
         color:"#333333",
         marginLeft:15,
+        flex:1,
     },
     ContLeft1:{
         flex:8,

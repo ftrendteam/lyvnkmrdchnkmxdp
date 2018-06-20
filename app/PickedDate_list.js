@@ -55,6 +55,7 @@ export default class PickedDate_list extends Component {
     }
 
     Return(){
+        this.refs.textInput.blur();
         this.props.navigator.pop();
     }
 
@@ -75,6 +76,7 @@ export default class PickedDate_list extends Component {
     }
 
     pressPop(rowData){
+        this.refs.textInput.blur();
         if(this.props.reloadView||this.props.ShopName){
             this.props.reloadView(rowData.shopname+'_'+rowData.shopcode);
             this.props.ShopName(rowData.shopname)
@@ -100,8 +102,8 @@ export default class PickedDate_list extends Component {
             <View style={styles.container}>
                 <View style={styles.Title}>
                     <TextInput
+                        ref="textInput"
                         style={styles.Search}
-                        autofocus="{true}"
                         returnKeyType="search"
                         placeholder="搜索机构编码"
                         placeholderTextColor="#bcbdc1"
@@ -128,6 +130,7 @@ export default class PickedDate_list extends Component {
                         </View>
                     </View>
                     <ListView
+                        keyboardShouldPersistTaps={"handled"}
                         style={styles.scrollview}
                         dataSource={this.state.dataSource}
                         enableEmptySections = {true}

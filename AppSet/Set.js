@@ -26,7 +26,10 @@ export default class Set extends Component {
             Radio:"",
             pressStatus: 0,
             PressStatus: 0,
+            pressStatus1: 0,
+            PressStatus1: 0,
             show:false,
+            SaoMahow:false,
             invoice:this.props.invoice ? this.props.invoice : "",
         };
     }
@@ -56,10 +59,6 @@ export default class Set extends Component {
         // this.props.navigator.push(nextRoute)
     }
 
-    SetButton(){
-        this._Show();
-    }
-
     UserInformation(){
         var nextRoute = {
             name: "用户信息",
@@ -71,17 +70,33 @@ export default class Set extends Component {
         this.props.navigator.push(nextRoute);
     }
 
+    /**
+     * 打印设置
+     * @private
+     */
+    SetButton(){
+        Storage.get('Radio').then((tags) => {
+            if (tags == "0") {
+                this.setState({
+                    pressStatus: 'pressin',
+                    PressStatus: 0,
+                });
+            } else if (tags== "1") {
+                this.setState({
+                    PressStatus: 'Pressin',
+                    pressStatus: 0
+                });
+            }
+        })
+        this._Show();
+    }
+
     _setModalVisible(){
         this._Show();
     }
 
     YButton() {
         Storage.save("Radio", "0");
-        Storage.get('Radio').then((tags) => {
-            this.setState({
-                Radio: tags,
-            })
-        })
         this.setState({
             pressStatus: 'pressin',
             PressStatus: '0',
@@ -90,11 +105,6 @@ export default class Set extends Component {
 
     NButton() {
         Storage.save("Radio", "1");
-        Storage.get('Radio').then((tags) => {
-            this.setState({
-                Radio: tags
-            })
-        })
         this.setState({
             PressStatus: 'Pressin',
             pressStatus: 0
@@ -107,6 +117,54 @@ export default class Set extends Component {
             show: !isShow,
         });
     }
+
+    /**
+     * 扫码设置
+     * @constructor
+     */
+    _setModalVisible1(){
+        this._SaoMahow();
+    }
+    SMButton(){
+        Storage.get('SaoMa').then((tags) => {
+            if (tags == "0") {
+                this.setState({
+                    pressStatus1: 'pressin1',
+                    PressStatus1: '0',
+                });
+            } else if (tags== "1") {
+                this.setState({
+                    PressStatus1: 'Pressin1',
+                    pressStatus1: 0
+                });
+            }
+        })
+        this._SaoMahow();
+    }
+
+    SYButton() {
+        Storage.save("SaoMa", "0");
+        this.setState({
+            pressStatus1: 'pressin1',
+            PressStatus1: '0',
+        });
+    }
+
+    SNButton() {
+        Storage.save("SaoMa", "1");
+        this.setState({
+            PressStatus1: 'Pressin1',
+            pressStatus1: 0
+        });
+    }
+
+    _SaoMahow(){
+        let isShow = this.state.SaoMahow;
+        this.setState({
+            SaoMahow: !isShow,
+        });
+    }
+
 
     render() {
         return (
@@ -137,6 +195,22 @@ export default class Set extends Component {
                     </TouchableOpacity>
                 </View>
                 <View style={styles.ContList}>
+                    <TouchableOpacity style={styles.listcont} onPress={this.SMButton.bind(this)}>
+                        <TextInput
+                            style={styles.TextInput1}
+                            editable={false}
+                            numberoflines={1}
+                            placeholder="扫码设置"
+                            textalign="center"
+                            underlineColorAndroid='transparent'
+                            placeholderTextColor="#333333"
+                        />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={this.SetButton.bind(this)}>
+                        <Image source={require("../images/2_03.png")}></Image>
+                    </TouchableOpacity>
+                </View>
+                <View style={styles.ContList}>
                     <TouchableOpacity style={styles.listcont} onPress={this.UserInformation.bind(this)}>
                         <TextInput
                             style={styles.TextInput1}
@@ -152,7 +226,6 @@ export default class Set extends Component {
                         <Image source={require("../images/2_03.png")}></Image>
                     </TouchableOpacity>
                 </View>
-
                 <Modal
                     transparent={true}
                     visible={this.state.show}
@@ -177,6 +250,34 @@ export default class Set extends Component {
                                     否
                                 </Text>
                                 <Image source={this.state.PressStatus == 'Pressin' ? require("../images/1_431.png") : require("../images/1_43.png")} style={styles.radioimage}/>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Modal>
+                <Modal
+                    transparent={true}
+                    visible={this.state.SaoMahow}
+                    onShow={() => {}}
+                    onRequestClose={() => {}} >
+                    <View style={styles.ModalStyle}>
+                        <View style={styles.ModalView}>
+                            <View style={styles.DanJu}>
+                                <View style={styles.danju}><Text style={styles.DanText}>是否打开搜索界面连续扫码设置</Text></View>
+                                <TouchableOpacity style={styles.ModalLeft} onPress={this._setModalVisible1.bind(this)}>
+                                    <Image source={require("../images/2_02.png")} />
+                                </TouchableOpacity>
+                            </View>
+                            <TouchableOpacity onPress={this.SYButton.bind(this)} style={styles.radio}>
+                                <Text style={styles.radiotext}>
+                                    是
+                                </Text>
+                                <Image source={this.state.pressStatus1 == 'pressin1' ? require("../images/1_431.png") : require("../images/1_43.png")} style={styles.radioimage}/>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={this.SNButton.bind(this)} style={styles.radio}>
+                                <Text style={styles.radiotext}>
+                                    否
+                                </Text>
+                                <Image source={this.state.PressStatus1 == 'Pressin1' ? require("../images/1_431.png") : require("../images/1_43.png")} style={styles.radioimage}/>
                             </TouchableOpacity>
                         </View>
                     </View>
