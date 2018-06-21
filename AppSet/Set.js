@@ -18,7 +18,7 @@ import Search from "../app/Search";
 import User_Information from "./User_Information";
 import NetUtils from "../utils/NetUtils";
 import Storage from '../utils/Storage';
-import ModalDropdown from 'native';
+
 export default class Set extends Component {
     constructor(props){
         super(props);

@@ -18,7 +18,6 @@ import {
 import HistoricalDocument from "./HistoricalDocument";
 import DateUtil from "../utils/DateUtil";
 import Storage from "../utils/Storage";
-import DateTimePicker from "react-native-datetime";
 import DatePicker from "react-native-dateandtime";
 
 let dateutil = new DateUtil();

@@ -1138,6 +1138,7 @@ export default class Search extends Component {
 
     //二维码扫描
     Code() {
+        alert("!23")
         NativeModules.RNScannerAndroid.openScanner();
     }
 
