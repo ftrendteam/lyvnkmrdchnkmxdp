@@ -46,7 +46,7 @@ import SellDan from "../Sell/SellDan";//销售历史单据
 import StockEnquiries from "../StockEnquiries/StockEnquiries";//库存查询
 import Shopsearch from "../StockEnquiries/Shopsearch";//点击商品 商品查询
 import SearchData from "../StockEnquiries/SearchData";//搜索页面 商品查询
-import PSDan from "../PSDan/PSDan.js";//商品配送
+import PSDan from "../PSDan/PSDan";//商品配送
 import YHSearch from "../YHSearch/YHSearch";//要货查询
 import Set from "../AppSet/Set";//设置
 import NetUtils from "../utils/NetUtils";

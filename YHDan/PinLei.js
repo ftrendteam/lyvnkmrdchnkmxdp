@@ -18,7 +18,6 @@ import PinLeiData from "./PinLeiData";
 import NetUtils from "../utils/NetUtils";
 import Storage from '../utils/Storage';
 
-
 export default class PinLei extends Component {
     constructor(props){
         super(props);
