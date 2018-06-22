@@ -20,7 +20,6 @@ import ProductCG_list from "./ProductCG_list";
 import PinLeiData from "../YHDan/PinLeiData";
 import NetUtils from "../utils/NetUtils";
 import Storage from '../utils/Storage';
-
 export default class ProductYS extends Component {
     constructor(props){
         super(props);

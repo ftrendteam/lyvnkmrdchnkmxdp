@@ -21,7 +21,6 @@ import PinLeiData from "../YHDan/PinLeiData";
 import NetUtils from "../utils/NetUtils";
 import Storage from '../utils/Storage';
 
-
 export default class ProductCG extends Component {
     constructor(props){
         super(props);
