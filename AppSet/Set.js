@@ -234,7 +234,7 @@ export default class Set extends Component {
                     <View style={styles.ModalStyle}>
                         <View style={styles.ModalView}>
                             <View style={styles.DanJu}>
-                                <View style={styles.danju}><Text style={styles.DanText}>是否打开打印设置</Text></View>
+                                <View style={styles.danju}><Text style={styles.DanText}>是否打开打印功能</Text></View>
                                 <TouchableOpacity style={styles.ModalLeft} onPress={this._setModalVisible.bind(this)}>
                                     <Image source={require("../images/2_02.png")} />
                                 </TouchableOpacity>
@@ -262,7 +262,7 @@ export default class Set extends Component {
                     <View style={styles.ModalStyle}>
                         <View style={styles.ModalView}>
                             <View style={styles.DanJu}>
-                                <View style={styles.danju}><Text style={styles.DanText}>是否打开搜索界面连续扫码设置</Text></View>
+                                <View style={styles.danju}><Text style={styles.DanText}>是否打开搜索界面连续扫码功能</Text></View>
                                 <TouchableOpacity style={styles.ModalLeft} onPress={this._setModalVisible1.bind(this)}>
                                     <Image source={require("../images/2_02.png")} />
                                 </TouchableOpacity>
