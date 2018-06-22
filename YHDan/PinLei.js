@@ -17,7 +17,7 @@ import Search from "../app/Search";
 import PinLeiData from "./PinLeiData";
 import NetUtils from "../utils/NetUtils";
 import Storage from '../utils/Storage';
-import ModalDropdown from 'native';
+
 
 export default class PinLei extends Component {
     constructor(props){

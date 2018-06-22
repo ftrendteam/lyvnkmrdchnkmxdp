@@ -985,7 +985,85 @@ export default class DBAdapter extends SQLiteOpenHelper {
             });
         })
     }
-
+  
+  /***
+   * 总交易报表数据查询
+   * @param startTime
+   * @param endTime
+   * @return {Promise}
+   */
+    selectAllData(startTime,endTime){
+        return new Promise(()=>{
+          db.transaction((tx) => {
+            let sql="select * from Detail where sDateTime <='"+endTime+"' and sDateTime >='"+startTime+"'";
+            tx.executeSql(sql, [], (tx, results) => {
+              resolve(results.rows);
+            });
+          }, (error) => {
+            this._errorCB('transaction', error);
+          });
+        });
+    }
+  
+  /***
+   * 收款员报表
+   * @param cashierCode
+   * @param startTime
+   * @param endTime
+   * @return {Promise}
+   */
+    selectCashier(cashierCode,startTime,endTime){
+        return new Promise(()=>{
+            db.transaction((tx)=>{
+                let sql="select * from detail where CashierCode='"+cashierCode+"' and sDateTime>='"+startTime+"' " +
+                  "and sDateTime <='"+endTime+"'";
+                tx.executeSql(sql,[],(tx,results)=>{
+                  resolve(results.rows);
+                })
+            },(error)=>{
+              this._errorCB('transaction', error);
+            });
+        });
+    }
+  
+  /***
+   * 品类报表
+   * @param cashierCode
+   * @param startTime
+   * @param endTime
+   * @return {Promise}
+   */
+  selectDep(startTime,endTime){
+    return new Promise(()=>{
+      db.transaction((tx)=>{
+        let sql="select * from Detail where sDateTime>='"+startTime+"' and sDateTime <='"+endTime+"' and TradeFlag='T'";
+        tx.executeSql(sql,[],(tx,results)=>{
+          resolve(results.rows);
+        })
+      },(error)=>{
+        this._errorCB('transaction', error);
+      });
+    });
+  }
+  
+  /***
+   * 单品报表查询
+   * @param startTime
+   * @param endTime
+   * @return {Promise}
+   */
+  selectSingleProd(startTime,endTime){
+    return new Promise(()=>{
+      db.transaction((tx)=>{
+        let sql="select * from Detail where sDateTime>='"+startTime+"' and sDateTime <='"+endTime+"'";
+        tx.executeSql(sql,[],(tx,results)=>{
+          resolve(results.rows);
+        })
+      },(error)=>{
+        this._errorCB('transaction', error);
+      });
+    });
+  }
     /***
      * 根据解析出来的prodCode 查询商品
      * @param prodCode

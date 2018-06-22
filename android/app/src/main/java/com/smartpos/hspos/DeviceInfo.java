@@ -11,7 +11,6 @@ import com.facebook.react.bridge.Callback;
 public class DeviceInfo extends ReactContextBaseJavaModule{
         private ReactApplicationContext reactContext;
 
-
         public DeviceInfo(ReactApplicationContext reactContext) {
             super(reactContext);
             this.reactContext = reactContext;

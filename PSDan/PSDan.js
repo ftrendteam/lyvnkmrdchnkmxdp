@@ -4,7 +4,7 @@
 
 import React, { Component } from 'react';
 import {
-    AppRegistry,
+   
     StyleSheet,
     Text,
     View,
@@ -21,7 +21,7 @@ import CKu from "./CKu";
 import PinLeiData from "../YHDan/PinLeiData";
 import ShoppingCart from "../app/ShoppingCart";//清单
 import Storage from '../utils/Storage';
-import ModalDropdown from 'native';
+
 
 export default class PSDan extends Component {
     constructor(props){
