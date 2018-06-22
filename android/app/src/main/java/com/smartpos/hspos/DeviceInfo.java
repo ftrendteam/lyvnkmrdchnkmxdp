@@ -35,4 +35,9 @@ public class DeviceInfo extends ReactContextBaseJavaModule{
         public void getIMEI(Callback successCallback){
             successCallback.invoke(SystemUtils.getIMEI(reactContext));
         }
+
+        @ReactMethod
+        public void getDeviceModel(Callback successCallback){
+            successCallback.invoke(SystemUtils.getDeviceModel());
+        }
 }
