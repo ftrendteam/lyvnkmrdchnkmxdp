@@ -1,5 +1,5 @@
 /**
- * 销售优惠界面
+ * 销售优惠界面Sell文件夹下
  */
 
 import React, {Component} from 'react';

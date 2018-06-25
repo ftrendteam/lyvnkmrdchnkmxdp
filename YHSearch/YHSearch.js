@@ -1,5 +1,5 @@
 /**
- * 库存查询
+ * 库存查询 YHSearch文件夹下
  */
 
 import React, { Component } from 'react';

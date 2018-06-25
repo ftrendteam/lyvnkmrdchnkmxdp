@@ -1,7 +1,5 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
+ * Sell文件夹下SellDan.js
  */
 
 import React, { Component } from 'react';
@@ -11,6 +9,7 @@ import {
 } from 'react-native';
 
 var styles = StyleSheet.create({
+    //公共头部
     container: {
         flex: 1,
         backgroundColor: "#f2f2f2",
@@ -36,6 +35,7 @@ var styles = StyleSheet.create({
         fontSize: 22,
         marginTop: 3,
     },
+    //selldan.js
     Rolling: {
         flex:15,
         backgroundColor:"#ffffff",
@@ -149,5 +149,97 @@ var styles = StyleSheet.create({
         color: "#666666",
         marginTop: 5,
     },
+    //sell_baobiao.js
+    Content:{
+        marginBottom:30,
+    },
+    ContList:{
+        borderBottomWidth:1,
+        borderBottomColor:"#f5f5f5",
+        flexDirection:"row",
+        height:50,
+        paddingTop:12,
+        paddingLeft: 16,
+        backgroundColor:"#ffffff",
+        borderBottomColor:"#f2f2f2",
+        borderBottomWidth:1,
+    },
+    ContLeft:{
+        color:"#666666",
+        fontSize:16,
+        width:70,
+        textAlign:"right",
+    },
+    ContRight:{
+        color:"#333333",
+        marginLeft:8,
+        flex:1,
+    },
+    button:{
+        flex:1,
+        backgroundColor:"#ff4e4e",
+        borderRadius:5,
+        paddingTop:8,
+        paddingBottom:8,
+    },
+    ButtonText:{
+        color:"#ffffff",
+        textAlign:"center",
+        fontSize:18,
+    },
+    Row:{
+        flexDirection: "row",
+        marginTop:12,
+        marginBottom:12,
+    },
+    BB_Title:{
+        flexDirection:"row",
+        backgroundColor:"#e3e3e3",
+        paddingTop:13,
+        paddingBottom:13,
+        paddingLeft:25,
+        paddingRight:25,
+    },
+    Title:{
+        backgroundColor:"#ffffff",
+        paddingTop:13,
+        paddingBottom:13,
+        paddingLeft:25,
+        paddingRight:25,
+        borderBottomWidth:1,
+        borderBottomColor:"#e3e3e3"
+    },
+    Name:{
+        flexDirection:"row",
+    },
+    XSNumber:{
+        flexDirection:"row",
+        flex:1
+    },
+    RowName:{
+        flex:1,
+        color:"#333333",
+        fontSize:16,
+    },
+    RowNumber:{
+        color:"#333333",
+        fontSize:16,
+    },
+    list:{
+        marginBottom:200,
+    },
+    Null: {
+        marginLeft: 25,
+        marginRight: 25,
+        marginTop: 120,
+    },
+    NullText: {
+        color: "#cccccc",
+        fontSize: 20,
+        textAlign: "center"
+    },
+    ListView:{
+
+    }
 });
 module.exports = styles;

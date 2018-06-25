@@ -1,5 +1,5 @@
 /**
- * 商品查询（搜索）
+ * 商品查询（搜索）StockEnquiries文件夹下
  */
 
 import React, { Component } from 'react';

@@ -1,5 +1,5 @@
 /**
- * 要货单商品品类
+ * 要货单商品品类 YHDan文件夹下
  */
 
 import React, { Component } from 'react';

@@ -96,8 +96,8 @@ android {
         applicationId "com.smartpos.hspos"
         minSdkVersion 16
         targetSdkVersion 22
-        versionCode 27
-        versionName "1.2.8"
+        versionCode 29
+        versionName "1.3.1"
         ndk {
             abiFilters "armeabi","armeabi-v7a", "x86"
         }
@@ -148,7 +148,6 @@ dependencies {
     compile "com.android.support:appcompat-v7:23.0.1"
     compile ("com.facebook.react:react-native:0.47.1"){force = true} // From node_modules
     compile project(':react-native-dateandtime')
-    compile project(':react-native-picker')
     compile project(':react-native-sqlite-storage')
     compile files('libs/sunmiscan.jar')
     compile 'com.squareup.okhttp3:okhttp:3.9.0'

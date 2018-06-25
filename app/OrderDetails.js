@@ -410,7 +410,7 @@ export default class GoodsDetails extends Component {
     }
 
     TotalButton(){
-        if(this.state.Number==""){
+        if(this.state.Number==""&&this.state.BQNumber==""){
             ToastAndroid.show('商品数量不能为空', ToastAndroid.SHORT);
         }else{
             var Modify=NumberUtils.numberFormat2(this.state.numberFormat2/this.state.Number);
@@ -850,8 +850,7 @@ export default class GoodsDetails extends Component {
     }
 
     pressPop(){
-        this.refs.textInput1.blur();
-        if(this.state.Number==""){
+        if(this.state.Number==""&&this.state.BQNumber==""){
             ToastAndroid.show('商品数量不能为空', ToastAndroid.SHORT);
         }else{
             if(this.state.YdCountm==6&&this.state.ydcountm==0){
@@ -1207,7 +1206,6 @@ export default class GoodsDetails extends Component {
     }
 
     PressPop(){
-        this.refs.textInput1.blur();
         var shopInfoData = [];
         var shopInfo = {};
         shopInfo.Pid = this.state.Pid;
@@ -1285,7 +1283,6 @@ export default class GoodsDetails extends Component {
                                     (this.state.YdCountm == 5) ?
                                         <View style={styles.onPrice}>
                                             <TextInput
-                                                ref="textInput1"
                                                 style={styles.Number}
                                                 autoFocus={true}
                                                 underlineColorAndroid='transparent'
@@ -1306,7 +1303,6 @@ export default class GoodsDetails extends Component {
                                                     </TouchableOpacity>
                                                     :
                                                     <TextInput
-                                                        ref="textInput1"
                                                         style={styles.Number}
                                                         returnKeyType='search'
                                                         autoFocus={true}

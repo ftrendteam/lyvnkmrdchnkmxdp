@@ -7,7 +7,28 @@ let flagLength=2;
 export default class DeCodePrePrint {
   constructor() {
   }
-  
+  init(dBAdapter){
+    dBAdapter.selectKgOpt("ScalePluLength").then((datas) => {
+      dBAdapter.selectKgOpt("ScalePreFlag").then((flags)=>{
+        let dataLen = datas.length;
+        if (dataLen != 0) {
+          strLength = datas.item(0).OptValue;
+          if (strLength == "") {
+            strLength = "5";
+          }
+        } else {
+          strLength = "5";
+        }
+        let flagLen = flags.length;
+        if (flagLen != 0) {
+          flagLength = flags.item(0).OptValue.length;
+          if (flagLength == "") {
+            flagLength = 2;
+          }
+        }
+      });
+    });
+  }
   deCodePreFlag = (deCode) => {
     let flag = StringUtils.subStr(0, 2, deCode);
     if(deCode.length==13){
@@ -27,30 +48,9 @@ export default class DeCodePrePrint {
    * 解码 返回ProdCode
    * @return {*}
    */
-   deCodeProdCode = (deCode, dBAdapter) => {
-    return new Promise((resolve, reject) => {
-      dBAdapter.selectKgOpt("ScalePluLength").then((datas) => {
-        dBAdapter.selectKgOpt("ScalePreFlag").then((flags)=>{
-          let dataLen = datas.length;
-          if (dataLen != 0) {
-            strLength = datas.item(0).OptValue;
-            if (strLength == "") {
-              strLength = "5";
-            }
-          } else {
-            strLength = "5";
-          }
-          let flagLen = flags.length;
-          if (flagLen != 0) {
-            flagLength = flags.item(0).OptValue.length;
-            if (flagLength == "") {
-              flagLength = 2;
-            }
-          }
-          resolve(StringUtils.subStr(flagLength, (flagLength + Number(strLength)), deCode));
-        });
-      });
-    });
+   deCodeProdCode = (deCode) => {
+     return StringUtils.subStr(flagLength, (flagLength + Number(strLength)), deCode);
+    
   }
   
   /***
@@ -80,9 +80,7 @@ export default class DeCodePrePrint {
           strDegree = "0.01";
           s = StringUtils.subStr(flagLength + Number(strLength), 13 - 1, deCode);
         }
-        //alert(2 + Number(strLength));
         let scaleMultiply  =parseFloat(Number(s) * Number(strDegree)).toFixed(fixed);
-        //let scaleMultiply = BigDecimalUtils.multiply(strDegree, s, 2);
         resolve(scaleMultiply);
       });
     });

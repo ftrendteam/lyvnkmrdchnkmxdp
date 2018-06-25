@@ -491,7 +491,7 @@ export default class Search extends Component {
                                 new Promise.all([deCode13.deCodeProdCode(reminder, dbAdapter), deCode13.deCodeTotile(reminder, dbAdapter)]).then((result) => {
                                     if (result.length == 2) {
                                         let prodCode = result[0];//解析出来的prodcode用来selectaidcode接口传入prodcode
-                                        let price = result[1];
+                                        let total = result[1];
                                         dbAdapter.selectAidCode(prodCode, 1).then((product) => {
                                             if (product.length == 0) {
                                                 ToastAndroid.show("商品不存在", ToastAndroid.SHORT);
@@ -499,25 +499,168 @@ export default class Search extends Component {
                                             }
                                             for (let i = 0; i < product.length; i++) {
                                                 var row = product.item(i);
-                                                if (DepCode !== null) {
-                                                    if (row.DepCode1 !== DepCode) {
-                                                        ToastAndroid.show("请选择该品类下的商品", ToastAndroid.SHORT);
-                                                        return;
+                                                dbAdapter.selectShopInfoData(row.Pid).then((datas) => {
+                                                    if (datas.length == 0) {
+                                                        var divide = total / row.ShopPrice;
+                                                        var countm = divide.toFixed(3);
+                                                    } else {
+                                                        var countm = row.ShopNumber;
+                                                    }
+                                                    if (DepCode !== null) {
+                                                        if (row.DepCode1 !== DepCode) {
+                                                            ToastAndroid.show("请选择该品类下的商品", ToastAndroid.SHORT);
+                                                            return;
+                                                        }
+                                                        else {
+                                                            if (this.state.name == "移动销售") {
+                                                                this.setState({
+                                                                    ProdName: row.ProdName,
+                                                                    ShopPrice: row.ShopPrice,
+                                                                    Number1:countm,
+                                                                    Pid: row.Pid,
+                                                                    Remark: row.ShopRemark,
+                                                                    ProdCode: row.ProdCode,
+                                                                    DepCode: row.DepCode1,
+                                                                    SuppCode: row.SuppCode,
+                                                                    BarCode: row.BarCode,
+                                                                    ydcountm: '',
+                                                                    focus: true,
+                                                                    Search: "",
+                                                                    modal: 1,
+                                                                    IsIntCount: row.IsIntCount
+                                                                })
+                                                            }
+                                                            else {
+                                                                //商品查询
+                                                                let params = {
+                                                                    reqCode: "App_PosReq",
+                                                                    reqDetailCode: "App_Client_CurrProdQry",
+                                                                    ClientCode: this.state.ClientCode,
+                                                                    sDateTime: Date.parse(new Date()),
+                                                                    Sign: NetUtils.MD5("App_PosReq" + "##" + "App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs") + '',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
+                                                                    username: userName,
+                                                                    usercode: this.state.Usercode,
+                                                                    SuppCode: row.SuppCode,
+                                                                    ShopCode: this.state.ShopCode,
+                                                                    ChildShopCode: this.state.ChildShopCode,
+                                                                    ProdCode: row.ProdCode,
+                                                                    OrgFormno: this.state.OrgFormno,
+                                                                    FormType: FormType,
+                                                                };
+                                                                FetchUtil.post(LinkUrl, JSON.stringify(params)).then((data) => {
+                                                                    var ShopPrice = JSON.stringify(data.ShopPrice);
+                                                                    if (data.retcode == 1) {
+                                                                        if (this.state.name == "商品查询") {
+                                                                            this.props.navigator.push({
+                                                                                component: Shopsearch,
+                                                                                params: {
+                                                                                    ProdCode: row.ProdCode,
+                                                                                    DepCode: row.DepCode1,
+                                                                                }
+                                                                            })
+                                                                        }
+                                                                        else {
+                                                                            let numberFormat2 = NumberUtils.numberFormat2((row.ShopNumber) * (row.ShopPrice));
+                                                                            if (this.state.name == "商品采购" || this.state.name == "协配采购" || this.state.Modify == 1) {
+                                                                                this.setState({
+                                                                                    ProdName: row.ProdName,
+                                                                                    ShopPrice: row.ShopPrice,
+                                                                                    Number1:countm,
+                                                                                    Pid: row.Pid,
+                                                                                    Remark: row.ShopRemark,
+                                                                                    prototal: row.ShopAmount,
+                                                                                    ProdCode: row.ProdCode,
+                                                                                    DepCode: row.DepCode1,
+                                                                                    SuppCode: row.SuppCode,
+                                                                                    BarCode: row.BarCode,
+                                                                                    ydcountm: data.countm,
+                                                                                    numberFormat2: numberFormat2,
+                                                                                    focus: true,
+                                                                                    Search: "",
+                                                                                    modal: 1,
+                                                                                    IsIntCount: row.IsIntCount
+                                                                                })
+                                                                            }
+                                                                            else if (this.state.name == "售价调整") {
+                                                                                dbAdapter.selectShopInfoData(row.Pid).then((datas) => {
+                                                                                    if (datas.length == 0) {
+                                                                                        this.setState({
+                                                                                            ProdName: row.ProdName,
+                                                                                            ShopPrice: row.ShopPrice,
+                                                                                            Pid: row.Pid,
+                                                                                            Number1: "",
+                                                                                            Remark: row.ShopRemark,
+                                                                                            prototal: row.ShopAmount,
+                                                                                            ProdCode: row.ProdCode,
+                                                                                            DepCode: row.DepCode1,
+                                                                                            SuppCode: row.SuppCode,
+                                                                                            BarCode: row.BarCode,
+                                                                                            NewNumber: data.ydcountm,
+                                                                                            focus: true,
+                                                                                            Search: "",
+                                                                                            PriceText: "",
+                                                                                            modal: 1,
+                                                                                            IsIntCount: row.IsIntCount
+                                                                                        })
+                                                                                    } else {
+                                                                                        for (let i = 0; i < datas.length; i++) {
+                                                                                            var data = datas.item(i);
+                                                                                            this.setState({
+                                                                                                ProdName: row.ProdName,
+                                                                                                ShopPrice: row.ShopPrice,
+                                                                                                Pid: row.Pid,
+                                                                                                Number1: 1,
+                                                                                                Remark: row.ShopRemark,
+                                                                                                prototal: row.ShopAmount,
+                                                                                                ProdCode: row.ProdCode,
+                                                                                                DepCode: row.DepCode1,
+                                                                                                SuppCode: row.SuppCode,
+                                                                                                BarCode: row.BarCode,
+                                                                                                NewNumber: data.ydcountm,
+                                                                                                focus: true,
+                                                                                                Search: "",
+                                                                                                PriceText: "",
+                                                                                                modal: 1,
+                                                                                                IsIntCount: row.IsIntCount
+                                                                                            })
+                                                                                        }
+                                                                                    }
+                                                                                })
+                                                                            }
+                                                                            else {
+                                                                                this.setState({
+                                                                                    ProdName: row.ProdName,
+                                                                                    ShopPrice: row.ShopPrice,
+                                                                                    Number1:countm,
+                                                                                    Pid: row.Pid,
+                                                                                    Remark: row.ShopRemark,
+                                                                                    prototal: row.ShopAmount,
+                                                                                    ProdCode: row.ProdCode,
+                                                                                    DepCode: row.DepCode1,
+                                                                                    SuppCode: row.SuppCode,
+                                                                                    BarCode: row.BarCode,
+                                                                                    ydcountm: countm,
+                                                                                    numberFormat2: numberFormat2,
+                                                                                    focus: true,
+                                                                                    Search: "",
+                                                                                    modal: 1,
+                                                                                    IsIntCount: row.IsIntCount
+                                                                                })
+                                                                            }
+                                                                        }
+                                                                    } else {
+                                                                        alert(JSON.stringify(data))
+                                                                    }
+                                                                })
+                                                            }
+                                                        }
                                                     }
                                                     else {
                                                         if (this.state.name == "移动销售") {
-                                                            if (weight == "") {
-                                                                this.setState({
-                                                                    Number1: '1'
-                                                                })
-                                                            } else {
-                                                                this.setState({
-                                                                    Number1: weight
-                                                                })
-                                                            }
                                                             this.setState({
                                                                 ProdName: row.ProdName,
-                                                                ShopPrice: row.StdPrice,
+                                                                ShopPrice: row.ShopPrice,
+                                                                Number1:countm,
                                                                 Pid: row.Pid,
                                                                 Remark: row.ShopRemark,
                                                                 ProdCode: row.ProdCode,
@@ -549,7 +692,6 @@ export default class Search extends Component {
                                                                 FormType: FormType,
                                                             };
                                                             FetchUtil.post(LinkUrl, JSON.stringify(params)).then((data) => {
-                                                                var countm = JSON.stringify(data.countm);
                                                                 var ShopPrice = JSON.stringify(data.ShopPrice);
                                                                 if (data.retcode == 1) {
                                                                     if (this.state.name == "商品查询") {
@@ -564,20 +706,10 @@ export default class Search extends Component {
                                                                     else {
                                                                         let numberFormat2 = NumberUtils.numberFormat2((row.ShopNumber) * (row.ShopPrice));
                                                                         if (this.state.name == "商品采购" || this.state.name == "协配采购" || this.state.Modify == 1) {
-                                                                            if (row.ShopNumber == 0) {
-                                                                                this.setState({
-                                                                                    numberFormat2: 0.00,
-                                                                                    Number1: '',
-                                                                                })
-                                                                            } else {
-                                                                                this.setState({
-                                                                                    numberFormat2: numberFormat2,
-                                                                                    Number1: row.ShopNumber,
-                                                                                })
-                                                                            }
                                                                             this.setState({
                                                                                 ProdName: row.ProdName,
-                                                                                ShopPrice: ShopPrice,
+                                                                                ShopPrice: row.ShopPrice,
+                                                                                Number1:countm,
                                                                                 Pid: row.Pid,
                                                                                 Remark: row.ShopRemark,
                                                                                 prototal: row.ShopAmount,
@@ -585,7 +717,8 @@ export default class Search extends Component {
                                                                                 DepCode: row.DepCode1,
                                                                                 SuppCode: row.SuppCode,
                                                                                 BarCode: row.BarCode,
-                                                                                ydcountm: countm,
+                                                                                ydcountm: data.countm,
+                                                                                numberFormat2: numberFormat2,
                                                                                 focus: true,
                                                                                 Search: "",
                                                                                 modal: 1,
@@ -639,24 +772,10 @@ export default class Search extends Component {
                                                                             })
                                                                         }
                                                                         else {
-                                                                            if (this.state.name == "标签采集" && row.ShopNumber == 0) {
-                                                                                this.setState({
-                                                                                    Number1: 1,
-                                                                                })
-                                                                            } else if (this.state.name !== "标签采集" && row.ShopNumber == 0) {
-                                                                                this.setState({
-                                                                                    numberFormat2: 0.00,
-                                                                                    Number1: '',
-                                                                                })
-                                                                            } else {
-                                                                                this.setState({
-                                                                                    numberFormat2: numberFormat2,
-                                                                                    Number1: row.ShopNumber,
-                                                                                })
-                                                                            }
                                                                             this.setState({
                                                                                 ProdName: row.ProdName,
                                                                                 ShopPrice: row.ShopPrice,
+                                                                                Number1:countm,
                                                                                 Pid: row.Pid,
                                                                                 Remark: row.ShopRemark,
                                                                                 prototal: row.ShopAmount,
@@ -664,7 +783,8 @@ export default class Search extends Component {
                                                                                 DepCode: row.DepCode1,
                                                                                 SuppCode: row.SuppCode,
                                                                                 BarCode: row.BarCode,
-                                                                                ydcountm: countm,
+                                                                                ydcountm: data.countm,
+                                                                                numberFormat2: numberFormat2,
                                                                                 focus: true,
                                                                                 Search: "",
                                                                                 modal: 1,
@@ -678,181 +798,7 @@ export default class Search extends Component {
                                                             })
                                                         }
                                                     }
-                                                }
-                                                else {
-                                                    if (this.state.name == "移动销售") {
-                                                        if (weight == "") {
-                                                            this.setState({
-                                                                Number1: '1'
-                                                            })
-                                                        } else {
-                                                            this.setState({
-                                                                Number1: weight
-                                                            })
-                                                        }
-                                                        this.setState({
-                                                            ProdName: row.ProdName,
-                                                            ShopPrice: row.StdPrice,
-                                                            Pid: row.Pid,
-                                                            Remark: row.ShopRemark,
-                                                            ProdCode: row.ProdCode,
-                                                            DepCode: row.DepCode1,
-                                                            SuppCode: row.SuppCode,
-                                                            BarCode: row.BarCode,
-                                                            ydcountm: '',
-                                                            focus: true,
-                                                            Search: "",
-                                                            modal: 1,
-                                                            IsIntCount: row.IsIntCount
-                                                        })
-                                                    }
-                                                    else {
-                                                        //商品查询
-                                                        let params = {
-                                                            reqCode: "App_PosReq",
-                                                            reqDetailCode: "App_Client_CurrProdQry",
-                                                            ClientCode: this.state.ClientCode,
-                                                            sDateTime: Date.parse(new Date()),
-                                                            Sign: NetUtils.MD5("App_PosReq" + "##" + "App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs") + '',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
-                                                            username: userName,
-                                                            usercode: this.state.Usercode,
-                                                            SuppCode: row.SuppCode,
-                                                            ShopCode: this.state.ShopCode,
-                                                            ChildShopCode: this.state.ChildShopCode,
-                                                            ProdCode: row.ProdCode,
-                                                            OrgFormno: this.state.OrgFormno,
-                                                            FormType: FormType,
-                                                        };
-                                                        FetchUtil.post(LinkUrl, JSON.stringify(params)).then((data) => {
-                                                            var countm = JSON.stringify(data.countm);
-                                                            var ShopPrice = JSON.stringify(data.ShopPrice);
-                                                            if (data.retcode == 1) {
-                                                                if (this.state.name == "商品查询") {
-                                                                    this.props.navigator.push({
-                                                                        component: Shopsearch,
-                                                                        params: {
-                                                                            ProdCode: row.ProdCode,
-                                                                            DepCode: row.DepCode1,
-                                                                        }
-                                                                    })
-                                                                }
-                                                                else {
-                                                                    let numberFormat2 = NumberUtils.numberFormat2((row.ShopNumber) * (row.ShopPrice));
-                                                                    if (this.state.name == "商品采购" || this.state.name == "协配采购" || this.state.Modify == 1) {
-                                                                        if (row.ShopNumber == 0) {
-                                                                            this.setState({
-                                                                                numberFormat2: 0.00,
-                                                                                Number1: '',
-                                                                            })
-                                                                        } else {
-                                                                            this.setState({
-                                                                                numberFormat2: numberFormat2,
-                                                                                Number1: row.ShopNumber,
-                                                                            })
-                                                                        }
-                                                                        this.setState({
-                                                                            ProdName: row.ProdName,
-                                                                            ShopPrice: ShopPrice,
-                                                                            Pid: row.Pid,
-                                                                            Remark: row.ShopRemark,
-                                                                            prototal: row.ShopAmount,
-                                                                            ProdCode: row.ProdCode,
-                                                                            DepCode: row.DepCode1,
-                                                                            SuppCode: row.SuppCode,
-                                                                            BarCode: row.BarCode,
-                                                                            ydcountm: countm,
-                                                                            focus: true,
-                                                                            Search: "",
-                                                                            modal: 1,
-                                                                            IsIntCount: row.IsIntCount
-                                                                        })
-                                                                    }
-                                                                    else if (this.state.name == "售价调整") {
-                                                                        dbAdapter.selectShopInfoData(row.Pid).then((datas) => {
-                                                                            if (datas.length == 0) {
-                                                                                this.setState({
-                                                                                    ProdName: row.ProdName,
-                                                                                    ShopPrice: row.ShopPrice,
-                                                                                    Pid: row.Pid,
-                                                                                    Number1: "",
-                                                                                    Remark: row.ShopRemark,
-                                                                                    prototal: row.ShopAmount,
-                                                                                    ProdCode: row.ProdCode,
-                                                                                    DepCode: row.DepCode1,
-                                                                                    SuppCode: row.SuppCode,
-                                                                                    BarCode: row.BarCode,
-                                                                                    NewNumber: data.ydcountm,
-                                                                                    focus: true,
-                                                                                    Search: "",
-                                                                                    PriceText: "",
-                                                                                    modal: 1,
-                                                                                    IsIntCount: row.IsIntCount
-                                                                                })
-                                                                            } else {
-                                                                                for (let i = 0; i < datas.length; i++) {
-                                                                                    var data = datas.item(i);
-                                                                                    this.setState({
-                                                                                        ProdName: row.ProdName,
-                                                                                        ShopPrice: row.ShopPrice,
-                                                                                        Pid: row.Pid,
-                                                                                        Number1: 1,
-                                                                                        Remark: row.ShopRemark,
-                                                                                        prototal: row.ShopAmount,
-                                                                                        ProdCode: row.ProdCode,
-                                                                                        DepCode: row.DepCode1,
-                                                                                        SuppCode: row.SuppCode,
-                                                                                        BarCode: row.BarCode,
-                                                                                        NewNumber: data.ydcountm,
-                                                                                        focus: true,
-                                                                                        Search: "",
-                                                                                        PriceText: "",
-                                                                                        modal: 1,
-                                                                                        IsIntCount: row.IsIntCount
-                                                                                    })
-                                                                                }
-                                                                            }
-                                                                        })
-                                                                    }
-                                                                    else {
-                                                                        if (this.state.name == "标签采集" && row.ShopNumber == 0) {
-                                                                            this.setState({
-                                                                                Number1: 1,
-                                                                            })
-                                                                        } else if (this.state.name !== "标签采集" && row.ShopNumber == 0) {
-                                                                            this.setState({
-                                                                                numberFormat2: 0.00,
-                                                                                Number1: '',
-                                                                            })
-                                                                        } else {
-                                                                            this.setState({
-                                                                                numberFormat2: numberFormat2,
-                                                                                Number1: row.ShopNumber,
-                                                                            })
-                                                                        }
-                                                                        this.setState({
-                                                                            ProdName: row.ProdName,
-                                                                            ShopPrice: row.ShopPrice,
-                                                                            Pid: row.Pid,
-                                                                            Remark: row.ShopRemark,
-                                                                            prototal: row.ShopAmount,
-                                                                            ProdCode: row.ProdCode,
-                                                                            DepCode: row.DepCode1,
-                                                                            SuppCode: row.SuppCode,
-                                                                            BarCode: row.BarCode,
-                                                                            ydcountm: countm,
-                                                                            focus: true,
-                                                                            Search: "",
-                                                                            modal: 1,
-                                                                            IsIntCount: row.IsIntCount
-                                                                        })
-                                                                    }
-                                                                }
-                                                            } else {
-                                                                alert(JSON.stringify(data))
-                                                            }
-                                                        })
-                                                    }
-                                                }
+                                                })
                                             }
                                         })
                                     }
@@ -913,7 +859,7 @@ export default class Search extends Component {
                                                                                     ShopPrice: ShopPrice,
                                                                                     ProdName: row.ProdName,
                                                                                     Pid: row.Pid,
-                                                                                    Remark: ro.ShopRemark,
+                                                                                    Remark: row.ShopRemark,
                                                                                     prototal: row.prototal,
                                                                                     ProdCode: row.ProdCode,
                                                                                     DepCode: row.DepCode1,
@@ -1141,7 +1087,6 @@ export default class Search extends Component {
 
     //二维码扫描
     Code() {
-        alert("!23")
         NativeModules.RNScannerAndroid.openScanner();
     }
 
@@ -2546,7 +2491,6 @@ export default class Search extends Component {
                     }
                 }
             }
-            DeviceEventEmitter.removeAllListeners();
         }
     }
 
@@ -2607,7 +2551,6 @@ export default class Search extends Component {
 
     }
     render() {
-        console.log("yyyyyyy=",this.state.Number1)
         return (
             <View style={styles.container}>
                 <View style={styles.Title}>

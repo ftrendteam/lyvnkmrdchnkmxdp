@@ -992,8 +992,8 @@ export default class DBAdapter extends SQLiteOpenHelper {
    * @param endTime
    * @return {Promise}
    */
-    selectAllData(startTime,endTime){
-        return new Promise(()=>{
+    SelectAllData(startTime,endTime){
+        return new Promise((resolve, reject)=>{
           db.transaction((tx) => {
             let sql="select * from Detail where sDateTime <='"+endTime+"' and sDateTime >='"+startTime+"'";
             tx.executeSql(sql, [], (tx, results) => {
@@ -1013,7 +1013,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
    * @return {Promise}
    */
     selectCashier(cashierCode,startTime,endTime){
-        return new Promise(()=>{
+        return new Promise((resolve, reject)=>{
             db.transaction((tx)=>{
                 let sql="select * from detail where CashierCode='"+cashierCode+"' and sDateTime>='"+startTime+"' " +
                   "and sDateTime <='"+endTime+"'";
@@ -1034,9 +1034,9 @@ export default class DBAdapter extends SQLiteOpenHelper {
    * @return {Promise}
    */
   selectDep(startTime,endTime){
-    return new Promise(()=>{
+    return new Promise((resolve, reject)=>{
       db.transaction((tx)=>{
-        let sql="select * from Detail where sDateTime>='"+startTime+"' and sDateTime <='"+endTime+"' and TradeFlag='T'";
+        let sql="select a.*,b.depName from detail a left join tdepset b where a.depCode =b.depcode and sDateTime>='"+startTime+"' and sDateTime <='"+endTime+"' and TradeFlag='T'";
         tx.executeSql(sql,[],(tx,results)=>{
           resolve(results.rows);
         })
@@ -1053,7 +1053,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
    * @return {Promise}
    */
   selectSingleProd(startTime,endTime){
-    return new Promise(()=>{
+    return new Promise((resolve, reject)=>{
       db.transaction((tx)=>{
         let sql="select * from Detail where sDateTime>='"+startTime+"' and sDateTime <='"+endTime+"'";
         tx.executeSql(sql,[],(tx,results)=>{

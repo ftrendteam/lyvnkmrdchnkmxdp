@@ -1,5 +1,5 @@
 /**
- * 销售付款页面
+ * 销售付款页面 Sell文件夹下
  */
 
 import React, {Component} from 'react';

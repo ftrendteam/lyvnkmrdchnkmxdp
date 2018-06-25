@@ -1,5 +1,5 @@
 /**
- * 移动销售历史查询
+ * 移动销售历史查询 Sell文件夹下
  */
 
 import React, {Component} from 'react';
@@ -20,6 +20,7 @@ import {
 } from 'react-native';
 import Index from "../app/Index";
 import Sell from "./Sell";
+import BaoBiao from "./Sell_BaoBiao";
 import ShoppingCart from "../app/ShoppingCart";
 import styles from "../style/styles";//style样式引用
 import NetUtils from "../utils/NetUtils";
@@ -58,11 +59,48 @@ export default class SellDan extends Component {
 
     ShopList() {
         var nextRoute = {
-            name: "主页",
-            component: ShoppingCart
+            name: "Sell",
+            component: Sell
         };
         this.props.navigator.push(nextRoute);
     }
+
+    JYbaobiao(){
+        this.props.navigator.push({
+            component: BaoBiao,
+            params: {
+                BBName: "总交易报表",
+            }
+        })
+    }
+
+    SKbaobiao(){
+        this.props.navigator.push({
+            component: BaoBiao,
+            params: {
+                BBName: "收款员报表",
+            }
+        })
+    }
+
+    PLbaobiao(){
+        this.props.navigator.push({
+            component: BaoBiao,
+            params: {
+                BBName: "品类报表",
+            }
+        })
+    }
+
+    DPbaobiao(){
+        this.props.navigator.push({
+            component: BaoBiao,
+            params: {
+                BBName: "单品报表",
+            }
+        })
+    }
+
     render() {
         return (
             <View style={styles.container}>
@@ -74,13 +112,13 @@ export default class SellDan extends Component {
                 </View>
                 <ScrollView style={styles.Rolling}>
                     <View style={styles.row}>
-                        <TouchableOpacity style={styles.OnclickList}>
+                        <TouchableOpacity style={styles.OnclickList} onPress={this.JYbaobiao.bind(this)}>
                             <Text style={styles.ModalHeadImage1}>
                                 <Image source={require("../images/1_63.png")}/>
                             </Text>
                             <Text style={styles.LisText}>总交易报表</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.OnclickList}>
+                        <TouchableOpacity style={styles.OnclickList}onPress={this.SKbaobiao.bind(this)}>
                             <Text style={styles.ModalHeadImage1}>
                                 <Image source={require("../images/1_64.png")}/>
                             </Text>
@@ -88,13 +126,13 @@ export default class SellDan extends Component {
                         </TouchableOpacity>
                     </View>
                     <View style={styles.row}>
-                        <TouchableOpacity style={styles.OnclickList}>
+                        <TouchableOpacity style={styles.OnclickList}onPress={this.PLbaobiao.bind(this)}>
                             <Text style={styles.ModalHeadImage1}>
                                 <Image source={require("../images/1_65.png")}/>
                             </Text>
                             <Text style={styles.LisText}>品类报表</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.OnclickList}>
+                        <TouchableOpacity style={styles.OnclickList}onPress={this.DPbaobiao.bind(this)}>
                             <Text style={styles.ModalHeadImage1}>
                                 <Image source={require("../images/1_66.png")}/>
                             </Text>
