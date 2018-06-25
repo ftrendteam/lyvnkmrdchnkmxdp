@@ -42,13 +42,8 @@ public class ScannerMainActivity extends Activity implements SurfaceHolder.Callb
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.ac_sunmi_scan_finder);
-
-        if (SystemUtils.getDeviceModel().equals("P1")) {
-            init();
-        } else {
             startActivityForResult(new Intent(ScannerMainActivity.this,
                     CaptureActivity.class), CaptureActivity.REQ_CODE);
-        }
     }
 
     private void init() {
