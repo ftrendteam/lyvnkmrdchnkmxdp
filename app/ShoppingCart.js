@@ -153,6 +153,7 @@ export default class ShoppingCart extends Component {
         Storage.get('PeiSong').then((PeiSong) => {
             if(PeiSong=="商品配送"){
                 dbAdapter.selectShopInfo().then((rows)=> {
+                  
                     if (rows.length == 0) {
                         Storage.get('LinkUrl').then((LinkUrl) => {
                             Storage.get('ClientCode').then((ClientCode)=>{
@@ -208,6 +209,8 @@ export default class ShoppingCart extends Component {
                                                                 'SuppCode':"",
                                                                 'Pid':pid,
                                                                 'DepCode':"",
+                                                              'kccount':ydcountm,
+                                                              'prodcode':detailInfo.prodcode
                                                             }
                                                             this.DataShop.push(DataShop);
                                                             shopInfo.Pid = pid;
@@ -246,7 +249,50 @@ export default class ShoppingCart extends Component {
                             })
                         })
                     }else{
+                      let ShopNumber =0;
+                      let shopAmount =0;
+                        for(let i=0;i<rows.length;i++){
+                          
+                          let detailInfo = rows.item(i);
+                          var serial=i+1;
+                          var prodcode=detailInfo.prodcode;
+                          var countm=detailInfo.countm;
+                          var pid=detailInfo.pid;
+                          var promemo = "";
+                          var ydcountm = detailInfo.countm;
+                          var prodname=detailInfo.prodname;
+                          var shopnumber=detailInfo.countm;
+                          var ProPrice=detailInfo.ShopPrice;
+                          var ShopAmount=detailInfo.prototal;
+                          shopAmount += Number(ShopAmount);
+                          ShopNumber += Number(shopnumber);
+                          this.ds.push(detailInfo);
+                          var DataShop = {
+                            'serial':serial,
+                            'prodname':prodname,
+                            'barCode':"",
+                            'prodcode': prodcode,
+                            'shopnumber':shopnumber,
+                            'countm': countm,
+                            'ProPrice': ProPrice,
+                            'promemo': "",
+                            'ydcountm': ydcountm,
+                            'ShopAmount':ShopAmount,
+                            'SuppCode':"",
+                            'Pid':pid,
+                            'DepCode':"",
+                            'kccount':ydcountm,
+                            'prodcode':detailInfo.ProdCode
+                          }
+                          this.DataShop.push(DataShop);
+                        }
+                      this.setState({
+                        ShopNumber:ShopNumber,//数量
+                        ShopAmount:NumberUtils.numberFormat2(shopAmount),//总金额
+                        ds:this.state.ds.cloneWithRows(this.DataShop),
+                      })
                         this.modal();
+                      
                     }
                 })
             } else{
@@ -291,6 +337,8 @@ export default class ShoppingCart extends Component {
                     'SuppCode':row.SuppCode,
                     'Pid':row.pid,
                     'DepCode':row.DepCode,
+                    'kccount':ydcountm,
+                    'prodcode':row.ProdCode
                 }
                 this.DataShop.push(DataShop);
             }
@@ -1412,6 +1460,8 @@ export default class ShoppingCart extends Component {
                     'SuppCode':row.SuppCode,
                     'Pid':row.pid,
                     'DepCode':row.DepCode,
+                    'kccount':ydcountm,
+                    'prodcode':row.ProdCode
                 }
                 this.DataShop.push(DataShop);
             }
@@ -1632,6 +1682,7 @@ export default class ShoppingCart extends Component {
                                     }
                                     if(this.screen==""){
                                         FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
+                                            
                                             if(data.retcode == 1){
                                                 if(this.state.Screen!=="1"||this.state.Screen!=="2"||this.screen==""||scode==null){
                                                     this.Wait();
@@ -1660,6 +1711,7 @@ export default class ShoppingCart extends Component {
                                         SUbmit:'',
                                     })
                                 }else{
+                                   
                                     FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
                                         if(data.retcode == 1){
                                             if(this.state.Screen!=="1"||this.state.Screen!=="2"||this.screen==""||scode==null){

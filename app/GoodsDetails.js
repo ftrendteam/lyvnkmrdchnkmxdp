@@ -114,7 +114,7 @@ export default class GoodsDetails extends Component {
                     for (let i = 0; i < DetailInfo2.length; i++) {
                         var row = DetailInfo2[i];
                         var number = row.countm;
-                        shopnumber += parseInt(row.countm);
+                        shopnumber += Number(row.countm);
                     }
                     this.dataRows = this.dataRows.concat(DetailInfo2);
                     this.DataShop = this.DataShop.concat(DetailInfo2);

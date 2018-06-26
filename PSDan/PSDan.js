@@ -248,7 +248,6 @@ export default class PSDan extends Component {
                             <Image source={require("../images/2_01.png")} style={styles.HeaderImage}></Image>
                         </TouchableOpacity>
                         <Text style={styles.HeaderList}>{this.state.invoice}</Text>
-
                     </View>
                 </View>
                 <View style={styles.ContList}>

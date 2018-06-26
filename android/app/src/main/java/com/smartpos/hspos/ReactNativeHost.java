@@ -2,7 +2,7 @@ package com.smartpos.hspos;
 
 import android.app.Application;
 
-import com.beefe.picker.PickerViewPackage;
+
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.wrp.datetime.*;
@@ -29,7 +29,6 @@ public class ReactNativeHost extends com.facebook.react.ReactNativeHost {
     protected List<ReactPackage> getPackages() {
         return Arrays.<ReactPackage>asList(
              new DateTimePickerPackage(),
-                new PickerViewPackage(),
                 new SQLitePluginPackage(),
                 new JsScannerReactPackage(),
                 new JSAndroidIMEIReactPackage(),

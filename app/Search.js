@@ -78,6 +78,7 @@ export default class Search extends Component {
             dataRows: "1",
             dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
             ShoppData: "",
+            SaoMa:"0"
         };
         this.dataRows = [];
     }
@@ -1091,6 +1092,11 @@ export default class Search extends Component {
     }
 
     Storage() {
+        Storage.get('SaoMa').then((saoMa)=>{
+            this.setState({
+              SaoMa:saoMa
+            })
+        });
         Storage.get('Name').then((tags) => {
             this.setState({
                 name: tags
@@ -2347,7 +2353,9 @@ export default class Search extends Component {
                                 modal: "",
                             })
                         }
-                        this.Code();
+                        if(this.state.SaoMa=='1'){
+                            this.Code();
+                        }
                     } else {
                         ToastAndroid.show('商品数量不能为负数', ToastAndroid.SHORT);
                     }
@@ -2417,7 +2425,9 @@ export default class Search extends Component {
                                     })
                                 }
                             }
+                          if(this.state.SaoMa=='1'){
                             this.Code();
+                          }
                         } else {
                             ToastAndroid.show('商品数量不能含有小数', ToastAndroid.SHORT);
                             this.setState({
@@ -2487,7 +2497,9 @@ export default class Search extends Component {
                                 })
                             }
                         }
+                      if(this.state.SaoMa=='1'){
                         this.Code();
+                      }
                     }
                 }
             }

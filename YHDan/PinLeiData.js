@@ -100,8 +100,8 @@ export default class PinLeiData extends Component {
                 </View>
             </TouchableOpacity>
         )
-
     }
+    
     render() {
         return (
             <View style={styles.container}>
