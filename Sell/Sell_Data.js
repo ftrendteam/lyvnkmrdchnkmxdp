@@ -17,6 +17,7 @@ import {
 import Index from "../app/Index";
 import Search from "../app/Search";
 import Sell_Data_List from "../Sell/Sell_Data_List";
+import SellDan from "../Sell/SellDan";//销售历史单据
 import DBAdapter from "../adapter/DBAdapter";
 import Storage from '../utils/Storage';
 import FetchUtil from "../utils/FetchUtils";
@@ -35,6 +36,7 @@ export default class SellData extends Component {
             ShopCode:"",
             PosCode:"",
             invoice:this.props.invoice ? this.props.invoice : "",
+            Sell1:this.props.Sell1 ? this.props.Sell1 : "",
             active:"",
             linkurl:"",
         };
@@ -129,23 +131,33 @@ export default class SellData extends Component {
                             DownLoadBasicData.downLoadPosOpt(this.state.linkurl, this.state.ShopCode, dbAdapter, this.state.PosCode).then((response) => {
                                 if (response = true) {
                                     //创建流水号 本地保存
-                                 
-                                    var nextRoute = {
-                                        name: "Index",
-                                        component: Index
-                                    };
-                                    this.props.navigator.push(nextRoute);
-                                    Storage.save("Bind", "bindsucceed");
-                                    Storage.save("ShopCode", this.state.ShopCode);
-                                    Storage.save("PosCode", this.state.PosCode);
-                                    Storage.save('Name', '移动销售');
-                                    Storage.save("Num", "1");
-                                    Storage.save("inoNum", "1");
-                                    Storage.save("invoice", "移动销售");
-                                    Storage.save('YdCountm', '4');
-                                      NumFormatUtils.createLsNo().then((data) => {
-                                        Storage.save("LsNo",data);
-                                      });
+                                    if(this.state.Sell1==1){
+                                        var nextRoute = {
+                                            name: "SellDan",
+                                            component: SellDan
+                                        };
+                                        this.props.navigator.push(nextRoute);
+                                        Storage.save("Bind", "bindsucceed");
+                                        Storage.save('Name', '移动销售');
+                                        Storage.save('name', '移动销售');
+                                    }else{
+                                        var nextRoute = {
+                                            name: "Index",
+                                            component: Index
+                                        };
+                                        this.props.navigator.push(nextRoute);
+                                        Storage.save("Bind", "bindsucceed");
+                                        Storage.save("ShopCode", this.state.ShopCode);
+                                        Storage.save("PosCode", this.state.PosCode);
+                                        Storage.save('Name', '移动销售');
+                                        Storage.save("Num", "1");
+                                        Storage.save("inoNum", "1");
+                                        Storage.save("invoice", "移动销售");
+                                        Storage.save('YdCountm', '4');
+                                        NumFormatUtils.createLsNo().then((data) => {
+                                            Storage.save("LsNo",data);
+                                        });
+                                    }
                                 } else {
                                     alert(JSON.stringify(response));
                                 }
@@ -178,16 +190,27 @@ export default class SellData extends Component {
                         if (data.retcode == 1) {
                             DownLoadBasicData.downLoadPosOpt(this.state.linkurl, this.state.ShopCode, dbAdapter, this.state.PosCode).then((response) => {
                                 if (response = true) {
-                                    var nextRoute={
-                                        name:"Search",
-                                        component:Search,
-                                    };
-                                    this.props.navigator.push(nextRoute);
-                                    Storage.save("Bind", "bindsucceed");
-                                    Storage.save("ShopCode", this.state.ShopCode);
-                                    Storage.save("PosCode", this.state.PosCode);
-                                    Storage.save('Name', '移动销售');
-                                    Storage.save("Num", "1");
+                                    if(this.state.Sell1==1){
+                                        var nextRoute = {
+                                            name: "SellDan",
+                                            component: SellDan
+                                        };
+                                        this.props.navigator.push(nextRoute);
+                                        Storage.save("Bind", "bindsucceed");
+                                        Storage.save('Name', '移动销售');
+                                        Storage.save('name', '移动销售');
+                                    }else{
+                                        var nextRoute={
+                                            name:"Search",
+                                            component:Search,
+                                        };
+                                        this.props.navigator.push(nextRoute);
+                                        Storage.save("Bind", "bindsucceed");
+                                        Storage.save("ShopCode", this.state.ShopCode);
+                                        Storage.save("PosCode", this.state.PosCode);
+                                        Storage.save('Name', '移动销售');
+                                        Storage.save("Num", "1");
+                                    }
                                 } else {
                                     alert(JSON.stringify(response));
                                 }

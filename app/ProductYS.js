@@ -148,7 +148,6 @@ export default class ProductYS extends Component {
     }
 
     Search(){
-        Storage.save('shopPandian','App_Client_NOYSCGQ');
         var nextRoute={
             name:"Distrition_list",
             component:Distrition_list,
@@ -157,6 +156,7 @@ export default class ProductYS extends Component {
                 SearchShopname1:(Suppcode1)=>this.SearchShopname1(Suppcode1),
                 DepName: (DepName) => this._DepName(DepName),
                 DepCode: (DepCode) => this._DepCode(DepCode),
+                App_Client:'App_Client_NOYSCGQ'
             }
         };
         this.props.navigator.push(nextRoute)

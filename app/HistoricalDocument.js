@@ -190,6 +190,7 @@ export default class HistoricalDocument extends Component {
                             if (this.dataRows == 0) {
                                 return;
                             } else {
+                                console.log("datarows=",JSON.stringify(this.dataRows));
                                 this.setState({
                                     dataSource: this.state.dataSource.cloneWithRows(this.dataRows)
                                 })
@@ -253,11 +254,13 @@ export default class HistoricalDocument extends Component {
                                     FormType: FormCheck,
 
                                 };
+                                console.log(JSON.stringify(params))
                                 FetchUtils.post(LinkUrl,JSON.stringify(params)).then((data) => {
                                     this.DataShop=[];
                                     this._setModalVisible();
                                     if (data.retcode == 1) {
                                         rowData.checktype = "已审核";
+                                        console.log("datarowssssssss=",JSON.stringify(this.dataRows))
                                         this.setState({
                                             dataSource: this.state.dataSource.cloneWithRows(this.dataRows)
                                         })
@@ -306,7 +309,7 @@ export default class HistoricalDocument extends Component {
                                 </Text> : null
                         }
                         {
-                            (this.state.name == "协配采购" || this.state.name == "协配收货") ?
+                            (this.state.name == "协配采购") ?
                                 <Text style={styles.List}>
                                     <Text style={styles.ListLeft}>机构信息：</Text>
                                     <Text style={styles.ListRight}>{rowData.childshop}</Text>

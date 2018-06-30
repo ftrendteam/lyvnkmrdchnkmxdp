@@ -58,7 +58,8 @@ export default class admin extends Component {
             detailInfo1:"",
             linkurl:"",
             sCode1:"",
-            textinput:""
+            textinput:"",
+            url:"",
         };
         this.pickerData=[]
     }
@@ -87,6 +88,9 @@ export default class admin extends Component {
         })
         Storage.get('Url').then((tags) => {
             //apk版本自动更新
+            this.setState({
+                url:tags
+            })
             FetchUtil.post(tags+"/Default2.aspx?jsonStr={'TblName':'AndroidYWVersion'}").then((data) => {//获取最新apk版本号
                 NativeModules.AndroidDeviceInfo.getVerCode((msg) => {//获取当前apk版本号
                     if (data > msg) {
@@ -173,16 +177,14 @@ export default class admin extends Component {
     }
 
     Datermine(){
-        Storage.get('Url').then((tags) => {
-            this.Edition();
-            this.NewEdition();
-            NativeModules.UpApk.isUpdata(tags,(finish)=>{
-                if (finish) {
-                    this.NewEdition();
-                    NativeModules.UpApk.installAPK();
-                }
-            });
-        })
+        this.Edition();
+        this.NewEdition();
+        NativeModules.UpApk.isUpdata(this.state.url,(finish)=>{
+            if (finish) {
+                this.NewEdition();
+                NativeModules.UpApk.installAPK();
+            }
+        });
     }
 
     NoDatermine(){

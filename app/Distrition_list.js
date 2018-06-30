@@ -29,24 +29,18 @@ export default class Distrition_list extends Component {
         this.state = {
             search:"",
             LinkUrl:"",
-            shopPandian:"",
             userName:"",
             Usercode:"",
             str2:"",
             DetailInfo:"",
             show:false,
+            App_Client:this.props.App_Client?this.props.App_Client:"",
             dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => true,}),
         };
         this.dataRows = [];
     }
     componentDidMount(){
         InteractionManager.runAfterInteractions(() => {
-            Storage.get('shopPandian').then((tags)=>{
-                this.setState({
-                    shopPandian:tags
-                })
-            })
-
             Storage.get('userName').then((tags)=>{
                 this.setState({
                     userName:tags
@@ -81,13 +75,36 @@ export default class Distrition_list extends Component {
     }
 
     fetch(){
+        var date = new Date();
+        var getFullYear = date.getFullYear();
+        var getMonth = date.getMonth() + 1;
+        var getDate = date.getDate();
+        var getHours = date.getHours();
+        var getMinutes = date.getMinutes();
+        var getSeconds = date.getSeconds();
+        if (getMonth >= 0 && getMonth <= 9) {
+            var getMonth = "0" + getMonth;
+        }
+        if (getDate >= 0 && getDate <= 9) {
+            var getDate = "0" + getDate;
+        }
+        if (getHours >= 0 && getHours <= 9) {
+            var getHours = "0" + getHours;
+        }
+        if (getMinutes >= 0 && getMinutes <= 9) {
+            var getMinutes = "0" + getMinutes;
+        }
+        if (getSeconds >= 0 && getSeconds <= 9) {
+            var getSeconds = "0" + getSeconds;
+        }
+        var SfullTime = getFullYear + "-" + getMonth + "-" + getDate + " " + getHours+":"+getMinutes+":"+getSeconds;
         Storage.get('ClientCode').then((tags) => {
             let params = {
                 reqCode:"App_PosReq",
-                reqDetailCode:this.state.shopPandian,
+                reqDetailCode:this.state.App_Client,
                 ClientCode:tags,
-                sDateTime:"2017-08-09 12:12:12",//获取当前时间转换成时间戳
-                Sign:NetUtils.MD5("App_PosReq" + "##" +this.state.shopPandian + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
+                sDateTime:SfullTime,//获取当前时间转换成时间戳
+                Sign:NetUtils.MD5("App_PosReq" + "##" +this.state.App_Client + "##" + SfullTime + "##" + "PosControlCs")+'',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
                 username:this.state.userName,
                 usercode:this.state.Usercode,
                 shopcode:this.state.str2,
@@ -139,13 +156,15 @@ export default class Distrition_list extends Component {
 
     pressPop(rowData){
         this.refs.textInput.blur();
-        if(this.props.reloadView||this.props.DepName||this.props.DepCode){
-            if(this.state.shopPandian=='App_Client_NOYSPSQ'){
+        if(this.props.reloadView||this.props.DepName||this.props.DepCode||this.props.SourceNumber){
+            if(this.state.App_Client=='App_Client_NOYSPSQ'){
                 this.props.reloadView(rowData.Formno);
                 this.props.DepName(rowData.depname);
                 this.props.DepCode(rowData.depcode);
-            }else if(this.state.shopPandian=='App_Client_NoEndPCQ'){
+            }else if(this.state.App_Client=='App_Client_NoEndPCQ'){
                 this.props.reloadView(rowData.Formno);
+            }else if(this.state.App_Client=='App_Client_NOProWXHQ'){
+                this.props.SourceNumber(rowData.Formno);
             }
         }
         this.props.navigator.pop();
@@ -154,7 +173,7 @@ export default class Distrition_list extends Component {
     pressPop1(rowData){
         this.refs.textInput.blur();
         if(this.props.SearchShopname||this.props.SearchShopname1||this.props.DepName||this.props.DepCode){
-            if(this.state.shopPandian=='App_Client_NOYSCGQ'||this.state.shopPandian=='App_Client_NOYSXPCGQ'){
+            if(this.state.App_Client=='App_Client_NOYSCGQ'||this.state.App_Client=='App_Client_NOYSXPCGQ'){
                 this.props.SearchShopname(rowData.Formno);
                 this.props.SearchShopname1(rowData.suppcode);
                 this.props.DepName(rowData.depname);
@@ -168,7 +187,7 @@ export default class Distrition_list extends Component {
         return(
             <View style={styles.header}>
                 {
-                    (this.state.shopPandian=='App_Client_NoEndPCQ'||this.state.shopPandian=='App_Client_NOYSPSQ')?
+                    (this.state.App_Client=='App_Client_NoEndPCQ'||this.state.App_Client=='App_Client_NOYSPSQ'||this.state.App_Client=='App_Client_NOProWXHQ')?
                         <TouchableOpacity onPress={()=>this.pressPop(rowData)} style={styles.Coding}>
                             <View style={[styles.coding,{flex:3}]}>
                                 <Text style={styles.codingText}>{rowData.Formno}</Text>
@@ -179,7 +198,7 @@ export default class Distrition_list extends Component {
                         </TouchableOpacity>:null
                 }
                 {
-                    (this.state.shopPandian=='App_Client_NOYSCGQ'||this.state.shopPandian=='App_Client_NOYSXPCGQ')?
+                    (this.state.App_Client=='App_Client_NOYSCGQ'||this.state.App_Client=='App_Client_NOYSXPCGQ')?
                         <TouchableOpacity onPress={()=>this.pressPop1(rowData)} style={styles.Coding}>
                             <View style={[styles.coding,{flex:3}]}>
                                 <Text style={styles.codingText}>{rowData.Formno}</Text>
@@ -225,7 +244,7 @@ export default class Distrition_list extends Component {
                             <Text style={styles.codingText}>单据号</Text>
                         </View>
                         {
-                            (this.state.invoice=="配送收货")?
+                            (this.state.invoice=="配送收货"||this.state.invoice=="批发销售")?
                                 <View style={[styles.coding,{flex:2}]}>
                                     <Text style={styles.codingText}>品类</Text>
                                 </View>:null
@@ -340,7 +359,7 @@ const styles = StyleSheet.create({
         borderBottomColor:"#f2f2f2",
     },
     scrollview:{
-        marginBottom:120,
+        marginBottom:140,
     },
     Null:{
         marginLeft:25,

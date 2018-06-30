@@ -11,6 +11,7 @@ import {
     Image,
     Modal,
     TextInput,
+    ToastAndroid,
     TouchableOpacity,
 } from 'react-native';
 import Index from "../app/Index";
@@ -18,7 +19,8 @@ import Search from "../app/Search";
 import User_Information from "./User_Information";
 import NetUtils from "../utils/NetUtils";
 import Storage from '../utils/Storage';
-
+var {NativeModules} = require('react-native');
+var RNScannerAndroid = NativeModules.RNScannerAndroid;
 export default class Set extends Component {
     constructor(props){
         super(props);
@@ -126,24 +128,30 @@ export default class Set extends Component {
         this._SaoMahow();
     }
     SMButton(){
-        Storage.get('SaoMa').then((tags) => {
-            if (tags == "0") {
-                this.setState({
-                    pressStatus1: 'pressin1',
-                    PressStatus1: '0',
-                });
-            } else if (tags== "1") {
-                this.setState({
-                    PressStatus1: 'Pressin1',
-                    pressStatus1: 0
-                });
+        NativeModules.AndroidDeviceInfo.getDeviceModel((deviceModel)=>{
+            if(deviceModel=="sq39Q"||deviceModel=="SHT"){
+                ToastAndroid.show("当前机器不支持连续扫码功能", ToastAndroid.SHORT);
+            }else {
+                Storage.get('SaoMa').then((tags) => {
+                    if (tags == "0") {
+                        this.setState({
+                            PressStatus1: 'Pressin1',
+                            pressStatus1: 0
+                        });
+                    } else if (tags== "1") {
+                        this.setState({
+                            pressStatus1: 'pressin1',
+                            PressStatus1: '0',
+                        });
+                    }
+                })
+                this._SaoMahow();
             }
-        })
-        this._SaoMahow();
+        });
     }
 
     SYButton() {
-        Storage.save("SaoMa", "0");
+        Storage.save("SaoMa", "1");//支持扫码
         this.setState({
             pressStatus1: 'pressin1',
             PressStatus1: '0',
@@ -151,7 +159,7 @@ export default class Set extends Component {
     }
 
     SNButton() {
-        Storage.save("SaoMa", "1");
+        Storage.save("SaoMa", "0");//不支持扫码
         this.setState({
             PressStatus1: 'Pressin1',
             pressStatus1: 0
@@ -206,7 +214,7 @@ export default class Set extends Component {
                             placeholderTextColor="#333333"
                         />
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={this.SetButton.bind(this)}>
+                    <TouchableOpacity onPress={this.SMButton.bind(this)}>
                         <Image source={require("../images/2_03.png")}></Image>
                     </TouchableOpacity>
                 </View>

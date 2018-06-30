@@ -583,7 +583,7 @@ export default class Pay extends Component {
     }
 
     Return() {
-        if (this.state.CardFaceNo == "") {
+        if (this.dataRows == '') {
             var nextRoute = {
                 name: "Sell",
                 component: Sell,
@@ -677,13 +677,13 @@ export default class Pay extends Component {
             } else {
                 if (item.item.PayCode == "01") {
                     if (this.state.Seles == "R") {
-                        if (this.state.amount > Number(this.state.Total) && this.state.Total < 0) {
+                        if (this.state.amount > this.state.Total) {
                             this.ModalShow()
                         } else {
                             this.RefundTotal()
                         }
                     } else if (this.state.Seles == "T") {
-                        if (this.state.amount > Number(this.state.Total) && this.state.Total > 0) {
+                        if (this.state.amount > this.state.Total) {
                             this.ModalShow()
                         } else {
                             this.Total();
@@ -784,7 +784,6 @@ export default class Pay extends Component {
                                 }
                             }
                         }
-
                         this.restorage1()
                     } else if (this.state.Seles == "T") {
                         var payTotal = Number(this.state.amount) + Number(this.state.payments);
@@ -863,7 +862,7 @@ export default class Pay extends Component {
                 }
                 else if (item.item.PayCode == "0Q") {
                     if (this.state.Seles == "R") {
-                        if (this.state.amount > Number(this.state.Total) && this.state.Total < 0) {
+                        if (this.state.amount >this.state.Total) {
                             this.ModalShow()
                         } else {
                             dbAdapter.selectPosOpt('MiYaMerchID').then((rows) => {
@@ -904,7 +903,7 @@ export default class Pay extends Component {
                             this.Barcode();
                         }
                     } else if (this.state.Seles == "T") {
-                        if (this.state.amount > Number(this.state.Total) && this.state.Total < 0) {
+                        if (this.state.amount >this.state.Total) {
                             this.ModalShow()
                         } else {
                             dbAdapter.selectPosOpt('MiYaMerchID').then((rows) => {
@@ -1044,13 +1043,13 @@ export default class Pay extends Component {
                 }
                 else if (item.item.PayCode == "05") {
                     if (this.state.Seles == "R") {
-                        if (this.state.amount > Number(this.state.Total) && this.state.Total < 0) {
+                        if (this.state.amount >this.state.Total) {
                             this.ModalShow()
                         } else {
                             this.SZRet();
                         }
                     } else if (this.state.Seles == "T") {
-                        if (this.state.amount > Number(this.state.Total) && this.state.Total > 0) {
+                        if (this.state.amount >this.state.Total) {
                             this.ModalShow()
                         } else {
                             this.MemberCard();
@@ -1374,7 +1373,7 @@ export default class Pay extends Component {
             Storage.get('Pid').then((Pid) => {
                 Storage.get('usercode').then((usercode) => {
                     Storage.get('userName').then((userName) => {
-                        if (this.state.ShopAmount == this.state.payments || this.state.ShopAmount < this.state.payments) {
+                        if (this.state.Total == 0.00||this.state.Total <0) {
                             this.HuiYuan();
                             var now = new Date();
                             var year = now.getFullYear();
@@ -1603,7 +1602,7 @@ export default class Pay extends Component {
             Storage.get('ShopName').then((ShopName) => {
                 Storage.get('usercode').then((usercode) => {
                     Storage.get('userName').then((userName) => {
-                        if (-this.state.ShopAmount == this.state.payments || -this.state.ShopAmount > this.state.payments) {
+                        if (this.state.Total == 0.00||this.state.Total <0) {
                             this.HuiYuan();
                             var now = new Date();
                             var year = now.getFullYear();

@@ -100,12 +100,13 @@ export default class Query extends Component {
         Storage.delete('YdCountm');
         Storage.delete('Modify');
         Storage.delete("PeiSong");
+        Storage.delete('SourceNumber');
         if(this.state.DepName1==""&&this.state.DepCode1==""){
             Storage.delete('DepCode');
         }else{
             Storage.save('DepCode', this.state.DepCode1);
         }
-        Storage.save('YdCountm', '3');
+        Storage.save('YdCountm', '盘点');
         Storage.save('OrgFormno',str);
         Storage.save('Date',data);
         Storage.save('Name','商品盘点');
@@ -118,12 +119,12 @@ export default class Query extends Component {
     }
 
     Search(){
-        Storage.save('shopPandian','App_Client_NoEndPCQ');
         var nextRoute={
             name:"Distrition_list",
             component:Distrition_list,
             params: {
                 reloadView:(sCode)=>this._reloadView(sCode),
+                App_Client:'App_Client_NoEndPCQ'
             }
         };
         this.props.navigator.push(nextRoute)
