@@ -3,13 +3,15 @@ import StringUtils from './StringUtils';
  * Created by admin on 2018/4/19.
  */
 let strLength;
-let flagLength=2;
+let flag;
+let flagLength = 2;
 export default class DeCodePrePrint {
   constructor() {
   }
-  init(dBAdapter){
+  
+  init(dBAdapter) {
     dBAdapter.selectKgOpt("ScalePluLength").then((datas) => {
-      dBAdapter.selectKgOpt("ScalePreFlag").then((flags)=>{
+      dBAdapter.selectKgOpt("ScalePreFlag").then((flags) => {
         let dataLen = datas.length;
         if (dataLen != 0) {
           strLength = datas.item(0).OptValue;
@@ -21,7 +23,8 @@ export default class DeCodePrePrint {
         }
         let flagLen = flags.length;
         if (flagLen != 0) {
-          flagLength = flags.item(0).OptValue.length;
+          flag = flags.item(0).OptValue;
+          flagLength = optValue.length;
           if (flagLength == "") {
             flagLength = 2;
           }
@@ -29,18 +32,16 @@ export default class DeCodePrePrint {
       });
     });
   }
+  
   deCodePreFlag = (deCode) => {
-    let flag = StringUtils.subStr(0, 2, deCode);
-    if(deCode.length==13){
-    
-    
-    if ("27"==flag) {
-      return true;
-    } else if ("13"==flag) {
-      return true;
+    let flagStart = StringUtils.subStr(0, flagLength, deCode);
+    if (deCode.length == 13) {
+      if (flagStart == flag) {
+        return true;
+      } else {
+        return false;
+      }
     } else {
-      return true;
-    }}else{
       return false;
     }
   }
@@ -48,8 +49,8 @@ export default class DeCodePrePrint {
    * 解码 返回ProdCode
    * @return {*}
    */
-   deCodeProdCode = (deCode) => {
-     return StringUtils.subStr(flagLength, (flagLength + Number(strLength)), deCode);
+  deCodeProdCode = (deCode) => {
+    return StringUtils.subStr(flagLength, (flagLength + Number(strLength)), deCode);
     
   }
   
@@ -57,7 +58,7 @@ export default class DeCodePrePrint {
    * 解析价格
    * @return {*}
    */
-  deCodeTotile = (deCode,dBAdapter) => {
+  deCodeTotile = (deCode, dBAdapter) => {
     return new Promise((resolve, reject) => {
       let strDegree;
       let s;
@@ -67,11 +68,14 @@ export default class DeCodePrePrint {
           strDegree = barDegrees.item(0).OptValue;
           s = StringUtils.subStr(flagLength + Number(strLength), 13 - 1, deCode);
           if (strDegree == "") {
-            strDegree = "0.01";fixed = 2;
+            strDegree = "0.01";
+            fixed = 2;
           } else if ("分" == strDegree) {
-            strDegree = "0.01";fixed = 2;
+            strDegree = "0.01";
+            fixed = 2;
           } else if ("角" == strDegree) {
-            strDegree = "0.1";fixed = 1;
+            strDegree = "0.1";
+            fixed = 1;
           } else if ("元" == strDegree) {
             strDegree = "1";
             fixed = 0;
@@ -80,7 +84,7 @@ export default class DeCodePrePrint {
           strDegree = "0.01";
           s = StringUtils.subStr(flagLength + Number(strLength), 13 - 1, deCode);
         }
-        let scaleMultiply  =parseFloat(Number(s) * Number(strDegree)).toFixed(fixed);
+        let scaleMultiply = parseFloat(Number(s) * Number(strDegree)).toFixed(fixed);
         resolve(scaleMultiply);
       });
     });

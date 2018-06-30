@@ -349,6 +349,7 @@ export  default class RequestBodyUtils {
             resolve(true);
           }
           let tablow = json.TblRow;//商品信息
+          console.log(tablow)
           if (RequestBodyUtils.currPage > 1) {
             tablow = json;
           } else if (RequestBodyUtils.currPage == 1) {

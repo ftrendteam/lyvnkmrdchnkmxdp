@@ -9,6 +9,7 @@ let flagLength=2;
 let dbAdapter;
 let strWeightLen;
 let strLength;
+let flag;
 export default class DeCodePrePrint18 {
   constructor() {
   }
@@ -16,20 +17,39 @@ export default class DeCodePrePrint18 {
   init = (code, DbAdapter) => {
     deCode = code;
     dbAdapter = DbAdapter;
-    // return  this.deCodePreFlag();
   }
-  
+  initFlag(dbAdapter){
+    dbAdapter.selectKgOpt("ScalePluLength").then((datas) => {
+      dbAdapter.selectKgOpt("ScalePreFlag").then((flags)=>{
+        let dataLen = datas.length;
+        if (dataLen != 0) {
+          strLength = datas.item(0).OptValue;
+          if (strLength == "") {
+            strLength = "5";
+          }
+        } else {
+          strLength = "5";
+        }
+        let flagsLen = flags.length;
+        if (flagsLen != 0) {
+          flag = flags.item(0).OptValue;
+          flagLength= flag.length;
+          if (flagLength == "") {
+            flagLength = 2;
+          }
+        } else {
+          flagLength = 2;
+        }
+      });
+    });
+  }
   deCodePreFlag = () => {
-    let flag = StringUtils.subStr(0, 2, deCode);
+    let curFlag = StringUtils.subStr(0, flagLength, deCode);
     if(deCode.length==18){
-      if ("27"==flag) {
+      if (flag==curFlag) {
         return true;
-      } else if ("13"==flag) {
-        
-        return true;
-      } else {
-        
-        return true;
+      }  else {
+        return false;
       }
     }else{
       return false;
@@ -40,31 +60,7 @@ export default class DeCodePrePrint18 {
    * 获取商品ProdCode
    */
   async deCodeProdCode() {
-      return new Promise((resolve, reject) => {
-          dbAdapter.selectKgOpt("ScalePluLength").then((datas) => {
-            dbAdapter.selectKgOpt("ScalePreFlag").then((flags)=>{
-              let dataLen = datas.length;
-              if (dataLen != 0) {
-                strLength = datas.item(0).OptValue;
-                if (strLength == "") {
-                  strLength = "5";
-                }
-              } else {
-                strLength = "5";
-              }
-              let flagsLen = flags.length;
-              if (flagsLen != 0) {
-                flagLength= flags.item(0).OptValue.length;
-                if (flagLength == "") {
-                  flagLength = 2;
-                }
-              } else {
-                flagLength = 2;
-              }
-              resolve(StringUtils.subStr(flagLength, (flagLength + Number(strLength)), deCode));
-            });
-          });
-      });
+    return StringUtils.subStr(flagLength, (flagLength + Number(strLength)), deCode);
   }
   
   /***
@@ -75,7 +71,6 @@ export default class DeCodePrePrint18 {
       let fixed = 2;
       //价格精度
       let strDegree = "";
-      
       dbAdapter.selectKgOpt("ScaleBARDEGREE").then((datas) => {
         let dataLen = datas.length;
         if (dataLen != 0) {
