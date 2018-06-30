@@ -461,7 +461,6 @@ export default class Index extends Component {
                                                                         FormType: FormType,
                                                                     };
                                                                     FetchUtil.post(LinkUrl, JSON.stringify(params)).then((data) => {
-                                                                        var countm = JSON.stringify(data.countm);
                                                                         var ShopPrice = JSON.stringify(data.ShopPrice);
                                                                         if (data.retcode == 1) {
                                                                             if (this.state.head == "商品查询") {
@@ -491,7 +490,7 @@ export default class Index extends Component {
                                                                                                 ProdCode: row.ProdCode,
                                                                                                 DepCode: row.DepCode1,
                                                                                                 SuppCode: row.SuppCode,
-                                                                                                ydcountm: countm,
+                                                                                                ydcountm: data.countm,
                                                                                                 BarCode: row.BarCode,
                                                                                                 IsIntCount: row.IsIntCount
                                                                                             }
@@ -509,7 +508,7 @@ export default class Index extends Component {
                                                                                                 ProdCode: row.ProdCode,
                                                                                                 DepCode: row.DepCode1,
                                                                                                 SuppCode: row.SuppCode,
-                                                                                                ydcountm: countm,
+                                                                                                ydcountm: data.countm,
                                                                                                 BarCode: row.BarCode,
                                                                                                 IsIntCount: row.IsIntCount
                                                                                             }
@@ -571,7 +570,7 @@ export default class Index extends Component {
                                                                                             ProdCode: row.ProdCode,
                                                                                             DepCode: row.DepCode1,
                                                                                             SuppCode: row.SuppCode,
-                                                                                            ydcountm: countm,
+                                                                                            ydcountm: data.countm,
                                                                                             BarCode: row.BarCode,
                                                                                             IsIntCount: row.IsIntCount
                                                                                         }
@@ -635,7 +634,6 @@ export default class Index extends Component {
                                                                         FormType: FormType,
                                                                     };
                                                                     FetchUtil.post(LinkUrl, JSON.stringify(params)).then((data) => {
-                                                                        var countm = JSON.stringify(data.countm);
                                                                         var ShopPrice = JSON.stringify(data.ShopPrice);
                                                                         if (this.state.head == "移动销售") {
                                                                             var shopnumber = 0;
@@ -727,7 +725,7 @@ export default class Index extends Component {
                                                                                                 ProdCode: row.ProdCode,
                                                                                                 DepCode: row.DepCode1,
                                                                                                 SuppCode: row.SuppCode,
-                                                                                                ydcountm: countm,
+                                                                                                ydcountm: data.countm,
                                                                                                 BarCode: row.BarCode,
                                                                                                 IsIntCount: row.IsIntCount
                                                                                             }
@@ -852,7 +850,7 @@ export default class Index extends Component {
                                                                                             ProdCode: row.ProdCode,
                                                                                             DepCode: row.DepCode1,
                                                                                             SuppCode: row.SuppCode,
-                                                                                            ydcountm: countm,
+                                                                                            ydcountm: data.countm,
                                                                                             BarCode: row.BarCode,
                                                                                             IsIntCount: row.IsIntCount
                                                                                         }
@@ -991,7 +989,7 @@ export default class Index extends Component {
                                                                                 ProdCode: row.ProdCode,
                                                                                 DepCode: row.DepCode1,
                                                                                 SuppCode: row.SuppCode,
-                                                                                ydcountm: countm,
+                                                                                ydcountm: JSON.stringify(data.countm),
                                                                                 BarCode: row.BarCode,
                                                                                 IsIntCount: row.IsIntCount
                                                                             }
@@ -1110,7 +1108,7 @@ export default class Index extends Component {
                                                                             ProdCode: row.ProdCode,
                                                                             DepCode: row.DepCode1,
                                                                             SuppCode: row.SuppCode,
-                                                                            ydcountm: countm,
+                                                                            ydcountm: JSON.stringify(data.countm),
                                                                             BarCode: row.BarCode,
                                                                             IsIntCount: row.IsIntCount
                                                                         }
@@ -3664,7 +3662,8 @@ export default class Index extends Component {
                                         数据更新
                                     </Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={[styles.ModalHeadImage, {borderRightWidth: 1, borderRightColor: "#f2f2f2"}]}></TouchableOpacity>
+                                <TouchableOpacity style={styles.ModalHeadImage}></TouchableOpacity>
+                                <TouchableOpacity style={styles.ModalHeadImage}></TouchableOpacity>
                             </View>
                         </View>
                     </ScrollView>

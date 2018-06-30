@@ -1075,8 +1075,10 @@ export default class DBAdapter extends SQLiteOpenHelper {
     selectCounterman(shopCode){
         return new Promise((resolve, reject) => {
             db.transaction((tx) => {
-                let sql="select distinct a.usercode,a.username from tuserset a " +
-                    "left join tusershop b where a.usercode=b.usercode and b.shopcode='"+shopCode+"'";
+                let sql="select distinct a.UserCode,c.username from tUserShop a inner join " +
+                    "tshopitem b on b.SubCode+rtrim(b.shopcode)+';' like '%;'+rtrim(a.shopcode)+';%' or " +
+                    "a.shopcode='0' join kgtuser c on a.UserCode=c.usercode and c.isdel='0' where " +
+                    "ifnull(b.IsDel,'0')<>'1' and b.shopcode='"+shopCode+"'";
                 tx.executeSql(sql, [], (tx, results) => {
                     //alert(results.rows);
                     resolve(results.rows);

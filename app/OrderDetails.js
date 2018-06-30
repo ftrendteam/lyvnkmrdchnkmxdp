@@ -652,6 +652,7 @@ export default class GoodsDetails extends Component {
                                     shopInfoData.push(shopInfo);
                                     //调用插入表方法
                                     dbAdapter.insertShopInfo(shopInfoData);
+                                    DeviceEventEmitter.removeAllListeners();
                                     if (this.state.ShoppData == "清单") {
                                         var nextRoute = {
                                             name: "清单",
@@ -752,6 +753,7 @@ export default class GoodsDetails extends Component {
                                 shopInfoData.push(shopInfo);
                                 //调用插入表方法
                                 dbAdapter.insertShopInfo(shopInfoData);
+                                DeviceEventEmitter.removeAllListeners();
                                 if (this.state.ShoppData == "清单") {
                                     var nextRoute = {
                                         name: "清单",

@@ -234,7 +234,7 @@ export default class Search extends Component {
                                                                                             DepCode: row.DepCode1,
                                                                                             SuppCode: row.SuppCode,
                                                                                             BarCode: row.BarCode,
-                                                                                            NewNumber: data.ydcountm,
+                                                                                            NewNumber: "",
                                                                                             focus: true,
                                                                                             Search: "",
                                                                                             PriceText: "",
@@ -410,7 +410,7 @@ export default class Search extends Component {
                                                                                         DepCode: row.DepCode1,
                                                                                         SuppCode: row.SuppCode,
                                                                                         BarCode: row.BarCode,
-                                                                                        NewNumber: data.ydcountm,
+                                                                                        NewNumber: "",
                                                                                         focus: true,
                                                                                         Search: "",
                                                                                         PriceText: "",
@@ -596,7 +596,7 @@ export default class Search extends Component {
                                                                                             DepCode: row.DepCode1,
                                                                                             SuppCode: row.SuppCode,
                                                                                             BarCode: row.BarCode,
-                                                                                            NewNumber: data.ydcountm,
+                                                                                            NewNumber: "",
                                                                                             focus: true,
                                                                                             Search: "",
                                                                                             PriceText: "",
@@ -740,7 +740,7 @@ export default class Search extends Component {
                                                                                         DepCode: row.DepCode1,
                                                                                         SuppCode: row.SuppCode,
                                                                                         BarCode: row.BarCode,
-                                                                                        NewNumber: data.ydcountm,
+                                                                                        NewNumber: "",
                                                                                         focus: true,
                                                                                         Search: "",
                                                                                         PriceText: "",
@@ -885,7 +885,7 @@ export default class Search extends Component {
                                                                                             DepCode: row.DepCode1,
                                                                                             SuppCode: row.SuppCode,
                                                                                             BarCode: row.BarCode,
-                                                                                            NewNumber: data.ydcountm,
+                                                                                            NewNumber: "",
                                                                                             focus: true,
                                                                                             Search: "",
                                                                                             PriceText: "",
@@ -999,7 +999,7 @@ export default class Search extends Component {
                                                                                         DepCode: row.DepCode1,
                                                                                         SuppCode: row.SuppCode,
                                                                                         BarCode: row.BarCode,
-                                                                                        NewNumber: data.ydcountm,
+                                                                                        NewNumber: "",
                                                                                         focus: true,
                                                                                         Search: "",
                                                                                         PriceText: "",
@@ -1593,7 +1593,7 @@ export default class Search extends Component {
                                         if (this.state.name == "标签采集") {
                                             shopInfo.prototal = "0";
                                         } else {
-                                            shopInfo.prototal = NumberUtils.numberFormat2(ShopPrice);
+                                            shopInfo.prototal = NumberUtils.numberFormat2(shopprice);
                                         }
                                         shopInfo.promemo = this.state.Remark;
                                         shopInfo.DepCode = this.state.DepCode;
