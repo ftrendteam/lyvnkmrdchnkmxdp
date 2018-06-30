@@ -62,7 +62,7 @@ export default class SalesMan extends Component {
 
         for (let i = 0; i < this.dataRows.length; i++) {
             let dataRow = this.dataRows[i];
-            if (((dataRow.Usercode + "").indexOf(value) >= 0)) {
+            if (((dataRow.usercode + "").indexOf(value) >= 0)) {
                 var str = this.dataRows.splice(i,1);
                 this.dataRows.unshift(str[0]);
                 // break;
@@ -76,7 +76,7 @@ export default class SalesMan extends Component {
 
     pressPop(rowData){
         if(this.props.SalesMan){
-            this.props.SalesMan(rowData.Usercode);
+            this.props.SalesMan(rowData.usercode);
         }
         this.props.navigator.pop();
     }
@@ -96,7 +96,7 @@ export default class SalesMan extends Component {
         return(
             <TouchableOpacity style={styles.headerList} onPress={()=>this.pressPop(rowData)}>
                 <View style={styles.coding}>
-                    <Text style={styles.codingText}>{rowData.Usercode}</Text>
+                    <Text style={styles.codingText}>{rowData.usercode}</Text>
                 </View>
                 <View style={styles.name}>
                     <Text style={styles.codingText}>{rowData.UserName}</Text>
@@ -131,7 +131,7 @@ export default class SalesMan extends Component {
                 <View>
                     <View style={styles.head}>
                         <View style={styles.coding}>
-                            <Text style={styles.codingText}>机构号</Text>
+                            <Text style={styles.codingText}>编码</Text>
                         </View>
                         <View style={styles.name}>
                             <Text style={styles.codingText}>名称</Text>
