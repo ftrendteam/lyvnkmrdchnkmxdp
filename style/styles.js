@@ -226,7 +226,7 @@ var styles = StyleSheet.create({
         fontSize:16,
     },
     list:{
-        marginBottom:200,
+        marginBottom:255,
     },
     Null: {
         marginLeft: 25,
@@ -238,8 +238,90 @@ var styles = StyleSheet.create({
         fontSize: 20,
         textAlign: "center"
     },
-    ListView:{
-
+    //批发销售
+    TitleSearch:{
+        backgroundColor:"#ff4e4e",
+        paddingLeft:16,
+        paddingRight:16,
+        paddingTop:15,
+        paddingBottom:15,
+        flexDirection:"row",
+    },
+    SearchImage:{
+        position:"absolute",
+        top:22,
+        left:24,
+    },
+    Search:{
+        borderRadius:30,
+        backgroundColor:"#ffffff",
+        color: "#333333",
+        paddingLeft:46,
+        paddingBottom:15,
+        paddingTop:6,
+        paddingBottom:6,
+        fontSize:14,
+        flex:1,
+    },
+    Right:{
+        width:60,
+        flexDirection:"row",
+        paddingTop:3,
+        paddingLeft:6
+    },
+    Text:{
+        fontSize:18,
+        color:"#ffffff",
+        paddingTop:5,
+        paddingLeft:10,
+    },
+    head:{
+        flexDirection:"row",
+        paddingTop:13,
+        paddingBottom:13,
+        paddingLeft:25,
+        paddingRight:25,
+    },
+    coding:{
+        flex:1,
+        paddingLeft:12
+    },
+    codingText:{
+        color:"#333333",
+        fontSize:16,
+        height:22,
+        overflow:"hidden"
+    },
+    name:{
+        flex:1,
+    },
+    headerList:{
+        flexDirection:"row",
+        paddingLeft:25,
+        paddingRight:25,
+        paddingTop:13,
+        paddingBottom:13,
+        backgroundColor:"#ffffff",
+        borderBottomWidth:1,
+        borderBottomColor:"#f2f2f2",
+    },
+    coding:{
+        flex:1,
+        paddingLeft:12
+    },
+    codingText1:{
+        color:"#333333",
+        fontSize:16,
+    },
+    name:{
+        flex:1,
+    },
+    nameText1:{
+        color:"#333333",
+        fontSize:16,
+    },
+    scrollview:{
+        marginBottom:170,
     }
 });
 module.exports = styles;

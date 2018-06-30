@@ -15,13 +15,16 @@ import {
     TouchableOpacity,
     InteractionManager,
 } from 'react-native';
+import styles from "../style/styles";//style样式引用
 import DBAdapter from "../adapter/DBAdapter";
 import Storage from '../utils/Storage';
+import NetUtils from "../utils/NetUtils";
+import FetchUtil from "../utils/FetchUtils";//网络请求封装
 
 let dbAdapter = new DBAdapter();
 let db;
 
-export default class PinLeiData extends Component {
+export default class SalesMan extends Component {
     constructor(props){
         super(props);
         this.state = {
@@ -38,13 +41,15 @@ export default class PinLeiData extends Component {
     }
 
     fetch(){
-        dbAdapter.selectTDepSet('1').then((rows) => {
-            for(let i =0;i<rows.length;i++){
-                var row = rows.item(i);
-                this.dataRows.push(row);
-            }
-            this.setState({
-                dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
+        Storage.get('code').then((tags) => {
+            dbAdapter.selectCounterman(tags).then((rows)=>{
+                for(let i =0;i<rows.length;i++){
+                    var row = rows.item(i);
+                    this.dataRows.push(row);
+                }
+                this.setState({
+                    dataSource:this.state.dataSource.cloneWithRows(this.dataRows),
+                })
             })
         })
     }
@@ -54,25 +59,24 @@ export default class PinLeiData extends Component {
     }
 
     Search(value){
-        
-            for (let i = 0; i < this.dataRows.length; i++) {
-                let dataRow = this.dataRows[i];
-                if (((dataRow.DepName + "").indexOf(value) >= 0)) {
-                    var str = this.dataRows.splice(i,1);
-                    this.dataRows.unshift(str[0]);
-                    // break;
-                }
+
+        for (let i = 0; i < this.dataRows.length; i++) {
+            let dataRow = this.dataRows[i];
+            if (((dataRow.Usercode + "").indexOf(value) >= 0)) {
+                var str = this.dataRows.splice(i,1);
+                this.dataRows.unshift(str[0]);
+                // break;
             }
-            this.setState({
-                dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
-            })
-        
+        }
+        this.setState({
+            dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
+        })
+
     }
 
     pressPop(rowData){
-        if(this.props.DepName||this.props.DepCode){
-            this.props.DepName(rowData.DepName);
-            this.props.DepCode(rowData.DepCode);
+        if(this.props.SalesMan){
+            this.props.SalesMan(rowData.Usercode);
         }
         this.props.navigator.pop();
     }
@@ -82,30 +86,29 @@ export default class PinLeiData extends Component {
      * 清空数据
      */
     DeleteData(){
-        if(this.props.DepName||this.props.DepCode){
-            this.props.DepName("");
-            this.props.DepCode("");
+        if(this.props.SalesMan){
+            this.props.SalesMan("");
         }
         this.props.navigator.pop();
     }
 
     _renderRow(rowData, sectionID, rowID){
         return(
-            <TouchableOpacity style={styles.header} onPress={()=>this.pressPop(rowData)}>
+            <TouchableOpacity style={styles.headerList} onPress={()=>this.pressPop(rowData)}>
                 <View style={styles.coding}>
-                    <Text style={styles.codingText}>{rowData.DepName}</Text>
+                    <Text style={styles.codingText}>{rowData.Usercode}</Text>
                 </View>
                 <View style={styles.name}>
-                    <Text style={styles.codingText}>{rowData.DepCode}</Text>
+                    <Text style={styles.codingText}>{rowData.UserName}</Text>
                 </View>
             </TouchableOpacity>
         )
     }
-    
+
     render() {
         return (
             <View style={styles.container}>
-                <View style={styles.Title}>
+                <View style={styles.TitleSearch}>
                     <TextInput
                         autofocus="{true}"
                         returnKeyType="search"
@@ -128,13 +131,13 @@ export default class PinLeiData extends Component {
                 <View>
                     <View style={styles.head}>
                         <View style={styles.coding}>
-                            <Text style={styles.codingText}>品类名称</Text>
+                            <Text style={styles.codingText}>机构号</Text>
                         </View>
                         <View style={styles.name}>
-                            <Text style={styles.codingText}>编码</Text>
+                            <Text style={styles.codingText}>名称</Text>
                         </View>
                     </View>
-                    <TouchableOpacity onPress={this.DeleteData.bind(this)} style={styles.header}>
+                    <TouchableOpacity onPress={this.DeleteData.bind(this)} style={styles.headerList}>
                         <View style={styles.coding}>
                             <Text style={[styles.codingText,{color:"#ff4e4e"}]}>清空</Text>
                         </View>
@@ -155,94 +158,3 @@ export default class PinLeiData extends Component {
         );
     }
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#f2f2f2',
-    },
-    Title:{
-        backgroundColor:"#ff4e4e",
-        paddingLeft:16,
-        paddingRight:16,
-        paddingTop:15,
-        paddingBottom:15,
-        flexDirection:"row",
-    },
-    SearchImage:{
-        position:"absolute",
-        top:22,
-        left:24,
-    },
-    Search:{
-        borderRadius:30,
-        backgroundColor:"#ffffff",
-        color: "#333333",
-        paddingLeft:46,
-        paddingBottom:15,
-        paddingTop:6,
-        paddingBottom:6,
-        fontSize:14,
-        flex:1,
-    },
-    Right:{
-        width:60,
-        flexDirection:"row",
-        paddingTop:3,
-        paddingLeft:6
-    },
-    Text:{
-        fontSize:18,
-        color:"#ffffff",
-        paddingTop:5,
-        paddingLeft:10,
-    },
-    head:{
-        flexDirection:"row",
-        paddingTop:13,
-        paddingBottom:13,
-        paddingLeft:25,
-        paddingRight:25,
-    },
-    coding:{
-        flex:1,
-        paddingLeft:12
-    },
-    codingText:{
-        color:"#333333",
-        fontSize:16,
-        height:22,
-        overflow:"hidden"
-    },
-    name:{
-        flex:1,
-    },
-    header:{
-        flexDirection:"row",
-        paddingLeft:25,
-        paddingRight:25,
-        paddingTop:13,
-        paddingBottom:13,
-        backgroundColor:"#ffffff",
-        borderBottomWidth:1,
-        borderBottomColor:"#f2f2f2",
-    },
-    coding:{
-        flex:1,
-        paddingLeft:12
-    },
-    codingText1:{
-        color:"#333333",
-        fontSize:16,
-    },
-    name:{
-        flex:1,
-    },
-    nameText1:{
-        color:"#333333",
-        fontSize:16,
-    },
-    scrollview:{
-        marginBottom:170,
-    }
-});

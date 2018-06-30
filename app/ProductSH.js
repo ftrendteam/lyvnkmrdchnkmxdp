@@ -72,7 +72,6 @@ export default class ProductSH extends Component {
     }
 
     Search(){
-        Storage.save('shopPandian','App_Client_NOYSXPCGQ');
         var nextRoute={
             name:"Distrition_list",
             component:Distrition_list,
@@ -81,6 +80,7 @@ export default class ProductSH extends Component {
                 SearchShopname1:(Suppcode1)=>this.SearchShopname1(Suppcode1),
                 DepName: (DepName) => this._DepName(DepName),
                 DepCode: (DepCode) => this._DepCode(DepCode),
+                App_Client:'App_Client_NOYSXPCGQ'
             }
         };
         this.props.navigator.push(nextRoute)
@@ -169,6 +169,7 @@ export default class ProductSH extends Component {
         Storage.delete('StateMent');
         Storage.delete('BQNumber');
         Storage.delete("PeiSong");
+        Storage.delete('SourceNumber');
         if(this.state.DepCode1==""||this.state.DepCode1==0){
             Storage.delete('DepCode');
         }else{
@@ -185,7 +186,6 @@ export default class ProductSH extends Component {
         Storage.save('ProYH','ProXPYS');
         Storage.save('YuanDan','1');
         Storage.save('Screen','1');
-        Storage.save('shopPandian','App_Client_NOYSXPCGQ');
         Storage.save('Date',data);
         Storage.save("scode",str);
         Storage.save('shildshop',str1);

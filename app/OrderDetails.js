@@ -60,7 +60,7 @@ export default class GoodsDetails extends Component {
             this.setState({
                 name: tags
             });
-            if(this.state.SaoMa==""){
+            if(this.state.SaoMa==""||this.state.SaoMa==0){
                 if(tags=="移动销售"&&this.state.Number==""){
                     this.setState({
                         Number: 1
@@ -956,9 +956,6 @@ export default class GoodsDetails extends Component {
                         ToastAndroid.show('商品数量不能为负数', ToastAndroid.SHORT);
                     }
                 }
-                else if(this.state.BQNumber<0){
-                    ToastAndroid.show('商品数量不能为负数', ToastAndroid.SHORT);
-                }
                 else{
                     if(this.state.IsIntCount==0){
                         var number = this.state.Number;//获取数量的数字
@@ -967,6 +964,9 @@ export default class GoodsDetails extends Component {
                             if(parseInt(BQNumber)==BQNumber){
                                 if(this.state.BQNumber==0){
                                     ToastAndroid.show('商品数量不能为0', ToastAndroid.SHORT);
+
+                                }else if(this.state.BQNumber<0){
+                                    ToastAndroid.show('商品数量不能为负数', ToastAndroid.SHORT);
                                 }else{
                                     var shopInfoData = [];
                                     var shopInfo = {};
@@ -1101,7 +1101,8 @@ export default class GoodsDetails extends Component {
                                 ToastAndroid.show('数量不能含有小数', ToastAndroid.SHORT);
                             }
                         }
-                    }else{
+                    }
+                    else{
                         if(this.state.name=="实时盘点"||this.state.name=="商品盘点"){
                             var shopInfoData = [];
                             var shopInfo = {};
@@ -1331,7 +1332,7 @@ export default class GoodsDetails extends Component {
                     }
                 </View>
                 {
-                    (this.state.YdCountm==1||this.state.YdCountm==6||this.state.YdCountm==5)?
+                    (this.state.YdCountm==1||this.state.YdCountm==6||this.state.YdCountm=="盘点")?
                     <View style={styles.List}>
                         <View style={styles.left2}>
                             <Text style={styles.left}>现在库存</Text>

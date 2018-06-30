@@ -34,6 +34,7 @@ export default class GoodsDetails extends Component {
             name: "",
             checktype: "",
             prototal: "",
+            ClientCode: "",
             dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
             Formno: this.props.Formno ? this.props.Formno : "",
             FormDate: this.props.FormDate ? this.props.FormDate : "",
@@ -45,6 +46,29 @@ export default class GoodsDetails extends Component {
     }
 
     componentDidMount() {
+        var date = new Date();
+        var getFullYear = date.getFullYear();
+        var getMonth = date.getMonth() + 1;
+        var getDate = date.getDate();
+        var getHours = date.getHours();
+        var getMinutes = date.getMinutes();
+        var getSeconds = date.getSeconds();
+        if (getMonth >= 0 && getMonth <= 9) {
+            var getMonth = "0" + getMonth;
+        }
+        if (getDate >= 0 && getDate <= 9) {
+            var getDate = "0" + getDate;
+        }
+        if (getHours >= 0 && getHours <= 9) {
+            var getHours = "0" + getHours;
+        }
+        if (getMinutes >= 0 && getMinutes <= 9) {
+            var getMinutes = "0" + getMinutes;
+        }
+        if (getSeconds >= 0 && getSeconds <= 9) {
+            var getSeconds = "0" + getSeconds;
+        }
+        var SfullTime = getFullYear + "-" + getMonth + "-" + getDate + " " + getHours + ":" + getMinutes + ":" + getSeconds;
         //获取本地数据库url
         Storage.get('LinkUrl').then((tags) => {
             this.setState({
@@ -66,72 +90,79 @@ export default class GoodsDetails extends Component {
         });
 
         //username
-        Storage.get('username').then((tags) => {
+        Storage.get('userName').then((tags) => {
             this.setState({
                 Username: tags
             });
         });
 
         //usercode
-        Storage.get('userpwd').then((tags) => {
+        Storage.get('usercode').then((tags) => {
             this.setState({
-                Userpwd: tags
+                usercode: tags
+            });
+        });
+
+        Storage.get('ClientCode').then((tags) => {
+            this.setState({
+                ClientCode: tags
             });
         });
 
         Storage.get('code').then((tags) => {
-            Storage.get("usercode", "").then((usercode) => {
-                Storage.get("username", "").then((username) => {
+            Storage.get("usercode").then((usercode) => {
+                Storage.get("userName").then((username) => {
                     let params = {
                         ClientCode: this.state.ClientCode,
                         username: this.state.Username,
-                        usercode: this.state.Userpwd,
+                        usercode: usercode,
                     };
                 });
-            });
-            let params = {
-                reqCode: 'App_PosReq',
-                reqDetailCode: this.state.reqDetailCode,
-                ClientCode: this.state.ClientCode,
-                sDateTime: Date.parse(new Date()),
-                Sign: NetUtils.MD5("App_PosReq" + "##" + this.state.reqDetailCode + "##" + Date.parse(new Date()) + "##" + "PosControlCs") + '',
-                username: this.state.Username,
-                usercode: this.state.Userpwd,
-                BeginDate: "",
-                EndDate: "",
-                shopcode: tags,
-                formno: this.state.Formno,
-                prodcode: "",
-            };
-            FetchUtils.post(this.state.linkurl, JSON.stringify(params)).then((data) => {
-                if (data.retcode == 1) {
-                    var numbercode = data.DetailInfo1.storecode;
-                    var numbershop = data.DetailInfo1.childshop;
-                    var checktype = data.DetailInfo1.checktype;
-                    var prototal = data.DetailInfo1.prototal;
-                    var DetailInfo2 = data.DetailInfo2;
-                    var shopnumber = 0;
-                    for (let i = 0; i < DetailInfo2.length; i++) {
-                        var row = DetailInfo2[i];
-                        var number = row.countm;
-                        shopnumber += Number(row.countm);
+                let params = {
+                    reqCode: 'App_PosReq',
+                    reqDetailCode: this.state.reqDetailCode,
+                    ClientCode: this.state.ClientCode,
+                    sDateTime: SfullTime,
+                    Sign: NetUtils.MD5("App_PosReq" + "##" + this.state.reqDetailCode + "##" + SfullTime + "##" + "PosControlCs") + '',
+                    username: this.state.Username,
+                    usercode: usercode,
+                    BeginDate: "",
+                    EndDate: "",
+                    shopcode: tags,
+                    formno: this.state.Formno,
+                    prodcode: "",
+                };
+                FetchUtils.post(this.state.linkurl, JSON.stringify(params)).then((data) => {
+                    if (data.retcode == 1) {
+                        var numbercode = data.DetailInfo1.storecode;
+                        var numbershop = data.DetailInfo1.childshop;
+                        var checktype = data.DetailInfo1.checktype;
+                        var prototal = data.DetailInfo1.prototal;
+                        var DetailInfo2 = data.DetailInfo2;
+                        var shopnumber = 0;
+                        for (let i = 0; i < DetailInfo2.length; i++) {
+                            var row = DetailInfo2[i];
+                            var number = row.countm;
+                            shopnumber += Number(row.countm);
+                        }
+                        this.dataRows = this.dataRows.concat(DetailInfo2);
+                        this.DataShop = this.DataShop.concat(DetailInfo2);
+                        var num = shopnumber.toFixed(2);//四舍五入保留两位
+                        this.setState({
+                            dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
+                            Number: num,
+                            storecode: numbercode,
+                            numbershop: numbershop,
+                            checktype: checktype,
+                            prototal: prototal,
+                        })
+                    } else {
+                        alert(JSON.stringify(data))
                     }
-                    this.dataRows = this.dataRows.concat(DetailInfo2);
-                    this.DataShop = this.DataShop.concat(DetailInfo2);
-                    this.setState({
-                        dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
-                        Number: shopnumber,
-                        storecode: numbercode,
-                        numbershop: numbershop,
-                        checktype: checktype,
-                        prototal: prototal,
-                    })
-                } else {
-                    alert(JSON.stringify(data))
-                }
-            }, (err) => {
-                alert("网络请求失败");
-            })
+                }, (err) => {
+                    alert("网络请求失败");
+                })
+            });
         })
     }
 
@@ -144,18 +175,41 @@ export default class GoodsDetails extends Component {
     }
 
     ShenHeButton() {
+        var date = new Date();
+        var getFullYear = date.getFullYear();
+        var getMonth = date.getMonth() + 1;
+        var getDate = date.getDate();
+        var getHours = date.getHours();
+        var getMinutes = date.getMinutes();
+        var getSeconds = date.getSeconds();
+        if (getMonth >= 0 && getMonth <= 9) {
+            var getMonth = "0" + getMonth;
+        }
+        if (getDate >= 0 && getDate <= 9) {
+            var getDate = "0" + getDate;
+        }
+        if (getHours >= 0 && getHours <= 9) {
+            var getHours = "0" + getHours;
+        }
+        if (getMinutes >= 0 && getMinutes <= 9) {
+            var getMinutes = "0" + getMinutes;
+        }
+        if (getSeconds >= 0 && getSeconds <= 9) {
+            var getSeconds = "0" + getSeconds;
+        }
+        var SfullTime = getFullYear + "-" + getMonth + "-" + getDate + " " + getHours + ":" + getMinutes + ":" + getSeconds;
         Storage.get('code').then((ShopCode) => {
             Storage.get('LinkUrl').then((LinkUrl) => {
                 Storage.get("usercode").then((usercode) => {
-                    Storage.get("username").then((username) => {
+                    Storage.get("userName").then((username) => {
                         Storage.get("FormCheck").then((FormCheck) => {
                             Storage.get('OrgFormno').then((OrgFormno) => {
                                 let params = {
                                     reqCode: "App_PosReq",
                                     reqDetailCode: "App_Client_FormCheck",
                                     ClientCode: this.state.ClientCode,
-                                    sDateTime: Date.parse(new Date()),
-                                    Sign: NetUtils.MD5("App_PosReq" + "##" + "App_Client_FormCheck" + "##" + Date.parse(new Date()) + "##" + "PosControlCs") + '',
+                                    sDateTime: SfullTime,
+                                    Sign: NetUtils.MD5("App_PosReq" + "##" + "App_Client_FormCheck" + "##" + SfullTime + "##" + "PosControlCs") + '',
                                     ShopCode: ShopCode,
                                     ChildShopCode: "",
                                     Formno: this.state.Formno,
@@ -239,13 +293,13 @@ export default class GoodsDetails extends Component {
                                 NativeModules.AndroidPrintInterface.print("\n");
                                 for (let i = 0; i < this.DataShop.length; i++) {
                                     var DataRows = this.DataShop[i];
-                                    var num=DataRows.prototal/DataRows.countm;
-                                    var ProPrice=num.toFixed(2)
+                                    var num = DataRows.prototal / DataRows.countm;
+                                    var ProPrice = num.toFixed(2)
                                     NativeModules.AndroidPrintInterface.print(DataRows.prodname + " " + " " + " " + " " + "\n");
                                     NativeModules.AndroidPrintInterface.print(" " + " " + " " + " " + " " + " " + " " + " " + " " + " " + " " + " " + " " + " " + DataRows.countm + " " + " " + " " + " " + " " + " " + " " + ProPrice + " " + " " + " " + " " + DataRows.prototal + "\n");
                                     NativeModules.AndroidPrintInterface.print("\n");
                                 }
-                                NativeModules.AndroidPrintInterface.print("总价：" +this.state.prototal +"\n");
+                                NativeModules.AndroidPrintInterface.print("总价：" + this.state.prototal + "\n");
                                 NativeModules.AndroidPrintInterface.print("\n");
                                 NativeModules.AndroidPrintInterface.print("\n");
                                 NativeModules.AndroidPrintInterface.print("\n");
@@ -297,7 +351,7 @@ export default class GoodsDetails extends Component {
                             (this.state.name == "门店要货") ?
                                 null
                                 :
-                                <View style={styles.ListLeft}>
+                                <View style={[styles.ListLeft, {marginRight: 10, backgroundColor: "#fffbe7"}]}>
                                     {
                                         (this.state.reqDetailCode == "App_Client_ProCGDetailQ" || this.state.reqDetailCode == "App_Client_ProYSDetailQ" || this.state.reqDetailCode == "App_Client_ProXPDetailCGQ" || this.state.reqDetailCode == "App_Client_ProXPDetailYSQ") ?
                                             <Text style={styles.ListText}>供应商：</Text>
@@ -412,7 +466,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#fffbe7"
     },
     List: {
-        height: 32,
+        height: 28,
         marginBottom: 10,
         flexDirection: "row",
     },
@@ -475,7 +529,7 @@ const styles = StyleSheet.create({
         paddingBottom: 50,
     },
     listViewStyle: {
-        marginBottom: 280,
+        marginBottom: 300,
         backgroundColor: "#ffffff"
     },
     ShenHe: {

@@ -135,6 +135,7 @@ export default class ProductCG extends Component {
         Storage.delete('Screen');
         Storage.delete('Modify');
         Storage.delete("PeiSong");
+        Storage.delete('SourceNumber');
         if(this.state.DepName1==""&&this.state.DepCode1==""){
             Storage.delete('DepCode');
         }else{

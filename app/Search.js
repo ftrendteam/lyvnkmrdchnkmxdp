@@ -243,7 +243,7 @@ export default class Search extends Component {
                                                                                         })
                                                                                     } else {
                                                                                         for (let i = 0; i < datas.length; i++) {
-                                                                                            var data = datas.item(i);
+                                                                                            var Data = datas.item(i);
                                                                                             this.setState({
                                                                                                 ProdName: row.ProdName,
                                                                                                 ShopPrice: row.ShopPrice,
@@ -255,7 +255,7 @@ export default class Search extends Component {
                                                                                                 DepCode: row.DepCode1,
                                                                                                 SuppCode: row.SuppCode,
                                                                                                 BarCode: row.BarCode,
-                                                                                                NewNumber: data.ydcountm,
+                                                                                                NewNumber: Data.ydcountm,
                                                                                                 focus: true,
                                                                                                 Search: "",
                                                                                                 PriceText: "",
@@ -419,7 +419,7 @@ export default class Search extends Component {
                                                                                     })
                                                                                 } else {
                                                                                     for (let i = 0; i < datas.length; i++) {
-                                                                                        var data = datas.item(i);
+                                                                                        var Data = datas.item(i);
                                                                                         this.setState({
                                                                                             ProdName: row.ProdName,
                                                                                             ShopPrice: row.ShopPrice,
@@ -431,7 +431,7 @@ export default class Search extends Component {
                                                                                             DepCode: row.DepCode1,
                                                                                             SuppCode: row.SuppCode,
                                                                                             BarCode: row.BarCode,
-                                                                                            NewNumber: data.ydcountm,
+                                                                                            NewNumber: Data.ydcountm,
                                                                                             focus: true,
                                                                                             Search: "",
                                                                                             PriceText: "",
@@ -605,7 +605,7 @@ export default class Search extends Component {
                                                                                         })
                                                                                     } else {
                                                                                         for (let i = 0; i < datas.length; i++) {
-                                                                                            var data = datas.item(i);
+                                                                                            var Data = datas.item(i);
                                                                                             this.setState({
                                                                                                 ProdName: row.ProdName,
                                                                                                 ShopPrice: row.ShopPrice,
@@ -617,7 +617,7 @@ export default class Search extends Component {
                                                                                                 DepCode: row.DepCode1,
                                                                                                 SuppCode: row.SuppCode,
                                                                                                 BarCode: row.BarCode,
-                                                                                                NewNumber: data.ydcountm,
+                                                                                                NewNumber: Data.ydcountm,
                                                                                                 focus: true,
                                                                                                 Search: "",
                                                                                                 PriceText: "",
@@ -749,7 +749,7 @@ export default class Search extends Component {
                                                                                     })
                                                                                 } else {
                                                                                     for (let i = 0; i < datas.length; i++) {
-                                                                                        var data = datas.item(i);
+                                                                                        var Data = datas.item(i);
                                                                                         this.setState({
                                                                                             ProdName: row.ProdName,
                                                                                             ShopPrice: row.ShopPrice,
@@ -761,7 +761,7 @@ export default class Search extends Component {
                                                                                             DepCode: row.DepCode1,
                                                                                             SuppCode: row.SuppCode,
                                                                                             BarCode: row.BarCode,
-                                                                                            NewNumber: data.ydcountm,
+                                                                                            NewNumber: Data.ydcountm,
                                                                                             focus: true,
                                                                                             Search: "",
                                                                                             PriceText: "",
@@ -872,7 +872,7 @@ export default class Search extends Component {
                                                                                     IsIntCount: row.IsIntCount
                                                                                 })
                                                                             } else if (this.state.name == "售价调整") {
-                                                                                dbAdapter.selectShopInfoData(rowData.Pid).then((datas) => {
+                                                                                dbAdapter.selectShopInfoData(row.Pid).then((datas) => {
                                                                                     if (datas.length == 0) {
                                                                                         this.setState({
                                                                                             ProdName: row.ProdName,
@@ -894,7 +894,7 @@ export default class Search extends Component {
                                                                                         })
                                                                                     } else {
                                                                                         for (let i = 0; i < datas.length; i++) {
-                                                                                            var data = datas.item(i);
+                                                                                            var Data = datas.item(i);
                                                                                             this.setState({
                                                                                                 ProdName: rows.item(0).ProdName,
                                                                                                 ShopPrice: rows.item(0).ShopPrice,
@@ -906,7 +906,7 @@ export default class Search extends Component {
                                                                                                 DepCode: row.DepCode1,
                                                                                                 SuppCode: row.SuppCode,
                                                                                                 BarCode: row.BarCode,
-                                                                                                NewNumber: data.ydcountm,
+                                                                                                NewNumber: Data.ydcountm,
                                                                                                 focus: true,
                                                                                                 Search: "",
                                                                                                 PriceText: "",
@@ -986,7 +986,7 @@ export default class Search extends Component {
                                                                                 IsIntCount: row.IsIntCount
                                                                             })
                                                                         } else if (this.state.name == "售价调整") {
-                                                                            dbAdapter.selectShopInfoData(rowData.Pid).then((datas) => {
+                                                                            dbAdapter.selectShopInfoData(row.Pid).then((datas) => {
                                                                                 if (datas.length == 0) {
                                                                                     this.setState({
                                                                                         ProdName: row.ProdName,
@@ -1008,7 +1008,7 @@ export default class Search extends Component {
                                                                                     })
                                                                                 } else {
                                                                                     for (let i = 0; i < datas.length; i++) {
-                                                                                        var data = datas.item(i);
+                                                                                        var Data = datas.item(i);
                                                                                         this.setState({
                                                                                             ProdName: row.ProdName,
                                                                                             ShopPrice: row.ShopPrice,
@@ -1020,7 +1020,7 @@ export default class Search extends Component {
                                                                                             DepCode: row.DepCode1,
                                                                                             SuppCode: row.SuppCode,
                                                                                             BarCode: row.BarCode,
-                                                                                            NewNumber: data.ydcountm,
+                                                                                            NewNumber: Data.ydcountm,
                                                                                             focus: true,
                                                                                             Search: "",
                                                                                             PriceText: "",
@@ -2754,7 +2754,7 @@ export default class Search extends Component {
                                                 </View>
                                             </View>
                                             {
-                                                (this.state.YdCountm == 1 || this.state.YdCountm == 6 || this.state.YdCountm == 5) ?
+                                                (this.state.YdCountm == 1 || this.state.YdCountm == 6 || this.state.YdCountm == "盘点") ?
                                                     <View style={styles.List}>
                                                         <View style={styles.left2}>
                                                             <Text style={styles.left}>现在库存</Text>
@@ -2763,7 +2763,7 @@ export default class Search extends Component {
                                                     </View> : null
                                             }
                                             {
-                                                (this.state.YdCountm == 2 || this.state.name == "商品配送") ?
+                                                (this.state.YdCountm == 2) ?
                                                     <View style={styles.List}>
                                                         <View style={styles.left2}>
                                                             <Text style={styles.left}>原单数量</Text>

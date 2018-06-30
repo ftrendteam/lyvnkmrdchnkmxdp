@@ -249,12 +249,12 @@ const styles = StyleSheet.create({
         flex:1,
     },
     scrollview:{
-        marginBottom:120,
+        marginBottom:180,
     },
     Null: {
         marginLeft: 25,
         marginRight: 25,
-        marginTop: 120,
+        marginTop: 140,
     },
     NullText: {
         color: "#cccccc",

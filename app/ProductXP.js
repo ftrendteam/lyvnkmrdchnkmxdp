@@ -159,6 +159,7 @@ export default class ProductXP extends Component {
         Storage.delete('BQNumber');
         Storage.delete('Modify');
         Storage.delete("PeiSong");
+        Storage.delete('SourceNumber');
         if(this.state.DepName1==""&&this.state.DepCode1==""){
             Storage.delete('DepCode');
         }else{

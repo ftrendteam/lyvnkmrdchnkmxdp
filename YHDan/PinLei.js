@@ -133,8 +133,8 @@ export default class PinLei extends Component {
                 Storage.save('historyClass', 'App_Client_ProSYDetailQ');
             }else if(this.state.invoice=="标签采集"){
                 this.delete();
-                Storage.save('Date', data);
                 Storage.save('YdCountm', '5');
+                Storage.save('Date', data);
                 Storage.save('BQNumber', '3');
                 Storage.save('Document', "标签采集");
                 Storage.save('Name', '标签采集');
@@ -206,8 +206,8 @@ export default class PinLei extends Component {
             }
             else if(this.state.invoice=="标签采集"){
                 this.delete();
-                Storage.save('Date', data);
                 Storage.save('YdCountm', '5');
+                Storage.save('Date', data);
                 Storage.save('BQNumber', '3');
                 Storage.save('Document', "标签采集");
                 Storage.save('Name', '标签采集');
@@ -241,6 +241,13 @@ export default class PinLei extends Component {
         Storage.delete('Modify');
         Storage.delete("PeiSong");
         Storage.delete('StateMent');
+        Storage.delete('SourceNumber');
+        //将内容保存到本地数据库
+        Storage.save('valueOf', 'App_Client_ProWXH');
+        Storage.save('history', 'App_Client_ProWXHQ');
+        Storage.save('historyClass', 'App_Client_ProWXHDetailQ');
+
+
         if(this.state.DepName1==""&&this.state.DepCode1==""){
             Storage.delete('DepCode');
         }else{

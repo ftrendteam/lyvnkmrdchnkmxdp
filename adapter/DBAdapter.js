@@ -136,6 +136,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
                         console.log(err)
                     });
                 } catch (err) {
+
                     console.log("kgop=", err)
                 }
 
@@ -255,6 +256,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
                 let IsCheck = tuserRirght.IsCheck;
                 let IsWrite = tuserRirght.IsWrite;
                 let IsSpec = tuserRirght.IsSpec;
+                console.log("Funccode=",Funccode)
                 let sql = "INSERT INTO tuserright(usercode,Funccode,isEnter,IsAdd,IsEdit,IsDel,IsQuery,IsPrint,IsPrnSet,IsExPort,IsCheck,IsWrite,IsSpec)" +
                     "values(?,?,?,?,?,?,?,?,?,?,?,?,?)";
                 tx.executeSql(sql, [usercode, Funccode, isEnter, IsAdd, IsEdit, IsDel, IsQuery, IsPrint, IsPrnSet, IsExPort, IsCheck, IsWrite, IsSpec], () => {
@@ -441,7 +443,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
     selectShopInfo() {
         return new Promise((resolve, reject) => {
             db.transaction((tx) => {
-                let ssql = "select a.*,b.*,ifNull(b.countm,0) as ShopNumber,ifNull(b.ShopPrice,a.StdPrice) as ProPrice,ifNull(b.ShopPrice,a.StdPrice) as ShopPrice ,ifNull(b.prototal,0) as ShopAmount   " +
+                let ssql = "select a.*,b.*,ifNull(b.countm,0) as ShopNumber,ifNull(b.ydcountm,0) as ydcountm,ifNull(b.ShopPrice,a.StdPrice) as ProPrice,ifNull(b.ShopPrice,a.StdPrice) as ShopPrice ,ifNull(b.prototal,0) as ShopAmount   " +
                     ",ifNull(b.promemo,'') as ShopRemark,b.depcode as  DepCode1 " +
                     " from product a join shopInfo b on a.Pid=b.Pid";
 
@@ -1064,6 +1066,28 @@ export default class DBAdapter extends SQLiteOpenHelper {
       });
     });
   }
+
+    /***
+     * 查询当前机构的业务员
+     * @param shopCode
+     * @return {Promise}
+     */
+    selectCounterman(shopCode){
+        return new Promise((resolve, reject) => {
+            db.transaction((tx) => {
+                let sql="select distinct a.usercode,a.username from tuserset a " +
+                    "left join tusershop b where a.usercode=b.usercode and b.shopcode='"+shopCode+"'";
+                tx.executeSql(sql, [], (tx, results) => {
+                    //alert(results.rows);
+                    resolve(results.rows);
+                });
+
+            }, (error) => {
+                this._errorCB('transaction', error);
+            });
+        });
+    }
+
     /***
      * 根据解析出来的prodCode 查询商品
      * @param prodCode

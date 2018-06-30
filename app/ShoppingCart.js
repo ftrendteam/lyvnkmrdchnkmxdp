@@ -2,7 +2,7 @@
  * 提交清单
  */
 
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import {
     AppRegistry,
     StyleSheet,
@@ -36,6 +36,7 @@ import ProductXP from "./ProductXP";
 import ProductSH from "./ProductSH";
 import PSDan from "../PSDan/PSDan";//商品配送
 import PinLei from "../YHDan/PinLei";//要货单第二分页
+import WholeSale from "../WholeSale/WholeSale";//批发销售
 import DeCodePrePrint18 from "../utils/DeCodePrePrint18";
 import NetUtils from "../utils/NetUtils";
 import FetchUtils from "../utils/FetchUtils";
@@ -44,7 +45,7 @@ import Storage from "../utils/Storage";
 import NumberUtils from "../utils/NumberUtils";
 import BigDecimalUtils from "../utils/BigDecimalUtils";
 import SideMenu from 'react-native-side-menu';
-import { SwipeListView } from 'react-native-swipe-list-view';
+import {SwipeListView} from 'react-native-swipe-list-view';
 
 var {NativeModules} = require('react-native');
 var RNScannerAndroid = NativeModules.RNScannerAndroid;
@@ -53,60 +54,56 @@ let decodepreprint = new DeCodePrePrint18();
 let db;
 
 export default class ShoppingCart extends Component {
-    constructor(props){
+    constructor(props) {
         super(props);
         this.state = {
-            show:false,
-            Show:false,
-            ScreenBod:false,
-            Succeed:false,
-            Wait:false,
-            DeleteData:false,
-            ShopNumber:"",
-            ShopAmount:"",
-            reqDetailCode:"",
-            Remark:"",
-            suppcode:"",
-            shildshop:"",
-            IMEI:"",
-            ProYH:"",
-            Date:"",
-            active:"",
-            ClientCode:"",
-            Usercode:"",
-            SuppCode:"",
-            ShopCode:"",
-            ChildShopCode:"",
-            OrgFormno:"",
-            FormType:"",
-            LinkUrl:"",
-            SUbmit:"",
-            BeiZhu:"",
+            show: false,
+            Show: false,
+            ScreenBod: false,
+            Succeed: false,
+            Wait: false,
+            DeleteData: false,
+            ShopNumber: "",
+            ShopAmount: "",
+            reqDetailCode: "",
+            Remark: "",
+            suppcode: "",
+            shildshop: "",
+            IMEI: "",
+            ProYH: "",
+            Date: "",
+            active: "",
+            ClientCode: "",
+            Usercode: "",
+            SuppCode: "",
+            ShopCode: "",
+            ChildShopCode: "",
+            OrgFormno: "",
+            FormType: "",
+            LinkUrl: "",
+            SUbmit: "",
+            BeiZhu: "",
+            SourceNumber:"",
             dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
-            ds:new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
+            ds: new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2}),
         };
         this.ds = [];
-        this.rows=[];
-        this.DataShop=[];
+        this.rows = [];
+        this.DataShop = [];
     }
 
     //自动跑接口
-    componentDidMount(){
+    componentDidMount() {
         InteractionManager.runAfterInteractions(() => {
+            this.Storage();
             this._dpSearch();
             this._fetch();
-            this.Storage();
             this.Device();
         });
 
-        Storage.get('Name').then((tags)=>{
-            this.setState({
-                Name:tags
-            })
-        })
     }
 
-    _dpSearch(){
+    _dpSearch() {
         //取出保存本地的数据  'valueOf'是保存的时候自己定义的参数   tags就是保存的那个值
         //在一进来页面就取出来，就不会出现第一次点击为 空值
         Storage.delete("ShoppData");
@@ -115,54 +112,38 @@ export default class ShoppingCart extends Component {
                 reqDetailCode: tags
             })
         });
-
-        //username获取
-        Storage.get('username').then((tags) => {
-            this.setState({
-                Username: tags
-            });
-        });
-
-        //usercode获取
-        Storage.get('userpwd').then((tags) => {
-            this.setState({
-                Userpwd: tags
-            });
-        });
-
         Storage.get('IMEI').then((tags) => {
             this.setState({
-                IMEI:tags
+                IMEI: tags
             })
         })
 
         Storage.get('ProYH').then((tags) => {
             this.setState({
-                ProYH:tags
+                ProYH: tags
             })
         })
 
         Storage.get('Date').then((tags) => {
             this.setState({
-                Date:tags
+                Date: tags
             })
         })
 
         this.modal();
         //查询shopInfo表中某品类的数量
         Storage.get('PeiSong').then((PeiSong) => {
-            if(PeiSong=="商品配送"){
-                dbAdapter.selectShopInfo().then((rows)=> {
-                  
+            if (PeiSong == "商品配送") {
+                dbAdapter.selectShopInfo().then((rows) => {
                     if (rows.length == 0) {
                         Storage.get('LinkUrl').then((LinkUrl) => {
-                            Storage.get('ClientCode').then((ClientCode)=>{
-                                Storage.get('shildshop').then((ChildShopCode)=>{
-                                    Storage.get('code').then((ShopCode)=>{
-                                        Storage.get('OrgFormno').then((OrgFormno)=>{
-                                            if(OrgFormno==null){
+                            Storage.get('ClientCode').then((ClientCode) => {
+                                Storage.get('shildshop').then((ChildShopCode) => {
+                                    Storage.get('code').then((ShopCode) => {
+                                        Storage.get('OrgFormno').then((OrgFormno) => {
+                                            if (OrgFormno == null) {
                                                 this.modal();
-                                            }else{
+                                            } else {
                                                 let params = {
                                                     reqCode: "App_PosReq",
                                                     reqDetailCode: "App_Client_ProPSYHDetailQ",
@@ -174,47 +155,47 @@ export default class ShoppingCart extends Component {
                                                     OrgFormno: OrgFormno,
                                                 };
                                                 FetchUtils.post(LinkUrl, JSON.stringify(params)).then((data) => {
-                                                    var DetailInfos =data.DetailInfo;
-                                                    if(data.retcode == 1){
+                                                    var DetailInfos = data.DetailInfo;
+                                                    if (data.retcode == 1) {
                                                         var ShopNumber = 0;
                                                         var shopAmount = 0;
-                                                        for(let i =0;i<DetailInfos.length;i++) {
+                                                        for (let i = 0; i < DetailInfos.length; i++) {
                                                             let detailInfo = DetailInfos[i];
                                                             var shopInfoData = [];
                                                             var shopInfo = {};
-                                                            var serial=i+1;
-                                                            var prodcode=detailInfo.prodcode;
-                                                            var countm=detailInfo.countm;
-                                                            var pid=detailInfo.pid;
+                                                            var serial = i + 1;
+                                                            var prodcode = detailInfo.prodcode;
+                                                            var countm = detailInfo.countm;
+                                                            var pid = detailInfo.pid;
                                                             var promemo = "";
                                                             var ydcountm = detailInfo.countm;
-                                                            var prodname=detailInfo.prodname;
-                                                            var shopnumber=detailInfo.countm;
-                                                            var ProPrice=detailInfo.ShopPrice;
-                                                            var ShopAmount=detailInfo.prototal;
+                                                            var prodname = detailInfo.prodname;
+                                                            var shopnumber = detailInfo.countm;
+                                                            var ProPrice = detailInfo.ShopPrice;
+                                                            var ShopAmount = detailInfo.prototal;
                                                             shopAmount += Number(ShopAmount);
                                                             ShopNumber += Number(shopnumber);
                                                             this.ds.push(detailInfo);
                                                             var DataShop = {
-                                                                'serial':serial,
-                                                                'prodname':prodname,
-                                                                'barCode':"",
+                                                                'serial': serial,
+                                                                'prodname': prodname,
+                                                                'barCode': "",
                                                                 'prodcode': prodcode,
-                                                                'shopnumber':shopnumber,
+                                                                'shopnumber': shopnumber,
                                                                 'countm': countm,
                                                                 'ProPrice': ProPrice,
                                                                 'promemo': "",
                                                                 'ydcountm': ydcountm,
-                                                                'ShopAmount':ShopAmount,
-                                                                'SuppCode':"",
-                                                                'Pid':pid,
-                                                                'DepCode':"",
-                                                              'kccount':ydcountm,
-                                                              'prodcode':detailInfo.prodcode
+                                                                'ShopAmount': ShopAmount,
+                                                                'SuppCode': "",
+                                                                'Pid': pid,
+                                                                'DepCode': "",
+                                                                'kccount': ydcountm,
+                                                                'prodcode': detailInfo.prodcode
                                                             }
                                                             this.DataShop.push(DataShop);
                                                             shopInfo.Pid = pid;
-                                                            shopInfo.ProdCode=prodcode;
+                                                            shopInfo.ProdCode = prodcode;
                                                             shopInfo.prodname = prodname;
                                                             shopInfo.countm = countm;
                                                             shopInfo.ShopPrice = ProPrice;
@@ -228,13 +209,14 @@ export default class ShoppingCart extends Component {
                                                             //调用插入表方法
                                                             dbAdapter.insertShopInfo(shopInfoData);
                                                         }
+                                                        var num = ShopNumber.toFixed(2);
                                                         this.setState({
-                                                            ShopNumber:ShopNumber,//数量
-                                                            ShopAmount:NumberUtils.numberFormat2(shopAmount),//总金额
-                                                            ds:this.state.ds.cloneWithRows(this.DataShop),
+                                                            ShopNumber: num,//数量
+                                                            ShopAmount: NumberUtils.numberFormat2(shopAmount),//总金额
+                                                            ds: this.state.ds.cloneWithRows(this.DataShop),
                                                         })
-                                                    }else{
-                                                        var msg=data.msg;
+                                                    } else {
+                                                        var msg = data.msg;
                                                         alert(msg)
                                                     }
                                                 }, (err) => {
@@ -248,54 +230,55 @@ export default class ShoppingCart extends Component {
                                 })
                             })
                         })
-                    }else{
-                      let ShopNumber =0;
-                      let shopAmount =0;
-                        for(let i=0;i<rows.length;i++){
-                          
-                          let detailInfo = rows.item(i);
-                          var serial=i+1;
-                          var prodcode=detailInfo.prodcode;
-                          var countm=detailInfo.countm;
-                          var pid=detailInfo.pid;
-                          var promemo = "";
-                          var ydcountm = detailInfo.countm;
-                          var prodname=detailInfo.prodname;
-                          var shopnumber=detailInfo.countm;
-                          var ProPrice=detailInfo.ShopPrice;
-                          var ShopAmount=detailInfo.prototal;
-                          shopAmount += Number(ShopAmount);
-                          ShopNumber += Number(shopnumber);
-                          this.ds.push(detailInfo);
-                          var DataShop = {
-                            'serial':serial,
-                            'prodname':prodname,
-                            'barCode':"",
-                            'prodcode': prodcode,
-                            'shopnumber':shopnumber,
-                            'countm': countm,
-                            'ProPrice': ProPrice,
-                            'promemo': "",
-                            'ydcountm': ydcountm,
-                            'ShopAmount':ShopAmount,
-                            'SuppCode':"",
-                            'Pid':pid,
-                            'DepCode':"",
-                            'kccount':ydcountm,
-                            'prodcode':detailInfo.ProdCode
-                          }
-                          this.DataShop.push(DataShop);
+                    }
+                    else {
+                        let ShopNumber = 0;
+                        let shopAmount = 0;
+                        for (let i = 0; i < rows.length; i++) {
+                            let detailInfo = rows.item(i);
+                            var serial = i + 1;
+                            var prodcode = detailInfo.prodcode;
+                            var countm = detailInfo.countm;
+                            var pid = detailInfo.pid;
+                            var promemo = "";
+                            var ydcountm = detailInfo.countm;
+                            var prodname = detailInfo.prodname;
+                            var shopnumber = detailInfo.countm;
+                            var ProPrice = detailInfo.ShopPrice;
+                            var ShopAmount = detailInfo.prototal;
+                            shopAmount += Number(ShopAmount);
+                            ShopNumber += Number(shopnumber);
+                            this.ds.push(detailInfo);
+                            var DataShop = {
+                                'serial': serial,
+                                'prodname': prodname,
+                                'barCode': "",
+                                'prodcode': prodcode,
+                                'shopnumber': shopnumber,
+                                'countm': countm,
+                                'ProPrice': ProPrice,
+                                'promemo': "",
+                                'ydcountm': ydcountm,
+                                'ShopAmount': ShopAmount,
+                                'SuppCode': "",
+                                'Pid': pid,
+                                'DepCode': "",
+                                'kccount': ydcountm,
+                                'prodcode': detailInfo.ProdCode
+                            }
+                            this.DataShop.push(DataShop);
                         }
-                      this.setState({
-                        ShopNumber:ShopNumber,//数量
-                        ShopAmount:NumberUtils.numberFormat2(shopAmount),//总金额
-                        ds:this.state.ds.cloneWithRows(this.DataShop),
-                      })
+                        var num = ShopNumber.toFixed(2);
+                        this.setState({
+                            ShopNumber: num,//数量
+                            ShopAmount: NumberUtils.numberFormat2(shopAmount),//总金额
+                            ds: this.state.ds.cloneWithRows(this.DataShop),
+                        })
                         this.modal();
-                      
+
                     }
                 })
-            } else{
+            } else {
                 this.shopinfo();
             }
         })
@@ -304,118 +287,159 @@ export default class ShoppingCart extends Component {
     /**
      * 查询shopinfo表数据
      */
-    shopinfo(){
-        dbAdapter.selectShopInfo().then((rows)=>{
+    shopinfo() {
+        dbAdapter.selectShopInfo().then((rows) => {
             var shopnumber = 0;
             var shopAmount = 0;
-            for(let i =0;i<rows.length;i++){
-                var serial=i+1;
-                var row = rows.item(i);
-                var prodname = row.prodname;
-                var number = row.ShopNumber;
-                var prodcode = row.ProdCode;
-                var countm = row.countm;
-                var ProPrice = row.ShopPrice;
-                var promemo = row.promemo;
-                var ydcountm = row.ydcountm;
-                var barCode = row.BarCode;
-                var SHopAMount=NumberUtils.numberFormat2(row.ShopAmount);
-                shopAmount += Number(SHopAMount);
-                shopnumber += Number(row.ShopNumber);
-                this.ds.push(row);
-                var DataShop = {
-                    'serial':serial,
-                    'prodname':prodname,
-                    'barCode':barCode,
-                    'prodcode': prodcode,
-                    'shopnumber':number,
-                    'countm': number,
-                    'ProPrice': ProPrice,
-                    'promemo': promemo,
-                    'ydcountm': ydcountm,
-                    'ShopAmount':row.ShopAmount,
-                    'SuppCode':row.SuppCode,
-                    'Pid':row.pid,
-                    'DepCode':row.DepCode,
-                    'kccount':ydcountm,
-                    'prodcode':row.ProdCode
+            if(rows.length==0){
+                Storage.delete('BeiZhu');
+            }else{
+                for (let i = 0; i < rows.length; i++) {
+                    var serial = i + 1;
+                    var row = rows.item(i);
+                    var prodname = row.prodname;
+                    var number = row.ShopNumber;
+                    var prodcode = row.ProdCode;
+                    var countm = row.countm;
+                    var ProPrice = row.ShopPrice;
+                    var promemo = row.promemo;
+                    var ydcountm = row.ydcountm;
+                    var barCode = row.BarCode;
+                    var SHopAMount = NumberUtils.numberFormat2(row.ShopAmount);
+                    shopAmount += Number(SHopAMount);
+                    shopnumber += Number(row.ShopNumber);
+                    this.ds.push(row);
+                    var DataShop = {
+                        'serial': serial,
+                        'prodname': prodname,
+                        'barCode': barCode,
+                        'prodcode': prodcode,
+                        'shopnumber': number,
+                        'countm': number,
+                        'ProPrice': ProPrice,
+                        'promemo': promemo,
+                        'ydcountm': ydcountm,
+                        'ShopAmount': row.ShopAmount,
+                        'SuppCode': row.SuppCode,
+                        'Pid': row.pid,
+                        'DepCode': row.DepCode,
+                        'kccount': ydcountm,
+                        'prodcode': row.ProdCode
+                    }
+                    this.DataShop.push(DataShop);
                 }
-                this.DataShop.push(DataShop);
+                var num=shopnumber.toFixed(2);
+                this.setState({
+                    number1: number,
+                    ShopNumber: num,//数量
+                    ShopAmount: NumberUtils.numberFormat2(shopAmount),//总金额
+                    ds: this.state.ds.cloneWithRows(this.DataShop)
+                })
             }
-            this.setState({
-                number1:number,
-                ShopNumber:shopnumber,//数量
-                ShopAmount:NumberUtils.numberFormat2(shopAmount),//总金额
-                ds:this.state.ds.cloneWithRows(this.DataShop)
-            })
             this.modal();
         })
     }
 
-    Storage(){
+    Storage() {
         Storage.get('Name').then((tags) => {
             this.setState({
-                head:tags
+                Name: tags
             })
+        })
+        //username获取
+        Storage.get('userName').then((tags) => {
+            this.setState({
+                Username: tags
+            });
         });
 
-        Storage.get('username').then((tags) => {
+        Storage.get('ClientCode').then((tags) => {
             this.setState({
-                username:tags
-            })
-        });
-
-        Storage.get('ClientCode').then((tags)=>{
-            this.setState({
-                ClientCode:tags
+                ClientCode: tags
             })
         })
 
-        Storage.get('Usercode').then((tags)=>{
+        Storage.get('usercode').then((tags) => {
             this.setState({
-                Usercode:tags
+                Usercode: tags
             })
         })
 
-        Storage.get('code').then((tags)=>{
+        Storage.get('code').then((tags) => {
             this.setState({
-                ShopCode:tags
+                ShopCode: tags
             })
         })
 
-        Storage.get('shildshop').then((tags)=>{
+        Storage.get('shildshop').then((tags) => {
+            if(tags==null){
+                this.setState({
+                    ChildShopCode: ""
+                })
+            }else{
+                this.setState({
+                    ChildShopCode: tags
+                })
+            }
+        })
+
+        Storage.get('OrgFormno').then((tags) => {
             this.setState({
-                ChildShopCode:tags
+                OrgFormno: tags
             })
         })
 
-        Storage.get('OrgFormno').then((tags)=>{
+        Storage.get('LinkUrl').then((tags) => {
             this.setState({
-                OrgFormno:tags
+                linkurl: tags
+            })
+        })
+
+        Storage.get('SourceNumber').then((tags) => {
+            if(tags==null){
+                this.setState({
+                    SourceNumber: ""
+                })
+            }else{
+                this.setState({
+                    SourceNumber: tags
+                })
+            }
+        })
+
+        Storage.get('Screen').then((tags) => {
+            this.setState({
+                Screen: tags
+            })
+        })
+
+        Storage.get('BeiZhu').then((tags) => {
+            this.setState({
+                BeiZhu: tags
             })
         })
 
     }
 
-    _fetch(){
+    _fetch() {
         //查询shopInfo表中所有商品的数量总和
-        dbAdapter.selectShopInfoAllCountm().then((rows)=>{
+        dbAdapter.selectShopInfoAllCountm().then((rows) => {
             var ShopCar = rows.item(0).countm;
             this.setState({
-                shopcar:ShopCar
+                shopcar: ShopCar
             });
         });
     }
 
     //扫描商品
-    Code(){
+    Code() {
         RNScannerAndroid.openScanner();
     }
 
     Device() {
         DeviceEventEmitter.addListener("code", (reminder) => {
             decodepreprint.init(reminder, dbAdapter);
-            if (this.state.head == null) {
+            if (this.state.Name == null) {
                 this._Emptydata();
             } else {
                 Storage.get('DepCode').then((DepCode) => {
@@ -423,21 +447,21 @@ export default class ShoppingCart extends Component {
                         Storage.get('LinkUrl').then((LinkUrl) => {
                             Storage.get('userName').then((userName) => {
                                 if ((reminder.length == 18 && decodepreprint.deCodePreFlag())) {
-                                    new Promise.all([decodepreprint.deCodeProdCode(),decodepreprint.deCodeTotal(),decodepreprint.deCodeWeight()]).then((results) => {
-                                        if(results.length==3){
+                                    new Promise.all([decodepreprint.deCodeProdCode(), decodepreprint.deCodeTotal(), decodepreprint.deCodeWeight()]).then((results) => {
+                                        if (results.length == 3) {
                                             let prodCode = results[0];
                                             let total = results[1];
                                             let weight = results[2];
                                             dbAdapter.selectAidCode(prodCode, 1).then((product) => {
-                                                if(product.length==0){
-                                                    ToastAndroid.show("商品不存在",ToastAndroid.SHORT);
+                                                if (product.length == 0) {
+                                                    ToastAndroid.show("商品不存在", ToastAndroid.SHORT);
                                                     return;
                                                 }
                                                 for (let i = 0; i < product.length; i++) {
                                                     var row = product.item(i);
-                                                    if(DepCode!==null) {
+                                                    if (DepCode !== null) {
                                                         if (row.DepCode1 !== DepCode) {
-                                                            ToastAndroid.show("请选择该品类下的商品",ToastAndroid.SHORT);
+                                                            ToastAndroid.show("请选择该品类下的商品", ToastAndroid.SHORT);
                                                             return;
                                                         } else {
                                                             let params = {
@@ -459,7 +483,7 @@ export default class ShoppingCart extends Component {
                                                                 var countm = JSON.stringify(data.countm);
                                                                 var ShopPrice = JSON.stringify(data.ShopPrice);
                                                                 if (data.retcode == 1) {
-                                                                    if (this.state.head == "商品查询") {
+                                                                    if (this.state.Name == "商品查询") {
                                                                         this.props.navigator.push({
                                                                             component: Shopsearch,
                                                                             params: {
@@ -472,9 +496,9 @@ export default class ShoppingCart extends Component {
                                                                             OrderDetails: '',
                                                                         })
                                                                     } else {
-                                                                        if (this.state.head == "商品采购" || this.state.head == "协配采购" || this.state.Modify == 1) {
+                                                                        if (this.state.Name == "商品采购" || this.state.Name == "协配采购" || this.state.Modify == 1) {
                                                                             Storage.save("ShoppData", "清单");
-                                                                            if(row.ShopNumber == 0){
+                                                                            if (row.ShopNumber == 0) {
                                                                                 this.props.navigator.push({
                                                                                     component: OrderDetails,
                                                                                     params: {
@@ -489,10 +513,10 @@ export default class ShoppingCart extends Component {
                                                                                         SuppCode: row.SuppCode,
                                                                                         ydcountm: countm,
                                                                                         BarCode: row.BarCode,
-                                                                                        IsIntCount:row.IsIntCount
+                                                                                        IsIntCount: row.IsIntCount
                                                                                     }
                                                                                 })
-                                                                            }else{
+                                                                            } else {
                                                                                 this.props.navigator.push({
                                                                                     component: OrderDetails,
                                                                                     params: {
@@ -507,14 +531,14 @@ export default class ShoppingCart extends Component {
                                                                                         SuppCode: row.SuppCode,
                                                                                         ydcountm: countm,
                                                                                         BarCode: row.BarCode,
-                                                                                        IsIntCount:row.IsIntCount
+                                                                                        IsIntCount: row.IsIntCount
                                                                                     }
                                                                                 })
                                                                             }
-                                                                        } else if(this.state.head=="售价调整"){
-                                                                            dbAdapter.selectShopInfoData(row.Pid).then((datas)=> {
+                                                                        } else if (this.state.Name == "售价调整") {
+                                                                            dbAdapter.selectShopInfoData(row.Pid).then((datas) => {
                                                                                 Storage.save("ShoppData", "清单");
-                                                                                if(datas.length==0){
+                                                                                if (datas.length == 0) {
                                                                                     this.props.navigator.push({
                                                                                         component: OrderDetails,
                                                                                         params: {
@@ -529,10 +553,10 @@ export default class ShoppingCart extends Component {
                                                                                             SuppCode: row.SuppCode,
                                                                                             ydcountm: "",
                                                                                             BarCode: row.BarCode,
-                                                                                            IsIntCount:row.IsIntCount
+                                                                                            IsIntCount: row.IsIntCount
                                                                                         }
                                                                                     })
-                                                                                }else{
+                                                                                } else {
                                                                                     for (let i = 0; i < datas.length; i++) {
                                                                                         var data = datas.item(i);
                                                                                         this.props.navigator.push({
@@ -549,13 +573,13 @@ export default class ShoppingCart extends Component {
                                                                                                 SuppCode: row.SuppCode,
                                                                                                 ydcountm: data.ydcountm,
                                                                                                 BarCode: row.BarCode,
-                                                                                                IsIntCount:row.IsIntCount
+                                                                                                IsIntCount: row.IsIntCount
                                                                                             }
                                                                                         })
                                                                                     }
                                                                                 }
                                                                             })
-                                                                        }else {
+                                                                        } else {
                                                                             Storage.save("ShoppData", "清单");
                                                                             this.props.navigator.push({
                                                                                 component: OrderDetails,
@@ -571,7 +595,7 @@ export default class ShoppingCart extends Component {
                                                                                     SuppCode: row.SuppCode,
                                                                                     ydcountm: countm,
                                                                                     BarCode: row.BarCode,
-                                                                                    IsIntCount:row.IsIntCount
+                                                                                    IsIntCount: row.IsIntCount
                                                                                 }
                                                                             })
                                                                         }
@@ -586,7 +610,7 @@ export default class ShoppingCart extends Component {
                                                             })
                                                         }
                                                     }
-                                                    else{
+                                                    else {
                                                         let params = {
                                                             reqCode: "App_PosReq",
                                                             reqDetailCode: "App_Client_CurrProdQry",
@@ -607,7 +631,7 @@ export default class ShoppingCart extends Component {
                                                             var countm = JSON.stringify(data.countm);
                                                             var ShopPrice = JSON.stringify(data.ShopPrice);
                                                             if (data.retcode == 1) {
-                                                                if (this.state.head == "商品查询") {
+                                                                if (this.state.Name == "商品查询") {
                                                                     this.props.navigator.push({
                                                                         component: Shopsearch,
                                                                         params: {
@@ -620,9 +644,9 @@ export default class ShoppingCart extends Component {
                                                                         OrderDetails: '',
                                                                     })
                                                                 } else {
-                                                                    if (this.state.head == "商品采购" || this.state.head == "协配采购" || this.state.Modify == 1) {
+                                                                    if (this.state.Name == "商品采购" || this.state.Name == "协配采购" || this.state.Modify == 1) {
                                                                         Storage.save("ShoppData", "清单");
-                                                                        if(row.ShopNumber == 0){
+                                                                        if (row.ShopNumber == 0) {
                                                                             this.props.navigator.push({
                                                                                 component: OrderDetails,
                                                                                 params: {
@@ -637,10 +661,10 @@ export default class ShoppingCart extends Component {
                                                                                     SuppCode: row.SuppCode,
                                                                                     ydcountm: countm,
                                                                                     BarCode: row.BarCode,
-                                                                                    IsIntCount:row.IsIntCount
+                                                                                    IsIntCount: row.IsIntCount
                                                                                 }
                                                                             })
-                                                                        }else{
+                                                                        } else {
                                                                             this.props.navigator.push({
                                                                                 component: OrderDetails,
                                                                                 params: {
@@ -655,14 +679,14 @@ export default class ShoppingCart extends Component {
                                                                                     SuppCode: row.SuppCode,
                                                                                     ydcountm: countm,
                                                                                     BarCode: row.BarCode,
-                                                                                    IsIntCount:row.IsIntCount
+                                                                                    IsIntCount: row.IsIntCount
                                                                                 }
                                                                             })
                                                                         }
-                                                                    }else if(this.state.head=="售价调整"){
-                                                                        dbAdapter.selectShopInfoData(row.Pid).then((datas)=> {
+                                                                    } else if (this.state.Name == "售价调整") {
+                                                                        dbAdapter.selectShopInfoData(row.Pid).then((datas) => {
                                                                             Storage.save("ShoppData", "清单");
-                                                                            if(datas.length==0){
+                                                                            if (datas.length == 0) {
                                                                                 this.props.navigator.push({
                                                                                     component: OrderDetails,
                                                                                     params: {
@@ -677,10 +701,10 @@ export default class ShoppingCart extends Component {
                                                                                         SuppCode: row.SuppCode,
                                                                                         ydcountm: "",
                                                                                         BarCode: row.BarCode,
-                                                                                        IsIntCount:row.IsIntCount
+                                                                                        IsIntCount: row.IsIntCount
                                                                                     }
                                                                                 })
-                                                                            }else{
+                                                                            } else {
                                                                                 for (let i = 0; i < datas.length; i++) {
                                                                                     var data = datas.item(i);
                                                                                     this.props.navigator.push({
@@ -697,13 +721,13 @@ export default class ShoppingCart extends Component {
                                                                                             SuppCode: row.SuppCode,
                                                                                             ydcountm: data.ydcountm,
                                                                                             BarCode: row.BarCode,
-                                                                                            IsIntCount:row.IsIntCount
+                                                                                            IsIntCount: row.IsIntCount
                                                                                         }
                                                                                     })
                                                                                 }
                                                                             }
                                                                         })
-                                                                    }else {
+                                                                    } else {
                                                                         Storage.save("ShoppData", "清单");
                                                                         this.props.navigator.push({
                                                                             component: OrderDetails,
@@ -719,7 +743,7 @@ export default class ShoppingCart extends Component {
                                                                                 SuppCode: row.SuppCode,
                                                                                 ydcountm: countm,
                                                                                 BarCode: row.BarCode,
-                                                                                IsIntCount:row.IsIntCount
+                                                                                IsIntCount: row.IsIntCount
                                                                             }
                                                                         })
                                                                     }
@@ -738,21 +762,21 @@ export default class ShoppingCart extends Component {
                                         }
                                     });
                                 }
-                                else if((reminder.length==13&&deCode13.deCodePreFlag(reminder))){//13位条码解析
-                                    new Promise.all([deCode13.deCodeProdCode(reminder,dbAdapter),deCode13.deCodeTotile(reminder,dbAdapter)]).then((result)=>{
-                                        if(result.length==2){
+                                else if ((reminder.length == 13 && deCode13.deCodePreFlag(reminder))) {//13位条码解析
+                                    new Promise.all([deCode13.deCodeProdCode(reminder, dbAdapter), deCode13.deCodeTotile(reminder, dbAdapter)]).then((result) => {
+                                        if (result.length == 2) {
                                             let prodCode = result[0];
                                             let price = result[1];
                                             dbAdapter.selectAidCode(prodCode, 1).then((rows) => {
-                                                if(rows.length==0){
-                                                    ToastAndroid.show("商品不存在",ToastAndroid.SHORT);
+                                                if (rows.length == 0) {
+                                                    ToastAndroid.show("商品不存在", ToastAndroid.SHORT);
                                                     return;
                                                 }
                                                 for (let i = 0; i < rows.length; i++) {
                                                     var row = rows.item(i);
-                                                    if(DepCode!==null) {
+                                                    if (DepCode !== null) {
                                                         if (row.DepCode1 !== DepCode) {
-                                                            ToastAndroid.show("请选择该品类下的商品",ToastAndroid.SHORT);
+                                                            ToastAndroid.show("请选择该品类下的商品", ToastAndroid.SHORT);
                                                             return;
                                                         } else {
                                                             let params = {
@@ -775,7 +799,7 @@ export default class ShoppingCart extends Component {
                                                                 var countm = JSON.stringify(data.countm);
                                                                 var ShopPrice = JSON.stringify(data.ShopPrice);
                                                                 if (data.retcode == 1) {
-                                                                    if (this.state.head == "商品查询") {
+                                                                    if (this.state.Name == "商品查询") {
                                                                         this.props.navigator.push({
                                                                             component: Shopsearch,
                                                                             params: {
@@ -788,9 +812,9 @@ export default class ShoppingCart extends Component {
                                                                             OrderDetails: '',
                                                                         })
                                                                     } else {
-                                                                        if (this.state.head == "商品采购" || this.state.head == "协配采购" || this.state.Modify == 1) {
+                                                                        if (this.state.Name == "商品采购" || this.state.Name == "协配采购" || this.state.Modify == 1) {
                                                                             Storage.save("ShoppData", "清单");
-                                                                            if(row.ShopNumber == 0){
+                                                                            if (row.ShopNumber == 0) {
                                                                                 this.props.navigator.push({
                                                                                     component: OrderDetails,
                                                                                     params: {
@@ -805,10 +829,10 @@ export default class ShoppingCart extends Component {
                                                                                         SuppCode: row.SuppCode,
                                                                                         ydcountm: countm,
                                                                                         BarCode: row.BarCode,
-                                                                                        IsIntCount:row.IsIntCount
+                                                                                        IsIntCount: row.IsIntCount
                                                                                     }
                                                                                 })
-                                                                            }else{
+                                                                            } else {
                                                                                 this.props.navigator.push({
                                                                                     component: OrderDetails,
                                                                                     params: {
@@ -823,14 +847,14 @@ export default class ShoppingCart extends Component {
                                                                                         SuppCode: row.SuppCode,
                                                                                         ydcountm: countm,
                                                                                         BarCode: row.BarCode,
-                                                                                        IsIntCount:row.IsIntCount
+                                                                                        IsIntCount: row.IsIntCount
                                                                                     }
                                                                                 })
                                                                             }
-                                                                        }else if(this.state.head=="售价调整"){
-                                                                            dbAdapter.selectShopInfoData(row.Pid).then((datas)=> {
+                                                                        } else if (this.state.Name == "售价调整") {
+                                                                            dbAdapter.selectShopInfoData(row.Pid).then((datas) => {
                                                                                 Storage.save("ShoppData", "清单");
-                                                                                if(datas.length==0){
+                                                                                if (datas.length == 0) {
                                                                                     this.props.navigator.push({
                                                                                         component: OrderDetails,
                                                                                         params: {
@@ -845,10 +869,10 @@ export default class ShoppingCart extends Component {
                                                                                             SuppCode: row.SuppCode,
                                                                                             ydcountm: "",
                                                                                             BarCode: row.BarCode,
-                                                                                            IsIntCount:row.IsIntCount
+                                                                                            IsIntCount: row.IsIntCount
                                                                                         }
                                                                                     })
-                                                                                }else{
+                                                                                } else {
                                                                                     for (let i = 0; i < datas.length; i++) {
                                                                                         var data = datas.item(i);
                                                                                         this.props.navigator.push({
@@ -865,7 +889,7 @@ export default class ShoppingCart extends Component {
                                                                                                 SuppCode: row.SuppCode,
                                                                                                 ydcountm: data.ydcountm,
                                                                                                 BarCode: row.BarCode,
-                                                                                                IsIntCount:row.IsIntCount
+                                                                                                IsIntCount: row.IsIntCount
                                                                                             }
                                                                                         })
                                                                                     }
@@ -887,7 +911,7 @@ export default class ShoppingCart extends Component {
                                                                                     SuppCode: row.SuppCode,
                                                                                     ydcountm: countm,
                                                                                     BarCode: row.BarCode,
-                                                                                    IsIntCount:row.IsIntCount
+                                                                                    IsIntCount: row.IsIntCount
                                                                                 }
                                                                             })
                                                                         }
@@ -902,7 +926,7 @@ export default class ShoppingCart extends Component {
                                                             })
                                                         }
                                                     }
-                                                    else{
+                                                    else {
                                                         let params = {
                                                             reqCode: "App_PosReq",
                                                             reqDetailCode: "App_Client_CurrProdQry",
@@ -923,7 +947,7 @@ export default class ShoppingCart extends Component {
                                                             var countm = JSON.stringify(data.countm);
                                                             var ShopPrice = JSON.stringify(data.ShopPrice);
                                                             if (data.retcode == 1) {
-                                                                if (this.state.head == "商品查询") {
+                                                                if (this.state.Name == "商品查询") {
                                                                     this.props.navigator.push({
                                                                         component: Shopsearch,
                                                                         params: {
@@ -936,9 +960,9 @@ export default class ShoppingCart extends Component {
                                                                         OrderDetails: '',
                                                                     })
                                                                 } else {
-                                                                    if (this.state.head == "商品采购" || this.state.head == "协配采购" || this.state.Modify == 1) {
+                                                                    if (this.state.Name == "商品采购" || this.state.Name == "协配采购" || this.state.Modify == 1) {
                                                                         Storage.save("ShoppData", "清单");
-                                                                        if(row.ShopNumber == 0){
+                                                                        if (row.ShopNumber == 0) {
                                                                             this.props.navigator.push({
                                                                                 component: OrderDetails,
                                                                                 params: {
@@ -953,10 +977,10 @@ export default class ShoppingCart extends Component {
                                                                                     SuppCode: row.SuppCode,
                                                                                     ydcountm: countm,
                                                                                     BarCode: row.BarCode,
-                                                                                    IsIntCount:row.IsIntCount
+                                                                                    IsIntCount: row.IsIntCount
                                                                                 }
                                                                             })
-                                                                        }else{
+                                                                        } else {
                                                                             this.props.navigator.push({
                                                                                 component: OrderDetails,
                                                                                 params: {
@@ -971,14 +995,14 @@ export default class ShoppingCart extends Component {
                                                                                     SuppCode: row.SuppCode,
                                                                                     ydcountm: countm,
                                                                                     BarCode: row.BarCode,
-                                                                                    IsIntCount:row.IsIntCount,
+                                                                                    IsIntCount: row.IsIntCount,
                                                                                 }
                                                                             })
                                                                         }
-                                                                    }else if(this.state.head=="售价调整"){
-                                                                        dbAdapter.selectShopInfoData(row.Pid).then((datas)=> {
+                                                                    } else if (this.state.Name == "售价调整") {
+                                                                        dbAdapter.selectShopInfoData(row.Pid).then((datas) => {
                                                                             Storage.save("ShoppData", "清单");
-                                                                            if(datas.length==0){
+                                                                            if (datas.length == 0) {
                                                                                 this.props.navigator.push({
                                                                                     component: OrderDetails,
                                                                                     params: {
@@ -993,10 +1017,10 @@ export default class ShoppingCart extends Component {
                                                                                         SuppCode: row.SuppCode,
                                                                                         ydcountm: "",
                                                                                         BarCode: row.BarCode,
-                                                                                        IsIntCount:row.IsIntCount
+                                                                                        IsIntCount: row.IsIntCount
                                                                                     }
                                                                                 })
-                                                                            }else{
+                                                                            } else {
                                                                                 for (let i = 0; i < datas.length; i++) {
                                                                                     var data = datas.item(i);
                                                                                     this.props.navigator.push({
@@ -1013,7 +1037,7 @@ export default class ShoppingCart extends Component {
                                                                                             SuppCode: row.SuppCode,
                                                                                             ydcountm: data.ydcountm,
                                                                                             BarCode: row.BarCode,
-                                                                                            IsIntCount:row.IsIntCount
+                                                                                            IsIntCount: row.IsIntCount
                                                                                         }
                                                                                     })
                                                                                 }
@@ -1035,7 +1059,7 @@ export default class ShoppingCart extends Component {
                                                                                 SuppCode: row.SuppCode,
                                                                                 ydcountm: countm,
                                                                                 BarCode: row.BarCode,
-                                                                                IsIntCount:row.IsIntCount,
+                                                                                IsIntCount: row.IsIntCount,
                                                                             }
                                                                         })
                                                                     }
@@ -1057,15 +1081,15 @@ export default class ShoppingCart extends Component {
                                 else {
                                     //商品查询
                                     dbAdapter.selectAidCode(reminder, 1).then((rows) => {
-                                        if(rows.length==0){
-                                            ToastAndroid.show("商品不存在",ToastAndroid.SHORT);
+                                        if (rows.length == 0) {
+                                            ToastAndroid.show("商品不存在", ToastAndroid.SHORT);
                                             return;
                                         }
                                         for (let i = 0; i < rows.length; i++) {
                                             var row = rows.item(i);
-                                            if(DepCode!==null) {
+                                            if (DepCode !== null) {
                                                 if (row.DepCode1 !== DepCode) {
-                                                    ToastAndroid.show("请选择该品类下的商品",ToastAndroid.SHORT);
+                                                    ToastAndroid.show("请选择该品类下的商品", ToastAndroid.SHORT);
                                                     return;
                                                 } else {
                                                     let params = {
@@ -1088,7 +1112,7 @@ export default class ShoppingCart extends Component {
                                                         var countm = JSON.stringify(data.countm);
                                                         var ShopPrice = JSON.stringify(data.ShopPrice);
                                                         if (data.retcode == 1) {
-                                                            if (this.state.head == "商品查询") {
+                                                            if (this.state.Name == "商品查询") {
                                                                 this.props.navigator.push({
                                                                     component: Shopsearch,
                                                                     params: {
@@ -1101,9 +1125,9 @@ export default class ShoppingCart extends Component {
                                                                     OrderDetails: '',
                                                                 })
                                                             } else {
-                                                                if (this.state.head == "商品采购" || this.state.head == "协配采购" || this.state.Modify == 1) {
+                                                                if (this.state.Name == "商品采购" || this.state.Name == "协配采购" || this.state.Modify == 1) {
                                                                     Storage.save("ShoppData", "清单");
-                                                                    if(row.ShopNumber == 0){
+                                                                    if (row.ShopNumber == 0) {
                                                                         this.props.navigator.push({
                                                                             component: OrderDetails,
                                                                             params: {
@@ -1118,10 +1142,10 @@ export default class ShoppingCart extends Component {
                                                                                 SuppCode: row.SuppCode,
                                                                                 ydcountm: countm,
                                                                                 BarCode: row.BarCode,
-                                                                                IsIntCount:row.IsIntCount,
+                                                                                IsIntCount: row.IsIntCount,
                                                                             }
                                                                         })
-                                                                    }else{
+                                                                    } else {
                                                                         this.props.navigator.push({
                                                                             component: OrderDetails,
                                                                             params: {
@@ -1136,14 +1160,14 @@ export default class ShoppingCart extends Component {
                                                                                 SuppCode: row.SuppCode,
                                                                                 ydcountm: countm,
                                                                                 BarCode: row.BarCode,
-                                                                                IsIntCount:row.IsIntCount,
+                                                                                IsIntCount: row.IsIntCount,
                                                                             }
                                                                         })
                                                                     }
-                                                                }else if(this.state.head=="售价调整"){
-                                                                    dbAdapter.selectShopInfoData(row.Pid).then((datas)=> {
+                                                                } else if (this.state.Name == "售价调整") {
+                                                                    dbAdapter.selectShopInfoData(row.Pid).then((datas) => {
                                                                         Storage.save("ShoppData", "清单");
-                                                                        if(datas.length==0){
+                                                                        if (datas.length == 0) {
                                                                             this.props.navigator.push({
                                                                                 component: OrderDetails,
                                                                                 params: {
@@ -1158,10 +1182,10 @@ export default class ShoppingCart extends Component {
                                                                                     SuppCode: row.SuppCode,
                                                                                     ydcountm: "",
                                                                                     BarCode: row.BarCode,
-                                                                                    IsIntCount:row.IsIntCount
+                                                                                    IsIntCount: row.IsIntCount
                                                                                 }
                                                                             })
-                                                                        }else{
+                                                                        } else {
                                                                             for (let i = 0; i < datas.length; i++) {
                                                                                 var data = datas.item(i);
                                                                                 this.props.navigator.push({
@@ -1178,7 +1202,7 @@ export default class ShoppingCart extends Component {
                                                                                         SuppCode: row.SuppCode,
                                                                                         ydcountm: data.ydcountm,
                                                                                         BarCode: row.BarCode,
-                                                                                        IsIntCount:row.IsIntCount
+                                                                                        IsIntCount: row.IsIntCount
                                                                                     }
                                                                                 })
                                                                             }
@@ -1200,7 +1224,7 @@ export default class ShoppingCart extends Component {
                                                                             SuppCode: row.SuppCode,
                                                                             ydcountm: countm,
                                                                             BarCode: row.BarCode,
-                                                                            IsIntCount:row.IsIntCount,
+                                                                            IsIntCount: row.IsIntCount,
                                                                         }
                                                                     })
                                                                 }
@@ -1214,7 +1238,7 @@ export default class ShoppingCart extends Component {
                                                         }
                                                     })
                                                 }
-                                            }else{
+                                            } else {
                                                 let params = {
                                                     reqCode: "App_PosReq",
                                                     reqDetailCode: "App_Client_CurrProdQry",
@@ -1235,7 +1259,7 @@ export default class ShoppingCart extends Component {
                                                     var countm = JSON.stringify(data.countm);
                                                     var ShopPrice = JSON.stringify(data.ShopPrice);
                                                     if (data.retcode == 1) {
-                                                        if (this.state.head == "商品查询") {
+                                                        if (this.state.Name == "商品查询") {
                                                             this.props.navigator.push({
                                                                 component: Shopsearch,
                                                                 params: {
@@ -1248,9 +1272,9 @@ export default class ShoppingCart extends Component {
                                                                 OrderDetails: '',
                                                             })
                                                         } else {
-                                                            if (this.state.head == "商品采购" || this.state.head == "协配采购" || this.state.Modify == 1) {
+                                                            if (this.state.Name == "商品采购" || this.state.Name == "协配采购" || this.state.Modify == 1) {
                                                                 Storage.save("ShoppData", "清单");
-                                                                if(row.ShopNumber == 0){
+                                                                if (row.ShopNumber == 0) {
                                                                     this.props.navigator.push({
                                                                         component: OrderDetails,
                                                                         params: {
@@ -1265,10 +1289,10 @@ export default class ShoppingCart extends Component {
                                                                             SuppCode: row.SuppCode,
                                                                             ydcountm: countm,
                                                                             BarCode: row.BarCode,
-                                                                            IsIntCount:row.IsIntCount,
+                                                                            IsIntCount: row.IsIntCount,
                                                                         }
                                                                     })
-                                                                }else{
+                                                                } else {
                                                                     this.props.navigator.push({
                                                                         component: OrderDetails,
                                                                         params: {
@@ -1283,14 +1307,14 @@ export default class ShoppingCart extends Component {
                                                                             SuppCode: row.SuppCode,
                                                                             ydcountm: countm,
                                                                             BarCode: row.BarCode,
-                                                                            IsIntCount:row.IsIntCount,
+                                                                            IsIntCount: row.IsIntCount,
                                                                         }
                                                                     })
                                                                 }
-                                                            }else if(this.state.head=="售价调整"){
-                                                                dbAdapter.selectShopInfoData(row.Pid).then((datas)=> {
+                                                            } else if (this.state.Name == "售价调整") {
+                                                                dbAdapter.selectShopInfoData(row.Pid).then((datas) => {
                                                                     Storage.save("ShoppData", "清单");
-                                                                    if(datas.length==0){
+                                                                    if (datas.length == 0) {
                                                                         this.props.navigator.push({
                                                                             component: OrderDetails,
                                                                             params: {
@@ -1305,10 +1329,10 @@ export default class ShoppingCart extends Component {
                                                                                 SuppCode: row.SuppCode,
                                                                                 ydcountm: "",
                                                                                 BarCode: row.BarCode,
-                                                                                IsIntCount:row.IsIntCount
+                                                                                IsIntCount: row.IsIntCount
                                                                             }
                                                                         })
-                                                                    }else{
+                                                                    } else {
                                                                         for (let i = 0; i < datas.length; i++) {
                                                                             var data = datas.item(i);
                                                                             this.props.navigator.push({
@@ -1325,7 +1349,7 @@ export default class ShoppingCart extends Component {
                                                                                     SuppCode: row.SuppCode,
                                                                                     ydcountm: data.ydcountm,
                                                                                     BarCode: row.BarCode,
-                                                                                    IsIntCount:row.IsIntCount
+                                                                                    IsIntCount: row.IsIntCount
                                                                                 }
                                                                             })
                                                                         }
@@ -1347,7 +1371,7 @@ export default class ShoppingCart extends Component {
                                                                         SuppCode: row.SuppCode,
                                                                         ydcountm: countm,
                                                                         BarCode: row.BarCode,
-                                                                        IsIntCount:row.IsIntCount,
+                                                                        IsIntCount: row.IsIntCount,
                                                                     }
                                                                 })
                                                             }
@@ -1373,48 +1397,48 @@ export default class ShoppingCart extends Component {
         })
     }
 
-    renderRow(rowData, sectionID, rowID){
+    renderRow(rowData, sectionID, rowID) {
         return (
-            <TouchableOpacity style={styles.ShopList} onPress={()=>this.OrderDetails(rowData)}>
-                <View style={[styles.RowList,{paddingLeft:30,}]}>
+            <TouchableOpacity style={styles.ShopList} onPress={() => this.OrderDetails(rowData)}>
+                <View style={[styles.RowList, {paddingLeft: 30,}]}>
                     <View style={styles.serial}>
                         <Text style={styles.SerialText}>{rowData.serial}.</Text>
                     </View>
                     {
                         (rowData.barCode == "") ?
-                            <Text style={[styles.Name,styles.Name1]}>{rowData.prodcode}</Text>
+                            <Text style={[styles.Name, styles.Name1]}>{rowData.prodcode}</Text>
                             :
-                            <Text style={[styles.Name,styles.Name1]}>{rowData.barCode}</Text>
+                            <Text style={[styles.Name, styles.Name1]}>{rowData.barCode}</Text>
                     }
-                    <Text style={[styles.Name,styles.Name1]}>{rowData.prodname}</Text>
+                    <Text style={[styles.Name, styles.Name1]}>{rowData.prodname}</Text>
                 </View>
                 {
-                    (this.state.Name=="售价调整")?
+                    (this.state.Name == "售价调整") ?
                         <View style={styles.RowList1}>
                             <Text style={styles.Number}>{rowData.ydcountm}</Text>
                         </View>
                         :
                         <View style={styles.RowList1}>
-                            <Text style={[styles.Number,styles.Name1]}>{rowData.shopnumber}</Text>
+                            <Text style={[styles.Number, styles.Name1]}>{rowData.shopnumber}</Text>
                         </View>
                 }
                 <View style={styles.RowList1}>
-                    <Text style={[styles.Price,styles.Name1]}>{rowData.ProPrice}</Text>
+                    <Text style={[styles.Price, styles.Name1]}>{rowData.ProPrice}</Text>
                 </View>
                 {
-                    (this.state.Name=="标签采集"||this.state.Name=="售价调整")?
-                        null:
+                    (this.state.Name == "标签采集" || this.state.Name == "售价调整") ?
+                        null :
                         <View style={styles.RowList1}>
-                            <Text style={[styles.SmallScale,styles.Name1]}>{rowData.ShopAmount}</Text>
+                            <Text style={[styles.SmallScale, styles.Name1]}>{rowData.ShopAmount}</Text>
                         </View>
                 }
             </TouchableOpacity>
         );
     }
 
-    renderHiddenRow(rowData, sectionID, rowID){
+    renderHiddenRow(rowData, sectionID, rowID) {
         return (
-            <TouchableOpacity onPress={()=>this.deteleShopInfo(rowData)} style={styles.rowBack}>
+            <TouchableOpacity onPress={() => this.deteleShopInfo(rowData)} style={styles.rowBack}>
                 <Text style={styles.rowBackText}>删除</Text>
             </TouchableOpacity>
         );
@@ -1424,15 +1448,16 @@ export default class ShoppingCart extends Component {
      *
      * 删除每一列数据
      */
-    deteleShopInfo(rowData, sectionID, rowID){
-        dbAdapter.deteleShopInfo(rowData.prodcode).then((rows)=>{});
-        dbAdapter.selectShopInfo().then((rows)=>{
-            this.DataShop=[];
-            this.ds=[];
+    deteleShopInfo(rowData, sectionID, rowID) {
+        dbAdapter.deteleShopInfo(rowData.prodcode).then((rows) => {
+        });
+        dbAdapter.selectShopInfo().then((rows) => {
+            this.DataShop = [];
+            this.ds = [];
             var shopnumber = 0;
             var shopAmount = 0;
-            for(let i =0;i<rows.length;i++){
-                var serial=i+1;
+            for (let i = 0; i < rows.length; i++) {
+                var serial = i + 1;
                 var row = rows.item(i);
                 var prodname = row.prodname;
                 var number = row.ShopNumber;
@@ -1442,49 +1467,50 @@ export default class ShoppingCart extends Component {
                 var promemo = row.promemo;
                 var ydcountm = row.ydcountm;
                 var barCode = row.BarCode;
-                var SHopAMount=NumberUtils.numberFormat2(row.ShopAmount);
+                var SHopAMount = NumberUtils.numberFormat2(row.ShopAmount);
                 shopAmount += Number(SHopAMount);
                 shopnumber += Number(row.ShopNumber);
                 this.ds.push(row);
                 var DataShop = {
-                    'serial':serial,
-                    'prodname':prodname,
-                    'barCode':barCode,
+                    'serial': serial,
+                    'prodname': prodname,
+                    'barCode': barCode,
                     'prodcode': prodcode,
-                    'shopnumber':number,
+                    'shopnumber': number,
                     'countm': number,
                     'ProPrice': ProPrice,
                     'promemo': promemo,
                     'ydcountm': ydcountm,
-                    'ShopAmount':row.ShopAmount,
-                    'SuppCode':row.SuppCode,
-                    'Pid':row.pid,
-                    'DepCode':row.DepCode,
-                    'kccount':ydcountm,
-                    'prodcode':row.ProdCode
+                    'ShopAmount': row.ShopAmount,
+                    'SuppCode': row.SuppCode,
+                    'Pid': row.pid,
+                    'DepCode': row.DepCode,
+                    'kccount': ydcountm,
+                    'prodcode': row.ProdCode
                 }
                 this.DataShop.push(DataShop);
             }
+            var num = shopnumber.toFixed(2);
             this.setState({
-                number1:number,
-                ShopNumber:shopnumber,//数量
-                ShopAmount:NumberUtils.numberFormat2(shopAmount),//总金额
-                ds:this.state.ds.cloneWithRows(this.DataShop)
+                number1: number,
+                ShopNumber: num,//数量
+                ShopAmount: NumberUtils.numberFormat2(shopAmount),//总金额
+                ds: this.state.ds.cloneWithRows(this.DataShop)
             })
         })
-        dbAdapter.selectShopInfoAllCountm().then((rows)=>{
+        dbAdapter.selectShopInfoAllCountm().then((rows) => {
             var ShopCar = rows.item(0).countm;
             this.setState({
-                shopcar:ShopCar
+                shopcar: ShopCar
             });
         });
     }
 
-    History(){
-        Storage.get('Name').then((tags)=> {
-            if(tags=="移动销售"||tags=="标签采集"){
+    History() {
+        Storage.get('Name').then((tags) => {
+            if (tags == "移动销售" || tags == "标签采集") {
                 ToastAndroid.show('暂不支持该业务', ToastAndroid.SHORT)
-            }else{
+            } else {
                 var nextRoute = {
                     name: "主页",
                     component: HistoricalDocument
@@ -1494,27 +1520,27 @@ export default class ShoppingCart extends Component {
         })
     }
 
-    Shop(){
-        var nextRoute={
-            name:"主页",
-            component:Index
+    Shop() {
+        var nextRoute = {
+            name: "主页",
+            component: Index
         };
         this.props.navigator.push(nextRoute)
     }
 
-    pressPush(){
+    pressPush() {
         Storage.save("ShoppData", "清单");
         this.props.navigator.push({
-            component:Search,
+            component: Search,
         });
         DeviceEventEmitter.removeAllListeners();
     }
 
     //点击商品列表跳转到修改商品数量页面
-    OrderDetails(rowData, sectionID, rowID){
-        Storage.get('FormType').then((FormType)=>{
+    OrderDetails(rowData, sectionID, rowID) {
+        Storage.get('FormType').then((FormType) => {
             Storage.get('LinkUrl').then((LinkUrl) => {
-                Storage.get('userName').then((userName)=>{
+                Storage.get('userName').then((userName) => {
                     Storage.get('PeiSong').then((PeiSong) => {
                         dbAdapter.selectAidCode(rowData.prodcode, 1).then((rowdata) => {
                             for (let i = 0; i < rowdata.length; i++) {
@@ -1581,156 +1607,159 @@ export default class ShoppingCart extends Component {
 
     }
 
-    pressPop(){
+    pressPop() {
         this._setModalVisible();
         this.props.navigator.pop();
     }
 
-    ScreenBod(){
+    ScreenBod() {
         let isScreen = this.state.ScreenBod;
         this.setState({
-            ScreenBod:!isScreen,
+            ScreenBod: !isScreen,
         });
     }
 
-    SCreenBod(){
+    SCreenBod() {
         this.setState({
-            SUbmit:'',
+            SUbmit: '',
         });
         this.ScreenBod();
     }
 
     //提交
-    submit(){
+    submit() {
         this.setState({
-            SUbmit:1
+            SUbmit: 1
         })
-        if(this.state.SUbmit==1){
+        if (this.state.SUbmit == 1) {
             return;
-        }else{
-            if(this.ds==0){
+        } else {
+            if (this.ds == 0) {
                 alert("请添加商品");
-            }else{
+            } else {
                 this.screen = [];
-                Storage.get('shildshop').then((tags)=>{
-                    this.setState({
-                        shildshop:tags
-                    })
-                })
-
-                Storage.get('LinkUrl').then((tags) => {
-                    this.setState({
-                        linkurl:tags
-                    })
-                })
-
-                Storage.get('Screen').then((tags)=>{
-                    this.setState({
-                        Screen:tags
-                    })
-                })
+                var date = new Date();
+                var getFullYear = date.getFullYear();
+                var getMonth = date.getMonth() + 1;
+                var getDate = date.getDate();
+                var getHours = date.getHours();
+                var getMinutes = date.getMinutes();
+                var getSeconds = date.getSeconds();
+                if (getMonth >= 0 && getMonth <= 9) {
+                    var getMonth = "0" + getMonth;
+                }
+                if (getDate >= 0 && getDate <= 9) {
+                    var getDate = "0" + getDate;
+                }
+                if (getHours >= 0 && getHours <= 9) {
+                    var getHours = "0" + getHours;
+                }
+                if (getMinutes >= 0 && getMinutes <= 9) {
+                    var getMinutes = "0" + getMinutes;
+                }
+                if (getSeconds >= 0 && getSeconds <= 9) {
+                    var getSeconds = "0" + getSeconds;
+                }
+                var SfullTime = getFullYear + "-" + getMonth + "-" + getDate + " " + getHours+":"+getMinutes+":"+getSeconds;
                 this.Wait();
                 Storage.get('code').then((tags) => {
-                    Storage.get("usercode","").then((usercode)=>{
-                        Storage.get("username","").then((username)=>{
-                            let params = {
-                                ClientCode: this.state.ClientCode,
-                                username: this.state.Username,
-                                usercode: this.state.Userpwd,
-                                Remark: this.state.ShopRemark,
-                            };
-                        });
-                    });
-                    Storage.get('scode').then((scode)=>{
-                        Storage.get('CKu').then((CKu)=> {
-                            Storage.get('DepCode').then((DepCode)=> {
-                                if(DepCode==null){
-                                    var depcode=0;
-                                }else{
-                                    var depcode=DepCode;
+                    let params = {
+                        ClientCode: this.state.ClientCode,
+                        username: this.state.Username,
+                        usercode: this.state.Usercode,
+                        Remark: this.state.ShopRemark,
+                    };
+                    Storage.get('scode').then((scode) => {
+                        Storage.get('CKu').then((CKu) => {
+                            Storage.get('DepCode').then((DepCode) => {
+                                if (DepCode == null) {
+                                    var depcode = 0;
+                                } else {
+                                    var depcode = DepCode;
                                 }
                                 let params = {
                                     reqCode: "App_PosReq",
                                     reqDetailCode: this.state.reqDetailCode,
                                     ClientCode: this.state.ClientCode,
-                                    sDateTime: "2017-08-09 12:12:12",//获取当前时间转换成时间戳
-                                    Sign: NetUtils.MD5("App_PosReq" + "##" +this.state.reqDetailCode + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs")+'',
+                                    sDateTime: SfullTime,//获取当前时间转换成时间戳
+                                    Sign: NetUtils.MD5("App_PosReq" + "##" + this.state.reqDetailCode + "##" + SfullTime + "##" + "PosControlCs") + '',
                                     username: this.state.Username,
-                                    usercode: this.state.Userpwd,
+                                    usercode: this.state.Usercode,
                                     DetailInfo1: {
                                         "ShopCode": tags,
                                         "OrgFormno": this.state.OrgFormno,
                                         "ProMemo": this.state.Remark,
-                                        "SuppCode":scode,
-                                        "childshop":this.state.shildshop,
-                                        "pdaGuid":this.state.IMEI,
-                                        "pdgFormno":this.state.ProYH+this.state.Date,
-                                        "storecode":CKu,
-                                        "depcode":depcode,
+                                        "SuppCode": scode,
+                                        "childshop": this.state.ChildShopCode,
+                                        "pdaGuid": this.state.IMEI,
+                                        "pdgFormno": this.state.ProYH + this.state.Date,
+                                        "storecode": CKu,
+                                        "depcode": depcode,
+                                        "ywUserCode":this.state.SourceNumber
                                     },
                                     DetailInfo2: this.DataShop,
                                 };
-                                if(this.state.Screen=="1"||this.state.Screen=="2"){
-                                    var DetailInfo2=params.DetailInfo2;
-                                    for(let i =0;i<DetailInfo2.length;i++){
+                                if (this.state.Screen == "1" || this.state.Screen == "2") {
+                                    var DetailInfo2 = params.DetailInfo2;
+                                    for (let i = 0; i < DetailInfo2.length; i++) {
                                         let detail = DetailInfo2[i];
                                         let ydcountm = detail.ydcountm;
                                         let countm = detail.countm;
-                                        if(ydcountm!==countm){
+                                        if (ydcountm !== countm) {
                                             this.screen.push(detail);
                                         }
                                     }
-                                    if(this.screen==""){
-                                        FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
-                                            
-                                            if(data.retcode == 1){
-                                                if(this.state.Screen!=="1"||this.state.Screen!=="2"||this.screen==""||scode==null){
+                                    if (this.screen == "") {
+                                        FetchUtils.post(this.state.linkurl, JSON.stringify(params)).then((data) => {
+
+                                            if (data.retcode == 1) {
+                                                if (this.state.Screen !== "1" || this.state.Screen !== "2" || this.screen == "" || scode == null) {
                                                     this.Wait();
                                                     this.Succeed();
                                                     Storage.get('Radio').then((Radio) => {
-                                                      if(Radio==0){
-                                                          this.Set();
-                                                      }
+                                                        if (Radio == 0) {
+                                                            this.Set();
+                                                        }
                                                     })
                                                 }
-                                            }else{
+                                            } else {
                                                 this.Wait();
                                                 alert(data.msg)
                                             }
-                                        },(err)=>{
+                                        }, (err) => {
                                             alert("网络请求失败");
                                         })
-                                    }else{
+                                    } else {
                                         this.setState({
-                                            dataSource:this.state.dataSource.cloneWithRows(this.screen),
+                                            dataSource: this.state.dataSource.cloneWithRows(this.screen),
                                         })
                                         this.Wait();
                                         this.ScreenBod();
                                     }
                                     this.setState({
-                                        SUbmit:'',
+                                        SUbmit: '',
                                     })
-                                }else{
-                                   
-                                    FetchUtils.post(this.state.linkurl,JSON.stringify(params)).then((data)=>{
-                                        if(data.retcode == 1){
-                                            if(this.state.Screen!=="1"||this.state.Screen!=="2"||this.screen==""||scode==null){
+                                } else {
+
+                                    FetchUtils.post(this.state.linkurl, JSON.stringify(params)).then((data) => {
+                                        if (data.retcode == 1) {
+                                            if (this.state.Screen !== "1" || this.state.Screen !== "2" || this.screen == "" || scode == null) {
                                                 this.Wait();
                                                 this.Succeed();
                                                 Storage.get('Radio').then((Radio) => {
-                                                    if(Radio==0){
+                                                    if (Radio == 0) {
                                                         this.Set();
                                                     }
                                                 })
                                             }
                                             this.setState({
-                                                SUbmit:'',
+                                                SUbmit: '',
                                             })
-                                        }else{
+                                        } else {
                                             this.Wait();
                                             alert(data.msg)
                                         }
-                                    },(err)=>{
+                                    }, (err) => {
                                         alert("网络请求失败");
                                     })
                                 }
@@ -1743,35 +1772,19 @@ export default class ShoppingCart extends Component {
     }
 
     submit1() {
-        Storage.get('shildshop').then((tags) => {
-            this.setState({
-                shildshop: tags
-            })
-        })
-
-        Storage.get('LinkUrl').then((tags) => {
-            this.setState({
-                linkurl: tags
-            })
-        })
-
         if (this.ds == 0) {
             alert("请添加商品")
         } else {
             Storage.get('code').then((tags) => {
-                Storage.get("usercode", "").then((usercode) => {
-                    Storage.get("username", "").then((username) => {
-                        let params = {
-                            ClientCode: this.state.ClientCode,
-                            username: this.state.Username,
-                            usercode: this.state.Userpwd,
-                            Remark: this.state.ShopRemark,
-                        };
-                    });
-                });
+                let params = {
+                    ClientCode: this.state.ClientCode,
+                    username: this.state.Username,
+                    usercode: this.state.Usercode,
+                    Remark: this.state.ShopRemark,
+                };
                 Storage.get('scode').then((scod) => {
-                    Storage.get('CKu').then((CKu)=> {
-                        Storage.get('DepCode').then((DepCode)=> {
+                    Storage.get('CKu').then((CKu) => {
+                        Storage.get('DepCode').then((DepCode) => {
                             if (DepCode == null) {
                                 var depcode = 0;
                             } else {
@@ -1784,17 +1797,17 @@ export default class ShoppingCart extends Component {
                                 sDateTime: "2017-08-09 12:12:12",
                                 Sign: NetUtils.MD5("App_PosReq" + "##" + this.state.reqDetailCode + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs") + '',
                                 username: this.state.Username,
-                                usercode: this.state.Userpwd,
+                                usercode: this.state.Usercode,
                                 DetailInfo1: {
                                     "ShopCode": tags,
                                     "OrgFormno": this.state.OrgFormno,
                                     "ProMemo": this.state.Remark,
                                     "SuppCode": scod,
-                                    "childshop": this.state.shildshop,
+                                    "childshop": this.state.ChildShopCode,
                                     "pdaGuid": this.state.IMEI,
                                     "pdgFormno": this.state.ProYH + this.state.Date,
-                                    "storecode":CKu,
-                                    "depcode":depcode,
+                                    "storecode": CKu,
+                                    "depcode": depcode,
                                 },
                                 DetailInfo2: this.DataShop,
                             };
@@ -1803,17 +1816,17 @@ export default class ShoppingCart extends Component {
                                     this.ScreenBod();
                                     this.Succeed();
                                     Storage.get('Radio').then((Radio) => {
-                                        if(Radio==0){
+                                        if (Radio == 0) {
                                             this.Set();
                                         }
                                     })
                                     this.setState({
-                                        SUbmit:'',
+                                        SUbmit: '',
                                     })
                                 } else {
                                     alert(data.msg)
                                 }
-                            },(err)=>{
+                            }, (err) => {
                                 alert("网络请求失败");
                             })
                         })
@@ -1826,10 +1839,10 @@ export default class ShoppingCart extends Component {
     /**
      *打印设置
      */
-    Set(){
-        if(this.state.Name=="售价调整"||this.state.Name=="标签采集"){
+    Set() {
+        if (this.state.Name == "售价调整" || this.state.Name == "标签采集") {
             console.log("hello")
-        }else{
+        } else {
             Storage.get('Pid').then((Pid) => {
                 Storage.get('code').then((ShopName) => {
                     Storage.get('MenDianName').then((MenDianName) => {
@@ -1859,11 +1872,11 @@ export default class ShoppingCart extends Component {
                                 }
                                 NativeModules.AndroidPrintInterface.initPrint();
                                 NativeModules.AndroidPrintInterface.setFontSize(30, 26, 0x26,);
-                                NativeModules.AndroidPrintInterface.print(" " + " " + " " + " " + " " + " " + " " + " " + MenDianName+"\n");
+                                NativeModules.AndroidPrintInterface.print(" " + " " + " " + " " + " " + " " + " " + " " + MenDianName + "\n");
                                 NativeModules.AndroidPrintInterface.print("\n");
                                 NativeModules.AndroidPrintInterface.setFontSize(20, 20, 0x22);
                                 NativeModules.AndroidPrintInterface.print("服务员：" + userName + "\n");
-                                NativeModules.AndroidPrintInterface.print("当前单据：" + this.state.head + "\n");
+                                NativeModules.AndroidPrintInterface.print("当前单据：" + this.state.Name + "\n");
                                 if (hh < 12) {
                                     var hours = "上午"
                                 } else if (hh >= 12) {
@@ -1881,7 +1894,7 @@ export default class ShoppingCart extends Component {
                                         var barCode = DataRows.barCode;
                                     }
                                     NativeModules.AndroidPrintInterface.print(DataRows.prodname + " " + " " + " " + " " + barCode + "\n");
-                                    NativeModules.AndroidPrintInterface.print(" " + " " + " " + " " + " " + " " + " " + " " + " " + " " + " " + " " + " " + " " + DataRows.shopnumber + " " +" " +" " +" " + " " + " " + " " + DataRows.ProPrice + " " + " " + " " + " " + DataRows.ShopAmount + "\n");
+                                    NativeModules.AndroidPrintInterface.print(" " + " " + " " + " " + " " + " " + " " + " " + " " + " " + " " + " " + " " + " " + DataRows.shopnumber + " " + " " + " " + " " + " " + " " + " " + DataRows.ProPrice + " " + " " + " " + " " + DataRows.ShopAmount + "\n");
                                     NativeModules.AndroidPrintInterface.print("\n");
                                 }
                                 NativeModules.AndroidPrintInterface.print("总价：" + this.state.ShopAmount + "\n");
@@ -1898,7 +1911,7 @@ export default class ShoppingCart extends Component {
 
     }
 
-    _Screen(rowData, sectionID, rowID){
+    _Screen(rowData, sectionID, rowID) {
         return (
             <View style={styles.ScreenList}>
                 <View style={styles.coulumnScreen}>
@@ -1922,38 +1935,50 @@ export default class ShoppingCart extends Component {
 
     //单据备注对话框
     _rightButtonClick() {
-        if(this.ds==0){
+        if (this.ds == 0) {
             alert("请添加商品")
-        }else{
-            this._setModalVisible();
+        } else {
+            if(this.state.BeiZhu==""){
+                this._setModalVisible();
+            }else{
+                this.setState({
+                    Remark: this.state.BeiZhu,
+                });
+                this._setModalVisible();
+            }
         }
     }
 
     _setModalVisible() {
         let isShow = this.state.show;
         this.setState({
-            show:!isShow,
-            BeiZhu:this.state.Remark,
+            show: !isShow,
+            BeiZhu: this.state.Remark,
         });
+        if(this.state.Remark==""){
+            Storage.delete('BeiZhu');
+        }else{
+            Storage.save('BeiZhu', this.state.Remark);
+        }
     }
 
     modal() {
         let isShow = this.state.Show;
         this.setState({
-            Show:!isShow,
+            Show: !isShow,
         });
     }
 
     //成功弹层
-    Succeed(){
+    Succeed() {
         let isShow = this.state.Succeed;
         this.setState({
-            Succeed:!isShow,
+            Succeed: !isShow,
         });
     }
 
     //成功返回
-    Return(){
+    Return() {
         Storage.delete('OrgFormno');
         Storage.delete('shildshop');
         this.Succeed();
@@ -1961,99 +1986,99 @@ export default class ShoppingCart extends Component {
     }
 
     //提交时各单据判断
-    DeterMine(){
-        Storage.get('Name').then((tags)=>{
-            if(tags=="商品盘点"){
+    DeterMine() {
+        Storage.get('Name').then((tags) => {
+            if (tags == "商品盘点") {
                 this.Succeed();
-                var nextRoute={
-                    name:"Query",
-                    component:Query,
+                var nextRoute = {
+                    name: "Query",
+                    component: Query,
                     params: {
-                        invoice:"商品盘点"
+                        invoice: "商品盘点"
                     }
                 };
                 this.props.navigator.push(nextRoute);
                 this.DataSource();
             }
-            if(tags=="配送收货"){
+            if (tags == "配送收货") {
                 this.Succeed();
-                var nextRoute={
-                    name:"Distrition",
-                    component:Distrition,
+                var nextRoute = {
+                    name: "Distrition",
+                    component: Distrition,
                     params: {
-                        invoice:"配送收货"
+                        invoice: "配送收货"
                     }
                 };
                 this.props.navigator.push(nextRoute);
                 this.DataSource();
             }
-            if(tags=="商品采购"){
+            if (tags == "商品采购") {
                 this.Succeed();
-                var nextRoute={
-                    name:"ProductCG",
-                    component:ProductCG,
+                var nextRoute = {
+                    name: "ProductCG",
+                    component: ProductCG,
                     params: {
-                        invoice:"商品采购"
+                        invoice: "商品采购"
                     }
                 };
                 this.props.navigator.push(nextRoute);
                 this.DataSource();
             }
-            if(tags=="商品验收"){
+            if (tags == "商品验收") {
                 this.Succeed();
-                var nextRoute={
-                    name:"ProductYS",
-                    component:ProductYS,
+                var nextRoute = {
+                    name: "ProductYS",
+                    component: ProductYS,
                     params: {
-                        invoice:"商品验收"
+                        invoice: "商品验收"
                     }
                 };
                 this.props.navigator.push(nextRoute);
                 this.DataSource();
             }
-            if(tags=="协配采购"){
+            if (tags == "协配采购") {
                 this.Succeed();
-                var nextRoute={
-                    name:"ProductXP",
-                    component:ProductXP,
+                var nextRoute = {
+                    name: "ProductXP",
+                    component: ProductXP,
                     params: {
-                        invoice:"协配采购"
+                        invoice: "协配采购"
                     }
                 };
                 this.props.navigator.push(nextRoute);
                 this.DataSource();
             }
-            if(tags=="协配收货"){
+            if (tags == "协配收货") {
                 this.Succeed();
-                var nextRoute={
-                    name:"ProductSH",
-                    component:ProductSH,
+                var nextRoute = {
+                    name: "ProductSH",
+                    component: ProductSH,
                     params: {
-                        invoice:"协配收货"
+                        invoice: "协配收货"
                     }
                 };
                 this.props.navigator.push(nextRoute);
                 this.DataSource();
             }
-            if(tags=="商品损溢"){
+            if (tags == "商品损溢") {
                 this.Succeed();
-                var nextRoute={
-                    name:"SunYi",
-                    component:SunYi,
+                var nextRoute = {
+                    name: "SunYi",
+                    component: SunYi,
                     params: {
-                        invoice:"商品损溢"
+                        invoice: "商品损溢"
                     }
                 };
                 this.props.navigator.push(nextRoute);
                 this.DataSource();
             }
-            if(tags=="商品配送"){
+            if (tags == "商品配送") {
                 this.Succeed();
-                var nextRoute={
-                    name:"PSDan",
-                    component:PSDan,
+                var nextRoute = {
+                    name: "PSDan",
+                    component: PSDan,
                     params: {
-                        invoice:"商品配送"
+                        invoice: "商品配送"
                     }
                 };
                 this.props.navigator.push(nextRoute);
@@ -2061,49 +2086,73 @@ export default class ShoppingCart extends Component {
                 Storage.delete('shildshop');
                 this.DataSource();
             }
-            if(tags=="门店要货"){
+            if (tags == "门店要货") {
                 this.Succeed();
-                var nextRoute={
-                    name:"PinLei",
-                    component:PinLei,
+                var nextRoute = {
+                    name: "PinLei",
+                    component: PinLei,
                     params: {
-                        invoice:"门店要货"
+                        invoice: "门店要货"
                     }
                 };
                 this.props.navigator.push(nextRoute);
                 this.DataSource();
             }
-            if(tags=="实时盘点"){
+            if (tags == "实时盘点") {
                 this.Succeed();
-                var nextRoute={
-                    name:"PinLei",
-                    component:PinLei,
+                var nextRoute = {
+                    name: "PinLei",
+                    component: PinLei,
                     params: {
-                        invoice:"实时盘点"
+                        invoice: "实时盘点"
                     }
                 };
                 this.props.navigator.push(nextRoute);
                 this.DataSource();
             }
-            if(tags=="标签采集"){
+            if (tags == "标签采集") {
                 this.Succeed();
-                var nextRoute={
-                    name:"PinLei",
-                    component:PinLei,
+                var nextRoute = {
+                    name: "PinLei",
+                    component: PinLei,
                     params: {
-                        invoice:"标签采集"
+                        invoice: "标签采集"
                     }
                 };
                 this.props.navigator.push(nextRoute);
                 this.DataSource();
             }
-            if(tags=="售价调整"){
+            if (tags == "售价调整") {
                 this.Succeed();
-                var nextRoute={
-                    name:"PinLei",
-                    component:PinLei,
+                var nextRoute = {
+                    name: "PinLei",
+                    component: PinLei,
                     params: {
-                        invoice:"售价调整"
+                        invoice: "售价调整"
+                    }
+                };
+                this.props.navigator.push(nextRoute);
+                this.DataSource();
+            }
+            if (tags == "批发报价") {
+                this.Succeed();
+                var nextRoute = {
+                    name: "批发报价",
+                    component: WholeSale,
+                    params: {
+                        invoice: "批发报价"
+                    }
+                };
+                this.props.navigator.push(nextRoute);
+                this.DataSource();
+            }
+            if (tags == "批发销售") {
+                this.Succeed();
+                var nextRoute = {
+                    name: "批发销售",
+                    component: WholeSale,
+                    params: {
+                        invoice: "批发销售"
                     }
                 };
                 this.props.navigator.push(nextRoute);
@@ -2114,60 +2163,62 @@ export default class ShoppingCart extends Component {
     }
 
     //提交时清空数据及更新setState
-    DataSource(){
+    DataSource() {
         dbAdapter.deleteData("shopInfo");
-        this.ds=[];
-        var price="";
+        this.ds = [];
+        var price = "";
         var date = new Date();
-        var data=JSON.stringify(date.getTime());
+        var data = JSON.stringify(date.getTime());
         this.setState({
-            ds:this.state.ds.cloneWithRows(this.ds),
-            ShopNumber:price,
-            ShopAmount:price,
-            shopcar:"",
-            active:data,
-            BeiZhu:"",
+            ds: this.state.ds.cloneWithRows(this.ds),
+            ShopNumber: price,
+            ShopAmount: price,
+            shopcar: "",
+            active: data,
+            BeiZhu: "",
         })
-        Storage.save('Date',this.state.active);
+        Storage.save('Date', this.state.active);
     }
 
-    DataButton(){
+    DataButton() {
         dbAdapter.deleteData("shopInfo");
-        this.ds=[];
-        var price="";
+        this.ds = [];
+        var price = "";
         this.setState({
-            ds:this.state.ds.cloneWithRows(this.ds),
-            ShopNumber:price,
-            ShopAmount:price,
-            shopcar:"",
-            BeiZhu:"",
+            ds: this.state.ds.cloneWithRows(this.ds),
+            ShopNumber: price,
+            ShopAmount: price,
+            shopcar: "",
+            BeiZhu: "",
         })
         this.DeleteData();
     }
 
-    CloseButton(){
+    CloseButton() {
         this.DeleteData();
     }
+
     //提交商品等待框
-    Wait(){
+    Wait() {
         let isShow = this.state.Wait;
         this.setState({
-            Wait:!isShow,
+            Wait: !isShow,
         });
     }
 
-    DeleteData(){
+    DeleteData() {
         let isShow = this.state.DeleteData;
         this.setState({
-            DeleteData:!isShow,
+            DeleteData: !isShow,
         });
     }
 
-    DeleteShop(){
+    DeleteShop() {
         this.DeleteData();
     }
 
     render() {
+        console.log("shopnumber=",this.state.ShopNumber)
         return (
             <View style={styles.container}>
                 <View style={styles.header}>
@@ -2185,19 +2236,19 @@ export default class ShoppingCart extends Component {
                     <View style={styles.NameList}>
                         <Text style={styles.Name}>名字</Text>
                         {
-                            (this.state.Name=="售价调整")?
+                            (this.state.Name == "售价调整") ?
                                 <Text style={styles.Number}>新价格</Text>
                                 :
                                 <Text style={styles.Number}>数量</Text>
                         }
                         {
-                            (this.state.Name=="售价调整")?
+                            (this.state.Name == "售价调整") ?
                                 <Text style={styles.Number}>原价格</Text>
                                 :
                                 <Text style={styles.Price}>单价</Text>
                         }
                         {
-                            (this.state.Name=="标签采集"||this.state.Name=="售价调整")?
+                            (this.state.Name == "标签采集" || this.state.Name == "售价调整") ?
                                 null
                                 :
                                 <Text style={styles.SmallScale}>小计</Text>
@@ -2227,16 +2278,16 @@ export default class ShoppingCart extends Component {
                                 null
                                 :
                                 <Text style={styles.ClientText}>
-                                    <Text style={[styles.ClientText,styles.ClientType]}>货品：</Text>
+                                    <Text style={[styles.ClientText, styles.ClientType]}>货品：</Text>
                                     <Text style={styles.ClientType}>{this.state.ShopNumber}</Text>
                                 </Text>
                         }
                         {
-                            (this.state.Name=="标签采集"||this.state.Name == "售价调整")?
+                            (this.state.Name == "标签采集" || this.state.Name == "售价调整") ?
                                 null
                                 :
                                 <Text style={styles.ClientText}>
-                                    <Text style={[styles.ClientText,styles.ClientType]}>总价：</Text>
+                                    <Text style={[styles.ClientText, styles.ClientType]}>总价：</Text>
                                     <Text style={styles.Price1}>{this.state.ShopAmount}</Text>
                                 </Text>
                         }
@@ -2250,44 +2301,59 @@ export default class ShoppingCart extends Component {
                                 style={styles.DocumentsNote1}
                                 autofocus={true}
                                 editable={false}
-                                defaultValue ={this.state.BeiZhu}
+                                defaultValue={this.state.BeiZhu}
                                 textalign="center"
                                 underlineColorAndroid='transparent'
                             />
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.Submit} onPress={this.submit.bind(this)}>
-                            <Text style={{fontSize:18,color:"#ffffff",textAlign:"center"}}>提交</Text>
+                            <Text style={{fontSize: 18, color: "#ffffff", textAlign: "center"}}>提交</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
                 <View style={styles.footer}>
-                    <TouchableOpacity style={styles.Home} onPress={this.History.bind(this)}><Image source={require("../images/1_300.png")}></Image><Text style={styles.home1}>历史单据查询</Text></TouchableOpacity>
-                    <TouchableOpacity style={styles.Home} onPress={this.Shop.bind(this)}><Image source={require("../images/1_311.png")}></Image><Text style={styles.home1}>商品</Text></TouchableOpacity>
+                    <TouchableOpacity style={styles.Home} onPress={this.History.bind(this)}><Image
+                        source={require("../images/1_300.png")}></Image><Text
+                        style={styles.home1}>历史单据查询</Text></TouchableOpacity>
+                    <TouchableOpacity style={styles.Home} onPress={this.Shop.bind(this)}><Image
+                        source={require("../images/1_311.png")}></Image><Text
+                        style={styles.home1}>商品</Text></TouchableOpacity>
                     <TouchableOpacity style={styles.Home}>
                         <View>
                             <Image source={require("../images/1_32.png")}>
                                 {
-                                    (this.state.shopcar==0)?
-                                        null:
-                                        <Text style={[{position:"absolute", right:-200,}]}>{this.state.shopcar}</Text>
+                                    (this.state.shopcar == 0) ?
+                                        null :
+                                        <Text style={[{position: "absolute", right: -200,}]}>{this.state.shopcar}</Text>
                                 }
                                 {
-                                    (this.state.shopcar>0)?
-                                        <Text style={[styles.ShopCar,{paddingTop:3,}]}>{this.state.shopcar}</Text>:null
+                                    (this.state.shopcar > 0) ?
+                                        <Text
+                                            style={[styles.ShopCar, {paddingTop: 3,}]}>{this.state.shopcar}</Text> : null
                                 }
                                 {
-                                    (this.state.shopcar<999)?
-                                        null:
-                                        <Text style={[styles.ShopCar,{width:30,height:30,top:11,lineHeight:21,}]}>{this.state.shopcar}</Text>
+                                    (this.state.shopcar < 999) ?
+                                        null :
+                                        <Text style={[styles.ShopCar, {
+                                            width: 30,
+                                            height: 30,
+                                            top: 11,
+                                            lineHeight: 21,
+                                        }]}>{this.state.shopcar}</Text>
                                 }
                                 {
-                                    (this.state.shopcar>999)?
+                                    (this.state.shopcar > 999) ?
                                         <View>
-                                            <Text style={[styles.ShopCar,{width:30,height:30,top:11,lineHeight:23}]}>{this.state.shopcar}</Text>
+                                            <Text style={[styles.ShopCar, {
+                                                width: 30,
+                                                height: 30,
+                                                top: 11,
+                                                lineHeight: 23
+                                            }]}>{this.state.shopcar}</Text>
                                             <Text style={styles.Add}>
                                                 +
                                             </Text>
-                                        </View>:null
+                                        </View> : null
                                 }
                             </Image>
                         </View>
@@ -2298,11 +2364,14 @@ export default class ShoppingCart extends Component {
                     animationType='fade'
                     transparent={true}
                     visible={this.state.Show}
-                    onShow={() => {}}
-                    onRequestClose={() => {}} >
+                    onShow={() => {
+                    }}
+                    onRequestClose={() => {
+                    }}>
                     <View style={styles.LoadCenter}>
                         <View style={styles.loading}>
-                            <ActivityIndicator key="1" color="#ffffff" size="large" style={styles.activity}></ActivityIndicator>
+                            <ActivityIndicator key="1" color="#ffffff" size="large"
+                                               style={styles.activity}></ActivityIndicator>
                             <Text style={styles.TextLoading}>加载中</Text>
                         </View>
                     </View>
@@ -2310,15 +2379,19 @@ export default class ShoppingCart extends Component {
                 <Modal
                     transparent={true}
                     visible={this.state.show}
-                    onShow={() => {}}
-                    onRequestClose={() => {}} >
-                    <View style={[styles.modalStyle,{justifyContent: 'center',alignItems: 'center',}]}>
-                        <View style={[styles.ModalView,{borderRadius:5,paddingBottom:20,width:300,
-                            height:330,backgroundColor:"#ffffff"}]}>
+                    onShow={() => {
+                    }}
+                    onRequestClose={() => {
+                    }}>
+                    <View style={[styles.modalStyle, {justifyContent: 'center', alignItems: 'center',}]}>
+                        <View style={[styles.ModalView, {
+                            borderRadius: 5, paddingBottom: 20, width: 300,
+                            height: 330, backgroundColor: "#ffffff"
+                        }]}>
                             <View style={styles.DanJu}>
                                 <View style={styles.danju}><Text style={styles.DanText}>单据备注</Text></View>
                                 <TouchableOpacity style={styles.ModalLeft} onPress={this._setModalVisible.bind(this)}>
-                                    <Image source={require("../images/2_02.png")} />
+                                    <Image source={require("../images/2_02.png")}/>
                                 </TouchableOpacity>
                             </View>
                             <TextInput
@@ -2329,9 +2402,9 @@ export default class ShoppingCart extends Component {
                                 placeholderTextColor="#888888"
                                 value={this.state.Remark}
                                 style={styles.TextInput}
-                                onChangeText={(value)=>{
+                                onChangeText={(value) => {
                                     this.setState({
-                                        Remark:value
+                                        Remark: value
                                     })
                                 }}/>
                             <TouchableOpacity style={styles.Button} onPress={this._setModalVisible.bind(this)}>
@@ -2346,8 +2419,10 @@ export default class ShoppingCart extends Component {
                     animationType='fade'
                     transparent={true}
                     visible={this.state.ScreenBod}
-                    onShow={() => {}}
-                    onRequestClose={() => {}} >
+                    onShow={() => {
+                    }}
+                    onRequestClose={() => {
+                    }}>
                     <View style={styles.ModalStyle}>
                         <View style={styles.DanJu}>
                             <View style={styles.danju}><Text style={styles.DanText}>
@@ -2363,7 +2438,7 @@ export default class ShoppingCart extends Component {
                                     </View>
                                     <View style={styles.coulumnScreen}>
                                         <Text style={styles.coulumnText}>
-                                            原始数量
+                                            原单数量
                                         </Text>
                                     </View>
                                     <View style={styles.coulumnScreen}>
@@ -2371,11 +2446,11 @@ export default class ShoppingCart extends Component {
                                             数量
                                         </Text>
                                     </View>
-                                </View>:null
+                                </View> : null
                         }
 
                         {
-                            (this.state.Screen=="2")?
+                            (this.state.Screen == "2") ?
                                 <View style={styles.ScreenTitle}>
                                     <View style={styles.coulumnScreen}>
                                         <Text style={styles.coulumnText}>
@@ -2392,10 +2467,10 @@ export default class ShoppingCart extends Component {
                                             数量
                                         </Text>
                                     </View>
-                                </View>:null
+                                </View> : null
                         }
 
-                        <View style={[{maxHeight:300,}]}>
+                        <View style={[{maxHeight: 300,}]}>
                             <ListView
                                 dataSource={this.state.dataSource}
                                 showsVerticalScrollIndicator={true}
@@ -2409,7 +2484,8 @@ export default class ShoppingCart extends Component {
                                     取消
                                 </Text>
                             </TouchableOpacity>
-                            <TouchableOpacity style={[styles.Cancel,{marginRight:25,}]} onPress={this.submit1.bind(this)}>
+                            <TouchableOpacity style={[styles.Cancel, {marginRight: 25,}]}
+                                              onPress={this.submit1.bind(this)}>
                                 <Text style={styles.CancelText}>
                                     确定
                                 </Text>
@@ -2421,15 +2497,20 @@ export default class ShoppingCart extends Component {
                     animationType='fade'
                     transparent={true}
                     visible={this.state.Succeed}
-                    onShow={() => {}}
-                    onRequestClose={() => {}}>
+                    onShow={() => {
+                    }}
+                    onRequestClose={() => {
+                    }}>
                     <View style={styles.Succeed}>
                         <View style={styles.header}>
                             <View style={styles.cont}>
                                 <TouchableOpacity onPress={this.Return.bind(this)}>
                                     <Image source={require("../images/2_01.png")}></Image>
                                 </TouchableOpacity>
-                                <Text style={[styles.HeaderList,{textAlign:"left",marginLeft:10,}]}>{this.state.head}</Text>
+                                <Text style={[styles.HeaderList, {
+                                    textAlign: "left",
+                                    marginLeft: 10,
+                                }]}>{this.state.Name}</Text>
                             </View>
                         </View>
                         <View style={styles.SucceedCont}>
@@ -2450,10 +2531,17 @@ export default class ShoppingCart extends Component {
                     animationType='fade'
                     transparent={true}
                     visible={this.state.DeleteData}
-                    onShow={() => {}}
-                    onRequestClose={() => {}}>
-                    <View style={[styles.modalStyle,{justifyContent: 'center',alignItems: 'center',}]}>
-                        <View style={[styles.ModalView,{borderRadius:5,paddingBottom:50,width:300,backgroundColor:"#ffffff"}]}>
+                    onShow={() => {
+                    }}
+                    onRequestClose={() => {
+                    }}>
+                    <View style={[styles.modalStyle, {justifyContent: 'center', alignItems: 'center',}]}>
+                        <View style={[styles.ModalView, {
+                            borderRadius: 5,
+                            paddingBottom: 50,
+                            width: 300,
+                            backgroundColor: "#ffffff"
+                        }]}>
                             <View style={styles.DanJu}>
                                 <View style={styles.danju}><Text style={styles.DanText}>是否清空全部商品？</Text></View>
                             </View>
@@ -2476,11 +2564,14 @@ export default class ShoppingCart extends Component {
                     animationType='fade'
                     transparent={true}
                     visible={this.state.Wait}
-                    onShow={() => {}}
-                    onRequestClose={() => {}} >
+                    onShow={() => {
+                    }}
+                    onRequestClose={() => {
+                    }}>
                     <View style={styles.LoadCenter}>
                         <View style={styles.loading}>
-                            <ActivityIndicator key="1" color="#ffffff" size="large" style={styles.activity}></ActivityIndicator>
+                            <ActivityIndicator key="1" color="#ffffff" size="large"
+                                               style={styles.activity}></ActivityIndicator>
                             <Text style={styles.TextLoading}>正在提交</Text>
                         </View>
                     </View>
@@ -2491,431 +2582,431 @@ export default class ShoppingCart extends Component {
 }
 
 const styles = StyleSheet.create({
-    ModalTitleText:{
-        fontSize:16,
-        color:"#ffffff",
-        textAlign:"center",
+    ModalTitleText: {
+        fontSize: 16,
+        color: "#ffffff",
+        textAlign: "center",
     },
-    Row:{
-        flexDirection:"row",
-        marginTop:50,
-        paddingLeft:20,
-        paddingRight:20,
+    Row: {
+        flexDirection: "row",
+        marginTop: 50,
+        paddingLeft: 20,
+        paddingRight: 20,
     },
-    DataButton:{
-        flex:1,
-        marginRight:35,
-        paddingTop:8,
-        paddingBottom:8,
-        borderRadius:3,
-        backgroundColor:"#ff4e4e",
+    DataButton: {
+        flex: 1,
+        marginRight: 35,
+        paddingTop: 8,
+        paddingBottom: 8,
+        borderRadius: 3,
+        backgroundColor: "#ff4e4e",
     },
-    CloseButton:{
-        flex:1,
-        paddingTop:8,
-        paddingBottom:8,
-        borderRadius:3,
-        backgroundColor:"#ff4e4e",
+    CloseButton: {
+        flex: 1,
+        paddingTop: 8,
+        paddingBottom: 8,
+        borderRadius: 3,
+        backgroundColor: "#ff4e4e",
     },
-    container:{
-        flex:1,
-        backgroundColor:"#f2f2f2",
+    container: {
+        flex: 1,
+        backgroundColor: "#f2f2f2",
     },
-    header:{
-        height:60,
-        backgroundColor:"#ff4e4e",
-        paddingTop:10,
+    header: {
+        height: 60,
+        backgroundColor: "#ff4e4e",
+        paddingTop: 10,
     },
-    cont:{
-        flexDirection:"row",
-        paddingLeft:16,
-        paddingRight:16,
+    cont: {
+        flexDirection: "row",
+        paddingLeft: 16,
+        paddingRight: 16,
     },
-    HeaderImage:{
-        marginLeft:18
+    HeaderImage: {
+        marginLeft: 18
     },
-    HeaderList:{
-        flex:6,
-        textAlign:"center",
-        color:"#ffffff",
-        fontSize:22,
-        marginTop:3,
+    HeaderList: {
+        flex: 6,
+        textAlign: "center",
+        color: "#ffffff",
+        fontSize: 22,
+        marginTop: 3,
     },
-    NameList:{
-        paddingLeft:25,
-        paddingRight:25,
-        flexDirection:"row",
-        paddingTop:20,
-        paddingBottom:20,
-        alignItems:"center",
+    NameList: {
+        paddingLeft: 25,
+        paddingRight: 25,
+        flexDirection: "row",
+        paddingTop: 20,
+        paddingBottom: 20,
+        alignItems: "center",
     },
-    RowList:{
-        flex:2,
+    RowList: {
+        flex: 2,
     },
-    serial:{
-        position:"absolute",
-        top:5,
-        left:4,
+    serial: {
+        position: "absolute",
+        top: 5,
+        left: 4,
     },
-    SerialText:{
+    SerialText: {
         borderRadius: 50,
         color: "#000000",
-        fontSize:14,
+        fontSize: 14,
     },
-    RowList1:{
-        flex:1,
+    RowList1: {
+        flex: 1,
     },
-    Name:{
-        flex:2,
-        fontSize:18,
-        color:"#333333",
+    Name: {
+        flex: 2,
+        fontSize: 18,
+        color: "#333333",
     },
-    Number:{
-        flex:1,
-        textAlign:"center",
-        fontSize:18,
-        color:"#333333",
+    Number: {
+        flex: 1,
+        textAlign: "center",
+        fontSize: 18,
+        color: "#333333",
     },
-    Price:{
-        flex:1,
-        textAlign:"center",
-        fontSize:18,
-        color:"#333333",
+    Price: {
+        flex: 1,
+        textAlign: "center",
+        fontSize: 18,
+        color: "#333333",
     },
-    SmallScale:{
-        flex:1,
-        textAlign:"right",
-        fontSize:18,
-        color:"#333333",
+    SmallScale: {
+        flex: 1,
+        textAlign: "right",
+        fontSize: 18,
+        color: "#333333",
     },
-    ShopList:{
-        paddingRight:25,
-        paddingTop:18,
-        paddingBottom:18,
-        backgroundColor:"#ffffff",
-        borderBottomWidth:1,
-        borderBottomColor:"#f2f2f2",
-        flexDirection:"row",
+    ShopList: {
+        paddingRight: 25,
+        paddingTop: 18,
+        paddingBottom: 18,
+        backgroundColor: "#ffffff",
+        borderBottomWidth: 1,
+        borderBottomColor: "#f2f2f2",
+        flexDirection: "row",
     },
-    Name1:{
-        color:"#333333",
-        fontSize:16,
-        height:22,
-        overflow:"hidden",
+    Name1: {
+        color: "#333333",
+        fontSize: 16,
+        height: 22,
+        overflow: "hidden",
     },
-    ContList1:{
-        flex:16,
-        marginBottom:60,
+    ContList1: {
+        flex: 16,
+        marginBottom: 60,
     },
-    CommoditySettlement:{
-        backgroundColor:"#ffffff",
-        borderTopWidth:1,
-        borderTopColor:"#f5f5f5",
-        paddingLeft:25,
-        paddingRight:25,
-        paddingTop:15,
-        height:160,
+    CommoditySettlement: {
+        backgroundColor: "#ffffff",
+        borderTopWidth: 1,
+        borderTopColor: "#f5f5f5",
+        paddingLeft: 25,
+        paddingRight: 25,
+        paddingTop: 15,
+        height: 160,
 
     },
-    Client:{
-        flexDirection:"row",
-        paddingBottom:5,
-        overflow:"hidden",
+    Client: {
+        flexDirection: "row",
+        paddingBottom: 5,
+        overflow: "hidden",
     },
-    Goods:{
-        flexDirection:"row",
+    Goods: {
+        flexDirection: "row",
     },
-    Note:{
-        flexDirection:"row",
+    Note: {
+        flexDirection: "row",
     },
-    Combined:{
-        flexDirection:"row",
+    Combined: {
+        flexDirection: "row",
     },
-    Combinedleft:{
-        flex:1,
-        paddingTop:5,
+    Combinedleft: {
+        flex: 1,
+        paddingTop: 5,
     },
-    Combinedright:{
-        flex:1,
-        paddingTop:5,
-        paddingBottom:5,
+    Combinedright: {
+        flex: 1,
+        paddingTop: 5,
+        paddingBottom: 5,
     },
-    Deletetext:{
-        color:"#ff4e4e",
-        textAlign:"center",
-        fontWeight:"bold",
+    Deletetext: {
+        color: "#ff4e4e",
+        textAlign: "center",
+        fontWeight: "bold",
     },
-    CombinedText:{
-        fontSize:16,
-        color:"#333333",
-        fontWeight:"bold"
+    CombinedText: {
+        fontSize: 16,
+        color: "#333333",
+        fontWeight: "bold"
     },
-    ClientType:{
-        fontSize:16,
-        color:"#666666",
+    ClientType: {
+        fontSize: 16,
+        color: "#666666",
     },
-    DocumentsNote:{
-        width:95,
-        marginTop:14,
+    DocumentsNote: {
+        width: 95,
+        marginTop: 14,
     },
-    DanJU:{
-        flex:5,
-        flexDirection:"row",
+    DanJU: {
+        flex: 5,
+        flexDirection: "row",
     },
-    Documentsnote:{
-        fontSize:16,
-        color:"#666666"
+    Documentsnote: {
+        fontSize: 16,
+        color: "#666666"
     },
-    DocumentsNote1:{
-        marginTop:3,
-        flex:4,
-        color:"#777777"
+    DocumentsNote1: {
+        marginTop: 3,
+        flex: 4,
+        color: "#777777"
     },
-    Submit:{
-        backgroundColor:"#ff4e4e",
-        paddingTop:10,
-        paddingBottom:10,
-        flex:2,
+    Submit: {
+        backgroundColor: "#ff4e4e",
+        paddingTop: 10,
+        paddingBottom: 10,
+        flex: 2,
     },
     ModalStyle: {
-        flex:1,
-        backgroundColor:"#F2F2F2",
+        flex: 1,
+        backgroundColor: "#F2F2F2",
     },
-    DanJu:{
-        paddingTop:13,
-        paddingBottom:13,
-        backgroundColor:"#ff4e4e",
-        flexDirection:'row',
+    DanJu: {
+        paddingTop: 13,
+        paddingBottom: 13,
+        backgroundColor: "#ff4e4e",
+        flexDirection: 'row',
     },
-    DanText:{
-        color:"#ffffff",
-        textAlign:"center",
-        fontSize:16,
+    DanText: {
+        color: "#ffffff",
+        textAlign: "center",
+        fontSize: 16,
     },
-    TextInput:{
-        marginLeft:25,
-        marginRight:25,
-        height:150,
-        marginTop:25,
-        backgroundColor:"#e2e2e2",
+    TextInput: {
+        marginLeft: 25,
+        marginRight: 25,
+        height: 150,
+        marginTop: 25,
+        backgroundColor: "#e2e2e2",
         textAlignVertical: 'top'
     },
-    Button:{
-        marginLeft:50,
-        marginRight:50,
-        backgroundColor:"#ff4e4e",
-        paddingTop:13,
-        paddingBottom:13,
-        borderRadius:5,
-        marginTop:25,
+    Button: {
+        marginLeft: 50,
+        marginRight: 50,
+        backgroundColor: "#ff4e4e",
+        paddingTop: 13,
+        paddingBottom: 13,
+        borderRadius: 5,
+        marginTop: 25,
     },
-    ButtonText:{
-        color:"#ffffff",
-        fontSize:18,
-        textAlign:"center",
+    ButtonText: {
+        color: "#ffffff",
+        fontSize: 18,
+        textAlign: "center",
     },
-    ModalLeft:{
-        position:"absolute",
-        right:15,
-        top:6,
-        paddingLeft:5,
-        paddingRight:5,
+    ModalLeft: {
+        position: "absolute",
+        right: 15,
+        top: 6,
+        paddingLeft: 5,
+        paddingRight: 5,
     },
-    danju:{
-        flex:1,
+    danju: {
+        flex: 1,
     },
-    viewStyle:{
-        backgroundColor:"#fffce6",
-        paddingLeft:25,
-        height:120,
+    viewStyle: {
+        backgroundColor: "#fffce6",
+        paddingLeft: 25,
+        height: 120,
     },
-    leftView:{
-        flexDirection:'row',
+    leftView: {
+        flexDirection: 'row',
         marginLeft: 8
     },
-    rightView:{
-        flexDirection:'row',
+    rightView: {
+        flexDirection: 'row',
         marginRight: 8
     },
-    Client:{
-        marginTop:10,
-        marginBottom:10,
-        flexDirection:'row',
+    Client: {
+        marginTop: 10,
+        marginBottom: 10,
+        flexDirection: 'row',
     },
-    client:{
-        fontSize:16,
-        color:"#555555",
+    client: {
+        fontSize: 16,
+        color: "#555555",
     },
-    ClientType:{
-        fontSize:16,
-        color:"#555555",
+    ClientType: {
+        fontSize: 16,
+        color: "#555555",
     },
-    goods:{
-        fontSize:16,
-        color:"#555555"
+    goods: {
+        fontSize: 16,
+        color: "#555555"
     },
-    ClientText:{
-        flex:2
+    ClientText: {
+        flex: 2
     },
-    GoodsNumber:{
-        fontSize:16,
-        color:"#555555"
+    GoodsNumber: {
+        fontSize: 16,
+        color: "#555555"
     },
-    Price1:{
-        fontSize:16,
-        fontWeight:"bold",
-        color:"#ff4e4e",
-        flex:2,
-        textAlign:"right"
+    Price1: {
+        fontSize: 16,
+        fontWeight: "bold",
+        color: "#ff4e4e",
+        flex: 2,
+        textAlign: "right"
     },
     modalStyle: {
-        backgroundColor:"#3e3d3d",
-        opacity:0.9,
-        flex:1,
+        backgroundColor: "#3e3d3d",
+        opacity: 0.9,
+        flex: 1,
     },
-    LoadCenter:{
-        flex:1,
+    LoadCenter: {
+        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
     },
-    loading:{
-        paddingLeft:15,
-        paddingRight:15,
-        paddingTop:15,
-        paddingBottom:15,
-        backgroundColor:"#000000",
-        opacity:0.8,
-        borderRadius:5,
+    loading: {
+        paddingLeft: 15,
+        paddingRight: 15,
+        paddingTop: 15,
+        paddingBottom: 15,
+        backgroundColor: "#000000",
+        opacity: 0.8,
+        borderRadius: 5,
     },
-    TextLoading:{
-        fontSize:17,
-        color:"#ffffff"
+    TextLoading: {
+        fontSize: 17,
+        color: "#ffffff"
     },
-    activity:{
-        marginBottom:5,
+    activity: {
+        marginBottom: 5,
     },
-    ScreenList:{
-        paddingTop:8,
-        paddingBottom:8,
-        flexDirection:"row",
-        backgroundColor:"#ffffff",
-        marginBottom:2,
+    ScreenList: {
+        paddingTop: 8,
+        paddingBottom: 8,
+        flexDirection: "row",
+        backgroundColor: "#ffffff",
+        marginBottom: 2,
     },
-    ScreenTitle:{
-        paddingTop:8,
-        paddingBottom:8,
-        height:55,
-        flexDirection:"row",
+    ScreenTitle: {
+        paddingTop: 8,
+        paddingBottom: 8,
+        height: 55,
+        flexDirection: "row",
     },
-    coulumnScreen:{
-        flex:1,
-        paddingLeft:5,
+    coulumnScreen: {
+        flex: 1,
+        paddingLeft: 5,
     },
-    coulumnText:{
-        fontSize:16,
-        textAlign:'center',
-        lineHeight:30,
+    coulumnText: {
+        fontSize: 16,
+        textAlign: 'center',
+        lineHeight: 30,
     },
-    Determine:{
-        marginTop:20,
-        flexDirection:"row"
+    Determine: {
+        marginTop: 20,
+        flexDirection: "row"
     },
-    Cancel:{
-        flex:1,
-        marginLeft:25,
-        backgroundColor:"#ff4e4e",
-        paddingTop:13,
-        paddingBottom:13,
-        borderRadius:5,
+    Cancel: {
+        flex: 1,
+        marginLeft: 25,
+        backgroundColor: "#ff4e4e",
+        paddingTop: 13,
+        paddingBottom: 13,
+        borderRadius: 5,
     },
-    CancelText:{
-        fontSize:16,
-        color:"#ffffff",
-        textAlign:"center",
+    CancelText: {
+        fontSize: 16,
+        color: "#ffffff",
+        textAlign: "center",
     },
-    footer:{
-        height:80,
-        flexDirection:"row",
-        borderTopWidth:1,
-        borderTopColor:"#f2f2f2"
+    footer: {
+        height: 80,
+        flexDirection: "row",
+        borderTopWidth: 1,
+        borderTopColor: "#f2f2f2"
     },
-    source:{
-        flexDirection:"row",
-        flex:1,
+    source: {
+        flexDirection: "row",
+        flex: 1,
     },
-    Home:{
-        flex:1,
+    Home: {
+        flex: 1,
         alignItems: 'center',
-        paddingTop:10,
-        backgroundColor:"#ffffff",
+        paddingTop: 10,
+        backgroundColor: "#ffffff",
     },
-    home1:{
-        color:'#999999',
-        fontSize:16,
-        marginTop:5,
-        flex:1,
+    home1: {
+        color: '#999999',
+        fontSize: 16,
+        marginTop: 5,
+        flex: 1,
     },
-    home2:{
-        color:'#ff4e4e',
-        fontSize:16,
-        marginTop:5,
-        flex:1,
+    home2: {
+        color: '#ff4e4e',
+        fontSize: 16,
+        marginTop: 5,
+        flex: 1,
     },
-    ShopCar:{
-        width:25,
-        height:25,
-        backgroundColor:"#ffba00",
-        color:"#ffffff",
-        textAlign:"center",
-        borderRadius:50,
-        position:"absolute",
-        top:10,
-        right:-42,
+    ShopCar: {
+        width: 25,
+        height: 25,
+        backgroundColor: "#ffba00",
+        color: "#ffffff",
+        textAlign: "center",
+        borderRadius: 50,
+        position: "absolute",
+        top: 10,
+        right: -42,
     },
-    Add:{
-        position:"absolute",
-        right:-50,
-        top:5,
-        color:"#ff4e4e",
-        fontWeight:"bold"
+    Add: {
+        position: "absolute",
+        right: -50,
+        top: 5,
+        color: "#ff4e4e",
+        fontWeight: "bold"
     },
-    Succeed:{
-        flex:1,
-        backgroundColor:"#ffffff",
+    Succeed: {
+        flex: 1,
+        backgroundColor: "#ffffff",
     },
-    SucceedCont:{
+    SucceedCont: {
         justifyContent: 'center',
         alignItems: 'center',
-        flex:1,
+        flex: 1,
     },
-    SucceedText:{
-        marginTop:20,
-        fontSize:18,
-        color:"#333333"
+    SucceedText: {
+        marginTop: 20,
+        fontSize: 18,
+        color: "#333333"
     },
-    DeterMine:{
-        position:"absolute",
-        bottom:20,
-        paddingTop:15,
-        paddingBottom:15,
-        borderRadius:25,
-        width:300,
-        backgroundColor:"#ff4e4e",
+    DeterMine: {
+        position: "absolute",
+        bottom: 20,
+        paddingTop: 15,
+        paddingBottom: 15,
+        borderRadius: 25,
+        width: 300,
+        backgroundColor: "#ff4e4e",
     },
-    DeterMineText:{
-        color:"#ffffff",
-        fontSize:16,
-        textAlign:"center"
+    DeterMineText: {
+        color: "#ffffff",
+        fontSize: 16,
+        textAlign: "center"
     },
-    rowBack:{
-        backgroundColor:"#ff4e4e",
-        paddingTop:18,
-        paddingBottom:18,
-        paddingRight:35
+    rowBack: {
+        backgroundColor: "#ff4e4e",
+        paddingTop: 18,
+        paddingBottom: 18,
+        paddingRight: 35
     },
-    rowBackText:{
-        color:"#ffffff",
-        fontSize:16,
-        textAlign:"right"
+    rowBackText: {
+        color: "#ffffff",
+        fontSize: 16,
+        textAlign: "right"
     }
 });

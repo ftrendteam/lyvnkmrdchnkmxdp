@@ -87,6 +87,7 @@ export default class Distrition extends Component {
         Storage.delete('BQNumber');
         Storage.delete('Modify');
         Storage.delete("PeiSong");
+        Storage.delete('SourceNumber');
         if(this.state.DepCode1==""||this.state.DepCode1==0){
             Storage.delete('DepCode');
         }else{
@@ -112,7 +113,6 @@ export default class Distrition extends Component {
      * 单号点击查询
      */
     Search(){
-        Storage.save('shopPandian','App_Client_NOYSPSQ');
         var nextRoute={
             name:"Distrition_list",
             component:Distrition_list,
@@ -120,6 +120,7 @@ export default class Distrition extends Component {
                 reloadView:(sCode)=>this._reloadView(sCode),
                 DepName:(DepName)=>this._DepName(DepName),
                 DepCode:(DepCode)=>this._DepCode(DepCode),
+                App_Client:'App_Client_NOYSPSQ'
             }
         };
         this.props.navigator.push(nextRoute)

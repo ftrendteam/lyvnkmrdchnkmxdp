@@ -242,6 +242,6 @@ const styles = StyleSheet.create({
         fontSize:16,
     },
     scrollview:{
-        marginBottom:120,
+        marginBottom:140,
     }
 });
