@@ -18,6 +18,7 @@ import Search from "./Search";
 import ProductCG_list from "./ProductCG_list";
 import ProductXP_list from "./ProductXP_list";
 import Distrition_list from "./Distrition_list";
+import ShoppingCart from "./ShoppingCart";//清单
 import PinLeiData from "../YHDan/PinLeiData";
 import NetUtils from "../utils/NetUtils";
 import Storage from '../utils/Storage';
@@ -80,7 +81,8 @@ export default class ProductSH extends Component {
                 SearchShopname1:(Suppcode1)=>this.SearchShopname1(Suppcode1),
                 DepName: (DepName) => this._DepName(DepName),
                 DepCode: (DepCode) => this._DepCode(DepCode),
-                App_Client:'App_Client_NOYSXPCGQ'
+                App_Client:'App_Client_NOYSXPCGQ',
+                invoice:"协配收货",
             }
         };
         this.props.navigator.push(nextRoute)
@@ -137,24 +139,46 @@ export default class ProductSH extends Component {
                 ToastAndroid.show("请选择供应商",ToastAndroid.SHORT);
                 return;
             }else{
-                var nextRoute={
-                    name:"Index",
-                    component:Index,
-                };
-                this.props.navigator.push(nextRoute);
-                this.Data();
+                if(this.state.suppcode1==""){
+                    this.Data();
+                    var nextRoute={
+                        name:"主页",
+                        component:Index
+                    };
+                    this.props.navigator.push(nextRoute);
+                    Storage.delete("PeiSong");
+                }else{
+                    this.Data();
+                    var nextRoute={
+                        name:"ShoppingCart",
+                        component:ShoppingCart,
+                    };
+                    this.props.navigator.push(nextRoute);
+                    Storage.save('PeiSong',"协配收货");
+                }
             }
         }else if(this.state.Disting=="1"){
             if(this.state.sCode1==""){
                 ToastAndroid.show("请选择供应商",ToastAndroid.SHORT);
                 return;
             }else {
-                var nextRoute = {
-                    name: "Search",
-                    component: Search,
-                };
-                this.props.navigator.push(nextRoute);
-                this.Data();
+                if(this.state.suppcode1==""){
+                    this.Data();
+                    var nextRoute = {
+                        name: "Search",
+                        component: Search,
+                    };
+                    this.props.navigator.push(nextRoute);
+                    Storage.delete("PeiSong");
+                }else{
+                    this.Data();
+                    var nextRoute={
+                        name:"ShoppingCart",
+                        component:ShoppingCart,
+                    };
+                    this.props.navigator.push(nextRoute);
+                    Storage.save('PeiSong',"协配收货");
+                }
             }
         }
 
@@ -168,14 +192,21 @@ export default class ProductSH extends Component {
         var str2=this.state.suppcode1;
         Storage.delete('StateMent');
         Storage.delete('BQNumber');
-        Storage.delete("PeiSong");
         Storage.delete('SourceNumber');
         if(this.state.DepCode1==""||this.state.DepCode1==0){
             Storage.delete('DepCode');
         }else{
             Storage.save('DepCode', this.state.DepCode1);
         }
-        Storage.save('YdCountm', '2');
+        if(this.state.suppcode1==""){
+            Storage.delete('DanHao');
+            Storage.save('YdCountm',"6");
+            Storage.save('Screen', '2');
+        }else{
+            Storage.save('DanHao',"App_Client_ProXPCGYWDetailQ");
+            Storage.save('YdCountm',"2");
+            Storage.save('Screen', '1');
+        }
         Storage.save('OrgFormno',str2);
         Storage.save('Name','协配收货');
         Storage.save('FormType','XPYSYW');
@@ -185,10 +216,9 @@ export default class ProductSH extends Component {
         Storage.save('historyClass','App_Client_ProXPYSDetailQ');
         Storage.save('ProYH','ProXPYS');
         Storage.save('YuanDan','1');
-        Storage.save('Screen','1');
         Storage.save('Date',data);
         Storage.save("scode",str);
-        Storage.save('shildshop',str1);
+        Storage.save('shildshop',str);
         if(this.state.suppcode1==""){
             Storage.save('Modify', '1');
         }

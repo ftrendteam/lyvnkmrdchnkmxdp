@@ -811,39 +811,166 @@ export default class Search extends Component {
                                         Storage.get('LinkUrl').then((LinkUrl) => {
                                             Storage.get('scode').then((scode) => {
                                                 dbAdapter.selectAidCode(reminder, 1).then((rows) => {
-                                                    for (let i = 0; i < rows.length; i++) {
-                                                        var row = rows.item(i);
-                                                        if (this.state.name == "商品采购" || this.state.name == "商品验收" || this.state.name == "协配采购" || this.state.name == "协配收货") {
-                                                            var SuppCode = scode;
-                                                        } else {
-                                                            var SuppCode = row.SuppCode;
+                                                    if(rows.length>1){
+                                                        this.Modal();
+                                                        this.dataRows = [];
+                                                        for (let i = 0; i < rows.length; i++) {
+                                                            var row = rows.item(i);
+                                                            this.dataRows.push(row);
                                                         }
-                                                        Storage.get('userName').then((userName) => {
-                                                            let params = {
-                                                                reqCode: "App_PosReq",
-                                                                reqDetailCode: "App_Client_CurrProdQry",
-                                                                ClientCode: this.state.ClientCode,
-                                                                sDateTime: Date.parse(new Date()),
-                                                                Sign: NetUtils.MD5("App_PosReq" + "##" + "App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs") + '',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
-                                                                username: userName,
-                                                                usercode: this.state.Usercode,
-                                                                SuppCode: SuppCode,
-                                                                ShopCode: this.state.ShopCode,
-                                                                ChildShopCode: this.state.ChildShopCode,
-                                                                ProdCode: row.ProdCode,
-                                                                OrgFormno: this.state.OrgFormno,
-                                                                FormType: FormType,
-                                                            };
-                                                            FetchUtil.post(LinkUrl, JSON.stringify(params)).then((data) => {
-                                                                var countm = JSON.stringify(data.countm);
-                                                                var ShopPrice = JSON.stringify(data.ShopPrice);
-                                                                if (data.retcode == 1) {
-                                                                    if (DepCode !== null) {
-                                                                        if (row.DepCode1 !== DepCode) {
-                                                                            ToastAndroid.show("请选择该品类下的商品", ToastAndroid.SHORT);
-                                                                            return;
+                                                        this.setState({
+                                                            dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
+                                                            dataRows: this.dataRows,
+                                                            Search:reminder
+                                                        })
+                                                    }else if(rows.length==1){
+                                                        for (let i = 0; i < rows.length; i++) {
+                                                            var row = rows.item(i);
+                                                            if (this.state.name == "商品采购" || this.state.name == "商品验收" || this.state.name == "协配采购" || this.state.name == "协配收货") {
+                                                                var SuppCode = scode;
+                                                            } else {
+                                                                var SuppCode = row.SuppCode;
+                                                            }
+                                                            Storage.get('userName').then((userName) => {
+                                                                let params = {
+                                                                    reqCode: "App_PosReq",
+                                                                    reqDetailCode: "App_Client_CurrProdQry",
+                                                                    ClientCode: this.state.ClientCode,
+                                                                    sDateTime: Date.parse(new Date()),
+                                                                    Sign: NetUtils.MD5("App_PosReq" + "##" + "App_Client_CurrProdQry" + "##" + Date.parse(new Date()) + "##" + "PosControlCs") + '',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
+                                                                    username: userName,
+                                                                    usercode: this.state.Usercode,
+                                                                    SuppCode: SuppCode,
+                                                                    ShopCode: this.state.ShopCode,
+                                                                    ChildShopCode: this.state.ChildShopCode,
+                                                                    ProdCode: row.ProdCode,
+                                                                    OrgFormno: this.state.OrgFormno,
+                                                                    FormType: FormType,
+                                                                };
+                                                                FetchUtil.post(LinkUrl, JSON.stringify(params)).then((data) => {
+                                                                    var countm = JSON.stringify(data.countm);
+                                                                    var ShopPrice = JSON.stringify(data.ShopPrice);
+                                                                    if (data.retcode == 1) {
+                                                                        if (DepCode !== null) {
+                                                                            if (row.DepCode1 !== DepCode) {
+                                                                                ToastAndroid.show("请选择该品类下的商品", ToastAndroid.SHORT);
+                                                                                return;
+                                                                            } else {
+                                                                                let numberFormat2 = NumberUtils.numberFormat2((row.ShopNumber) * (row.ShopPrice));
+                                                                                if (this.state.name == "商品采购" || this.state.name == "协配采购" || this.state.Modify == 1) {
+                                                                                    if (row.ShopNumber == 0) {
+                                                                                        this.setState({
+                                                                                            numberFormat2: 0.00,
+                                                                                            Number1: '',
+                                                                                        })
+                                                                                    } else {
+                                                                                        this.setState({
+                                                                                            numberFormat2: numberFormat2,
+                                                                                            Number1: row.ShopNumber,
+                                                                                        })
+                                                                                    }
+                                                                                    this.setState({
+                                                                                        ShopPrice: ShopPrice,
+                                                                                        ProdName: row.ProdName,
+                                                                                        Pid: row.Pid,
+                                                                                        Remark: row.ShopRemark,
+                                                                                        prototal: row.prototal,
+                                                                                        ProdCode: row.ProdCode,
+                                                                                        DepCode: row.DepCode1,
+                                                                                        SuppCode: row.SuppCode,
+                                                                                        BarCode: row.BarCode,
+                                                                                        ydcountm: countm,
+                                                                                        Search: "",
+                                                                                        modal: 1,
+                                                                                        IsIntCount: row.IsIntCount
+                                                                                    })
+                                                                                } else if (this.state.name == "售价调整") {
+                                                                                    dbAdapter.selectShopInfoData(row.Pid).then((datas) => {
+                                                                                        if (datas.length == 0) {
+                                                                                            this.setState({
+                                                                                                ProdName: row.ProdName,
+                                                                                                ShopPrice: row.ShopPrice,
+                                                                                                Pid: row.Pid,
+                                                                                                Number1: "",
+                                                                                                Remark: row.ShopRemark,
+                                                                                                prototal: row.ShopAmount,
+                                                                                                ProdCode: row.ProdCode,
+                                                                                                DepCode: row.DepCode1,
+                                                                                                SuppCode: row.SuppCode,
+                                                                                                BarCode: row.BarCode,
+                                                                                                NewNumber: "",
+                                                                                                focus: true,
+                                                                                                Search: "",
+                                                                                                PriceText: "",
+                                                                                                modal: 1,
+                                                                                                IsIntCount: row.IsIntCount
+                                                                                            })
+                                                                                        } else {
+                                                                                            for (let i = 0; i < datas.length; i++) {
+                                                                                                var Data = datas.item(i);
+                                                                                                this.setState({
+                                                                                                    ProdName: rows.item(0).ProdName,
+                                                                                                    ShopPrice: rows.item(0).ShopPrice,
+                                                                                                    Pid: rows.item(0).Pid,
+                                                                                                    Number1: 1,
+                                                                                                    Remark: row.ShopRemark,
+                                                                                                    prototal: row.ShopAmount,
+                                                                                                    ProdCode: row.ProdCode,
+                                                                                                    DepCode: row.DepCode1,
+                                                                                                    SuppCode: row.SuppCode,
+                                                                                                    BarCode: row.BarCode,
+                                                                                                    NewNumber: Data.ydcountm,
+                                                                                                    focus: true,
+                                                                                                    Search: "",
+                                                                                                    PriceText: "",
+                                                                                                    modal: 1,
+                                                                                                    IsIntCount: row.IsIntCount
+                                                                                                })
+                                                                                            }
+                                                                                        }
+                                                                                    })
+                                                                                } else {
+                                                                                    if (this.state.name == "标签采集" && row.ShopNumber == 0) {
+                                                                                        this.setState({
+                                                                                            Number1: 1,
+                                                                                        })
+                                                                                    } else {
+                                                                                        this.setState({
+                                                                                            numberFormat2: numberFormat2,
+                                                                                            Number1: row.ShopNumber,
+                                                                                        })
+                                                                                    }
+
+                                                                                    if (this.state.name !== "标签采集" && row.ShopNumber == 0) {
+                                                                                        this.setState({
+                                                                                            numberFormat2: 0.00,
+                                                                                            Number1: '',
+                                                                                        })
+                                                                                    } else {
+                                                                                        this.setState({
+                                                                                            numberFormat2: numberFormat2,
+                                                                                            Number1: row.ShopNumber,
+                                                                                        })
+                                                                                    }
+                                                                                    this.setState({
+                                                                                        ShopPrice: ShopPrice,
+                                                                                        ProdName: row.ProdName,
+                                                                                        Pid: row.Pid,
+                                                                                        Remark: row.ShopRemark,
+                                                                                        prototal: row.prototal,
+                                                                                        ProdCode: row.ProdCode,
+                                                                                        DepCode: row.DepCode1,
+                                                                                        SuppCode: row.SuppCode,
+                                                                                        BarCode: row.BarCode,
+                                                                                        ydcountm: countm,
+                                                                                        Search: "",
+                                                                                        modal: 1,
+                                                                                        IsIntCount: row.IsIntCount
+                                                                                    })
+                                                                                }
+                                                                            }
                                                                         } else {
-                                                                            let numberFormat2 = NumberUtils.numberFormat2((row.ShopNumber) * (row.ShopPrice));
+                                                                            let numberFormat2 = NumberUtils.numberFormat2((row.ShopNumber) * (ShopPrice));
                                                                             if (this.state.name == "商品采购" || this.state.name == "协配采购" || this.state.Modify == 1) {
                                                                                 if (row.ShopNumber == 0) {
                                                                                     this.setState({
@@ -871,7 +998,8 @@ export default class Search extends Component {
                                                                                     modal: 1,
                                                                                     IsIntCount: row.IsIntCount
                                                                                 })
-                                                                            } else if (this.state.name == "售价调整") {
+                                                                            }
+                                                                            else if (this.state.name == "售价调整") {
                                                                                 dbAdapter.selectShopInfoData(row.Pid).then((datas) => {
                                                                                     if (datas.length == 0) {
                                                                                         this.setState({
@@ -896,9 +1024,9 @@ export default class Search extends Component {
                                                                                         for (let i = 0; i < datas.length; i++) {
                                                                                             var Data = datas.item(i);
                                                                                             this.setState({
-                                                                                                ProdName: rows.item(0).ProdName,
-                                                                                                ShopPrice: rows.item(0).ShopPrice,
-                                                                                                Pid: rows.item(0).Pid,
+                                                                                                ProdName: row.ProdName,
+                                                                                                ShopPrice: row.ShopPrice,
+                                                                                                Pid: row.Pid,
                                                                                                 Number1: 1,
                                                                                                 Remark: row.ShopRemark,
                                                                                                 prototal: row.ShopAmount,
@@ -916,19 +1044,13 @@ export default class Search extends Component {
                                                                                         }
                                                                                     }
                                                                                 })
-                                                                            } else {
+                                                                            }
+                                                                            else {
                                                                                 if (this.state.name == "标签采集" && row.ShopNumber == 0) {
                                                                                     this.setState({
                                                                                         Number1: 1,
                                                                                     })
-                                                                                } else {
-                                                                                    this.setState({
-                                                                                        numberFormat2: numberFormat2,
-                                                                                        Number1: row.ShopNumber,
-                                                                                    })
-                                                                                }
-
-                                                                                if (this.state.name !== "标签采集" && row.ShopNumber == 0) {
+                                                                                } else if (this.state.name !== "标签采集" && row.ShopNumber == 0) {
                                                                                     this.setState({
                                                                                         numberFormat2: 0.00,
                                                                                         Number1: '',
@@ -956,121 +1078,15 @@ export default class Search extends Component {
                                                                                 })
                                                                             }
                                                                         }
+                                                                        this.Modal();
                                                                     } else {
-                                                                        let numberFormat2 = NumberUtils.numberFormat2((row.ShopNumber) * (ShopPrice));
-                                                                        if (this.state.name == "商品采购" || this.state.name == "协配采购" || this.state.Modify == 1) {
-                                                                            if (row.ShopNumber == 0) {
-                                                                                this.setState({
-                                                                                    numberFormat2: 0.00,
-                                                                                    Number1: '',
-                                                                                })
-                                                                            } else {
-                                                                                this.setState({
-                                                                                    numberFormat2: numberFormat2,
-                                                                                    Number1: row.ShopNumber,
-                                                                                })
-                                                                            }
-                                                                            this.setState({
-                                                                                ShopPrice: ShopPrice,
-                                                                                ProdName: row.ProdName,
-                                                                                Pid: row.Pid,
-                                                                                Remark: row.ShopRemark,
-                                                                                prototal: row.prototal,
-                                                                                ProdCode: row.ProdCode,
-                                                                                DepCode: row.DepCode1,
-                                                                                SuppCode: row.SuppCode,
-                                                                                BarCode: row.BarCode,
-                                                                                ydcountm: countm,
-                                                                                Search: "",
-                                                                                modal: 1,
-                                                                                IsIntCount: row.IsIntCount
-                                                                            })
-                                                                        } else if (this.state.name == "售价调整") {
-                                                                            dbAdapter.selectShopInfoData(row.Pid).then((datas) => {
-                                                                                if (datas.length == 0) {
-                                                                                    this.setState({
-                                                                                        ProdName: row.ProdName,
-                                                                                        ShopPrice: row.ShopPrice,
-                                                                                        Pid: row.Pid,
-                                                                                        Number1: "",
-                                                                                        Remark: row.ShopRemark,
-                                                                                        prototal: row.ShopAmount,
-                                                                                        ProdCode: row.ProdCode,
-                                                                                        DepCode: row.DepCode1,
-                                                                                        SuppCode: row.SuppCode,
-                                                                                        BarCode: row.BarCode,
-                                                                                        NewNumber: "",
-                                                                                        focus: true,
-                                                                                        Search: "",
-                                                                                        PriceText: "",
-                                                                                        modal: 1,
-                                                                                        IsIntCount: row.IsIntCount
-                                                                                    })
-                                                                                } else {
-                                                                                    for (let i = 0; i < datas.length; i++) {
-                                                                                        var Data = datas.item(i);
-                                                                                        this.setState({
-                                                                                            ProdName: row.ProdName,
-                                                                                            ShopPrice: row.ShopPrice,
-                                                                                            Pid: row.Pid,
-                                                                                            Number1: 1,
-                                                                                            Remark: row.ShopRemark,
-                                                                                            prototal: row.ShopAmount,
-                                                                                            ProdCode: row.ProdCode,
-                                                                                            DepCode: row.DepCode1,
-                                                                                            SuppCode: row.SuppCode,
-                                                                                            BarCode: row.BarCode,
-                                                                                            NewNumber: Data.ydcountm,
-                                                                                            focus: true,
-                                                                                            Search: "",
-                                                                                            PriceText: "",
-                                                                                            modal: 1,
-                                                                                            IsIntCount: row.IsIntCount
-                                                                                        })
-                                                                                    }
-                                                                                }
-                                                                            })
-                                                                        } else {
-                                                                            if (this.state.name == "标签采集" && row.ShopNumber == 0) {
-                                                                                this.setState({
-                                                                                    Number1: 1,
-                                                                                })
-                                                                            } else if (this.state.name !== "标签采集" && row.ShopNumber == 0) {
-                                                                                this.setState({
-                                                                                    numberFormat2: 0.00,
-                                                                                    Number1: '',
-                                                                                })
-                                                                            } else {
-                                                                                this.setState({
-                                                                                    numberFormat2: numberFormat2,
-                                                                                    Number1: row.ShopNumber,
-                                                                                })
-                                                                            }
-                                                                            this.setState({
-                                                                                ShopPrice: ShopPrice,
-                                                                                ProdName: row.ProdName,
-                                                                                Pid: row.Pid,
-                                                                                Remark: row.ShopRemark,
-                                                                                prototal: row.prototal,
-                                                                                ProdCode: row.ProdCode,
-                                                                                DepCode: row.DepCode1,
-                                                                                SuppCode: row.SuppCode,
-                                                                                BarCode: row.BarCode,
-                                                                                ydcountm: countm,
-                                                                                Search: "",
-                                                                                modal: 1,
-                                                                                IsIntCount: row.IsIntCount
-                                                                            })
-                                                                        }
+                                                                        alert(JSON.stringify(data))
                                                                     }
-                                                                    this.Modal();
-                                                                } else {
-                                                                    alert(JSON.stringify(data))
-                                                                }
-                                                            }, (err) => {
-                                                                alert("网络请求失败");
+                                                                }, (err) => {
+                                                                    alert("网络请求失败");
+                                                                })
                                                             })
-                                                        })
+                                                        }
                                                     }
                                                 })
                                             })
@@ -1161,6 +1177,12 @@ export default class Search extends Component {
                 ShoppData: tags
             })
         })
+        Storage.get('OrgFormno').then((tags) => {
+            this.setState({
+                OrgFormno: tags
+            });
+        });
+
 
     }
 
@@ -1379,7 +1401,8 @@ export default class Search extends Component {
                                                         })
                                                     }
                                                 }
-                                            } else {
+                                            }
+                                            else {
                                                 let numberFormat2 = NumberUtils.numberFormat2((rowData.ShopNumber) * (ShopPrice));
                                                 if (this.state.name == "商品采购" || this.state.name == "协配采购" || this.state.Modify == 1) {
                                                     if (rowData.ShopNumber == 0) {
@@ -1452,7 +1475,8 @@ export default class Search extends Component {
                                                             }
                                                         }
                                                     })
-                                                } else {
+                                                }
+                                                else {
                                                     if (this.state.BqYs == "1" && rowData.ShopNumber == 0) {
                                                         this.setState({
                                                             Number1: 1,
@@ -1489,7 +1513,7 @@ export default class Search extends Component {
                                         }
                                         this.Modal();
                                     } else {
-                                        alert(JSON.stringify(data))
+                                        // alert(JSON.stringify(data))
                                     }
                                 }, (err) => {
                                     alert("网络请求失败");
@@ -1518,7 +1542,7 @@ export default class Search extends Component {
     }
 
     onNumber() {
-        if (this.state.YdCountm == 6 && this.state.ydcountm == 0) {
+        if (this.state.name=="商品配送" && this.state.ydcountm == 0) {
             alert("库存为0，该商品不能进行配送")
         } else {
             if (this.state.Number1 < 0) {
@@ -1962,7 +1986,7 @@ export default class Search extends Component {
         if (this.state.Number1 == "") {
             ToastAndroid.show('商品数量不能为空', ToastAndroid.SHORT);
         } else {
-            if (this.state.YdCountm == 6 && this.state.ydcountm == 0) {
+            if (this.state.name=="商品配送" && this.state.ydcountm == 0) {
                 alert("库存为0，该商品不能进行配送")
             } else {
                 if (this.state.Number1 < 0) {
@@ -2283,7 +2307,7 @@ export default class Search extends Component {
     }
 
     pressPop() {
-        if (this.state.YdCountm == 6 && this.state.ydcountm == 0) {
+        if (this.state.name=="商品配送" && this.state.ydcountm == 0) {
             alert("库存为0，该商品不能进行配送")
         } else {
             if (this.state.Number1 == "") {
@@ -2754,7 +2778,7 @@ export default class Search extends Component {
                                                 </View>
                                             </View>
                                             {
-                                                (this.state.YdCountm == 1 || this.state.YdCountm == 6 || this.state.YdCountm == "盘点") ?
+                                                (this.state.YdCountm == 1|| this.state.YdCountm == "盘点"||this.state.YdCountm==6&&this.state.OrgFormno==null) ?
                                                     <View style={styles.List}>
                                                         <View style={styles.left2}>
                                                             <Text style={styles.left}>现在库存</Text>
@@ -2763,7 +2787,7 @@ export default class Search extends Component {
                                                     </View> : null
                                             }
                                             {
-                                                (this.state.YdCountm == 2) ?
+                                                (this.state.OrgFormno!==null) ?
                                                     <View style={styles.List}>
                                                         <View style={styles.left2}>
                                                             <Text style={styles.left}>原单数量</Text>

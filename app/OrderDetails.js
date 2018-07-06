@@ -93,6 +93,12 @@ export default class GoodsDetails extends Component {
             })
         })
 
+        Storage.get('OrgFormno').then((tags) => {
+            this.setState({
+                OrgFormno: tags
+            });
+        });
+
         Storage.get('YuanDan').then((tags)=>{
             if(tags==1){
                 if(this.state.ydcountm>0&&this.state.Number==""){
@@ -179,7 +185,7 @@ export default class GoodsDetails extends Component {
             });
         }
         else{
-            if(this.state.YdCountm==6&&this.state.ydcountm==0){
+            if(this.state.name=="商品配送"&&this.state.ydcountm==0){
                 ToastAndroid.show('库存为0，该商品不能进行配送', ToastAndroid.SHORT);
             } else {
                 if(this.state.Number<0){
@@ -418,7 +424,7 @@ export default class GoodsDetails extends Component {
                 ShopPrice:Modify,
             })
             if(this.state.OrderDetails==1){
-                if(this.state.YdCountm==6&&this.state.ydcountm==0){
+                if(this.state.name=="商品配送"&&this.state.ydcountm==0){
                     ToastAndroid.show('库存为0，该商品不能进行配送', ToastAndroid.SHORT);
                 }else {
                     if(this.state.Number<0){
@@ -855,7 +861,7 @@ export default class GoodsDetails extends Component {
         if(this.state.Number==""&&this.state.BQNumber==""){
             ToastAndroid.show('商品数量不能为空', ToastAndroid.SHORT);
         }else{
-            if(this.state.YdCountm==6&&this.state.ydcountm==0){
+            if(this.state.name=="商品配送"&&this.state.ydcountm==0){
                 ToastAndroid.show('库存为0，该商品不能进行配送', ToastAndroid.SHORT);
             }
             else {
@@ -1334,7 +1340,7 @@ export default class GoodsDetails extends Component {
                     }
                 </View>
                 {
-                    (this.state.YdCountm==1||this.state.YdCountm==6||this.state.YdCountm=="盘点")?
+                    (this.state.YdCountm==1||this.state.YdCountm=="盘点"||this.state.YdCountm==6&&this.state.OrgFormno==null)?
                     <View style={styles.List}>
                         <View style={styles.left2}>
                             <Text style={styles.left}>现在库存</Text>
@@ -1343,7 +1349,7 @@ export default class GoodsDetails extends Component {
                     </View>:null
                 }
                 {
-                    (this.state.YdCountm==2)?
+                    (this.state.OrgFormno!==null)?
                         <View style={styles.List}>
                             <View style={styles.left2}>
                                 <Text style={styles.left}>原单数量</Text>

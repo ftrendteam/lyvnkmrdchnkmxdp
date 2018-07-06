@@ -90,6 +90,7 @@ export default class Query extends Component {
         var str=this.state.sCode1;
         var date = new Date();
         var data=JSON.stringify(date.getTime());
+        Storage.delete('DanHao');
         Storage.delete('OrgFormno');
         Storage.delete('Screen');
         Storage.delete('scode');
@@ -124,7 +125,8 @@ export default class Query extends Component {
             component:Distrition_list,
             params: {
                 reloadView:(sCode)=>this._reloadView(sCode),
-                App_Client:'App_Client_NoEndPCQ'
+                App_Client:'App_Client_NoEndPCQ',
+                invoice:"商品盘点",
             }
         };
         this.props.navigator.push(nextRoute)

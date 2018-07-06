@@ -152,6 +152,7 @@ export default class ProductXP extends Component {
         var data=JSON.stringify(date.getTime());
         var str=this.state.sCode1;
         var str1=this.state.shopname1;
+        Storage.delete('DanHao');
         Storage.delete('YuanDan');
         Storage.delete('Screen');
         Storage.delete('OrgFormno');

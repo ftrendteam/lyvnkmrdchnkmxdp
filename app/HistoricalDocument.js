@@ -190,7 +190,6 @@ export default class HistoricalDocument extends Component {
                             if (this.dataRows == 0) {
                                 return;
                             } else {
-                                console.log("datarows=",JSON.stringify(this.dataRows));
                                 this.setState({
                                     dataSource: this.state.dataSource.cloneWithRows(this.dataRows)
                                 })
@@ -206,7 +205,6 @@ export default class HistoricalDocument extends Component {
                     })
                 })
             });
-
         });
     }
 

@@ -84,11 +84,6 @@ export default class PinLei extends Component {
         if(this.state.Disting=="0") {
             var date = new Date();
             var data=JSON.stringify(date.getTime());
-            var nextRoute={
-                name:"Index",
-                component:Index
-            };
-            this.props.navigator.push(nextRoute);
             if(this.state.invoice=="门店要货"){
                 this.delete();
                 Storage.save('Name', '门店要货');
@@ -150,15 +145,19 @@ export default class PinLei extends Component {
                 Storage.save('valueOf', 'App_Client_ProTJ');//门店要货提交
                 Storage.save('history', 'App_Client_ProTJQ');//门店要货查询
                 Storage.save('historyClass', 'App_Client_ProTJDetailQ');//门店要货明细查询
+            }else if(this.state.invoice=="移动销售"){
+                this.delete();
+                Storage.save("Name", "移动销售");
+                Storage.save('YdCountm', '4');
             }
+            var nextRoute={
+                name:"Index",
+                component:Index
+            };
+            this.props.navigator.push(nextRoute);
         }else if(this.state.Disting=="1"){
             var date = new Date();
             var data=JSON.stringify(date.getTime());
-            var nextRoute={
-                name:"Search",
-                component:Search
-            };
-            this.props.navigator.push(nextRoute);
             if(this.state.invoice=="门店要货"){
                 this.delete();
                 Storage.save('Name', '门店要货');
@@ -224,12 +223,22 @@ export default class PinLei extends Component {
                 Storage.save('valueOf', 'App_Client_ProTJ');//门店要货提交
                 Storage.save('history', 'App_Client_ProTJQ');//门店要货查询
                 Storage.save('historyClass', 'App_Client_ProTJDetailQ');//门店要货明细查询
+            }else if(this.state.invoice=="移动销售"){
+                this.delete();
+                Storage.save("Name", "移动销售");
+                Storage.save('YdCountm', '4');
             }
+            var nextRoute={
+                name:"Search",
+                component:Search
+            };
+            this.props.navigator.push(nextRoute);
         }
 
     }
 
     delete(){
+        Storage.delete('DanHao');
         Storage.delete('OrgFormno');
         Storage.delete('scode');
         Storage.delete('shildshop');

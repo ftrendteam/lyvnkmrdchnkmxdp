@@ -65,7 +65,6 @@ export default class Sell extends Component {
         }
         this.dataRow = [];
         this.TblRow = [];
-        this.ShopData = [];
     }
 
     modal() {
@@ -236,168 +235,105 @@ export default class Sell extends Component {
     Device() {
         DeviceEventEmitter.addListener("code", (reminder) => {
             decodepreprint.init(reminder, dbAdapter);
-            if ((reminder.length == 13 && deCode13.deCodePreFlag(reminder))) {//13位条码解析
-                new Promise.all([deCode13.deCodeProdCode(reminder, dbAdapter), deCode13.deCodeTotile(reminder, dbAdapter)]).then((result) => {
-                    if (result.length == 2) {
-                        let prodCode = result[0];
-                        let price = result[1];
-                        dbAdapter.selectProdCode(prodCode, 1).then((prods) => {
-                            if (prods.length == 0) {
-                                ToastAndroid.show("商品不存在", ToastAndroid.SHORT);
-                                return;
-                            }
-                            var row = prods.item(0);
-                            let newShopNumber = BigDecimalUtils.divide(price, row.StdPrice, 2);
-
-                            var DataRows = {
-                                'ProdCode': row.ProdCode,
-                                'ProdName': row.ProdName,
-                                'ShopPrice': row.StdPrice,
-                                'ShopNumber': newShopNumber,
-                                'ShopAmount': price,
-                                'Pid': row.Pid,
-                            };
-                            this.dataRow.push(DataRows);
-
-                            var SHopAMount = NumberUtils.numberFormat2(row.ShopAmount);
-                            shopAmount += Number(SHopAMount);
-                            this.setState({
-                                //vipPrice:vipPrice,
-                                MnCode: "",
-                                ShopNumber: BigDecimalUtils.add(this.state.ShopNumber, newShopNumber, 2),
-                                ShopAmount: BigDecimalUtils.add(this.state.ShopAmount, price, 2),
-                                dataSource: this.state.dataSource.cloneWithRows(this.dataRow),
-                            });
-                            var shopInfoData = [];
-                            var shopInfo = {};
-                            shopInfo.Pid = row.Pid;
-                            shopInfo.ProdCode = row.ProdCode;
-                            shopInfo.prodname = row.ProdName;
-                            shopInfo.countm = newShopNumber;
-                            shopInfo.ShopPrice = row.StdPrice;
-                            shopInfo.prototal = price;
-                            shopInfo.promemo = "";
-                            shopInfo.DepCode = row.DepCode;
-                            shopInfo.ydcountm = "";
-                            shopInfo.SuppCode = row.SuppCode;
-                            shopInfo.BarCode = row.BarCode;
-                            shopInfoData.push(shopInfo);
-                            //let vipPrice = VipPrice.vipPrice(row,shopInfoData);
-                            //let VIPprice = BigDecimalUtils.subtract(shopAmount,vipPrice,2);
-                            //this.setState({
-                            //  ShopNumber: shopnumber,//数量
-                            //  ShopAmount: VIPprice,//总金额this.dataRow
-                            //  dataSource: this.state.dataSource.cloneWithRows(this.dataRow),
-                            //})
-                            //调用插入表方法
-                            dbAdapter.insertShopInfo(shopInfoData, "1");
-                            //this._dbSearch();
-                            //_dbSearch()
-                        });
-                    }
-                });
-            } else if (reminder.length == 18 && decodepreprint.deCodePreFlag()) {
+            if ((reminder.length == 18 && decodepreprint.deCodePreFlag())) {
+                this.ShopData = [];
                 new Promise.all([decodepreprint.deCodeProdCode(), decodepreprint.deCodeTotal(), decodepreprint.deCodeWeight()]).then((results) => {
                     if (results.length == 3) {
                         let prodCode = results[0];
-                        let total = results[1];
-                        let weight = results[2];
-                        dbAdapter.selectProdCode(prodCode, 1).then((product) => {
-                            let length = rows.length;
-                            if (product.length != 0) {
-                                var row = product.item(0);
-                                var DataRows = {
-                                    'ProdCode': row.ProdCode,
-                                    'ProdName': row.ProdName,
-                                    'ShopPrice': row.StdPrice,
-                                    'ShopNumber': weight,
-                                    'ShopAmount': total,
-                                    'Pid': row.Pid,
-                                };
-                                this.dataRow.push(DataRows);
-                                this.setState({
-                                    //vipPrice:vipPrice,
-                                    MnCode: "",
-                                    ShopNumber: BigDecimalUtils.add(this.state.ShopNumber, weight, 2),
-                                    ShopAmount: BigDecimalUtils.add(this.state.ShopAmount, total, 2),
-                                    dataSource: this.state.dataSource.cloneWithRows(this.dataRow),
-                                });
-
-                                var shopInfoData = [];
-                                var shopInfo = {};
-                                shopInfo.Pid = row.Pid;
-                                shopInfo.ProdCode = row.ProdCode;
-                                shopInfo.prodname = row.ProdName;
-                                shopInfo.countm = weight;
-                                shopInfo.ShopPrice = row.StdPrice;
-                                shopInfo.prototal = total;
-                                shopInfo.promemo = "";
-                                shopInfo.DepCode = row.DepCode;
-                                shopInfo.ydcountm = "";
-                                shopInfo.SuppCode = row.SuppCode;
-                                shopInfo.BarCode = row.BarCode;
-                                shopInfoData.push(shopInfo);
-                                //调用插入表方法
-                                dbAdapter.insertShopInfo(shopInfoData, "1");
+                        dbAdapter.selectAidCode(prodCode, 1).then((rows) => {
+                            if (rows.length == 0) {
+                                ToastAndroid.show("商品不存在", ToastAndroid.SHORT);
+                                return;
+                            }
+                            else{
+                                if (DepCode !== null) {
+                                    for (let i = 0; i < rows.length; i++) {
+                                        var row = rows.item(i);
+                                        if (row.DepCode1 !== DepCode) {
+                                            ToastAndroid.show("请选择该品类下的商品", ToastAndroid.SHORT);
+                                            return;
+                                        } else {
+                                            this.ShopData.push(row);//展示商品数组
+                                        }
+                                    }
+                                    this.setState({
+                                        ShopData: this.state.ShopData.cloneWithRows(this.ShopData),
+                                    });
+                                    this._ShopList();
+                                }else{
+                                    for (let i = 0; i < rows.length; i++) {
+                                        var row = rows.item(i);
+                                        this.ShopData.push(row);
+                                    }
+                                    this.setState({
+                                        ShopData: this.state.ShopData.cloneWithRows(this.ShopData),
+                                    });
+                                    this._ShopList();
+                                }
                             }
                         })
                     }
                 })
-            } else {
-                dbAdapter.selectAidCode(reminder, 1).then((rows) => {
-                    let length = rows.length;
-                    if (length == 0) {
-                        alert("助记码不存在")
-                    } else {
-                        var shopnumber = 0;
-                        var shopAmount = 0;
-                        for (let i = 0; i < length; i++) {
-                            var row = rows.item(i);
-                            var ShopPrice = row.ShopPrice;
-                            var prototal = BigDecimalUtils.multiply(this.state.Countm, row.ShopPrice, 2);
-                            var number = row.ShopNumber;
-                            shopnumber = BigDecimalUtils.add(this.state.Countm, this.state.ShopNumber, 2);
-                            row.ShopNumber = this.state.Countm;
-                            row.ShopAmount = prototal;
-
-                            this.dataRow.push(row);//展示商品数组
-                        }
-                        ;
-                        shopAmount = BigDecimalUtils.add(ShopPrice, this.state.ShopAmount, 2);
-                        this.setState({
-                            MnCode: "",
-                            ShopNumber: shopnumber,
-                            ShopAmount: shopAmount,
-                            dataSource: this.state.dataSource.cloneWithRows(this.dataRow),
-                        });
-                        var shopInfoData = [];
-                        var shopInfo = {};
-                        shopInfo.Pid = row.Pid;
-                        shopInfo.ProdCode = row.ProdCode;
-                        shopInfo.prodname = row.ProdName;
-                        shopInfo.countm = this.state.Countm;
-                        shopInfo.ShopPrice = row.ShopPrice;
-                        shopInfo.prototal = (this.state.Countm) * (row.ShopPrice);
-                        shopInfo.promemo = this.state.promemo;
-                        shopInfo.DepCode = row.DepCode;
-                        shopInfo.ydcountm = "";
-                        shopInfo.SuppCode = row.SuppCode;
-                        shopInfo.BarCode = row.BarCode;
-                        shopInfoData.push(shopInfo);
-                        //调用插入表方法
-                        dbAdapter.insertShopInfo(shopInfoData, "1");
-                        //this._dbSearch();
-                        let vipPrice = VipPrice.vipPrice(TblRow1[0], this.TblRow);
-                        let newPrice = BigDecimalUtils.subtract(shopAmount, vipPrice, 2);
-                        let allPrice = 0;
-                        for (let i = 0; i < this.dataRow.length; i++) {
-                            allPrice = BigDecimalUtils.add(allPrice, this.dataRow[i].ShopAmount, 2);
-                        }
-                        this.setState({
-                            ShopAmount: allPrice,
-                        });
+                DeviceEventEmitter.removeAllListeners()
+            }
+            else if ((reminder.length == 13 && deCode13.deCodePreFlag(reminder))) {//13位条码解析
+                this.ShopData = [];
+                new Promise.all([deCode13.deCodeProdCode(reminder, dbAdapter), deCode13.deCodeTotile(reminder, dbAdapter)]).then((result) => {
+                    if (result.length == 2) {
+                        let prodCode = result[0];//解析出来的prodcode用来selectaidcode接口传入prodcode
+                        dbAdapter.selectAidCode(prodCode, 1).then((rows) => {
+                            if (rows.length == 0) {
+                                ToastAndroid.show("商品不存在", ToastAndroid.SHORT);
+                                return;
+                            }else{
+                                if (DepCode !== null) {
+                                    for (let i = 0; i < rows.length; i++) {
+                                        var row = rows.item(i);
+                                        if (row.DepCode1 !== DepCode) {
+                                            ToastAndroid.show("请选择该品类下的商品", ToastAndroid.SHORT);
+                                            return;
+                                        } else {
+                                            this.ShopData.push(row);//展示商品数组
+                                        }
+                                    }
+                                    this.setState({
+                                        ShopData: this.state.ShopData.cloneWithRows(this.ShopData),
+                                    });
+                                    this._ShopList();
+                                }else{
+                                    for (let i = 0; i < rows.length; i++) {
+                                        var row = rows.item(i);
+                                        this.ShopData.push(row);
+                                    }
+                                    this.setState({
+                                        ShopData: this.state.ShopData.cloneWithRows(this.ShopData),
+                                    });
+                                    this._ShopList();
+                                }
+                            }
+                        })
                     }
                 })
+                DeviceEventEmitter.removeAllListeners()
+            }
+            else {
+                this.ShopData = [];
+                dbAdapter.selectAidCode(this.state.MnCode, 1).then((rows) => {
+                    if (rows.length == 0) {
+                        ToastAndroid.show("商品不存在", ToastAndroid.SHORT);
+                        return;
+                    } else {
+                        for (let i = 0; i < rows.length; i++) {
+                            var row = rows.item(i);
+                            this.ShopData.push(row);//展示商品数组
+                        }
+                        this.setState({
+                            ShopData: this.state.ShopData.cloneWithRows(this.ShopData),
+                        });
+                        this._ShopList();
+                    }
+                });
+                DeviceEventEmitter.removeAllListeners()
             }
         })
     }
@@ -719,6 +655,7 @@ export default class Sell extends Component {
             }
             decodepreprint.init(reminder, dbAdapter);
             if ((reminder.length == 18 && decodepreprint.deCodePreFlag())) {
+                this.ShopData = [];
                 new Promise.all([decodepreprint.deCodeProdCode(), decodepreprint.deCodeTotal(), decodepreprint.deCodeWeight()]).then((results) => {
                     if (results.length == 3) {
                         let prodCode = results[0];
@@ -758,6 +695,7 @@ export default class Sell extends Component {
                 })
             }
             else if ((reminder.length == 13 && deCode13.deCodePreFlag(reminder))) {//13位条码解析
+                this.ShopData = [];
                 new Promise.all([deCode13.deCodeProdCode(reminder, dbAdapter), deCode13.deCodeTotile(reminder, dbAdapter)]).then((result) => {
                     if (result.length == 2) {
                         let prodCode = result[0];//解析出来的prodcode用来selectaidcode接口传入prodcode
@@ -796,6 +734,7 @@ export default class Sell extends Component {
                 })
             }
             else {
+                this.ShopData = [];
                 dbAdapter.selectAidCode(this.state.MnCode, 1).then((rows) => {
                     if (rows.length == 0) {
                         ToastAndroid.show("商品不存在", ToastAndroid.SHORT);
@@ -1059,7 +998,7 @@ export default class Sell extends Component {
                         <View style={styles.Cont}>
                             <View style={styles.BouncesTitle}>
                                 <Text style={[styles.TitleText, {fontSize: 18}]}>商品列表</Text>
-                                <TouchableOpacity onPress={this.CloseShopList.bind(this)} style={styles.closeImage}>
+                                <TouchableOpacity style={styles.closeImage}>
                                     <Image source={require("../images/2_02.png")}></Image>
                                 </TouchableOpacity>
                             </View>

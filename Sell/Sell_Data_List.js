@@ -45,12 +45,6 @@ export default class Sell_Data_List extends Component {
 
     componentDidMount(){
         InteractionManager.runAfterInteractions(() => {
-            Storage.get('invoice').then((tags)=>{
-                this.setState({
-                    invoice:tags
-                })
-            });
-
             Storage.get('Sell').then((tags)=>{
                 this.setState({
                     Sell:tags

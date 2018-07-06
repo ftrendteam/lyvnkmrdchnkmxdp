@@ -16,6 +16,7 @@ import {
 import Index from "../app/Index";
 import Distrition_list from "../app/Distrition_list";
 import Search from "../app/Search";
+import ShoppingCart from "../app/ShoppingCart";
 import PinLeiData from "../YHDan/PinLeiData";
 import SalesMan from "./SalesMan";
 import Customers from "./Customers";
@@ -104,6 +105,8 @@ export default class WholeSale extends Component {
             component:Distrition_list,//app文件夹
             params: {
                 SourceNumber:(SourceNumber)=>this._SourceNumber(SourceNumber),
+                Customers:(Customers)=>this._Customers(Customers),
+                SalesMan:(SalesMan)=>this._SalesMan(SalesMan),
                 App_Client:'App_Client_NOProWXHQ'
             }
         };
@@ -183,25 +186,65 @@ export default class WholeSale extends Component {
                 Storage.delete('BQNumber');
                 Storage.delete('YdCountm');
                 Storage.delete('Modify');
-                Storage.delete("PeiSong");
                 Storage.delete('StateMent');
                 if(this.state.DepName1==""&&this.state.DepCode1==""){
                     Storage.delete('DepCode');
                 }else{
                     Storage.save('DepCode', this.state.DepCode1);
                 }
+                if(this.state.SourceNumber1==""){
+                    Storage.delete('DanHao');
+                    Storage.save('YdCountm',"6");
+                    Storage.save('Screen', '2');
+                }else{
+                    Storage.save('DanHao',"App_Client_ProWBJYWDetailQ");
+                    Storage.save('YdCountm',"2");
+                    Storage.save('Screen', '1');
+                }
                 Storage.save('Name', '批发销售');
                 Storage.save('FormType', 'PFXHYW');
                 Storage.save('ProYH', 'ProWXH');
                 Storage.save('FormCheck', 'PFXHYW');
-                Storage.save('SourceNumber', this.state.SourceNumber1);
-                Storage.save('YdCountm', '2');
-                Storage.save('Screen','1');
+                Storage.save('SourceNumber', this.state.SalesMan1);
                 //将内容保存到本地数据库
                 Storage.save('valueOf', 'App_Client_ProWXH');
                 Storage.save('history', 'App_Client_ProWXHQ');
                 Storage.save('historyClass', 'App_Client_ProWXHDetailQ');
+                if(this.state.Disting=="0") {
+                    if(this.state.SourceNumber1==""){
+                        var nextRoute={
+                            name:"Index",
+                            component:Index
+                        };
+                        this.props.navigator.push(nextRoute);
+                        Storage.delete("PeiSong");
+                    }else{
+                        var nextRoute={
+                            name:"ShoppingCart",
+                            component:ShoppingCart,
+                        };
+                        this.props.navigator.push(nextRoute);
+                        Storage.save('PeiSong',"批发销售");
+                    }
+                }else if(this.state.Disting=="1"){
+                    if(this.state.SourceNumber1==""){
+                        var nextRoute={
+                            name:"Search",
+                            component:Search
+                        };
+                        this.props.navigator.push(nextRoute);
+                        Storage.delete("PeiSong");
+                    }else{
+                        var nextRoute={
+                            name:"ShoppingCart",
+                            component:ShoppingCart,
+                        };
+                        this.props.navigator.push(nextRoute);
+                        Storage.save('PeiSong',"批发销售");
+                    }
+                }
             }else if(this.state.invoice=="批发报价"){
+                Storage.delete('DanHao');
                 Storage.delete('OrgFormno');
                 Storage.delete('scode');
                 Storage.delete('shildshop');
@@ -228,24 +271,24 @@ export default class WholeSale extends Component {
                 Storage.save('valueOf', 'App_Client_ProWBH');
                 Storage.save('history', 'App_Client_ProWBHQ');
                 Storage.save('historyClass', 'App_Client_ProWBHDetailQ');
+                if(this.state.Disting=="0") {
+                    var nextRoute={
+                        name:"Index",
+                        component:Index
+                    };
+                    this.props.navigator.push(nextRoute);
+                }else if(this.state.Disting=="1"){
+                    var nextRoute={
+                        name:"Search",
+                        component:Search
+                    };
+                    this.props.navigator.push(nextRoute);
+                }
             }
             Storage.save('Date', data);
-            Storage.save('OrgFormno', this.state.SalesMan1);
+            Storage.save('OrgFormno', this.state.SourceNumber1);
             Storage.save('scode', this.state.Customers1);
             Storage.save('shildshop', this.state.Plan1);
-            if(this.state.Disting=="0") {
-                var nextRoute={
-                    name:"Index",
-                    component:Index
-                };
-                this.props.navigator.push(nextRoute);
-            }else if(this.state.Disting=="1"){
-                var nextRoute={
-                    name:"Search",
-                    component:Search
-                };
-                this.props.navigator.push(nextRoute);
-            }
         }
     }
 
@@ -258,7 +301,6 @@ export default class WholeSale extends Component {
                             <Image source={require("../images/2_01.png")} style={styles.HeaderImage}></Image>
                         </TouchableOpacity>
                         <Text style={styles.HeaderList}>{this.state.invoice}</Text>
-
                     </View>
                 </View>
                 <View style={styles.ContList}>

@@ -36,11 +36,6 @@ export default class CKu extends Component {
     }
     componentDidMount(){
         InteractionManager.runAfterInteractions(() => {
-            Storage.get('invoice').then((tags)=>{
-                this.setState({
-                    invoice:tags
-                })
-            })
             this.fetch();
         });
     }

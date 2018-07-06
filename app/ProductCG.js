@@ -127,6 +127,7 @@ export default class ProductCG extends Component {
         var str=this.state.sCode1;
         var date = new Date();
         var data=JSON.stringify(date.getTime());
+        Storage.delete('DanHao');
         Storage.delete('OrgFormno');
         Storage.delete('shildshop');
         Storage.delete('StateMent');

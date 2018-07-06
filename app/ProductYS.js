@@ -17,6 +17,7 @@ import Index from "./Index";
 import Search from "./Search";
 import Distrition_list from "./Distrition_list";
 import ProductCG_list from "./ProductCG_list";
+import ShoppingCart from "./ShoppingCart";//清单
 import PinLeiData from "../YHDan/PinLeiData";
 import NetUtils from "../utils/NetUtils";
 import Storage from '../utils/Storage';
@@ -89,12 +90,23 @@ export default class ProductYS extends Component {
                 ToastAndroid.show("请选择供应商",ToastAndroid.SHORT);
                 return;
             }else{
-                var nextRoute={
-                    name:"Index",
-                    component:Index,
-                };
-                this.props.navigator.push(nextRoute);
-                this.Data();
+                if(this.state.suppcode1==""){
+                    this.Data();
+                    var nextRoute={
+                        name:"主页",
+                        component:Index
+                    };
+                    this.props.navigator.push(nextRoute);
+                    Storage.delete("PeiSong");
+                }else{
+                    this.Data();
+                    var nextRoute={
+                        name:"ShoppingCart",
+                        component:ShoppingCart,
+                    };
+                    this.props.navigator.push(nextRoute);
+                    Storage.save('PeiSong',"商品验收");
+                }
             }
         }
         else if(this.state.Disting=="1"){
@@ -103,12 +115,23 @@ export default class ProductYS extends Component {
                 ToastAndroid.show("请选择供应商",ToastAndroid.SHORT);
                 return;
             }else{
-                var nextRoute={
-                    name:"Search",
-                    component:Search,
-                };
-                this.props.navigator.push(nextRoute);
-                this.Data();
+                if(this.state.suppcode1==""){
+                    this.Data();
+                    var nextRoute = {
+                        name: "Search",
+                        component: Search,
+                    };
+                    this.props.navigator.push(nextRoute);
+                    Storage.delete("PeiSong");
+                }else{
+                    this.Data();
+                    var nextRoute={
+                        name:"ShoppingCart",
+                        component:ShoppingCart,
+                    };
+                    this.props.navigator.push(nextRoute);
+                    Storage.save('PeiSong',"商品验收");
+                }
             }
         }
     }
@@ -127,7 +150,15 @@ export default class ProductYS extends Component {
         }else{
             Storage.save('DepCode', this.state.DepCode1);
         }
-        Storage.save('YdCountm', '2');
+        if(this.state.suppcode1==""){
+            Storage.delete('DanHao');
+            Storage.save('YdCountm',"6");
+            Storage.save('Screen', '2');
+        }else{
+            Storage.save('DanHao',"App_Client_ProCGYHYWDetailQ");
+            Storage.save('YdCountm',"2");
+            Storage.save('Screen', '1');
+        }
         Storage.save('OrgFormno',str1);
         Storage.save('Name','商品验收');
         Storage.save('FormType','YSYW');
@@ -156,7 +187,8 @@ export default class ProductYS extends Component {
                 SearchShopname1:(Suppcode1)=>this.SearchShopname1(Suppcode1),
                 DepName: (DepName) => this._DepName(DepName),
                 DepCode: (DepCode) => this._DepCode(DepCode),
-                App_Client:'App_Client_NOYSCGQ'
+                App_Client:'App_Client_NOYSCGQ',
+                invoice:"商品验收",
             }
         };
         this.props.navigator.push(nextRoute)

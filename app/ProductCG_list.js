@@ -35,11 +35,6 @@ export default class ProductCG_list extends Component {
     }
     componentDidMount(){
         InteractionManager.runAfterInteractions(() => {
-            Storage.get('invoice').then((tags)=>{
-                this.setState({
-                    invoice:tags
-                })
-            })
             this.fetch();
         });
     }

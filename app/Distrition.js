@@ -15,6 +15,7 @@ import {
 import Index from "./Index";
 import Search from "./Search";
 import Distrition_list from "./Distrition_list";
+import ShoppingCart from "./ShoppingCart";//清单
 import PinLeiData from "../YHDan/PinLeiData";
 import NetUtils from "../utils/NetUtils";
 import Storage from '../utils/Storage';
@@ -62,19 +63,41 @@ export default class Distrition extends Component {
      */
     Home(){
         if(this.state.Disting=="0") {
-            var nextRoute={
-                name:"主页",
-                component:Index
-            };
-            this.props.navigator.push(nextRoute);
-            this.Data();
+            if(this.state.sCode1==""){
+                this.Data();
+                var nextRoute={
+                    name:"主页",
+                    component:Index
+                };
+                this.props.navigator.push(nextRoute);
+                Storage.delete("PeiSong");
+            }else{
+                this.Data();
+                var nextRoute={
+                    name:"ShoppingCart",
+                    component:ShoppingCart,
+                };
+                this.props.navigator.push(nextRoute);
+                Storage.save('PeiSong',"配送收货");
+            }
         }else if(this.state.Disting=="1"){
-            var nextRoute={
-                name:"Search",
-                component:Search
-            };
-            this.props.navigator.push(nextRoute);
-            this.Data();
+            if(this.state.sCode1==""){
+                this.Data();
+                var nextRoute={
+                    name:"Search",
+                    component:Search
+                };
+                this.props.navigator.push(nextRoute);
+                Storage.delete("PeiSong");
+            }else{
+                this.Data();
+                var nextRoute={
+                    name:"ShoppingCart",
+                    component:ShoppingCart,
+                };
+                this.props.navigator.push(nextRoute);
+                Storage.save('PeiSong',"配送收货");
+            }
         }
     }
 
@@ -82,18 +105,25 @@ export default class Distrition extends Component {
         var date = new Date();
         var data=JSON.stringify(date.getTime());
         var str=this.state.sCode1;
-        Storage.delete('shildshop');
         Storage.delete('StateMent');
         Storage.delete('BQNumber');
         Storage.delete('Modify');
-        Storage.delete("PeiSong");
         Storage.delete('SourceNumber');
         if(this.state.DepCode1==""||this.state.DepCode1==0){
             Storage.delete('DepCode');
         }else{
             Storage.save('DepCode', this.state.DepCode1);
         }
-        Storage.save('YdCountm', '2');
+        if(this.state.sCode1==""){
+            Storage.delete('DanHao');
+            Storage.save('YdCountm',"6");
+            Storage.save('Screen', '2');
+        }else{
+            Storage.save('DanHao',"App_Client_ProPPSYHYWDetailQ");
+            Storage.save('YdCountm',"2");
+            Storage.save('Screen', '1');
+        }
+        Storage.save('shildshop',"");
         Storage.save('YuanDan','1');
         Storage.save('OrgFormno',str);
         Storage.save("scode",str);
@@ -105,7 +135,6 @@ export default class Distrition extends Component {
         Storage.save('history','App_Client_ProPSSHQ');
         Storage.save('historyClass','App_Client_ProPSSHDetailQ');
         Storage.save('ProYH','ProPSSH');
-        Storage.save('Screen','1');
     }
 
     /**
@@ -120,7 +149,8 @@ export default class Distrition extends Component {
                 reloadView:(sCode)=>this._reloadView(sCode),
                 DepName:(DepName)=>this._DepName(DepName),
                 DepCode:(DepCode)=>this._DepCode(DepCode),
-                App_Client:'App_Client_NOYSPSQ'
+                App_Client:'App_Client_NOYSPSQ',
+                invoice:"配送收货",
             }
         };
         this.props.navigator.push(nextRoute)

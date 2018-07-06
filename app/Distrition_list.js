@@ -35,6 +35,7 @@ export default class Distrition_list extends Component {
             DetailInfo:"",
             show:false,
             App_Client:this.props.App_Client?this.props.App_Client:"",
+            invoice:this.props.invoice ? this.props.invoice : "",
             dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => true,}),
         };
         this.dataRows = [];
@@ -65,11 +66,6 @@ export default class Distrition_list extends Component {
                 })
             })
 
-            Storage.get('invoice').then((tags)=>{
-                this.setState({
-                    invoice:tags
-                })
-            })
             this.fetch();
         });
     }
@@ -165,6 +161,8 @@ export default class Distrition_list extends Component {
                 this.props.reloadView(rowData.Formno);
             }else if(this.state.App_Client=='App_Client_NOProWXHQ'){
                 this.props.SourceNumber(rowData.Formno);
+                this.props.SalesMan(rowData.suppcode);
+                this.props.Customers(rowData.suppname);
             }
         }
         this.props.navigator.pop();
