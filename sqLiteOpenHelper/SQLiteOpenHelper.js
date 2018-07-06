@@ -39,8 +39,15 @@ export default class SQLiteOpenHelper {
       this.open();
     }
     //db.onUpdateComponent()
-    db.updater
+    
     db.transaction((tx) => {
+      tx.executeSql('CREATE TABLE IF NOT EXISTS mBarCode(prodcode varchar(40) not null ,barcode varchar(20) not null,EditDate varchar(20) null,' +
+        'prodname varchar(40) null,spec varchar(20) null)'
+        , [], () => {
+          //this._successCB('executeSql');
+        }, (err) => {
+          this._errorCB('a', err);
+        });
       //创建机构信息
       tx.executeSql('CREATE TABLE IF NOT EXISTS tshopitem(pid int not null Primary Key,shopcode varchar(20) null,shopname varchar(200) null,' +
         'UniqueCode varchar(5) null,shoplevel int null,subcode varchar(200) null,FNeedPS char(1) null,FCanPH char(1) null,PSShop varchar(20) null,isdel varchar(1) null,FCanCG varchar(1) null)'

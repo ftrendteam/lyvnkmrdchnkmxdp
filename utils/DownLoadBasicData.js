@@ -23,6 +23,7 @@ export default class DownLoadBasicData {
       }
     });
     DownLoadBasicData.downLoadTshopitem(url, shopCode, dbAdapter);
+    DownLoadBasicData.deownMbarCode(url,dbAdapter);
     //downLoadPosOpt(url, shopCode, dbAdapter, posCode);
     Storage.get('PosCode').then((PosCode) => {
       DownLoadBasicData.downLoadPosOpt(url, shopCode, dbAdapter, PosCode);
@@ -44,7 +45,22 @@ export default class DownLoadBasicData {
         }
       });
     });
-    
+  }
+  
+  
+  static deownMbarCode(url,dbAdapter){
+    return new Promise((resolve, reject) => {
+      let requestBody = JSON.stringify({
+        'TblName': 'mbarCode',
+      });
+      FetchUtils.post(url, requestBody).then((response) => {
+        if ((response != "" && response.retcode == 1)) {
+          let tblRow = response.TblRow;
+          console.log(tblRow)
+          dbAdapter.insertMbarCode(tblRow)
+        }
+      });
+    });
   }
   
   static downLoadPosOpt(url, shopCode, dbAdapter, posCode) {

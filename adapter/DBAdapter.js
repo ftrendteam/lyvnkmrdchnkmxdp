@@ -120,7 +120,26 @@ export default class DBAdapter extends SQLiteOpenHelper {
             }
         });
     }
-
+    WHT(){
+      return new Promise((resolve, reject) => {
+        db.transaction((tx) => {
+          try {
+            let sql='insert into shopinfo(pid,ProdCode,prodname,countm,ShopPrice,' +
+              'prototal,DepCode,ydcountm,SuppCode,BarCode) select pid,prodcode,prodname,3 ,' +
+              'stdPrice,3*stdPrice,DepCode,0,SuppCode,BarCode from product where pid<222';
+            tx.executeSql(sql, [], (tx, result) => {
+              resolve(result.rows);
+            }, (err) => {
+              reject("");
+              console.log(err)
+            });
+          } catch (err) {
+            console.log("kgop=", err)
+          }
+      
+        });
+      });
+    }
     selectKgOpt(where) {
         if (!db) {
             this.open();
@@ -699,7 +718,29 @@ export default class DBAdapter extends SQLiteOpenHelper {
         });
 
     }
-
+  
+  /***
+   * 查询当前机构的业务员
+   * @param shopCode
+   * @return {Promise}
+   */
+  selectCounterman(shopCode){
+      return new Promise((resolve, reject) => {
+        db.transaction((tx) => {
+            let sql="select distinct a.UserCode,c.username from tUserShop a inner join " +
+              "tshopitem b on b.SubCode+rtrim(b.shopcode)+';' like '%;'+rtrim(a.shopcode)+';%' or " +
+              "a.shopcode='0' join kgtuser c on a.UserCode=c.usercode and c.isdel='0' where " +
+              "IsNull(b.IsDel,'0')<>'1' and a.shopcode='"+shopCode+"'";
+          tx.executeSql(sql, [], (tx, results) => {
+            //alert(results.rows);
+            resolve(results.rows);
+          });
+      
+        }, (error) => {
+          this._errorCB('transaction', error);
+        });
+      });
+    }
     /***
      * 根据登录界面的用户编码，返回机构列表
      * @param  当前shopcode下管理的机构信息
@@ -1096,23 +1137,23 @@ export default class DBAdapter extends SQLiteOpenHelper {
      * @param DepLevel   当前默认传1
      * @returns {Promise}
      */
-    selectProdCode(prodCode, DepLevel) {
-        return new Promise((resolve, reject) => {
-            db.transaction((tx) => {
-                let ssql = "select a.*,ifNull(b.countm,0) as ShopNumber,ifNull(b.ShopPrice,a.StdPrice) as ShopPrice ,ifNull(b.prototal,0) as ShopAmount   " +
-                    ",ifNull(b.promemo,'') as ShopRemark,c.depcode" + DepLevel + " as DepCode1 " +
-                    " from product a left join shopInfo b on a.Pid=b.Pid  ";
-                ssql = ssql + " left join  tdepset c on c.IsDel='0' and a.depcode=c.depcode where a.IsDel='0' and prodtype<>'1'";
-                ssql = ssql + "  and  a.prodcode ='" + prodCode + "'";
-                tx.executeSql(ssql, [], (tx, results) => {
-                    resolve(results.rows);
-
-                });
-            }, (error) => {
-                this._errorCB('transaction', error);
-            });
-        })
-    }
+    //selectProdCode(prodCode, DepLevel) {
+    //    return new Promise((resolve, reject) => {
+    //        db.transaction((tx) => {
+    //            let ssql = "select a.*,ifNull(b.countm,0) as ShopNumber,ifNull(b.ShopPrice,a.StdPrice) as ShopPrice ,ifNull(b.prototal,0) as ShopAmount   " +
+    //                ",ifNull(b.promemo,'') as ShopRemark,c.depcode" + DepLevel + " as DepCode1 " +
+    //                " from product a left join shopInfo b on a.Pid=b.Pid  ";
+    //            ssql = ssql + " left join  tdepset c on c.IsDel='0' and a.depcode=c.depcode where a.IsDel='0' and prodtype<>'1'";
+    //            ssql = ssql + "  and  a.prodcode ='" + prodCode + "' left join mBarCode d where a.prodcode=d.prodcode and d.barcode='"+prodCode+"'";
+    //            tx.executeSql(ssql, [], (tx, results) => {
+    //                resolve(results.rows);
+    //
+    //            });
+    //        }, (error) => {
+    //            this._errorCB('transaction', error);
+    //        });
+    //    })
+    //}
 
     /***
      * 助记码查询商品
@@ -1124,10 +1165,11 @@ export default class DBAdapter extends SQLiteOpenHelper {
                     ",ifNull(b.promemo,'') as ShopRemark,c.depcode" + DepLevel + " as DepCode1 " +
                     " from product a left join shopInfo b on a.Pid=b.Pid  ";
                 ssql = ssql + " left join  tdepset c on c.IsDel='0' and a.depcode=c.depcode where a.IsDel='0' and prodtype<>'1'";
-                //ssql = ssql + "  and (a.prodname like '%" + aidCode + "%' or a.aidcode like '%" + aidCode + "%' or a.prodcode like '%" + aidCode + "%' or a.barcode like '%" + aidCode + "%')";
                 ssql = ssql + " and (a.prodcode= '" + aidCode + "'  or a.barcode = '" + aidCode + "')";
                 ssql=ssql+" limit 20 ";
+                console.log(ssql)
                 tx.executeSql(ssql, [], (tx, results) => {
+                  console.log(results.rows.length)
                     if(results.rows.length==0){
                         let sql = "select a.*,ifNull(b.countm,0) as ShopNumber,ifNull(b.ShopPrice,a.StdPrice) as ShopPrice ,ifNull(b.prototal,0) as ShopAmount   " +
                             ",ifNull(b.promemo,'') as ShopRemark,c.depcode" + DepLevel + " as DepCode1 " +
@@ -1135,8 +1177,23 @@ export default class DBAdapter extends SQLiteOpenHelper {
                         sql = sql + " left join  tdepset c on c.IsDel='0' and a.depcode=c.depcode where a.IsDel='0' and prodtype<>'1'";
                         sql = sql + "  and (a.prodname like '%" + aidCode + "%' or a.aidcode like '%" + aidCode + "%' or a.prodcode like '%" + aidCode + "%' or a.barcode like '%" + aidCode + "%')";
                         sql=sql+" limit 20 ";
+                        
                         tx.executeSql(sql, [], (tx, result) => {
+                          if(result.rows.length>0){
                             resolve(result.rows);
+                          }else{
+                            let sql3 = "select a.*,ifNull(b.countm,0) as ShopNumber,ifNull(b.ShopPrice,a.StdPrice) as ShopPrice ,ifNull(b.prototal,0) as ShopAmount   " +
+                              ",ifNull(b.promemo,'') as ShopRemark,c.depcode" + DepLevel + " as DepCode1 " +
+                              " from product a left join mBarCode d left join shopInfo b  on a.Pid=b.Pid  ";
+                            sql3 = sql3 + " left join  tdepset c on c.IsDel='0' and a.depcode=c.depcode where a.IsDel='0' and prodtype<>'1'";
+                            //sql = sql + "  and (a.prodname like '%" + aidCode + "%' or a.aidcode like '%" + aidCode + "%' or a.prodcode like '%" + aidCode + "%' or a.barcode like '%" + aidCode + "%')";
+                            sql3 =sql3+" and(a.prodcode=d.prodcode and d.barcode='"+aidCode+"')"
+                            sql3=sql3+" limit 20 ";
+                            tx.executeSql(sql3, [], (tx, result) => {
+                              resolve(result.rows);
+                            })
+                          }
+                          
                         });
                     }else{
                         resolve(results.rows);
@@ -1148,7 +1205,40 @@ export default class DBAdapter extends SQLiteOpenHelper {
             });
         });
     }
-
+  
+  /**
+   * 多条码商品
+   */
+  insertMbarCode(mBarCodeData){
+    this.deleteData('mBarCode');
+    db.transaction((tx) => {
+      //
+      console.log(mBarCodeData.length)
+      for (let i = 0; i < mBarCodeData.length; i++) {
+        try {
+          let mBarCode = mBarCodeData[i];
+          let prodcode = mBarCode.prodcode;
+          let EditDate = mBarCode.EditDate;
+          let prodname = mBarCode.prodname;
+          let barcode = mBarCode.barcode;
+          let spec = mBarCode.spec;
+          console.log("prodname=",prodname)
+          let sql = "insert into mBarCode(prodcode,barcode,EditDate,prodname,spec) values(?,?,?,?,?)";
+        tx.executeSql(sql, [prodcode, barcode, EditDate, prodname, spec], () => {
+          
+          }, (err) => {
+            console.log("err=222==", err);
+          }
+        );
+      } catch (err) {
+        console.log("nige sb=",err);
+      }
+      
+      }
+    });
+  
+    
+  }
     /***
      * 扫描查询商品
      */
@@ -1354,13 +1444,12 @@ export default class DBAdapter extends SQLiteOpenHelper {
                 } catch (err) {
                     console.log("err2==", err);
                 }
-
             }
-
         });
 
     }
-
+    
+   
     /***
      * 保存流水表Deatil
      */
