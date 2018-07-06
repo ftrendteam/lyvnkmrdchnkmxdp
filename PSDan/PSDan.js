@@ -207,7 +207,7 @@ export default class PSDan extends Component {
         Storage.delete('YuanDan');
         Storage.delete('YdCountm');
         Storage.delete('Modify');
-        if(this.state.DepCode1==""&&this.state.DepCode1==0){
+        if(this.state.DepCode1==""||this.state.DepCode1==0){
             Storage.delete('DepCode');
         }else{
             Storage.save('DepCode', this.state.DepCode1);

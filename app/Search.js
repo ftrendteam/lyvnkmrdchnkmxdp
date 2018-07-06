@@ -2778,7 +2778,7 @@ export default class Search extends Component {
                                                 </View>
                                             </View>
                                             {
-                                                (this.state.YdCountm == 1|| this.state.YdCountm == "盘点"||this.state.YdCountm==6&&this.state.OrgFormno==null) ?
+                                                (this.state.YdCountm == 1 ||this.state.YdCountm==6 || this.state.YdCountm == "盘点"||this.state.YdCountm==2&&this.state.OrgFormno==null) ?
                                                     <View style={styles.List}>
                                                         <View style={styles.left2}>
                                                             <Text style={styles.left}>现在库存</Text>
@@ -2787,7 +2787,7 @@ export default class Search extends Component {
                                                     </View> : null
                                             }
                                             {
-                                                (this.state.OrgFormno!==null) ?
+                                                (this.state.YdCountm==2&&this.state.OrgFormno!==null) ?
                                                     <View style={styles.List}>
                                                         <View style={styles.left2}>
                                                             <Text style={styles.left}>原单数量</Text>

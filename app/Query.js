@@ -90,6 +90,7 @@ export default class Query extends Component {
         var str=this.state.sCode1;
         var date = new Date();
         var data=JSON.stringify(date.getTime());
+        Storage.delete('VipInfo');
         Storage.delete('DanHao');
         Storage.delete('OrgFormno');
         Storage.delete('Screen');

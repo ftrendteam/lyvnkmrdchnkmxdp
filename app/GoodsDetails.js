@@ -347,36 +347,41 @@ export default class GoodsDetails extends Component {
                     </View>
                 </View>
                 <View style={styles.Cont}>
-                    <View style={styles.List}>
-                        {
-                            (this.state.name == "门店要货") ?
-                                null
-                                :
-                                <View>
-                                    {
-                                        (this.state.name == "批发销售"||this.state.name == "批发报价")?
-                                            <View style={[styles.ListLeft, {marginRight: 10, backgroundColor: "#fffbe7"}]}>
-                                                <Text style={styles.ListText}>批发客户：</Text>
-                                                <Text style={styles.ListText}>{this.state.storecode}</Text>
-                                            </View>
-                                            :
-                                            <View style={[styles.ListLeft, {marginRight: 10, backgroundColor: "#fffbe7"}]}>
-                                                {
-                                                    (this.state.reqDetailCode == "App_Client_ProCGDetailQ" || this.state.reqDetailCode == "App_Client_ProYSDetailQ" || this.state.reqDetailCode == "App_Client_ProXPDetailCGQ" || this.state.reqDetailCode == "App_Client_ProXPDetailYSQ") ?
-                                                        <Text style={styles.ListText}>供应商：</Text>
-                                                        :
-                                                        <Text style={styles.ListText}>仓库：</Text>
-                                                }
-                                                <Text style={styles.ListText}>{this.state.storecode}</Text>
-                                            </View>
-                                    }
+                    {
+                        (this.state.name == "售价调整") ?
+                            null
+                            :
+                            <View style={styles.List}>
+                                {
+                                    (this.state.name == "门店要货") ?
+                                        null
+                                        :
+                                        <View>
+                                            {
+                                                (this.state.name == "批发销售"||this.state.name == "批发报价")?
+                                                    <View style={[styles.ListLeft, {marginRight: 10, backgroundColor: "#fffbe7"}]}>
+                                                        <Text style={styles.ListText}>批发客户：</Text>
+                                                        <Text style={styles.ListText}>{this.state.storecode}</Text>
+                                                    </View>
+                                                    :
+                                                    <View style={[styles.ListLeft, {marginRight: 10, backgroundColor: "#fffbe7"}]}>
+                                                        {
+                                                            (this.state.reqDetailCode == "App_Client_ProCGDetailQ" || this.state.reqDetailCode == "App_Client_ProYSDetailQ" || this.state.reqDetailCode == "App_Client_ProXPDetailCGQ" || this.state.reqDetailCode == "App_Client_ProXPDetailYSQ") ?
+                                                                <Text style={styles.ListText}>供应商：</Text>
+                                                                :
+                                                                <Text style={styles.ListText}>仓库：</Text>
+                                                        }
+                                                        <Text style={styles.ListText}>{this.state.storecode}</Text>
+                                                    </View>
+                                            }
+                                        </View>
+                                }
+                                <View style={styles.ListRight}>
+                                    <Text style={styles.ListText}>货品数：</Text>
+                                    <Text style={styles.ListText}>{this.state.Number}</Text>
                                 </View>
-                        }
-                        <View style={styles.ListRight}>
-                            <Text style={styles.ListText}>货品数：</Text>
-                            <Text style={styles.ListText}>{this.state.Number}</Text>
-                        </View>
-                    </View>
+                            </View>
+                    }
                     <View style={styles.List}>
                         <View style={[styles.ListLeft, {flex: 1}]}>
                             <Text style={styles.ListText}>单据备注：</Text>
@@ -426,12 +431,27 @@ export default class GoodsDetails extends Component {
                         <View style={[{width: 80,}]}>
                             <Text style={styles.Name}>名称</Text>
                         </View>
-                        <View style={[{width: 80,}]}>
-                            <Text style={styles.Name}>数量</Text>
-                        </View>
-                        <View style={[{width: 80,}]}>
-                            <Text style={styles.Name}>金额</Text>
-                        </View>
+                        {
+                            (this.state.name=="售价调整")?
+                                <View style={[{width: 80,}]}>
+                                    <Text style={styles.Name}>原价</Text>
+                                </View>
+                                :
+                                <View style={[{width: 80,}]}>
+                                    <Text style={styles.Name}>数量</Text>
+                                </View>
+                        }
+                        {
+                            (this.state.name=="售价调整")?
+                                <View style={[{width: 80,}]}>
+                                    <Text style={styles.Name}>新价格</Text>
+                                </View>
+                                :
+                                <View style={[{width: 80,}]}>
+                                    <Text style={styles.Name}>金额</Text>
+                                </View>
+
+                        }
                         <View style={styles.ShopList1}>
                             <Text style={styles.Name}></Text>
                         </View>

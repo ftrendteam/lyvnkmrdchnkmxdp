@@ -269,10 +269,6 @@ export default class Index extends Component {
                                                                                 SaoMa: 1,
                                                                             }
                                                                         })
-                                                                        DeviceEventEmitter.removeAllListeners();
-                                                                        this.setState({
-                                                                            OrderDetails: '',
-                                                                        })
                                                                     } else {
                                                                         let params = {
                                                                             reqCode: "App_PosReq",
@@ -301,10 +297,6 @@ export default class Index extends Component {
                                                                                             ProdCode: row.ProdCode,
                                                                                             DepCode: row.DepCode1,
                                                                                         }
-                                                                                    })
-                                                                                    DeviceEventEmitter.removeAllListeners();
-                                                                                    this.setState({
-                                                                                        OrderDetails: '',
                                                                                     })
                                                                                 } else {
                                                                                     if (this.state.head == "商品采购" || this.state.head == "协配采购" || this.state.Modify == 1) {
@@ -407,10 +399,6 @@ export default class Index extends Component {
                                                                                             }
                                                                                         })
                                                                                     }
-                                                                                    DeviceEventEmitter.removeAllListeners();
-                                                                                    this.setState({
-                                                                                        OrderDetails: '',
-                                                                                    })
                                                                                 }
                                                                             } else {
                                                                                 alert(JSON.stringify(data))
@@ -472,10 +460,6 @@ export default class Index extends Component {
                                                                                         ProdCode: row.ProdCode,
                                                                                         DepCode: row.DepCode1,
                                                                                     }
-                                                                                })
-                                                                                DeviceEventEmitter.removeAllListeners();
-                                                                                this.setState({
-                                                                                    OrderDetails: '',
                                                                                 })
                                                                             } else {
                                                                                 if (this.state.head == "商品采购" || this.state.head == "协配采购" || this.state.Modify == 1) {
@@ -578,10 +562,6 @@ export default class Index extends Component {
                                                                                         }
                                                                                     })
                                                                                 }
-                                                                                DeviceEventEmitter.removeAllListeners();
-                                                                                this.setState({
-                                                                                    OrderDetails: '',
-                                                                                })
                                                                             }
                                                                         } else {
                                                                             alert(JSON.stringify(data))
@@ -590,6 +570,7 @@ export default class Index extends Component {
                                                                 }
                                                             }
                                                         })
+                                                        DeviceEventEmitter.removeAllListeners();
                                                     }
                                                 })
                                             }
@@ -738,7 +719,6 @@ export default class Index extends Component {
                                                                                 alert(JSON.stringify(data))
                                                                             }
                                                                         }
-                                                                        DeviceEventEmitter.removeAllListeners();
                                                                     })
                                                                 }
                                                             }
@@ -863,18 +843,17 @@ export default class Index extends Component {
                                                                             alert(JSON.stringify(data))
                                                                         }
                                                                     }
-                                                                    DeviceEventEmitter.removeAllListeners();
                                                                 })
                                                             }
                                                         })
                                                     }
+                                                    DeviceEventEmitter.removeAllListeners();
                                                 })
                                             }
                                         })
-                                    }
-                                    else {
+                                    } else {
                                         //商品查询
-                                        dbAdapter.selectAidCode(reminder, 1).then((rows) => {
+                                        dbAdapter.selectAidCode("6903583220015", 1).then((rows) => {
                                             if (rows.length == 0) {
                                                 ToastAndroid.show("商品不存在", ToastAndroid.SHORT);
                                                 return;
@@ -888,6 +867,7 @@ export default class Index extends Component {
                                                 this.setState({
                                                     ShopData: this.state.ShopData.cloneWithRows(this.ShopData),
                                                 })
+                                                DeviceEventEmitter.removeAllListeners();
                                                 this._MoreShop();
                                                 return;
                                             }
@@ -1011,7 +991,6 @@ export default class Index extends Component {
                                                                             })
                                                                         }
                                                                     }
-                                                                    DeviceEventEmitter.removeAllListeners();
                                                                 } else {
                                                                     alert(JSON.stringify(data))
                                                                 }
@@ -1130,13 +1109,13 @@ export default class Index extends Component {
                                                                         })
                                                                     }
                                                                 }
-                                                                DeviceEventEmitter.removeAllListeners();
                                                             } else {
                                                                 alert(JSON.stringify(data))
                                                             }
                                                         })
                                                     }
                                                 }
+                                                DeviceEventEmitter.removeAllListeners();
                                             }
                                         })
                                     }
@@ -1259,63 +1238,80 @@ export default class Index extends Component {
 
     //获取左侧商品品类信息、商品总数、触发第一个列表
     _fetch() {
-        let ShopCar1 = 0;
-        var priductdata = 0;
-        let DepCode;
-        let priductData = [];
-        dbAdapter.selectTDepSet('1').then((rows) => {
-            for (let i = 0; i < rows.length; i++) {
-                var row = rows.item(i);
-                this.dataRows.push(row);
-                var ShopCar = rows.item(0).DepCode;
-                ShopCar1 = BigDecimalUtils.add(row.ShopNumber, ShopCar1, 2);
-            }
-            ;
-            //判断修改数量页面传过来depcode是否为空
-            if (this.state.depcode == "") {
-                DepCode = ShopCar;
-                this.setState({
-                    depcode: ShopCar,
-                    currentindex: ShopCar,
-                });
-                lastDepCode = ShopCar;
-            } else {
-                DepCode = this.state.depcode;
-                this.setState({
-                    currentindex: this.state.depcode,
-                });
-            }
-            //获取商品总数（DepCode为类别的depcode）
-            dbAdapter.selectProduct1(DepCode, 1).then((rows) => {
+        Storage.get('DepCode').then((Depcode) => {
+            let ShopCar1 = 0;
+            var priductdata = 0;
+            let DepCode;
+            let priductData = [];
+            dbAdapter.selectTDepSet('1').then((rows) => {
                 for (let i = 0; i < rows.length; i++) {
                     var row = rows.item(i);
+                    this.dataRows.push(row);
+                    var ShopCar = rows.item(0).DepCode;
+                    ShopCar1 = BigDecimalUtils.add(row.ShopNumber, ShopCar1, 2);
+                };
+                //判断修改数量页面传过来depcode是否为空
+                if (Depcode!==null){
+                    if (this.state.depcode == "") {
+                        DepCode = Depcode;
+                        this.setState({
+                            depcode: Depcode,
+                            currentindex: Depcode,
+                        });
+                        lastDepCode = Depcode;
+                    } else {
+                        DepCode = this.state.depcode;
+                        this.setState({
+                            currentindex: this.state.depcode,
+                        });
+                    }
+                }else{
+                    if (this.state.depcode == "") {
+                        DepCode = ShopCar;
+                        this.setState({
+                            depcode: ShopCar,
+                            currentindex: ShopCar,
+                        });
+                        lastDepCode = ShopCar;
+                    } else {
+                        DepCode = this.state.depcode;
+                        this.setState({
+                            currentindex: this.state.depcode,
+                        });
+                    }
                 }
-                ;
-                priductdata = JSON.stringify(row.countn);
-            });
-            //触发第一个左侧品类
-            dbAdapter.selectProduct(DepCode, page, 1).then((rows) => {
-                if (lastDepCode !== "") {
-                    page = 1;
-                }
-                for (let i = 0; i < rows.length; i++) {
-                    var row = rows.item(i);
-                    priductData.push(row);
-                }
-                ;
-                total = priductdata;
-                totalPage = total % 9 == 0 ? total / 9 : Math.floor(total / 9) + 1;
-                this.productData = priductData;
-                this.setState({
-                    dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
-                    ShopCar1: ShopCar1,
-                    Page: priductdata,
-                    data: priductData,
-                    isloading: false,
+                //获取商品总数（DepCode为类别的depcode）
+                dbAdapter.selectProduct1(DepCode, 1).then((rows) => {
+                    for (let i = 0; i < rows.length; i++) {
+                        var row = rows.item(i);
+                    }
+                    ;
+                    priductdata = JSON.stringify(row.countn);
+                });
+                //触发第一个左侧品类
+                dbAdapter.selectProduct(DepCode, page, 1).then((rows) => {
+                    if (lastDepCode !== "") {
+                        page = 1;
+                    }
+                    for (let i = 0; i < rows.length; i++) {
+                        var row = rows.item(i);
+                        priductData.push(row);
+                    }
+                    ;
+                    total = priductdata;
+                    totalPage = total % 9 == 0 ? total / 9 : Math.floor(total / 9) + 1;
+                    this.productData = priductData;
+                    this.setState({
+                        dataSource: this.state.dataSource.cloneWithRows(this.dataRows),
+                        ShopCar1: ShopCar1,
+                        Page: priductdata,
+                        data: priductData,
+                        isloading: false,
+                    });
                 });
             });
-        });
-        this._fetch1();
+            this._fetch1();
+        })
     }
 
     _fetch1() {
@@ -1944,7 +1940,7 @@ export default class Index extends Component {
                         var row = rows.item(i);
                         Storage.delete('ShoppData');//删除 从清单点击商品类表 从修改数量点击回去 回到清单列表
                         if (DepCode !== null) {
-                            if (row.DepCode1 !== DepCode) {
+                            if (row.DepCode1 !== this.state.depcode) {
                                 ToastAndroid.show("请选择该品类下的商品", ToastAndroid.SHORT);
                                 return;
                             } else {
@@ -2319,7 +2315,7 @@ export default class Index extends Component {
      * 门店要货
      */
     YaoHuo() {
-        if (this.state.ShopCar1 > 0) {
+        if (this.state.shopcar > 0) {
             this._setModalVisible();
             ToastAndroid.show("商品未提交", ToastAndroid.SHORT);
             return;
@@ -2362,7 +2358,7 @@ export default class Index extends Component {
      * 商品损溢
      */
     SunYi() {
-        if (this.state.ShopCar1 > 0) {
+        if (this.state.shopcar > 0) {
             this._setModalVisible();
             ToastAndroid.show("商品未提交", ToastAndroid.SHORT);
             return;
@@ -2399,7 +2395,7 @@ export default class Index extends Component {
      * 实时盘点
      */
     SSPanDian() {
-        if (this.state.ShopCar1 > 0) {
+        if (this.state.shopcar > 0) {
             this._setModalVisible();
             ToastAndroid.show("商品未提交", ToastAndroid.SHORT);
             return;
@@ -2434,7 +2430,7 @@ export default class Index extends Component {
      * 商品盘点
      */
     SPPanDian() {
-        if (this.state.ShopCar1 > 0) {
+        if (this.state.shopcar > 0) {
             this._setModalVisible();
             ToastAndroid.show("商品未提交", ToastAndroid.SHORT);
             return;
@@ -2470,7 +2466,7 @@ export default class Index extends Component {
      * 配送收货
      */
     PSShouHuo() {
-        if (this.state.ShopCar1 > 0) {
+        if (this.state.shopcar > 0) {
             this._setModalVisible();
             ToastAndroid.show("商品未提交", ToastAndroid.SHORT);
             return;
@@ -2514,7 +2510,7 @@ export default class Index extends Component {
      * 商品采购
      */
     SPCaiGou() {
-        if (this.state.ShopCar1 > 0) {
+        if (this.state.shopcar > 0) {
             this._setModalVisible();
             ToastAndroid.show("商品未提交", ToastAndroid.SHORT);
             return;
@@ -2557,7 +2553,7 @@ export default class Index extends Component {
      * 商品验收
      */
     SPYanShou() {
-        if (this.state.ShopCar1 > 0) {
+        if (this.state.shopcar > 0) {
             this._setModalVisible();
             ToastAndroid.show("商品未提交", ToastAndroid.SHORT);
             return;
@@ -2600,7 +2596,7 @@ export default class Index extends Component {
      * 协配采购
      */
     XPCaiGou() {
-        if (this.state.ShopCar1 > 0) {
+        if (this.state.shopcar > 0) {
             this._setModalVisible();
             ToastAndroid.show("商品未提交", ToastAndroid.SHORT);
             return;
@@ -2645,7 +2641,7 @@ export default class Index extends Component {
      * 协配收货
      */
     XPShouHuo() {
-        if (this.state.ShopCar1 > 0) {
+        if (this.state.shopcar > 0) {
             this._setModalVisible();
             ToastAndroid.show("商品未提交", ToastAndroid.SHORT);
             return;
@@ -2691,7 +2687,7 @@ export default class Index extends Component {
      * 商品配送
      */
     PSDan() {
-        if (this.state.ShopCar1 > 0) {
+        if (this.state.shopcar > 0) {
             this._setModalVisible();
             ToastAndroid.show("商品未提交", ToastAndroid.SHORT);
             return;
@@ -2726,7 +2722,7 @@ export default class Index extends Component {
      * 标签采集
      */
     BQbutton() {
-        if (this.state.ShopCar1 > 0) {
+        if (this.state.shopcar > 0) {
             this._setModalVisible();
             ToastAndroid.show("商品未提交", ToastAndroid.SHORT);
             return;
@@ -2761,7 +2757,7 @@ export default class Index extends Component {
      * 移动销售 进行绑定功能
      */
     Sell() {
-        if (this.state.ShopCar1 > 0) {
+        if (this.state.shopcar > 0) {
             this._setModalVisible();
             ToastAndroid.show("商品未提交", ToastAndroid.SHORT);
             return;
@@ -2833,7 +2829,7 @@ export default class Index extends Component {
      * 批发销售
      */
     WholeSale() {
-        if (this.state.ShopCar1 > 0) {
+        if (this.state.shopcar > 0) {
             this._setModalVisible();
             ToastAndroid.show("商品未提交", ToastAndroid.SHORT);
             return;
@@ -2868,7 +2864,7 @@ export default class Index extends Component {
      * 批发报价
      */
     Offer() {
-        if (this.state.ShopCar1 > 0) {
+        if (this.state.shopcar > 0) {
             this._setModalVisible();
             ToastAndroid.show("商品未提交", ToastAndroid.SHORT);
             return;
@@ -2903,7 +2899,7 @@ export default class Index extends Component {
      * 库存查询
      */
     StockEnquiries() {
-        if (this.state.ShopCar1 > 0) {
+        if (this.state.shopcar > 0) {
             this._setModalVisible();
             ToastAndroid.show("商品未提交", ToastAndroid.SHORT);
             return;
@@ -2923,7 +2919,7 @@ export default class Index extends Component {
      * 商品查询
      */
     ShopSearch() {
-        if (this.state.ShopCar1 > 0) {
+        if (this.state.shopcar > 0) {
             this._setModalVisible();
             ToastAndroid.show("商品未提交", ToastAndroid.SHORT);
             return;
@@ -2954,7 +2950,7 @@ export default class Index extends Component {
      * 要货查询
      */
     YHSearch() {
-        if (this.state.ShopCar1 > 0) {
+        if (this.state.shopcar > 0) {
             this._setModalVisible();
             ToastAndroid.show("商品未提交", ToastAndroid.SHORT);
             return;
@@ -2985,7 +2981,7 @@ export default class Index extends Component {
      * 售价调整
      */
     PriceTZ() {
-        if (this.state.ShopCar1 > 0) {
+        if (this.state.shopcar > 0) {
             this._setModalVisible();
             ToastAndroid.show("商品未提交", ToastAndroid.SHORT);
             return;
@@ -3037,7 +3033,7 @@ export default class Index extends Component {
      */
     pullOut() {
         this._setModalVisible();
-        if (this.state.ShopCar1 > 0) {
+        if (this.state.shopcar > 0) {
             ToastAndroid.show("商品未提交", ToastAndroid.SHORT);
             return;
         } else {
@@ -3062,7 +3058,7 @@ export default class Index extends Component {
 
     pullOut1() {
         this._StateMent();
-        if (this.state.ShopCar1 > 0) {
+        if (this.state.shopcar > 0) {
             ToastAndroid.show("商品未提交", ToastAndroid.SHORT);
             return;
         } else {
@@ -3096,7 +3092,7 @@ export default class Index extends Component {
 
     //报表(业务及收银)
     StateMent() {
-        if (this.state.ShopCar1 > 0) {
+        if (this.state.shopcar > 0) {
             this._setModalVisible();
             ToastAndroid.show("商品未提交", ToastAndroid.SHORT);
             return;

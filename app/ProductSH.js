@@ -190,6 +190,7 @@ export default class ProductSH extends Component {
         var str=this.state.sCode1;
         var str1=this.state.shopname1;
         var str2=this.state.suppcode1;
+        Storage.delete('VipInfo');
         Storage.delete('StateMent');
         Storage.delete('BQNumber');
         Storage.delete('SourceNumber');

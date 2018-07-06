@@ -238,6 +238,7 @@ export default class PinLei extends Component {
     }
 
     delete(){
+        Storage.delete('VipInfo');
         Storage.delete('DanHao');
         Storage.delete('OrgFormno');
         Storage.delete('scode');

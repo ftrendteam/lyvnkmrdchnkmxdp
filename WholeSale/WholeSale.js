@@ -256,13 +256,13 @@ export default class WholeSale extends Component {
                 Storage.delete('Modify');
                 Storage.delete("PeiSong");
                 Storage.delete('StateMent');
-                Storage.delete('SourceNumber');
                 Storage.delete('Screen');
                 if(this.state.DepName1==""&&this.state.DepCode1==""){
                     Storage.delete('DepCode');
                 }else{
                     Storage.save('DepCode', this.state.DepCode1);
                 }
+                Storage.save('SourceNumber', this.state.SalesMan1);
                 Storage.save('Name', '批发报价');
                 Storage.save('FormType', 'PFBJYW');
                 Storage.save('ProYH', 'ProWBH');

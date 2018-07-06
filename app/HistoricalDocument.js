@@ -229,51 +229,52 @@ export default class HistoricalDocument extends Component {
         })
     }
 
-    ShenHeButton(rowData){
+    ShenHeButton(rowData) {
         this._setModalVisible();
         Storage.get('code').then((ShopCode) => {
             Storage.get('LinkUrl').then((LinkUrl) => {
                 Storage.get("usercode").then((usercode) => {
                     Storage.get("username").then((username) => {
                         Storage.get("FormCheck").then((FormCheck) => {
-                            Storage.get('OrgFormno').then((OrgFormno)=>{
-                                let params = {
-                                    reqCode: "App_PosReq",
-                                    reqDetailCode: "App_Client_FormCheck",
-                                    ClientCode: this.state.ClientCode,
-                                    sDateTime: Date.parse(new Date()),
-                                    Sign: NetUtils.MD5("App_PosReq" + "##" + "App_Client_FormCheck" + "##" + Date.parse(new Date()) + "##" + "PosControlCs") + '',
-                                    ShopCode: ShopCode,
-                                    ChildShopCode: "",
-                                    Formno: rowData.Formno,
-                                    OrgFormno: OrgFormno,
-                                    Usercode: usercode,
-                                    Username: username,
-                                    FormType: FormCheck,
+                            if(this.state.name == "商品配送"||this.state.name == "配送收货"||this.state.name == "商品验收"||this.state.name == "商品盘点"||this.state.name == "协配收货"||this.state.name == "批发销售"){
+                                var orgformno=rowData.orgformno;
+                            }else{
+                                var orgformno="";
+                            }
+                            let params = {
+                                reqCode: "App_PosReq",
+                                reqDetailCode: "App_Client_FormCheck",
+                                ClientCode: this.state.ClientCode,
+                                sDateTime: Date.parse(new Date()),
+                                Sign: NetUtils.MD5("App_PosReq" + "##" + "App_Client_FormCheck" + "##" + Date.parse(new Date()) + "##" + "PosControlCs") + '',
+                                ShopCode: ShopCode,
+                                ChildShopCode: "",
+                                Formno: rowData.Formno,
+                                OrgFormno: orgformno,
+                                Usercode: usercode,
+                                Username: username,
+                                FormType: FormCheck,
 
-                                };
-                                console.log(JSON.stringify(params))
-                                FetchUtils.post(LinkUrl,JSON.stringify(params)).then((data) => {
-                                    this.DataShop=[];
-                                    this._setModalVisible();
-                                    if (data.retcode == 1) {
-                                        rowData.checktype = "已审核";
-                                        console.log("datarowssssssss=",JSON.stringify(this.dataRows))
-                                        this.setState({
-                                            dataSource: this.state.dataSource.cloneWithRows(this.dataRows)
-                                        })
+                            };
+                            FetchUtils.post(LinkUrl, JSON.stringify(params)).then((data) => {
+                                this.DataShop = [];
+                                this._setModalVisible();
+                                if (data.retcode == 1) {
+                                    rowData.checktype = "已审核";
+                                    this.setState({
+                                        dataSource: this.state.dataSource.cloneWithRows(this.dataRows)
+                                    })
+                                } else {
+                                    var msg = data.msg;
+                                    if (msg == "判断用户的权限出错") {
+                                        alert("用户没有权限")
                                     } else {
-                                        var msg=data.msg;
-                                        if(msg=="判断用户的权限出错"){
-                                            alert("用户没有权限")
-                                        }else{
-                                            alert(JSON.stringify(data));
-                                        }
+                                        alert(JSON.stringify(data));
                                     }
-                                }, (err) => {
-                                    this._setModalVisible();
-                                    alert("网络请求失败");
-                                })
+                                }
+                            }, (err) => {
+                                this._setModalVisible();
+                                alert("网络请求失败");
                             })
                         })
                     })
@@ -291,6 +292,15 @@ export default class HistoricalDocument extends Component {
                             <Text style={styles.ListLeft}>单号：</Text>
                             <Text style={styles.ListRight}>{rowData.Formno}</Text>
                         </Text>
+                        {
+                            (this.state.name == "商品配送"||this.state.name == "配送收货"||this.state.name == "商品验收"||this.state.name == "商品盘点"||this.state.name == "协配收货"||this.state.name == "批发销售") ?
+                                <Text style={styles.List}>
+                                    <Text style={styles.ListLeft}>来源单号：</Text>
+                                    <Text style={styles.ListRight}>{rowData.orgformno}</Text>
+                                </Text>
+                                :
+                                null
+                        }
                         <Text style={styles.List}>
                             <Text style={styles.ListLeft}>单据状态：</Text>
                             <Text style={[styles.ListRight, {color: "#ff4e4e"}]}>{rowData.checktype}</Text>
@@ -342,7 +352,7 @@ export default class HistoricalDocument extends Component {
                     </View>
                 </TouchableOpacity>
                 {
-                    (rowData.checktype=="已审核")?
+                    (rowData.checktype == "已审核") ?
                         null
                         :
                         <View style={styles.SHDan}>
@@ -570,23 +580,23 @@ const styles = StyleSheet.create({
     activity: {
         marginBottom: 5,
     },
-    SHDan:{
+    SHDan: {
         flexDirection: "row",
     },
-    SHLeft:{
-        flex:2,
+    SHLeft: {
+        flex: 2,
     },
     ShenHe: {
-        flex:1,
-        height:30,
-        paddingTop:6,
-        paddingBottom:6,
-        borderRadius:5,
-        backgroundColor:"#ffba00"
+        flex: 1,
+        height: 30,
+        paddingTop: 6,
+        paddingBottom: 6,
+        borderRadius: 5,
+        backgroundColor: "#ffba00"
     },
-    ShenHe_text:{
-        textAlign:"center",
-        color:"#ffffff",
-        fontSize:16,
+    ShenHe_text: {
+        textAlign: "center",
+        color: "#ffffff",
+        fontSize: 16,
     },
 });

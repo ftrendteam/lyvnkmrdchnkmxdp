@@ -105,6 +105,7 @@ export default class Distrition extends Component {
         var date = new Date();
         var data=JSON.stringify(date.getTime());
         var str=this.state.sCode1;
+        Storage.delete('VipInfo');
         Storage.delete('StateMent');
         Storage.delete('BQNumber');
         Storage.delete('Modify');

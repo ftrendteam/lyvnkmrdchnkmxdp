@@ -76,6 +76,11 @@ export default class GoodsDetails extends Component {
         });
 
         Storage.get('YdCountm').then((tags)=>{
+            if(tags==2&&this.state.Number==""){
+                this.setState({
+                    Number:this.state.ydcountm
+                })
+            }
             this.setState({
                 YdCountm:tags
             })
@@ -99,20 +104,11 @@ export default class GoodsDetails extends Component {
             });
         });
 
-        Storage.get('YuanDan').then((tags)=>{
-            if(tags==1){
-                if(this.state.ydcountm>0&&this.state.Number==""){
-                    this.setState({
-                        Number:this.state.ydcountm
-                    })
-                }
-            }
-            let numberFormat1 = NumberUtils.numberFormat2(this.state.ShopPrice);
-            let numberFormat2 = NumberUtils.numberFormat2((this.state.Number)*(this.state.ShopPrice));
-            this.setState({
-                ShopPrice:numberFormat1,
-                numberFormat2:numberFormat2,
-            })
+        let numberFormat1 = NumberUtils.numberFormat2(this.state.ShopPrice);
+        let numberFormat2 = NumberUtils.numberFormat2((this.state.Number)*(this.state.ShopPrice));
+        this.setState({
+            ShopPrice:numberFormat1,
+            numberFormat2:numberFormat2,
         })
 
         dbAdapter.selectKgOpt('YDPosCanChangePrice').then((data) => {
@@ -1340,7 +1336,7 @@ export default class GoodsDetails extends Component {
                     }
                 </View>
                 {
-                    (this.state.YdCountm==1||this.state.YdCountm=="盘点"||this.state.YdCountm==6&&this.state.OrgFormno==null)?
+                    (this.state.YdCountm==1||this.state.YdCountm==6||this.state.YdCountm=="盘点"||this.state.YdCountm==2&&this.state.OrgFormno==null)?
                     <View style={styles.List}>
                         <View style={styles.left2}>
                             <Text style={styles.left}>现在库存</Text>
@@ -1349,7 +1345,7 @@ export default class GoodsDetails extends Component {
                     </View>:null
                 }
                 {
-                    (this.state.OrgFormno!==null)?
+                    (this.state.YdCountm==2&&this.state.OrgFormno!==null)?
                         <View style={styles.List}>
                             <View style={styles.left2}>
                                 <Text style={styles.left}>原单数量</Text>

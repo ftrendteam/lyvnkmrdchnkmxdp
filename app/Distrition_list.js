@@ -115,6 +115,7 @@ export default class Distrition_list extends Component {
                     if(DetailInfo==null){
                         return;
                     }else{
+                        alert(JSON.stringify(this.dataRows))
                         this.setState({
                             dataSource:this.state.dataSource.cloneWithRows(this.dataRows)
                         })
@@ -161,8 +162,8 @@ export default class Distrition_list extends Component {
                 this.props.reloadView(rowData.Formno);
             }else if(this.state.App_Client=='App_Client_NOProWXHQ'){
                 this.props.SourceNumber(rowData.Formno);
-                this.props.SalesMan(rowData.suppcode);
-                this.props.Customers(rowData.suppname);
+                this.props.SalesMan(rowData.ywusercode);
+                this.props.Customers(rowData.suppcode);
             }
         }
         this.props.navigator.pop();

@@ -141,6 +141,7 @@ export default class ProductYS extends Component {
         var data=JSON.stringify(date.getTime());
         var str=this.state.sCode1;
         var str1=this.state.suppcode1;
+        Storage.delete('VipInfo');
         Storage.delete('shildshop');
         Storage.delete('StateMent');
         Storage.delete('BQNumber');

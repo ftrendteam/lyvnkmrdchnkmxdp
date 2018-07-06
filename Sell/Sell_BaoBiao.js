@@ -343,7 +343,7 @@ export default class BaoBiao extends Component {
                                     NativeModules.AndroidPrintInterface.print("商品销售数量：" + this.state.SellShop);
                                     NativeModules.AndroidPrintInterface.print("合计：" + this.state.TotalPrice.toFixed(2));
                                     NativeModules.AndroidPrintInterface.print("顾客数：" + this.state.CustomerNumber);
-                                    NativeModules.AndroidPrintInterface.print("客单价：" + this.state.price);
+                                    NativeModules.AndroidPrintInterface.print("客单价：" + "0");
                                     NativeModules.AndroidPrintInterface.print("收入总价：" + this.state.sTotal);
                                     NativeModules.AndroidPrintInterface.print("支出合计：" + this.state.combined);
                                     NativeModules.AndroidPrintInterface.print("优惠金额：" + this.state.YHamount);
@@ -689,7 +689,7 @@ export default class BaoBiao extends Component {
                                                         borderBottomColor: "#e3e3e3",
                                                     }]}>
                                                         <Text style={styles.RowName}>客单价</Text>
-                                                        <Text style={styles.RowName}>{this.state.price}</Text>
+                                                        <Text style={styles.RowName}>0</Text>
                                                     </View>
                                             }
                                             <View style={[styles.BB_Title, {

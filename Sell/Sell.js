@@ -318,7 +318,7 @@ export default class Sell extends Component {
             }
             else {
                 this.ShopData = [];
-                dbAdapter.selectAidCode(this.state.MnCode, 1).then((rows) => {
+                dbAdapter.selectAidCode(reminder, 1).then((rows) => {
                     if (rows.length == 0) {
                         ToastAndroid.show("商品不存在", ToastAndroid.SHORT);
                         return;

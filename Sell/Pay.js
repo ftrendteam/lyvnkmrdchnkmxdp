@@ -1563,7 +1563,7 @@ export default class Pay extends Component {
                             for (let i = 0; i < this.state.dataRows.length; i++) {
                                 var DataRows = this.state.dataRows[i];
                                 NativeModules.AndroidPrintInterface.print(DataRows.ProdName + "\n");
-                                NativeModules.AndroidPrintInterface.print(DataRows.ProdCode + " " + " " + " " + " " + " " + " " + " " + " " + " " + DataRows.ShopNumber + ".00" + " " + " " + DataRows.ShopPrice + " " + " " + DataRows.ShopAmount + "\n");
+                                NativeModules.AndroidPrintInterface.print(DataRows.ProdCode + " " + " " + " " + " " + " " + " " + " " + " " + " " + DataRows.ShopNumber + " " + " " + DataRows.ShopPrice + " " + " " + DataRows.ShopAmount + "\n");
                             }
                             NativeModules.AndroidPrintInterface.print("\n");
                             var YHui = Number(this.state.shopamount) - Number(this.state.ShopAmount);

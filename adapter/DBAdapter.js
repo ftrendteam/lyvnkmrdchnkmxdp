@@ -1167,34 +1167,34 @@ export default class DBAdapter extends SQLiteOpenHelper {
                 ssql = ssql + " left join  tdepset c on c.IsDel='0' and a.depcode=c.depcode where a.IsDel='0' and prodtype<>'1'";
                 ssql = ssql + " and (a.prodcode= '" + aidCode + "'  or a.barcode = '" + aidCode + "')";
                 ssql=ssql+" limit 20 ";
-                console.log(ssql)
+
                 tx.executeSql(ssql, [], (tx, results) => {
-                  console.log(results.rows.length)
+
                     if(results.rows.length==0){
-                        let sql = "select a.*,ifNull(b.countm,0) as ShopNumber,ifNull(b.ShopPrice,a.StdPrice) as ShopPrice ,ifNull(b.prototal,0) as ShopAmount   " +
+                        let sql3 = "select a.*,ifNull(b.countm,0) as ShopNumber,ifNull(b.ShopPrice,a.StdPrice) as ShopPrice ,ifNull(b.prototal,0) as ShopAmount   " +
                             ",ifNull(b.promemo,'') as ShopRemark,c.depcode" + DepLevel + " as DepCode1 " +
-                            " from product a left join shopInfo b on a.Pid=b.Pid  ";
-                        sql = sql + " left join  tdepset c on c.IsDel='0' and a.depcode=c.depcode where a.IsDel='0' and prodtype<>'1'";
-                        sql = sql + "  and (a.prodname like '%" + aidCode + "%' or a.aidcode like '%" + aidCode + "%' or a.prodcode like '%" + aidCode + "%' or a.barcode like '%" + aidCode + "%')";
-                        sql=sql+" limit 20 ";
-                        
-                        tx.executeSql(sql, [], (tx, result) => {
-                          if(result.rows.length>0){
-                            resolve(result.rows);
-                          }else{
-                            let sql3 = "select a.*,ifNull(b.countm,0) as ShopNumber,ifNull(b.ShopPrice,a.StdPrice) as ShopPrice ,ifNull(b.prototal,0) as ShopAmount   " +
-                              ",ifNull(b.promemo,'') as ShopRemark,c.depcode" + DepLevel + " as DepCode1 " +
-                              " from product a left join mBarCode d left join shopInfo b  on a.Pid=b.Pid  ";
-                            sql3 = sql3 + " left join  tdepset c on c.IsDel='0' and a.depcode=c.depcode where a.IsDel='0' and prodtype<>'1'";
-                            //sql = sql + "  and (a.prodname like '%" + aidCode + "%' or a.aidcode like '%" + aidCode + "%' or a.prodcode like '%" + aidCode + "%' or a.barcode like '%" + aidCode + "%')";
-                            sql3 =sql3+" and(a.prodcode=d.prodcode and d.barcode='"+aidCode+"')"
-                            sql3=sql3+" limit 20 ";
-                            tx.executeSql(sql3, [], (tx, result) => {
-                              resolve(result.rows);
-                            })
-                          }
-                          
-                        });
+                            " from product a join mBarCode d on a.prodcode=d.prodcode left join shopInfo b  on a.Pid=b.Pid  ";
+                        sql3 = sql3 + " left join  tdepset c on c.IsDel='0' and a.depcode=c.depcode where a.IsDel='0' and prodtype<>'1'";
+                        //sql = sql + "  and (a.prodname like '%" + aidCode + "%' or a.aidcode like '%" + aidCode + "%' or a.prodcode like '%" + aidCode + "%' or a.barcode like '%" + aidCode + "%')";
+                        sql3 =sql3+" and( d.barcode='"+aidCode+"')"
+                        sql3=sql3+" limit 20 ";
+                        tx.executeSql(sql3, [], (tx, result3) => {
+                            if(result3.rows.length==0){
+                                let sql = "select a.*,ifNull(b.countm,0) as ShopNumber,ifNull(b.ShopPrice,a.StdPrice) as ShopPrice ,ifNull(b.prototal,0) as ShopAmount   " +
+                                    ",ifNull(b.promemo,'') as ShopRemark,c.depcode" + DepLevel + " as DepCode1 " +
+                                    " from product a left join shopInfo b on a.Pid=b.Pid  ";
+                                sql = sql + " left join  tdepset c on c.IsDel='0' and a.depcode=c.depcode where a.IsDel='0' and prodtype<>'1'";
+                                sql = sql + "  and (a.prodname like '%" + aidCode + "%' or a.aidcode like '%" + aidCode + "%' or a.prodcode like '%" + aidCode + "%' or a.barcode like '%" + aidCode + "%')";
+                                sql=sql+" limit 20 ";
+
+                                tx.executeSql(sql, [], (tx, result) => {
+                                    resolve(result.rows);
+                                });
+                            }else{
+                                resolve(result3.rows);
+                            }
+
+                        })
                     }else{
                         resolve(results.rows);
                     }
