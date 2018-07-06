@@ -135,6 +135,7 @@ export default class GoodsDetails extends Component {
                 FetchUtils.post(this.state.linkurl, JSON.stringify(params)).then((data) => {
                     if (data.retcode == 1) {
                         var numbercode = data.DetailInfo1.storecode;
+                        var depname = data.DetailInfo1.depname;
                         var numbershop = data.DetailInfo1.childshop;
                         var checktype = data.DetailInfo1.checktype;
                         var prototal = data.DetailInfo1.prototal;
@@ -220,7 +221,6 @@ export default class GoodsDetails extends Component {
 
                                 };
                                 FetchUtils.post(LinkUrl, JSON.stringify(params)).then((data) => {
-                                    this.DataShop = [];
                                     if (data.retcode == 1) {
                                         if (this.state.checktype == "未审核") {
                                             this.setState({
@@ -291,6 +291,7 @@ export default class GoodsDetails extends Component {
                                 NativeModules.AndroidPrintInterface.print("------------------------------------------------------------" + "\n");
                                 NativeModules.AndroidPrintInterface.print("名称" + " " + " " + " " + " " + " " + " " + " " + " " + " " + " " + "数量" + " " + " " + " " + " " + "单价" + " " + " " + " " + " " + "小计" + "\n");
                                 NativeModules.AndroidPrintInterface.print("\n");
+                                console.log(this.DataShop.length)
                                 for (let i = 0; i < this.DataShop.length; i++) {
                                     var DataRows = this.DataShop[i];
                                     var num = DataRows.prototal / DataRows.countm;
@@ -351,14 +352,24 @@ export default class GoodsDetails extends Component {
                             (this.state.name == "门店要货") ?
                                 null
                                 :
-                                <View style={[styles.ListLeft, {marginRight: 10, backgroundColor: "#fffbe7"}]}>
+                                <View>
                                     {
-                                        (this.state.reqDetailCode == "App_Client_ProCGDetailQ" || this.state.reqDetailCode == "App_Client_ProYSDetailQ" || this.state.reqDetailCode == "App_Client_ProXPDetailCGQ" || this.state.reqDetailCode == "App_Client_ProXPDetailYSQ") ?
-                                            <Text style={styles.ListText}>供应商：</Text>
+                                        (this.state.name == "批发销售"||this.state.name == "批发报价")?
+                                            <View style={[styles.ListLeft, {marginRight: 10, backgroundColor: "#fffbe7"}]}>
+                                                <Text style={styles.ListText}>批发客户：</Text>
+                                                <Text style={styles.ListText}>{this.state.storecode}</Text>
+                                            </View>
                                             :
-                                            <Text style={styles.ListText}>仓库：</Text>
+                                            <View style={[styles.ListLeft, {marginRight: 10, backgroundColor: "#fffbe7"}]}>
+                                                {
+                                                    (this.state.reqDetailCode == "App_Client_ProCGDetailQ" || this.state.reqDetailCode == "App_Client_ProYSDetailQ" || this.state.reqDetailCode == "App_Client_ProXPDetailCGQ" || this.state.reqDetailCode == "App_Client_ProXPDetailYSQ") ?
+                                                        <Text style={styles.ListText}>供应商：</Text>
+                                                        :
+                                                        <Text style={styles.ListText}>仓库：</Text>
+                                                }
+                                                <Text style={styles.ListText}>{this.state.storecode}</Text>
+                                            </View>
                                     }
-                                    <Text style={styles.ListText}>{this.state.storecode}</Text>
                                 </View>
                         }
                         <View style={styles.ListRight}>

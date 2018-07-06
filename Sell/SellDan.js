@@ -46,6 +46,16 @@ export default class SellDan extends Component {
                     name: tags
                 })
             });
+            this._fetch()
+        });
+    }
+
+    _fetch() {
+        dbAdapter.selectShopInfoAllCountm().then((rows) => {
+            var ShopCar = rows.item(0).countm;
+            this.setState({
+                shopcar: ShopCar
+            });
         });
     }
 
@@ -65,7 +75,7 @@ export default class SellDan extends Component {
         this.props.navigator.push(nextRoute);
     }
 
-    JYbaobiao(){
+    JYbaobiao() {
         this.props.navigator.push({
             component: BaoBiao,
             params: {
@@ -74,7 +84,7 @@ export default class SellDan extends Component {
         })
     }
 
-    SKbaobiao(){
+    SKbaobiao() {
         this.props.navigator.push({
             component: BaoBiao,
             params: {
@@ -83,7 +93,7 @@ export default class SellDan extends Component {
         })
     }
 
-    PLbaobiao(){
+    PLbaobiao() {
         this.props.navigator.push({
             component: BaoBiao,
             params: {
@@ -92,7 +102,7 @@ export default class SellDan extends Component {
         })
     }
 
-    DPbaobiao(){
+    DPbaobiao() {
         this.props.navigator.push({
             component: BaoBiao,
             params: {
@@ -107,7 +117,6 @@ export default class SellDan extends Component {
                 <View style={styles.header}>
                     <View style={styles.cont}>
                         <Text style={styles.HeaderList}>{this.state.name}</Text>
-
                     </View>
                 </View>
                 <ScrollView style={styles.Rolling}>
@@ -118,7 +127,7 @@ export default class SellDan extends Component {
                             </Text>
                             <Text style={styles.LisText}>总交易报表</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.OnclickList}onPress={this.SKbaobiao.bind(this)}>
+                        <TouchableOpacity style={styles.OnclickList} onPress={this.SKbaobiao.bind(this)}>
                             <Text style={styles.ModalHeadImage1}>
                                 <Image source={require("../images/1_64.png")}/>
                             </Text>
@@ -126,13 +135,13 @@ export default class SellDan extends Component {
                         </TouchableOpacity>
                     </View>
                     <View style={styles.row}>
-                        <TouchableOpacity style={styles.OnclickList}onPress={this.PLbaobiao.bind(this)}>
+                        <TouchableOpacity style={styles.OnclickList} onPress={this.PLbaobiao.bind(this)}>
                             <Text style={styles.ModalHeadImage1}>
                                 <Image source={require("../images/1_65.png")}/>
                             </Text>
                             <Text style={styles.LisText}>品类报表</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.OnclickList}onPress={this.DPbaobiao.bind(this)}>
+                        <TouchableOpacity style={styles.OnclickList} onPress={this.DPbaobiao.bind(this)}>
                             <Text style={styles.ModalHeadImage1}>
                                 <Image source={require("../images/1_66.png")}/>
                             </Text>
@@ -141,11 +150,12 @@ export default class SellDan extends Component {
                     </View>
                 </ScrollView>
                 <View style={styles.footer}>
-                    <TouchableOpacity style={styles.Home}><Image source={require("../images/1_30.png")}></Image><Text
-                        style={styles.home2}>历史单据查询</Text></TouchableOpacity>
-                    <TouchableOpacity style={styles.Home} onPress={this.Shop.bind(this)}><Image
-                        source={require("../images/1_311.png")}></Image><Text
-                        style={styles.home1}>商品</Text></TouchableOpacity>
+                    <TouchableOpacity style={styles.Home}>
+                        <Image source={require("../images/1_30.png")}></Image>
+                        <Text style={styles.home2}>历史单据查询</Text></TouchableOpacity>
+                    <TouchableOpacity style={styles.Home} onPress={this.Shop.bind(this)}>
+                        <Image source={require("../images/1_311.png")}></Image>
+                        <Text style={styles.home1}>商品</Text></TouchableOpacity>
                     <TouchableOpacity style={styles.Home} onPress={this.ShopList.bind(this)}>
                         <View>
                             <Image source={require("../images/1_322.png")}>

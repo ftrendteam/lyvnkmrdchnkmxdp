@@ -22,7 +22,8 @@ import DateUtil from "../utils/DateUtil";
 import DBAdapter from "../adapter/DBAdapter";//接口页面
 import Storage from "../utils/Storage";
 import DatePicker from "react-native-dateandtime";
-
+var {NativeModules} = require('react-native');
+var RNScannerAndroid = NativeModules.RNScannerAndroid;
 let dbAdapter = new DBAdapter();
 let dateutil = new DateUtil();
 let db;
@@ -39,6 +40,7 @@ export default class BaoBiao extends Component {
             TShop: "",
             sTotal: "",
             combined: "",
+            TradeFlag:"",
             SellShop: "",
             TotalPrice: "",
             CustomerNumber: "",
@@ -49,9 +51,8 @@ export default class BaoBiao extends Component {
             startDate: DateUtil.formatDateTime(new Date()),
             endDate: DateUtil.formatDateTime(new Date()),
             BBName: this.props.BBName ? this.props.BBName : "",
-            dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => row1 !== row2,}),
+            dataSource: new ListView.DataSource({rowHasChanged:  (row1, row2) => true,}),
         }
-        this.dataRows = [];
     }
 
     componentDidMount() {
@@ -91,6 +92,7 @@ export default class BaoBiao extends Component {
                 var combined = 0;//合计
                 var YHamount = 0;
                 var JYamount = 0;
+                let TradeFlag=0;
                 if (rows.length == 0) {
                     this.setState({
                         Report: 0,
@@ -100,6 +102,7 @@ export default class BaoBiao extends Component {
                         var row = rows.item(i);
                         var total = row.Total;
                         var amount = row.Amount;
+                        TradeFlag=row.TradeFlag;
                         if (row.TradeFlag == "T") {
                             Sell += Number(total);//销售
                         }
@@ -122,6 +125,7 @@ export default class BaoBiao extends Component {
                     this.setState({
                         Sell: Sell,
                         TShop: TShop,
+                        TradeFlag:TradeFlag,
                         sTotal: sTotal,
                         combined: combined,
                         SellShop: SellShop,
@@ -188,6 +192,7 @@ export default class BaoBiao extends Component {
                         Report: 0,
                     })
                 } else {
+                    this.dataRows = [];
                     for (let i = 0; i < rows.length; i++) {
                         var row = rows.item(i);
                         if (currentDepCode.indexOf(row.DepCode) < 0) {
@@ -202,12 +207,14 @@ export default class BaoBiao extends Component {
                         let scalTotal = 0;
                         let retTotal = 0;
                         let dscTotal = 0;
+                        let TradeFlag=0;
                         for (let k = 0; k < rows.length; k++) {
                             var row = rows.item(k);
                             if (curDep == row.DepCode) {
                                 depCode = row.DepCode;
                                 depName = row.DepName;
                                 scalNum += row.Amount;
+                                TradeFlag=row.TradeFlag;
                                 if (row.TradeFlag == "T") {
                                     scalTotal += row.Total;
                                 }
@@ -225,6 +232,7 @@ export default class BaoBiao extends Component {
                             'scalTotal': scalTotal.toFixed(2),
                             'retTotal': retTotal.toFixed(2),
                             'dscTotal': dscTotal,
+                            'TradeFlag':TradeFlag,
                         }
                         this.dataRows.push(depObj);
                     }
@@ -242,16 +250,19 @@ export default class BaoBiao extends Component {
                         Report: 0,
                     })
                 } else {
+                    this.dataRows = [];
                     let ProdCode = "";
                     let ProdName = "";
                     let scalTotal = 0;
                     let retTotal = 0;
                     let DscTotal = 0;
                     let BarCode = 0;
+                    let TradeFlag=0;
                     for (let i = 0; i < rows.length; i++) {
                         var row = rows.item(i);
                         ProdCode = row.ProdCode;
                         ProdName = row.ProdName;
+                        TradeFlag=row.TradeFlag;
                         if (row.TradeFlag == "T") {
                             scalTotal = row.Total;
                         }
@@ -267,6 +278,7 @@ export default class BaoBiao extends Component {
                             'retTotal': retTotal,
                             'DscTotal': DscTotal,
                             'BarCode': BarCode,
+                            'TradeFlag':TradeFlag,
                         }
                         this.dataRows.push(depObj);
                     }
@@ -277,6 +289,109 @@ export default class BaoBiao extends Component {
                 }
             })
         }
+    }
+
+    DaYinButton(){
+        Storage.get('Pid').then((Pid) => {
+            Storage.get('code').then((ShopName) => {
+                Storage.get('MenDianName').then((MenDianName) => {
+                    Storage.get('usercode').then((usercode) => {
+                        Storage.get('userName').then((userName) => {
+                            Storage.get('Name').then((Name) => {
+                                var now = new Date();
+                                var year = now.getFullYear();
+                                var month = now.getMonth() + 1;
+                                var day = now.getDate();
+                                var hh = now.getHours();
+                                var mm = now.getMinutes();
+                                var ss = now.getSeconds();
+                                if (month >= 1 && month <= 9) {
+                                    month = "0" + month;
+                                }
+                                if (day >= 1 && day <= 9) {
+                                    day = "0" + day;
+                                }
+                                if (hh >= 1 && hh <= 9) {
+                                    hh = "0" + hh;
+                                }
+                                if (mm >= 1 && mm <= 9) {
+                                    mm = "0" + mm;
+                                }
+                                if (ss >= 1 && ss <= 9) {
+                                    ss = "0" + ss;
+                                }
+                                NativeModules.AndroidPrintInterface.initPrint();
+                                NativeModules.AndroidPrintInterface.setFontSize(30, 26, 0x26,);
+                                NativeModules.AndroidPrintInterface.print(" " + " " + " " + " " + " " + " " + " " +MenDianName + "\n");
+                                NativeModules.AndroidPrintInterface.print("\n");
+                                NativeModules.AndroidPrintInterface.setFontSize(20, 20, 0x22);
+                                NativeModules.AndroidPrintInterface.print("服务员：" + userName + "\n");
+                                NativeModules.AndroidPrintInterface.print("当前单据：" + Name + "\n");
+                                if (hh < 12) {
+                                    var hours = "上午"
+                                } else if (hh >= 12) {
+                                    var hours = "下午"
+                                }
+                                NativeModules.AndroidPrintInterface.print(year + "年" + month + "月" + day + "日" + " " + hours + hh + ":" + mm + ":" + ss + "\n");
+                                NativeModules.AndroidPrintInterface.print("------------------------------------------------------------" + "\n");
+                                if(this.state.BBName =="总交易报表"){
+                                    if(this.state.TradeFlag=="R"){
+                                        NativeModules.AndroidPrintInterface.print("退货：" + this.state.TShop);
+                                    }else if(this.state.TradeFlag=="T"){
+                                        NativeModules.AndroidPrintInterface.print("销售：" + this.state.Sell.toFixed(2));
+                                    }
+                                    NativeModules.AndroidPrintInterface.print("商品销售数量：" + this.state.SellShop);
+                                    NativeModules.AndroidPrintInterface.print("合计：" + this.state.TotalPrice.toFixed(2));
+                                    NativeModules.AndroidPrintInterface.print("顾客数：" + this.state.CustomerNumber);
+                                    NativeModules.AndroidPrintInterface.print("客单价：" + this.state.price);
+                                    NativeModules.AndroidPrintInterface.print("收入总价：" + this.state.sTotal);
+                                    NativeModules.AndroidPrintInterface.print("支出合计：" + this.state.combined);
+                                    NativeModules.AndroidPrintInterface.print("优惠金额：" + this.state.YHamount);
+                                    NativeModules.AndroidPrintInterface.print("结余金额：" + this.state.JYamount.toFixed(2));
+                                }
+                                if(this.state.BBName =="收款员报表"){
+                                    NativeModules.AndroidPrintInterface.print("退货：" + this.state.TShop);
+                                    NativeModules.AndroidPrintInterface.print("销售：" + this.state.Sell.toFixed(2));
+                                    NativeModules.AndroidPrintInterface.print("合计：" + this.state.TotalPrice.toFixed(2));
+                                    NativeModules.AndroidPrintInterface.print("收入总价：" + this.state.sTotal);
+                                    NativeModules.AndroidPrintInterface.print("支出合计：" + this.state.combined);
+                                    NativeModules.AndroidPrintInterface.print("优惠金额：" + this.state.YHamount);
+                                }
+                                if(this.state.BBName =="品类报表"||this.state.BBName =="单品报表"){
+                                    for (let i = 0; i < this.dataRows.length; i++) {
+                                        var DataRows = this.dataRows[i];
+                                        if(this.state.BBName == "品类报表"){
+                                            NativeModules.AndroidPrintInterface.print("商品品类：" + DataRows.depName);
+                                            if(DataRows.TradeFlag=="T"){
+                                                NativeModules.AndroidPrintInterface.print("销售数量：" + DataRows.scalNum+" "+" "+"销售金额：" + DataRows.scalTotal);
+                                            }else if(DataRows.TradeFlag=="R"){
+                                                NativeModules.AndroidPrintInterface.print("销售数量：" + DataRows.scalNum+" "+" "+"退货金额：" + DataRows.retTotal);
+                                            }
+                                            NativeModules.AndroidPrintInterface.print("优惠金额：" + DataRows.dscTotal);
+                                        }
+                                        if(this.state.BBName == "单品报表"){
+                                            NativeModules.AndroidPrintInterface.print("编码：" + DataRows.ProdCode+" "+" "+"商品：" + DataRows.ProdName);
+                                            if(DataRows.TradeFlag=="T"){
+                                                NativeModules.AndroidPrintInterface.print("销售金额：" + DataRows.scalTotal+" "+" "+"优惠金额：" + DataRows.DscTotal);
+                                            }else if(DataRows.TradeFlag=="R"){
+                                                NativeModules.AndroidPrintInterface.print("退货金额：" + DataRows.retTotal+" "+" "+"优惠金额：" + DataRows.DscTotal);
+                                            }
+                                            NativeModules.AndroidPrintInterface.print("条码：" + DataRows.BarCode);
+                                        }
+                                        NativeModules.AndroidPrintInterface.print("\n");
+                                    }
+                                }
+                                NativeModules.AndroidPrintInterface.print("\n");
+                                NativeModules.AndroidPrintInterface.print("\n");
+                                NativeModules.AndroidPrintInterface.print("\n");
+                                NativeModules.AndroidPrintInterface.print("\n");
+                                NativeModules.AndroidPrintInterface.startPrint();
+                            })
+                        })
+                    })
+                })
+            })
+        })
     }
 
     _renderRow(rowData, sectionID, rowID) {
@@ -482,7 +597,7 @@ export default class BaoBiao extends Component {
                                           onPress={this.pressPop.bind(this)}>
                             <Text style={styles.ButtonText}>查询</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.button} onPress={this.pressPop.bind(this)}>
+                        <TouchableOpacity style={styles.button} onPress={this.DaYinButton.bind(this)}>
                             <Text style={styles.ButtonText}>打印</Text>
                         </TouchableOpacity>
                     </View>
@@ -510,14 +625,26 @@ export default class BaoBiao extends Component {
                                         />
                                         :
                                         <View>
-                                            <View style={[styles.BB_Title, {
-                                                backgroundColor: "#f2f2f2",
-                                                borderBottomWidth: 1,
-                                                borderBottomColor: "#e3e3e3",
-                                            }]}>
-                                                <Text style={styles.RowName}>销售</Text>
-                                                <Text style={styles.RowName}>{this.state.Sell}</Text>
-                                            </View>
+                                            {
+                                                (this.state.TradeFlag=="T")?
+                                                    <View style={[styles.BB_Title, {
+                                                        backgroundColor: "#f2f2f2",
+                                                        borderBottomWidth: 1,
+                                                        borderBottomColor: "#e3e3e3",
+                                                    }]}>
+                                                        <Text style={styles.RowName}>销售</Text>
+                                                        <Text style={styles.RowName}>{Number(this.state.Sell).toFixed(2)}</Text>
+                                                    </View>
+                                                    :
+                                                    <View style={[styles.BB_Title, {
+                                                        backgroundColor: "#f2f2f2",
+                                                        borderBottomWidth: 1,
+                                                        borderBottomColor: "#e3e3e3",
+                                                    }]}>
+                                                        <Text style={styles.RowName}>退货</Text>
+                                                        <Text style={styles.RowName}>{this.state.TShop}</Text>
+                                                    </View>
+                                            }
                                             {
                                                 (this.state.BBName == "收款员报表") ?
                                                     null
@@ -536,16 +663,8 @@ export default class BaoBiao extends Component {
                                                 borderBottomWidth: 1,
                                                 borderBottomColor: "#e3e3e3",
                                             }]}>
-                                                <Text style={styles.RowName}>退货</Text>
-                                                <Text style={styles.RowName}>{this.state.TShop}</Text>
-                                            </View>
-                                            <View style={[styles.BB_Title, {
-                                                backgroundColor: "#f2f2f2",
-                                                borderBottomWidth: 1,
-                                                borderBottomColor: "#e3e3e3",
-                                            }]}>
                                                 <Text style={styles.RowName}>合计</Text>
-                                                <Text style={styles.RowName}>{this.state.TotalPrice}</Text>
+                                                <Text style={styles.RowName}>{Number(this.state.TotalPrice).toFixed(2)}</Text>
                                             </View>
                                             {
                                                 (this.state.BBName == "收款员报表") ?
@@ -607,7 +726,7 @@ export default class BaoBiao extends Component {
                                                         borderBottomColor: "#e3e3e3",
                                                     }]}>
                                                         <Text style={styles.RowName}>结余金额</Text>
-                                                        <Text style={styles.RowName}>{this.state.JYamount}</Text>
+                                                        <Text style={styles.RowName}>{Number(this.state.JYamount).toFixed(2)}</Text>
                                                     </View>
                                             }
                                         </View>

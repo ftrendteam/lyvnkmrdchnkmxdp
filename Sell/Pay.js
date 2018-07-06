@@ -677,13 +677,13 @@ export default class Pay extends Component {
             } else {
                 if (item.item.PayCode == "01") {
                     if (this.state.Seles == "R") {
-                        if (this.state.amount > this.state.Total) {
+                        if (this.state.amount > this.state.Total&&this.state.Total!=="") {
                             this.ModalShow()
                         } else {
                             this.RefundTotal()
                         }
                     } else if (this.state.Seles == "T") {
-                        if (this.state.amount > this.state.Total) {
+                        if (this.state.amount > this.state.Total&&this.state.Total!=="") {
                             this.ModalShow()
                         } else {
                             this.Total();

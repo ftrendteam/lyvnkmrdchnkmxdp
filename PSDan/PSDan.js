@@ -26,22 +26,17 @@ export default class PSDan extends Component {
     constructor(props){
         super(props);
         this.state = {
-            invoice:"",
             JiGou:'',
             YHDan:'',
             Disting:'',
             DepName1:"",
             DepCode1:"",
             CKu:"001",
+            invoice:this.props.invoice ? this.props.invoice : "",
         }
     }
 
     componentDidMount(){
-        Storage.get('invoice').then((tags)=>{
-            this.setState({
-                invoice:tags
-            })
-        })
         Storage.get('Disting').then((tags)=>{
             this.setState({
                 Disting:tags
@@ -155,20 +150,20 @@ export default class PSDan extends Component {
                 return;
             }else{
                 if(this.state.YHDan==""){
+                    this.Data();
                     var nextRoute={
                         name:"Index",
                         component:Index,
                     };
                     this.props.navigator.push(nextRoute);
-                    this.Data();
                     Storage.delete("PeiSong");
                 }else{
+                    this.Data();
                     var nextRoute={
                         name:"ShoppingCart",
                         component:ShoppingCart,
                     };
                     this.props.navigator.push(nextRoute);
-                    this.Data();
                     Storage.save('PeiSong',"商品配送");
                 }
             }
@@ -181,20 +176,20 @@ export default class PSDan extends Component {
                 return;
             }else{
                 if(this.state.YHDan==""){
+                    this.Data();
                     var nextRoute={
                         name:"Search",
                         component:Search,
                     };
                     this.props.navigator.push(nextRoute);
-                    this.Data();
                     Storage.delete("PeiSong");
                 }else{
+                    this.Data();
                     var nextRoute={
                         name:"ShoppingCart",
                         component:ShoppingCart,
                     };
                     this.props.navigator.push(nextRoute);
-                    this.Data();
                     Storage.save('PeiSong',"商品配送");
                 }
             }
@@ -218,16 +213,15 @@ export default class PSDan extends Component {
             Storage.save('DepCode', this.state.DepCode1);
         }
         if(this.state.YHDan==""){
+            Storage.delete('DanHao');
             Storage.save('YdCountm',"6");
-        }else{
-            Storage.save('YdCountm',"2");
-        }
-        Storage.save('Date',data);
-        if(this.state.YHDan==""){
             Storage.save('Screen', '2');
         }else{
+            Storage.save('DanHao',"App_Client_ProPSYHDetailQ");
+            Storage.save('YdCountm',"2");
             Storage.save('Screen', '1');
         }
+        Storage.save('Date',data);
         Storage.save('Name','商品配送');
         Storage.save('shildshop',str2);
         Storage.save('OrgFormno',str1);
