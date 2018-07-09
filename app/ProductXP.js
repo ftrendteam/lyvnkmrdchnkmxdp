@@ -173,7 +173,7 @@ export default class ProductXP extends Component {
         Storage.save('FormCheck', 'XPCGYW');//要货查询审核按钮
         Storage.save('valueOf','App_Client_ProXPCG');
         Storage.save('history','App_Client_ProXPCGQ');
-        Storage.save('historyClass','App_Client_ProXPCGDetailQ');
+        Storage.save('historyClass','App_Client_ProXPDetailCGQ');
         Storage.save('ProYH','ProXPCG');
         Storage.save('Date',data);
         Storage.save("scode",str);

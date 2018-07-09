@@ -126,6 +126,7 @@ export default class Index extends Component {
             depcode: this.props.DepCode ? this.props.DepCode : "",//要货单第二分页传入的depcode以及修改数量返回
             dataSource: new ListView.DataSource({rowHasChanged: (row1, row2) => true,}),
             ShopData: new ListView.DataSource({rowHasChanged: (row1, row2) => true,}),
+            saveDepCode:'',
         };
         this.dataRows = [];
         this.productData = [];
@@ -163,6 +164,7 @@ export default class Index extends Component {
                 DeviceEventEmitter.removeAllListeners();
                 this.props.navigator.push(nextRoute);
             } else {
+                DeviceEventEmitter.removeAllListeners();
                 var nextRoute = {
                     name: "主页",
                     component: ShoppingCart
@@ -853,7 +855,7 @@ export default class Index extends Component {
                                         })
                                     } else {
                                         //商品查询
-                                        dbAdapter.selectAidCode("6903583220015", 1).then((rows) => {
+                                        dbAdapter.selectAidCode(reminder, 1).then((rows) => {
                                             if (rows.length == 0) {
                                                 ToastAndroid.show("商品不存在", ToastAndroid.SHORT);
                                                 return;
@@ -867,7 +869,6 @@ export default class Index extends Component {
                                                 this.setState({
                                                     ShopData: this.state.ShopData.cloneWithRows(this.ShopData),
                                                 })
-                                                DeviceEventEmitter.removeAllListeners();
                                                 this._MoreShop();
                                                 return;
                                             }
@@ -1234,6 +1235,15 @@ export default class Index extends Component {
             })
 
         });
+        Storage.get('DepCode').then((depCode)=>{
+            if (depCode==null||depCode=='undefined'){
+                depCode='';
+            }
+            this.setState({
+                saveDepCode: depCode
+            })
+
+        });
     }
 
     //获取左侧商品品类信息、商品总数、触发第一个列表
@@ -1450,7 +1460,7 @@ export default class Index extends Component {
     }
 
     /**
-     * 一品多码listview列表
+     * 一码多品listview列表
      */
     _ShopDataRow(rowData, sectionID, rowID) {
         return (
@@ -1526,7 +1536,7 @@ export default class Index extends Component {
     }
 
     /**
-     *一品多码条目事件
+     *一码多品条目事件
      * @constructor
      */
     onclickShop(rowData) {
@@ -1561,7 +1571,8 @@ export default class Index extends Component {
                         if (this.state.depcode !== rowData.DepCode1) {
                             ToastAndroid.show("请选择该品类下的商品", ToastAndroid.SHORT);
                             return;
-                        } else {
+                        }
+                        else {
                             if (this.state.head == "移动销售") {
                                 var shopnumber = 0;
                                 var shopAmount = 0;
@@ -1729,6 +1740,7 @@ export default class Index extends Component {
                                 })
                                 this._MoreShop();
                             }
+                            DeviceEventEmitter.removeAllListeners();
                         }
                     }
                     else {
@@ -1898,6 +1910,7 @@ export default class Index extends Component {
                                 })
                             })
                         }
+                        DeviceEventEmitter.removeAllListeners();
                         this._MoreShop();
                     }
                 }
@@ -1940,7 +1953,8 @@ export default class Index extends Component {
                         var row = rows.item(i);
                         Storage.delete('ShoppData');//删除 从清单点击商品类表 从修改数量点击回去 回到清单列表
                         if (DepCode !== null) {
-                            if (row.DepCode1 !== this.state.depcode) {
+
+                            if (this.state.saveDepCode!=''&&row.DepCode1 !== this.state.saveDepCode) {
                                 ToastAndroid.show("请选择该品类下的商品", ToastAndroid.SHORT);
                                 return;
                             } else {
@@ -1986,7 +2000,7 @@ export default class Index extends Component {
                                                         FormType: FormType,
                                                     };
                                                     FetchUtil.post(LinkUrl, JSON.stringify(params)).then((data) => {
-                                                        var countm = JSON.stringify(data.countm);
+                                                        var Countm = JSON.stringify(data.countm);
                                                         var ShopPrice = JSON.stringify(data.ShopPrice);
                                                         if (data.retcode == 1) {
                                                             if (this.state.head == "商品查询") {
@@ -2012,7 +2026,7 @@ export default class Index extends Component {
                                                                                 ProdCode: item.item.ProdCode,
                                                                                 DepCode: item.item.DepCode1,
                                                                                 SuppCode: item.item.SuppCode,
-                                                                                ydcountm: countm,
+                                                                                ydcountm: Countm,
                                                                                 BarCode: item.item.BarCode,
                                                                                 IsIntCount: row.IsIntCount
                                                                             }
@@ -2030,7 +2044,7 @@ export default class Index extends Component {
                                                                                 ProdCode: item.item.ProdCode,
                                                                                 DepCode: item.item.DepCode1,
                                                                                 SuppCode: item.item.SuppCode,
-                                                                                ydcountm: countm,
+                                                                                ydcountm: Countm,
                                                                                 BarCode: item.item.BarCode,
                                                                                 IsIntCount: row.IsIntCount
                                                                             }
@@ -2072,7 +2086,7 @@ export default class Index extends Component {
                                                                                         ProdCode: item.item.ProdCode,
                                                                                         DepCode: item.item.DepCode1,
                                                                                         SuppCode: item.item.SuppCode,
-                                                                                        ydcountm: data.ydcountm,
+                                                                                        ydcountm: Countm,
                                                                                         BarCode: item.item.BarCode,
                                                                                         IsIntCount: row.IsIntCount
                                                                                     }
@@ -2093,7 +2107,7 @@ export default class Index extends Component {
                                                                             ProdCode: item.item.ProdCode,
                                                                             DepCode: item.item.DepCode1,
                                                                             SuppCode: item.item.SuppCode,
-                                                                            ydcountm: countm,
+                                                                            ydcountm: Countm,
                                                                             BarCode: item.item.BarCode,
                                                                             IsIntCount: row.IsIntCount
                                                                         }
@@ -2154,7 +2168,7 @@ export default class Index extends Component {
                                                     FormType: FormType,
                                                 };
                                                 FetchUtil.post(LinkUrl, JSON.stringify(params)).then((data) => {
-                                                    var countm = JSON.stringify(data.countm);
+                                                    var Countm = JSON.stringify(data.countm);
                                                     var ShopPrice = JSON.stringify(data.ShopPrice);
                                                     if (data.retcode == 1) {
                                                         if (this.state.head == "商品查询") {
@@ -2180,7 +2194,7 @@ export default class Index extends Component {
                                                                             ProdCode: item.item.ProdCode,
                                                                             DepCode: item.item.DepCode1,
                                                                             SuppCode: item.item.SuppCode,
-                                                                            ydcountm: countm,
+                                                                            ydcountm: Countm,
                                                                             BarCode: item.item.BarCode,
                                                                             IsIntCount: row.IsIntCount
                                                                         }
@@ -2198,7 +2212,7 @@ export default class Index extends Component {
                                                                             ProdCode: item.item.ProdCode,
                                                                             DepCode: item.item.DepCode1,
                                                                             SuppCode: item.item.SuppCode,
-                                                                            ydcountm: countm,
+                                                                            ydcountm: Countm,
                                                                             BarCode: item.item.BarCode,
                                                                             IsIntCount: row.IsIntCount
                                                                         }
@@ -2239,7 +2253,7 @@ export default class Index extends Component {
                                                                                     ProdCode: item.item.ProdCode,
                                                                                     DepCode: item.item.DepCode1,
                                                                                     SuppCode: item.item.SuppCode,
-                                                                                    ydcountm: data.ydcountm,
+                                                                                    ydcountm: Countm,
                                                                                     BarCode: item.item.BarCode,
                                                                                     IsIntCount: row.IsIntCount
                                                                                 }
@@ -2261,7 +2275,7 @@ export default class Index extends Component {
                                                                         ProdCode: item.item.ProdCode,
                                                                         DepCode: item.item.DepCode1,
                                                                         SuppCode: item.item.SuppCode,
-                                                                        ydcountm: countm,
+                                                                        ydcountm: Countm,
                                                                         BarCode: item.item.BarCode,
                                                                         IsIntCount: row.IsIntCount
                                                                     }
@@ -2269,7 +2283,7 @@ export default class Index extends Component {
                                                             }
                                                         }
                                                     } else {
-                                                        // alert(JSON.stringify(data))
+                                                        alert(JSON.stringify(data))
                                                     }
                                                 })
                                             })

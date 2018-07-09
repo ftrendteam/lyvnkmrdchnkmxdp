@@ -112,6 +112,7 @@ export default class Query extends Component {
         Storage.save('OrgFormno',str);
         Storage.save('Date',data);
         Storage.save('Name','商品盘点');
+        Storage.save('FormType','PCYW');
         Storage.save('FormCheck', 'PCYW');//要货查询审核按钮
         Storage.save('valueOf','App_Client_ProPC');
         Storage.save('history','App_Client_ProPCQ');

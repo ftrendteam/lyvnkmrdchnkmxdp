@@ -115,7 +115,6 @@ export default class Distrition_list extends Component {
                     if(DetailInfo==null){
                         return;
                     }else{
-                        alert(JSON.stringify(this.dataRows))
                         this.setState({
                             dataSource:this.state.dataSource.cloneWithRows(this.dataRows)
                         })

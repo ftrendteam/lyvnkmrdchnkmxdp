@@ -106,7 +106,6 @@ export default class ShoppingCart extends Component {
             this._fetch();
             this.Device();
         });
-
     }
 
     _dpSearch() {
@@ -338,7 +337,11 @@ export default class ShoppingCart extends Component {
                     var countm = row.countm;
                     var ProPrice = row.ShopPrice;
                     var promemo = row.promemo;
-                    var ydcountm = row.ydcountm;
+                    if(row.ydcountm==""){
+                        var ydcountm = 0;
+                    }else{
+                        var ydcountm = row.ydcountm;
+                    }
                     var barCode = row.BarCode;
                     var SHopAMount = NumberUtils.numberFormat2(row.ShopAmount);
                     shopAmount += Number(SHopAMount);
@@ -570,6 +573,7 @@ export default class ShoppingCart extends Component {
                                                                         FormType: FormType,
                                                                     };
                                                                     FetchUtil.post(LinkUrl, JSON.stringify(params)).then((data) => {
+                                                                        var Countm=JSON.stringify(data.countm);
                                                                         var ShopPrice = JSON.stringify(data.ShopPrice);
                                                                         if (data.retcode == 1) {
                                                                             if (this.state.Name == "商品查询") {
@@ -595,7 +599,7 @@ export default class ShoppingCart extends Component {
                                                                                                 ProdCode: row.ProdCode,
                                                                                                 DepCode: row.DepCode1,
                                                                                                 SuppCode: row.SuppCode,
-                                                                                                ydcountm: data.countm,
+                                                                                                ydcountm: Countm,
                                                                                                 BarCode: row.BarCode,
                                                                                                 IsIntCount: row.IsIntCount
                                                                                             }
@@ -613,7 +617,7 @@ export default class ShoppingCart extends Component {
                                                                                                 ProdCode: row.ProdCode,
                                                                                                 DepCode: row.DepCode1,
                                                                                                 SuppCode: row.SuppCode,
-                                                                                                ydcountm: data.countm,
+                                                                                                ydcountm: Countm,
                                                                                                 BarCode: row.BarCode,
                                                                                                 IsIntCount: row.IsIntCount
                                                                                             }
@@ -634,7 +638,7 @@ export default class ShoppingCart extends Component {
                                                                                                     ProdCode: row.ProdCode,
                                                                                                     DepCode: row.DepCode1,
                                                                                                     SuppCode: row.SuppCode,
-                                                                                                    ydcountm: "",
+                                                                                                    ydcountm: Countm,
                                                                                                     BarCode: row.BarCode,
                                                                                                     IsIntCount: row.IsIntCount
                                                                                                 }
@@ -675,7 +679,7 @@ export default class ShoppingCart extends Component {
                                                                                             ProdCode: row.ProdCode,
                                                                                             DepCode: row.DepCode1,
                                                                                             SuppCode: row.SuppCode,
-                                                                                            ydcountm: data.countm,
+                                                                                            ydcountm: Countm,
                                                                                             BarCode: row.BarCode,
                                                                                             IsIntCount: row.IsIntCount
                                                                                         }
@@ -706,7 +710,7 @@ export default class ShoppingCart extends Component {
                                                                         ProdCode: row.ProdCode,
                                                                         DepCode: row.DepCode1,
                                                                         SuppCode: row.SuppCode,
-                                                                        ydcountm: "",
+                                                                        ydcountm: Countm,
                                                                         BarCode: row.BarCode,
                                                                         IsIntCount: row.IsIntCount,
                                                                         SaoMa:1,
@@ -730,7 +734,7 @@ export default class ShoppingCart extends Component {
                                                                     FormType: FormType,
                                                                 };
                                                                 FetchUtil.post(LinkUrl, JSON.stringify(params)).then((data) => {
-                                                                    var countm = JSON.stringify(data.countm);
+                                                                    var Countm = JSON.stringify(data.countm);
                                                                     var ShopPrice = JSON.stringify(data.ShopPrice);
                                                                     if (data.retcode == 1) {
                                                                         if (this.state.Name == "商品查询") {
@@ -756,7 +760,7 @@ export default class ShoppingCart extends Component {
                                                                                             ProdCode: row.ProdCode,
                                                                                             DepCode: row.DepCode1,
                                                                                             SuppCode: row.SuppCode,
-                                                                                            ydcountm: data.countm,
+                                                                                            ydcountm: Countm,
                                                                                             BarCode: row.BarCode,
                                                                                             IsIntCount: row.IsIntCount
                                                                                         }
@@ -774,7 +778,7 @@ export default class ShoppingCart extends Component {
                                                                                             ProdCode: row.ProdCode,
                                                                                             DepCode: row.DepCode1,
                                                                                             SuppCode: row.SuppCode,
-                                                                                            ydcountm: data.countm,
+                                                                                            ydcountm: Countm,
                                                                                             BarCode: row.BarCode,
                                                                                             IsIntCount: row.IsIntCount
                                                                                         }
@@ -836,7 +840,7 @@ export default class ShoppingCart extends Component {
                                                                                         ProdCode: row.ProdCode,
                                                                                         DepCode: row.DepCode1,
                                                                                         SuppCode: row.SuppCode,
-                                                                                        ydcountm: data.countm,
+                                                                                        ydcountm: Countm,
                                                                                         BarCode: row.BarCode,
                                                                                         IsIntCount: row.IsIntCount
                                                                                     }
@@ -896,7 +900,7 @@ export default class ShoppingCart extends Component {
                                                                     FormType: FormType,
                                                                 };
                                                                 FetchUtil.post(LinkUrl, JSON.stringify(params)).then((data) => {
-                                                                    var countm = JSON.stringify(data.countm);
+                                                                    var Countm = JSON.stringify(data.countm);
                                                                     var ShopPrice = JSON.stringify(data.ShopPrice);
                                                                     DeviceEventEmitter.removeAllListeners();
                                                                     if (this.state.Name == "移动销售") {
@@ -989,7 +993,7 @@ export default class ShoppingCart extends Component {
                                                                                             ProdCode: row.ProdCode,
                                                                                             DepCode: row.DepCode1,
                                                                                             SuppCode: row.SuppCode,
-                                                                                            ydcountm: data.countm,
+                                                                                            ydcountm: Countm,
                                                                                             BarCode: row.BarCode,
                                                                                             IsIntCount: row.IsIntCount
                                                                                         }
@@ -1021,7 +1025,7 @@ export default class ShoppingCart extends Component {
                                                                 FormType: FormType,
                                                             };
                                                             FetchUtil.post(LinkUrl, JSON.stringify(params)).then((data) => {
-                                                                var countm = JSON.stringify(data.countm);
+                                                                var Countm = JSON.stringify(data.countm);
                                                                 var ShopPrice = JSON.stringify(data.ShopPrice);
                                                                 DeviceEventEmitter.removeAllListeners();
                                                                 if (this.state.Name == "移动销售") {
@@ -1114,7 +1118,7 @@ export default class ShoppingCart extends Component {
                                                                                         ProdCode: row.ProdCode,
                                                                                         DepCode: row.DepCode1,
                                                                                         SuppCode: row.SuppCode,
-                                                                                        ydcountm: data.countm,
+                                                                                        ydcountm: Countm,
                                                                                         BarCode: row.BarCode,
                                                                                         IsIntCount: row.IsIntCount
                                                                                     }
@@ -1149,7 +1153,6 @@ export default class ShoppingCart extends Component {
                                             this.setState({
                                                 ShopData: this.state.ShopData.cloneWithRows(this.ShopData),
                                             })
-                                            DeviceEventEmitter.removeAllListeners();
                                             this._MoreShop();
                                             return;
                                         }
@@ -1178,6 +1181,7 @@ export default class ShoppingCart extends Component {
                                                             FormType: FormType,
                                                         };
                                                         FetchUtil.post(LinkUrl, JSON.stringify(params)).then((data) => {
+                                                            var Countm=JSON.stringify(data.countm);
                                                             var ShopPrice = JSON.stringify(data.ShopPrice);
                                                             if (data.retcode == 1) {
                                                                 DeviceEventEmitter.removeAllListeners();
@@ -1267,7 +1271,7 @@ export default class ShoppingCart extends Component {
                                                                                 ProdCode: row.ProdCode,
                                                                                 DepCode: row.DepCode1,
                                                                                 SuppCode: row.SuppCode,
-                                                                                ydcountm: JSON.stringify(data.countm),
+                                                                                ydcountm: Countm,
                                                                                 BarCode: row.BarCode,
                                                                                 IsIntCount: row.IsIntCount
                                                                             }
@@ -1297,7 +1301,7 @@ export default class ShoppingCart extends Component {
                                                         FormType: FormType,
                                                     };
                                                     FetchUtil.post(LinkUrl, JSON.stringify(params)).then((data) => {
-                                                        var countm = JSON.stringify(data.countm);
+                                                        var Countm = JSON.stringify(data.countm);
                                                         var ShopPrice = JSON.stringify(data.ShopPrice);
                                                         if (data.retcode == 1) {
                                                             DeviceEventEmitter.removeAllListeners();
@@ -1386,7 +1390,7 @@ export default class ShoppingCart extends Component {
                                                                             ProdCode: row.ProdCode,
                                                                             DepCode: row.DepCode1,
                                                                             SuppCode: row.SuppCode,
-                                                                            ydcountm: JSON.stringify(data.countm),
+                                                                            ydcountm: Countm,
                                                                             BarCode: row.BarCode,
                                                                             IsIntCount: row.IsIntCount
                                                                         }
@@ -1504,124 +1508,116 @@ export default class ShoppingCart extends Component {
                 Storage.get('LinkUrl').then((LinkUrl) => {
                     Storage.get('userName').then((userName) => {
                         Storage.get('PeiSong').then((PeiSong) => {
-                            dbAdapter.selectAidCode(rowData.prodcode, 1).then((rowdata) => {
+                            dbAdapter.selectAidCode(rowData.ProdCode, 1).then((rowdata) => {
                                 for (let i = 0; i < rowdata.length; i++) {
                                     var row = rowdata.item(i);
-                                    if (DepCode !== null) {
-                                        if (DepCode !== rowData.DepCode1) {
-                                            ToastAndroid.show("请选择该品类下的商品", ToastAndroid.SHORT);
-                                            return;
+                                }
+                                if (DepCode !== null) {
+                                    if (DepCode !== rowData.DepCode1) {
+                                        ToastAndroid.show("请选择该品类下的商品", ToastAndroid.SHORT);
+                                        return;
+                                    }else{
+                                        if (PeiSong == "商品配送") {
+                                            var SuppCode = "";
                                         } else {
-                                            Storage.save("ShoppData", "清单");
-                                            dbAdapter.selectShopInfoData(rowData.Pid).then((rows) => {
-                                                for (let i = 0; i < rows.length; i++) {
-                                                    var rowdatas = rows.item(i);
-                                                    if (PeiSong == "商品配送") {
-                                                        var SuppCode = "";
-                                                    } else {
-                                                        var SuppCode = rowData.SuppCode;
-                                                    }
-                                                    let params = {
-                                                        reqCode: "App_PosReq",
-                                                        reqDetailCode: "App_Client_CurrProdQry",
-                                                        ClientCode: this.state.ClientCode,
-                                                        sDateTime: "2017-08-09 12:12:12",
-                                                        Sign: NetUtils.MD5("App_PosReq" + "##" + "App_Client_CurrProdQry" + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs") + '',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
-                                                        username: userName,
-                                                        usercode: this.state.Usercode,
-                                                        SuppCode: SuppCode,
-                                                        ShopCode: this.state.ShopCode,
-                                                        ChildShopCode: this.state.ChildShopCode,
-                                                        ProdCode: rowData.prodcode,
-                                                        OrgFormno: this.state.OrgFormno,
-                                                        FormType: FormType,
-                                                    };
-                                                    FetchUtil.post(LinkUrl, JSON.stringify(params)).then((data) => {
-                                                        var ydcountm = JSON.stringify(data.countm);
-                                                        var ShopPrice = JSON.stringify(data.ShopPrice);
-                                                        if (data.retcode == 1) {
-                                                            this.props.navigator.push({
-                                                                component: OrderDetails,
-                                                                params: {
-                                                                    ProdName: rowData.prodname,
-                                                                    ShopPrice: rowData.ProPrice,
-                                                                    countm: rowData.countm,
-                                                                    Pid: row.pid,
-                                                                    ProdCode: rowData.prodcode,
-                                                                    DepCode: rowData.DepCode,
-                                                                    ydcountm: JSON.stringify(row.ydcountm),
-                                                                    SuppCode: row.SuppCode,
-                                                                    BarCode: row.BarCode,
-                                                                    promemo: row.promemo,
-                                                                    IsIntCount: rowdatas.IsIntCount
-                                                                }
-                                                            })
-                                                        } else {
-                                                            alert(JSON.stringify(data))
-                                                        }
-                                                    }, (err) => {
-                                                        alert("网络请求失败");
-                                                    })
-                                                }
-                                            })
+                                            var SuppCode = rowData.SuppCode;
                                         }
-                                    }
-                                    else {
-                                        Storage.save("ShoppData", "清单");
-                                        dbAdapter.selectShopInfoData(rowData.Pid).then((rows) => {
-                                            for (let i = 0; i < rows.length; i++) {
-                                                var rowdatas = rows.item(i);
-                                                if (PeiSong == "商品配送") {
-                                                    var SuppCode = "";
-                                                } else {
-                                                    var SuppCode = rowData.SuppCode;
-                                                }
-                                                let params = {
-                                                    reqCode: "App_PosReq",
-                                                    reqDetailCode: "App_Client_CurrProdQry",
-                                                    ClientCode: this.state.ClientCode,
-                                                    sDateTime: "2017-08-09 12:12:12",
-                                                    Sign: NetUtils.MD5("App_PosReq" + "##" + "App_Client_CurrProdQry" + "##" + "2017-08-09 12:12:12" + "##" + "PosControlCs") + '',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
-                                                    username: userName,
-                                                    usercode: this.state.Usercode,
-                                                    SuppCode: SuppCode,
-                                                    ShopCode: this.state.ShopCode,
-                                                    ChildShopCode: this.state.ChildShopCode,
-                                                    ProdCode: rowData.prodcode,
-                                                    OrgFormno: this.state.OrgFormno,
-                                                    FormType: FormType,
-                                                };
-                                                FetchUtil.post(LinkUrl, JSON.stringify(params)).then((data) => {
-                                                    var ydcountm = JSON.stringify(data.countm);
-                                                    var ShopPrice = JSON.stringify(data.ShopPrice);
-                                                    if (data.retcode == 1) {
-                                                        this.props.navigator.push({
-                                                            component: OrderDetails,
-                                                            params: {
-                                                                ProdName: rowData.prodname,
-                                                                ShopPrice: rowData.ProPrice,
-                                                                countm: rowData.countm,
-                                                                Pid: row.pid,
-                                                                ProdCode: rowData.prodcode,
-                                                                DepCode: rowData.DepCode,
-                                                                ydcountm: JSON.stringify(row.ydcountm),
-                                                                SuppCode: row.SuppCode,
-                                                                BarCode: row.BarCode,
-                                                                promemo: row.promemo,
-                                                                IsIntCount: rowdatas.IsIntCount
-                                                            }
-                                                        })
-                                                    } else {
-                                                        alert(JSON.stringify(data))
+                                        let params = {
+                                            reqCode: "App_PosReq",
+                                            reqDetailCode: "App_Client_CurrProdQry",
+                                            ClientCode: this.state.ClientCode,
+                                            sDateTime: SfullTime,
+                                            Sign: NetUtils.MD5("App_PosReq" + "##" + "App_Client_CurrProdQry" + "##" + SfullTime + "##" + "PosControlCs") + '',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
+                                            username: userName,
+                                            usercode: this.state.Usercode,
+                                            SuppCode: SuppCode,
+                                            ShopCode: this.state.ShopCode,
+                                            ChildShopCode: this.state.ChildShopCode,
+                                            ProdCode: rowData.ProdCode,
+                                            OrgFormno: this.state.OrgFormno,
+                                            FormType: FormType,
+                                        };
+                                        FetchUtil.post(LinkUrl, JSON.stringify(params)).then((data) => {
+                                            var ydcountm = JSON.stringify(data.countm);
+                                            var ShopPrice = JSON.stringify(data.ShopPrice);
+                                            if (data.retcode == 1) {
+                                                Storage.save("ShoppData", "清单");
+                                                DeviceEventEmitter.removeAllListeners();
+                                                this.props.navigator.push({
+                                                    component: OrderDetails,
+                                                    params: {
+                                                        ProdName: row.ProdName,
+                                                        ShopPrice: row.ShopPrice,
+                                                        countm: row.ShopNumber,
+                                                        Pid: row.Pid,
+                                                        ProdCode: row.ProdCode,
+                                                        DepCode: row.DepCode,
+                                                        ydcountm: ydcountm,
+                                                        SuppCode: row.SuppCode,
+                                                        BarCode: row.BarCode,
+                                                        promemo: row.promemo,
+                                                        IsIntCount: row.IsIntCount
                                                     }
-                                                }, (err) => {
-                                                    alert("网络请求失败");
                                                 })
+                                            } else {
+                                                alert(JSON.stringify(data))
                                             }
+                                        }, (err) => {
+                                            alert("网络请求失败");
                                         })
                                     }
-                                    this._MoreShop();
+                                }else{
+                                    if (PeiSong == "商品配送") {
+                                        var SuppCode = "";
+                                    } else {
+                                        var SuppCode = rowData.SuppCode;
+                                    }
+                                    let params = {
+                                        reqCode: "App_PosReq",
+                                        reqDetailCode: "App_Client_CurrProdQry",
+                                        ClientCode: this.state.ClientCode,
+                                        sDateTime: SfullTime,
+                                        Sign: NetUtils.MD5("App_PosReq" + "##" + "App_Client_CurrProdQry" + "##" + SfullTime + "##" + "PosControlCs") + '',//reqCode + "##" + reqDetailCode + "##" + sDateTime + "##" + "PosControlCs"
+                                        username: userName,
+                                        usercode: this.state.Usercode,
+                                        SuppCode: SuppCode,
+                                        ShopCode: this.state.ShopCode,
+                                        ChildShopCode: this.state.ChildShopCode,
+                                        ProdCode: rowData.ProdCode,
+                                        OrgFormno: this.state.OrgFormno,
+                                        FormType: FormType,
+                                    };
+                                    FetchUtil.post(LinkUrl, JSON.stringify(params)).then((data) => {
+                                        var Countm = JSON.stringify(data.countm);
+                                        var ShopPrice = JSON.stringify(data.ShopPrice);
+                                        if (data.retcode == 1) {
+                                            Storage.save("ShoppData", "清单");
+                                            DeviceEventEmitter.removeAllListeners();
+                                            this.props.navigator.push({
+                                                component: OrderDetails,
+                                                params: {
+                                                    ProdName: row.ProdName,
+                                                    ShopPrice: row.ShopPrice,
+                                                    countm: row.ShopNumber,
+                                                    Pid: row.Pid,
+                                                    ProdCode: row.ProdCode,
+                                                    DepCode: row.DepCode,
+                                                    ydcountm: Countm,
+                                                    SuppCode: row.SuppCode,
+                                                    BarCode: row.BarCode,
+                                                    promemo: row.promemo,
+                                                    IsIntCount: row.IsIntCount
+                                                }
+                                            })
+                                        } else {
+                                            alert(JSON.stringify(data))
+                                        }
+                                    }, (err) => {
+                                        alert("网络请求失败");
+                                    })
                                 }
+                                this._MoreShop();
+
                             })
                         })
                     })
@@ -1696,6 +1692,7 @@ export default class ShoppingCart extends Component {
             if (tags == "移动销售" || tags == "标签采集") {
                 ToastAndroid.show('暂不支持该业务', ToastAndroid.SHORT)
             } else {
+                DeviceEventEmitter.removeAllListeners();
                 var nextRoute = {
                     name: "主页",
                     component: HistoricalDocument
@@ -1706,6 +1703,7 @@ export default class ShoppingCart extends Component {
     }
 
     Shop() {
+        DeviceEventEmitter.removeAllListeners();
         var nextRoute = {
             name: "主页",
             component: Index
@@ -1772,7 +1770,7 @@ export default class ShoppingCart extends Component {
                                                     Pid: row.pid,
                                                     ProdCode: rowData.prodcode,
                                                     DepCode: rowData.DepCode,
-                                                    ydcountm: JSON.stringify(row.ydcountm),
+                                                    ydcountm: ydcountm,
                                                     SuppCode: row.SuppCode,
                                                     BarCode: row.BarCode,
                                                     promemo: row.promemo,
@@ -1862,11 +1860,13 @@ export default class ShoppingCart extends Component {
                     Storage.get('scode').then((scode) => {
                         Storage.get('CKu').then((CKu) => {
                             Storage.get('DepCode').then((DepCode) => {
-                                if (DepCode == null||CKu==null) {
-                                    var depcode = 0;
-                                    var CKu=""
+                                if (DepCode == null) {
+                                    depcode = 0;
                                 } else {
                                     var depcode = DepCode;
+                                }
+                                if(CKu==null){
+                                    CKu=""
                                 }
                                 let params = {
                                     reqCode: "App_PosReq",
@@ -1965,6 +1965,7 @@ export default class ShoppingCart extends Component {
         if (this.ds == 0) {
             alert("请添加商品")
         } else {
+            this.Wait();
             Storage.get('code').then((tags) => {
                 let params = {
                     ClientCode: this.state.ClientCode,
@@ -2013,10 +2014,13 @@ export default class ShoppingCart extends Component {
                                     this.setState({
                                         SUbmit: '',
                                     })
+                                    this.Wait();
                                 } else {
+                                    this.Wait();
                                     alert(data.msg)
                                 }
                             }, (err) => {
+                                this.Wait();
                                 alert("网络请求失败");
                             })
                         })

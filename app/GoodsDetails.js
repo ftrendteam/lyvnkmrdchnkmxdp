@@ -78,6 +78,7 @@ export default class GoodsDetails extends Component {
 
         //reqDetailCode
         Storage.get('historyClass').then((tags) => {
+
             this.setState({
                 reqDetailCode: tags
             });
@@ -161,6 +162,7 @@ export default class GoodsDetails extends Component {
                         alert(JSON.stringify(data))
                     }
                 }, (err) => {
+                    console.log(err)
                     alert("网络请求失败");
                 })
             });
@@ -366,7 +368,7 @@ export default class GoodsDetails extends Component {
                                                     :
                                                     <View style={[styles.ListLeft, {marginRight: 10, backgroundColor: "#fffbe7"}]}>
                                                         {
-                                                            (this.state.reqDetailCode == "App_Client_ProCGDetailQ" || this.state.reqDetailCode == "App_Client_ProYSDetailQ" || this.state.reqDetailCode == "App_Client_ProXPDetailCGQ" || this.state.reqDetailCode == "App_Client_ProXPDetailYSQ") ?
+                                                            (this.state.name=="协配采购"||this.state.name=="协配收货"||this.state.reqDetailCode == "App_Client_ProCGDetailQ" || this.state.reqDetailCode == "App_Client_ProYSDetailQ" || this.state.reqDetailCode == "App_Client_ProXPDetailCGQ" || this.state.reqDetailCode == "App_Client_ProXPDetailYSQ") ?
                                                                 <Text style={styles.ListText}>供应商：</Text>
                                                                 :
                                                                 <Text style={styles.ListText}>仓库：</Text>

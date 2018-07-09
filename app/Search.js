@@ -1155,6 +1155,9 @@ export default class Search extends Component {
         })
 
         Storage.get('OrgFormno').then((tags) => {
+            if(tags==null||tags=='undefined'){
+                tags='';
+            }
             this.setState({
                 OrgFormno: tags
             })
@@ -1513,7 +1516,7 @@ export default class Search extends Component {
                                         }
                                         this.Modal();
                                     } else {
-                                        // alert(JSON.stringify(data))
+                                        alert(JSON.stringify(data))
                                     }
                                 }, (err) => {
                                     alert("网络请求失败");
@@ -1542,8 +1545,8 @@ export default class Search extends Component {
     }
 
     onNumber() {
-        if (this.state.name=="商品配送" && this.state.ydcountm == 0) {
-            alert("库存为0，该商品不能进行配送")
+        if (this.state.name=="商品配送" && this.state.ydcountm == 0&&this.state.OrgFormno!='') {
+            alert("原始单据不包括该商品")
         } else {
             if (this.state.Number1 < 0) {
                 if (this.state.name == "商品损溢" || this.state.name == "商品盘点" || this.state.name == "移动销售") {
@@ -1986,8 +1989,8 @@ export default class Search extends Component {
         if (this.state.Number1 == "") {
             ToastAndroid.show('商品数量不能为空', ToastAndroid.SHORT);
         } else {
-            if (this.state.name=="商品配送" && this.state.ydcountm == 0) {
-                alert("库存为0，该商品不能进行配送")
+            if (this.state.name=="商品配送" && this.state.ydcountm == 0&&this.state.OrgFormno!="") {
+                alert("原始单据不包括该商品")
             } else {
                 if (this.state.Number1 < 0) {
                     if (this.state.name == "商品损溢" || this.state.name == "商品盘点" || this.state.name == "移动销售") {
@@ -2307,8 +2310,8 @@ export default class Search extends Component {
     }
 
     pressPop() {
-        if (this.state.name=="商品配送" && this.state.ydcountm == 0) {
-            alert("库存为0，该商品不能进行配送")
+        if (this.state.name=="商品配送" && this.state.ydcountm == 0&&this.state.OrgFormno!="") {
+            alert("原始单据不包括该商品")
         } else {
             if (this.state.Number1 == "") {
                 ToastAndroid.show('商品数量不能为空', ToastAndroid.SHORT);

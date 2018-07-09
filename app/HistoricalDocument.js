@@ -256,6 +256,7 @@ export default class HistoricalDocument extends Component {
                                 FormType: FormCheck,
 
                             };
+                            console.log(JSON.stringify(params))
                             FetchUtils.post(LinkUrl, JSON.stringify(params)).then((data) => {
                                 this.DataShop = [];
                                 this._setModalVisible();
