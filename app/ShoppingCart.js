@@ -186,8 +186,6 @@ export default class ShoppingCart extends Component {
                                                         ChildShopCode: ChildShopCode,
                                                         OrgFormno: OrgFormno,
                                                     };
-                                                    console.log(JSON.stringify(params))
-                                                    console.log(LinkUrl)
                                                     FetchUtil.post(LinkUrl, JSON.stringify(params)).then((data) => {
                                                         var DetailInfos = data.DetailInfo;
                                                         if (data.retcode == 1) {
@@ -464,12 +462,12 @@ export default class ShoppingCart extends Component {
         dbAdapter.selectShopInfoAllCountm().then((rows) => {
             var ShopCar = rows.item(0).countm;
             this.setState({
-                shopcar: ShopCar
+                shopcar: ShopCar.toFixed(2)
             });
         });
     }
 
-    //扫描商品
+    //扫描商品console.log("params==",JSON.stringify(params))
     Code() {
         RNScannerAndroid.openScanner();
     }
@@ -1790,7 +1788,6 @@ export default class ShoppingCart extends Component {
                 })
             })
         })
-
     }
 
     pressPop() {

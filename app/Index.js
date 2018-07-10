@@ -271,6 +271,7 @@ export default class Index extends Component {
                                                                                 SaoMa: 1,
                                                                             }
                                                                         })
+                                                                        DeviceEventEmitter.removeAllListeners();
                                                                     } else {
                                                                         let params = {
                                                                             reqCode: "App_PosReq",
@@ -402,6 +403,7 @@ export default class Index extends Component {
                                                                                         })
                                                                                     }
                                                                                 }
+                                                                                DeviceEventEmitter.removeAllListeners();
                                                                             } else {
                                                                                 alert(JSON.stringify(data))
                                                                             }
@@ -432,9 +434,6 @@ export default class Index extends Component {
                                                                         }
                                                                     })
                                                                     DeviceEventEmitter.removeAllListeners();
-                                                                    this.setState({
-                                                                        OrderDetails: '',
-                                                                    })
                                                                 } else {
                                                                     let params = {
                                                                         reqCode: "App_PosReq",
@@ -565,6 +564,7 @@ export default class Index extends Component {
                                                                                     })
                                                                                 }
                                                                             }
+                                                                            DeviceEventEmitter.removeAllListeners();
                                                                         } else {
                                                                             alert(JSON.stringify(data))
                                                                         }
@@ -572,11 +572,10 @@ export default class Index extends Component {
                                                                 }
                                                             }
                                                         })
-                                                        DeviceEventEmitter.removeAllListeners();
                                                     }
                                                 })
                                             }
-                                        });
+                                        })
                                     }
                                     else if ((reminder.length == 13 && deCode13.deCodePreFlag(reminder))) {//13位条码解析
                                         new Promise.all([deCode13.deCodeProdCode(reminder, dbAdapter), deCode13.deCodeTotile(reminder, dbAdapter)]).then((result) => {
@@ -721,6 +720,7 @@ export default class Index extends Component {
                                                                                 alert(JSON.stringify(data))
                                                                             }
                                                                         }
+                                                                        DeviceEventEmitter.removeAllListeners();
                                                                     })
                                                                 }
                                                             }
@@ -845,15 +845,16 @@ export default class Index extends Component {
                                                                             alert(JSON.stringify(data))
                                                                         }
                                                                     }
+                                                                    DeviceEventEmitter.removeAllListeners();
                                                                 })
                                                             }
                                                         })
                                                     }
-                                                    DeviceEventEmitter.removeAllListeners();
                                                 })
                                             }
                                         })
-                                    } else {
+                                    }
+                                    else {
                                         //商品查询
                                         dbAdapter.selectAidCode(reminder, 1).then((rows) => {
                                             if (rows.length == 0) {
@@ -897,6 +898,7 @@ export default class Index extends Component {
                                                                 FormType: FormType,
                                                             };
                                                             FetchUtil.post(LinkUrl, JSON.stringify(params)).then((data) => {
+                                                                DeviceEventEmitter.removeAllListeners();
                                                                 var countm = JSON.stringify(data.countm);
                                                                 var ShopPrice = JSON.stringify(data.ShopPrice);
                                                                 if (data.retcode == 1) {
@@ -1015,6 +1017,7 @@ export default class Index extends Component {
                                                             FormType: FormType,
                                                         };
                                                         FetchUtil.post(LinkUrl, JSON.stringify(params)).then((data) => {
+                                                            DeviceEventEmitter.removeAllListeners();
                                                             var countm = JSON.stringify(data.countm);
                                                             var ShopPrice = JSON.stringify(data.ShopPrice);
                                                             if (data.retcode == 1) {
@@ -1116,7 +1119,6 @@ export default class Index extends Component {
                                                         })
                                                     }
                                                 }
-                                                DeviceEventEmitter.removeAllListeners();
                                             }
                                         })
                                     }
@@ -1153,6 +1155,7 @@ export default class Index extends Component {
 
     //页面执行方法
     componentDidMount() {
+
         Storage.save("num", "1");
         Storage.delete("ShoppData");
         InteractionManager.runAfterInteractions(() => {
@@ -1181,7 +1184,6 @@ export default class Index extends Component {
                     });
                 }
             })
-
         });
     }
 
@@ -1331,14 +1333,13 @@ export default class Index extends Component {
             } else {
                 for (let i = 0; i < rows.length; i++) {
                     var row = rows.item(i);
-                }
-                ;
+                };
             }
         });
         dbAdapter.selectShopInfoAllCountm().then((rows) => {
             let ShopCar = rows.item(0).countm;
             this.setState({
-                shopcar: ShopCar,
+                shopcar: ShopCar.toFixed(2),
             });
         });
     }

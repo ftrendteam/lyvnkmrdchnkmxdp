@@ -212,7 +212,7 @@ export default class HistoricalDocument extends Component {
         dbAdapter.selectShopInfoAllCountm().then((rows) => {
             var ShopCar = rows.item(0).countm;
             this.setState({
-                shopcar: ShopCar
+                shopcar: ShopCar.toFixed(2),
             });
         });
     }

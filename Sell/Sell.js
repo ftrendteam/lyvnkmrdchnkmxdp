@@ -998,7 +998,7 @@ export default class Sell extends Component {
                         <View style={styles.Cont}>
                             <View style={styles.BouncesTitle}>
                                 <Text style={[styles.TitleText, {fontSize: 18}]}>商品列表</Text>
-                                <TouchableOpacity style={styles.closeImage}>
+                                <TouchableOpacity onPress={this.CloseShopList.bind(this)} style={styles.closeImage}>
                                     <Image source={require("../images/2_02.png")}></Image>
                                 </TouchableOpacity>
                             </View>
