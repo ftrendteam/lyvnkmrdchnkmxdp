@@ -982,6 +982,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
                 "(select a.depcode1  ,ifNull(b.countm,0) as ShopNumber from tdepset a left join (select depcode,sum(countm) " +
                 " as countm from shopInfo group by depcode) b on a.depcode=b.depcode where IsDel=0 ) a join tdepset b on " +
                 "a.depcode1=b.depcode and b.isdel='0' where b.DepLevel='1' group by a.depcode1) a join tdepset b on a.depcode12=b.depcode and b.isdel='0'";
+                
                 tx.executeSql(sql, [], (tx, results) => {
                     resolve(results.rows);
                 });
@@ -1165,9 +1166,8 @@ export default class DBAdapter extends SQLiteOpenHelper {
                     ",ifNull(b.promemo,'') as ShopRemark,c.depcode" + DepLevel + " as DepCode1 " +
                     " from product a left join shopInfo b on a.Pid=b.Pid  ";
                 ssql = ssql + " left join  tdepset c on c.IsDel='0' and a.depcode=c.depcode where a.IsDel='0' and prodtype<>'1'";
-                ssql = ssql + " and (a.prodcode= '" + aidCode + "'  or a.barcode = '" + aidCode + "')";
+                ssql = ssql + " and (a.prodcode= '" + aidCode + "'  or a.barcode = '" + aidCode + "' or boxcode='"+aidCode+"')";
                 ssql=ssql+" limit 20 ";
-
                 tx.executeSql(ssql, [], (tx, results) => {
 
                     if(results.rows.length==0){
@@ -1175,7 +1175,6 @@ export default class DBAdapter extends SQLiteOpenHelper {
                             ",ifNull(b.promemo,'') as ShopRemark,c.depcode" + DepLevel + " as DepCode1 " +
                             " from product a join mBarCode d on a.prodcode=d.prodcode left join shopInfo b  on a.Pid=b.Pid  ";
                         sql3 = sql3 + " left join  tdepset c on c.IsDel='0' and a.depcode=c.depcode where a.IsDel='0' and prodtype<>'1'";
-                        //sql = sql + "  and (a.prodname like '%" + aidCode + "%' or a.aidcode like '%" + aidCode + "%' or a.prodcode like '%" + aidCode + "%' or a.barcode like '%" + aidCode + "%')";
                         sql3 =sql3+" and( d.barcode='"+aidCode+"')"
                         sql3=sql3+" limit 20 ";
                         tx.executeSql(sql3, [], (tx, result3) => {
@@ -1186,7 +1185,6 @@ export default class DBAdapter extends SQLiteOpenHelper {
                                 sql = sql + " left join  tdepset c on c.IsDel='0' and a.depcode=c.depcode where a.IsDel='0' and prodtype<>'1'";
                                 sql = sql + "  and (a.prodname like '%" + aidCode + "%' or a.aidcode like '%" + aidCode + "%' or a.prodcode like '%" + aidCode + "%' or a.barcode like '%" + aidCode + "%')";
                                 sql=sql+" limit 20 ";
-
                                 tx.executeSql(sql, [], (tx, result) => {
                                     resolve(result.rows);
                                 });
@@ -1213,7 +1211,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
     this.deleteData('mBarCode');
     db.transaction((tx) => {
       //
-      console.log(mBarCodeData.length)
+      
       for (let i = 0; i < mBarCodeData.length; i++) {
         try {
           let mBarCode = mBarCodeData[i];
@@ -1222,16 +1220,16 @@ export default class DBAdapter extends SQLiteOpenHelper {
           let prodname = mBarCode.prodname;
           let barcode = mBarCode.barcode;
           let spec = mBarCode.spec;
-          console.log("prodname=",prodname)
+         
           let sql = "insert into mBarCode(prodcode,barcode,EditDate,prodname,spec) values(?,?,?,?,?)";
         tx.executeSql(sql, [prodcode, barcode, EditDate, prodname, spec], () => {
           
           }, (err) => {
-            console.log("err=222==", err);
+          
           }
         );
       } catch (err) {
-        console.log("nige sb=",err);
+      
       }
       
       }
