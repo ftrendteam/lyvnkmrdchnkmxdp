@@ -420,7 +420,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
                       console.log(err);
                     });
   
-                    sql = "update shopInfo set ShopPrice=round(prototal/ShopNumber,2) where pid=?";
+                    sql = "update shopInfo set ShopPrice=round(prototal/countm,2) where pid=?";
                     tx.executeSql(sql, [Pid], () => {
                       resolve(true);
                     }, (err) => {
@@ -437,8 +437,7 @@ export default class DBAdapter extends SQLiteOpenHelper {
                         console.log(err);
                       }
                     );
-                  }
-                  else {
+                  } else {
                      sql = " replace INTO shopInfo(pid,ProdCode,prodname,countm,ShopPrice,prototal,promemo,DepCode,ydcountm,SuppCode,BarCode)" +
                       "values(?,?,?,?,?,?,?,?,?,?,?)";
                     tx.executeSql(sql, [Pid, ProdCode, shopName, ShopNumber, ShopPrice, ShopAmount, ShopRemark, DepCode, ydcountm, suppCode, BarCode], () => {
@@ -1090,6 +1089,21 @@ export default class DBAdapter extends SQLiteOpenHelper {
     });
   }
   
+  /***
+   * 顾客数
+   */
+  selectGK(startTime,endTime){
+    return new Promise((resolve, reject)=>{
+      db.transaction((tx)=>{
+        let sql="select * from Sum where TradeFlag !='C' and TradeFlag !='D' and ino= '1' and sDateTime>='"+startTime+"' and sDateTime <='"+endTime+"'";
+        tx.executeSql(sql,[],(tx,results)=>{
+          resolve(results.rows);
+        })
+      },(error)=>{
+        this._errorCB('transaction', error);
+      });
+    });
+  }
   /***
    * 单品报表查询
    * @param startTime
