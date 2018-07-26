@@ -8,13 +8,14 @@ import com.vanstone.trans.api.SystemApi;
 import com.vanstone.utils.CommonConvert;
 import com.vanstone.trans.api.constants.GlobalConstants;
 public class PrintModel{
-  //  private A90Print a90Print;
+
     private String deviceModel;
     private SumPrint sumPrint;
+    private Context context;
+
     static{
         if("A90".equals(SystemUtils.getDeviceModel())){
             System.load("data/data/com.smartpos.hspos/lib-main/libA90JavahCore.so");
-          // System.loadLibrary("A90JavahCore");
         }
     }
     public void init(Context context){
@@ -25,14 +26,17 @@ public class PrintModel{
                                         .StringToBytes(GlobalConstants.CurAppDir
                                                 + "/" + "\0"), context);
         }else if("P1".equals(deviceModel)||"P1N".equals(deviceModel)||"P1_4G".equals(deviceModel)){
-                     sumPrint= SumPrint.getInstance(context);
+            sumPrint= SumPrint.getInstance(context);
+
         }
     }
+
     public void initPrint(){
         if("A90".equals(deviceModel)){
                 A90Print.initSet();
         }
     }
+
     public void print(String strPrint){
         if("A90".equals(deviceModel)){
             A90Print.print(strPrint);
@@ -45,7 +49,7 @@ public class PrintModel{
         if("A90".equals(deviceModel)){
             A90Print.setFontSize(Ascii, CFont, Zoom);//设置字体
         }else if("P1".equals(deviceModel)||"P1N".equals(deviceModel)||"P1_4G".equals(deviceModel)){
-                      sumPrint.setFontSize(Ascii,CFont);
+            sumPrint.setFontSize(Ascii);
         }
     }
 
@@ -54,4 +58,6 @@ public class PrintModel{
             A90Print.startPrint();
         }
     }
+
+
 }

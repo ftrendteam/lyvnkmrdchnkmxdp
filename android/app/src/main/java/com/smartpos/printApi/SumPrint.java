@@ -1,5 +1,4 @@
 package com.smartpos.printApi;
-
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -7,9 +6,6 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.text.TextUtils;
-
-
-
 import java.util.Date;
 import java.util.List;
 
@@ -75,10 +71,10 @@ public class SumPrint{
     }
 
 
-    public void setFontSize(int size,int model) {
+    public void setFontSize(int size) {
         try {
             woyouService.setFontSize(size, callback);//字体大小 35
-            woyouService.setAlignment(model, callback);//居中 1
+
            // woyouService.printText(shopName + "\n", callback);
             //woyouService.setFontSize(28, callback);//28
             //woyouService.setAlignment(0, callback);//居左 0

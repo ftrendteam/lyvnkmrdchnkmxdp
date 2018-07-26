@@ -13,7 +13,7 @@ public class JSReader extends ReactContextBaseJavaModule{
     private ReaderCardModel readerModer;
     public JSReader(ReactApplicationContext  context) {
         super(context);
-        readerModer =new ReaderCardModel();
+        readerModer =new ReaderCardModel(context);
 
     }
 
@@ -29,7 +29,8 @@ public class JSReader extends ReactContextBaseJavaModule{
 
     @ReactMethod
     public void read(String key,Callback successCallback){
-        successCallback.invoke(readerModer.read(key));
+        //successCallback.invoke(readerModer.read(key,successCallback));
+        readerModer.read(key,successCallback);
     }
 
     @ReactMethod
